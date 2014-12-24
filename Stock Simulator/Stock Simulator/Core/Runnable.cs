@@ -11,14 +11,16 @@ namespace StockSimulator.Core
 		/// <summary>
 		/// List of dependent runnables that need to be run before this one.
 		/// </summary>
-		private List<Runnable> _dependents;
+		public virtual string[] DependentNames
+		{
+			get { return new string[0]; }
+		}
 
 		/// <summary>
 		/// Constructor for the runnable.
 		/// </summary>
 		public Runnable() : base()
 		{
-			_dependents = new List<Runnable>();
 		}
 
 		/// <summary>
@@ -27,7 +29,6 @@ namespace StockSimulator.Core
 		/// </summary>
 		public void Add(Runnable newDependent)
 		{
-			_dependents.Add(newDependent);
 		}
 
 		/// <summary>

@@ -3,36 +3,53 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using StockSimulator.Core;
 
-namespace StockSimulator.Strategies
+namespace StockSimulator.Core
 {
 	/// <summary>
 	/// The main strategy that will buy the best deemed stocks each day as long as we have money
 	/// </summary>
-	class Main : Strategy
+	class MainStrategy
 	{
+		/// <summary>
+		/// The list of all the instruments to be simulated to find the best
+		/// stocks to buy on a particular day.
+		/// </summary>
+		private BestOfTask[] _simulatedInstruments;
+
 		/// <summary>
 		/// Initializes all the symbols that we are going to consider when buying.
 		/// </summary>
-		public override void Initialize()
+		public void Initialize()
 		{
-			base.Initialize();
-
 			// Load the config file with the instument list for all the symbols that we 
 			// want to test.
+			// TODO: for now just hard code it.
+			string[] instruments =
+			{
+				"AAPL",
+				"AMD"
+			};
 
-			// Add all the symbols as dependent strategies using the bestofsubstrategies 
+			// Add all the symbols as dependent strategies using the bestofsubstrategies
+			_simulatedInstruments = new BestOfTask[instruments.Length];
+			for (int i = 0; i < instruments.Length; i++)
+			{
+				_simulatedInstruments[i] = new BestOfTask(instruments[i]);
+			}
 
-
+			// Run all to start with so we have the data to simulate with.
+			for (int i = 0; i < _simulatedInstruments.Length; i++)
+			{
+				_simulatedInstruments[i].RunAll();
+			}
 		}
 
 		/// <summary>
 		/// Called on each bar update. Will determine which stocks we should buy.
 		/// </summary>
-		public override void OnBarUpdate()
+		public void OnBarUpdate()
 		{
-			base.OnBarUpdate();
 
 			// Update the broker to sell any shares that need a sellin'
 

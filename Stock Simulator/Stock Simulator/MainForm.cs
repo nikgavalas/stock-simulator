@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+using StockSimulator.Core;
+
 namespace StockSimulator
 {
 	public partial class MainForm : Form
@@ -15,6 +17,11 @@ namespace StockSimulator
 		public MainForm()
 		{
 			InitializeComponent();
+		}
+
+		private void btnRun_Click(object sender, EventArgs e)
+		{
+			Program.Sim.Initialize();
 		}
 	}
 }

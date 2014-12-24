@@ -8,9 +8,9 @@ using StockSimulator.Core;
 
 namespace StockSimulator.Strategies
 {
-	class BestOfSubStrategies : Strategy
+	class MacdStrategy : Strategy
 	{
-		public BestOfSubStrategies() : base()
+		public MacdStrategy() : base()
 		{
 
 		}
@@ -23,9 +23,7 @@ namespace StockSimulator.Strategies
 			get
 			{
 				string[] deps = {
-					"MacdStrategy",
-					"RsiStrategy",
-					"SmaStrategy"
+					"Macd"
 				};
 
 				return deps;
@@ -35,7 +33,7 @@ namespace StockSimulator.Strategies
 		public override void Run()
 		{
 			base.Run();
-			Debug.WriteLine("BestOfSubStrategies::Run()");
+			Debug.WriteLine("MacdStrategy::Run()");
 		}
 	}
 }
