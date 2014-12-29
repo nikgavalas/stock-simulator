@@ -1,8 +1,8 @@
 obj/
-"Stock Simulator"/"Stock Simulator"/bin/
 *.exe
 *.pdb
 *.exe.manifest
+*.exe.config
 *.suo
 
 # Windows image file caches
@@ -48,6 +48,3 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
-
-Stock Simulator/Stock Simulator/bin/Debug/Stock Simulator.exe
-Stock Simulator/Stock Simulator/bin/**
