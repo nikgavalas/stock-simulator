@@ -16,30 +16,29 @@ namespace StockSimulator.Core
 	/// </summary>
 	public class TickerDataStore
 	{
-		SortedDictionary<string, TickerData> _symbolsInMemory;
+		SortedDictionary<int, TickerData> _symbolsInMemory;
 
 		/// <summary>
 		/// Constructor
 		/// </summary>
 		public TickerDataStore()
 		{
-			_symbolsInMemory = new SortedDictionary<string, TickerData>();
+			_symbolsInMemory = new SortedDictionary<int, TickerData>();
 		}
 
 		/// <summary>
 		/// Gets the symbol data from either memory, disk, or a server.
 		/// </summary>
-		/// <param name="exchange">Exchange for the ticker code</param>
 		/// <param name="ticker">Ticker to get data for</param>
 		/// <param name="start">Start date for the data</param>
 		/// <param name="end">End date for the data</param>
 		/// <returns>Data (price, volume, etc) for the ticker</returns>
-		public TickerData GetTickerData(string exchange, string ticker, DateTime start, DateTime end)
+		public TickerData GetTickerData(TickerExchangePair ticker, DateTime start, DateTime end)
 		{
 			TickerData data = new TickerData();
 
 			// The symbol exists in memory already.
-			string key = GetDictionaryKey(exchange, ticker);
+			int key = ticker.GetHashCode();
 			if (_symbolsInMemory.ContainsKey(key))
 			{
 				data = _symbolsInMemory[key];
@@ -48,14 +47,14 @@ namespace StockSimulator.Core
 				// If it doesn't then we have to get some more data.
 				if (data.Start > start || data.End < end)
 				{
-					data = GetDataFromDiskOrServer(exchange, ticker, start, end);
+					data = GetDataFromDiskOrServer(ticker, start, end);
 				}
 
 			}
 			// Symbol isn't in memory so we need to load from the disk or the server.
 			else
 			{
-				data = GetDataFromDiskOrServer(exchange, ticker, start, end);
+				data = GetDataFromDiskOrServer(ticker, start, end);
 			}
 			return data;
 		}
@@ -64,14 +63,13 @@ namespace StockSimulator.Core
 		/// Tries to get the data from the disk first. If all the data isn't on disk
 		/// then request it from the server.
 		/// </summary>
-		/// <param name="exchange">Exchange for the ticker code</param>
 		/// <param name="ticker">Ticker to get data for</param>
 		/// <param name="start">Start date for the data</param>
 		/// <param name="end">End date for the data</param>
 		/// <returns>Data (price, volume, etc) for the ticker</returns>
-		private TickerData GetDataFromDiskOrServer(string exchange, string ticker, DateTime start, DateTime end)
+		private TickerData GetDataFromDiskOrServer(TickerExchangePair ticker, DateTime start, DateTime end)
 		{
-			TickerData data = GetDataFromDisk(exchange, ticker, start, end);
+			TickerData data = GetDataFromDisk(ticker, start, end);
 
 			// Check if the data from the disk is in the range. If it's
 			// not then we need to get data from the server so we have it.
@@ -79,8 +77,8 @@ namespace StockSimulator.Core
 			{
 				try
 				{
-					data = GetDataFromServer(exchange, ticker, start, end);
-					AppendNewData(exchange, ticker, data);
+					data = GetDataFromServer(ticker, start, end);
+					AppendNewData(ticker, data);
 
 					// TODO: Save this new data to the disk so we don't have to query
 					// the internet as much.
@@ -92,7 +90,7 @@ namespace StockSimulator.Core
 			}
 			else
 			{
-				AppendNewData(exchange, ticker, data);
+				AppendNewData(ticker, data);
 			}
 
 			return data;
@@ -102,12 +100,11 @@ namespace StockSimulator.Core
 		/// Appends the new data to the data in memory. Or if the data isn't in memory yet,
 		/// it will add it to memory.
 		/// </summary>
-		/// <param name="exchange">Exchange for the ticker code</param>
 		/// <param name="ticker">Ticker to get data for</param>
 		/// <param name="newData">Data to append</param>
-		private void AppendNewData(string exchange, string ticker, TickerData newData)
+		private void AppendNewData(TickerExchangePair ticker, TickerData newData)
 		{
-			string key = GetDictionaryKey(exchange, ticker);
+			int key = ticker.GetHashCode();
 			if (_symbolsInMemory.ContainsKey(key))
 			{
 				TickerData existingData = _symbolsInMemory[key];
@@ -119,12 +116,12 @@ namespace StockSimulator.Core
 				// exists, we don't have to worry about their being any gaps in that data.
 				if (newData.End < existingData.Start)
 				{
-					TickerData stitch = GetDataFromServer(exchange, ticker, newData.End, existingData.Start);
+					TickerData stitch = GetDataFromServer(ticker, newData.End, existingData.Start);
 					existingData.AppendData(stitch);
 				}
 				if (newData.Start > existingData.End)
 				{
-					TickerData stitch = GetDataFromServer(exchange, ticker, existingData.End, newData.Start);
+					TickerData stitch = GetDataFromServer(ticker, existingData.End, newData.Start);
 					existingData.AppendData(stitch);
 				}
 
@@ -137,27 +134,15 @@ namespace StockSimulator.Core
 		}
 
 		/// <summary>
-		/// Returns a string used to index the tickers in memory.
-		/// </summary>
-		/// <param name="exchange">Exchange for the ticker code</param>
-		/// <param name="ticker">Ticker to get data for</param>
-		/// <returns>String for indexing the ticker dictionary</returns>
-		private string GetDictionaryKey(string exchange, string ticker)
-		{
-			return exchange + ticker;
-		}
-
-		/// <summary>
 		/// Gets the data from the disk for the symbol dates requested. If it doesn't exist
 		/// on disk, then we'll have to get it from the internet and then save it on disk
 		/// for later use.
 		/// </summary>
-		/// <param name="exchange">Exchange for the ticker code</param>
 		/// <param name="ticker">Ticker to get data for</param>
 		/// <param name="start">Start date for the data</param>
 		/// <param name="end">End date for the data</param>
 		/// <returns>Data (price, volume, etc) for the ticker</returns>
-		private TickerData GetDataFromDisk(string exchange, string ticker, DateTime start, DateTime end)
+		private TickerData GetDataFromDisk(TickerExchangePair ticker, DateTime start, DateTime end)
 		{
 			// If the file doesn't exist then we for sure have to pull it from the internet.
 			// If file != exist
@@ -178,11 +163,11 @@ namespace StockSimulator.Core
 		/// <param name="start">Start date for the data</param>
 		/// <param name="end">End date for the data</param>
 		/// <returns>Data (price, volume, etc) for the ticker</returns>
-		private TickerData GetDataFromServer(string exchange, string ticker, DateTime start, DateTime end)
+		private TickerData GetDataFromServer(TickerExchangePair ticker, DateTime start, DateTime end)
 		{
 			string downloadedData;
 
-			DownloadURIBuilder uriBuilder = new DownloadURIBuilder(exchange, ticker);
+			DownloadURIBuilder uriBuilder = new DownloadURIBuilder(ticker.Exchange, ticker.Ticker);
 			
 			// Need to always get up till today from the server since google only supports a start date.
 			string uri = uriBuilder.getGetPricesUrlForRecentData(start, DateTime.Now);

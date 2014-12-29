@@ -17,7 +17,7 @@ namespace StockSimulator.Core
 		public BestOfTask(TickerExchangePair ticker)
 		{
 			// Get the data for the symbol.
-			TickerData tickerData = Program.Sim.DataStore.GetTickerData(ticker.Exchange, ticker.Ticker, new DateTime(2012, 1, 1), DateTime.Now);
+			TickerData tickerData = Program.Sim.DataStore.GetTickerData(ticker, new DateTime(2012, 1, 1), DateTime.Now);
 
 			_strategyTree = new StrategyTree("BestOfSubStrategies", tickerData);
 		}
