@@ -20,7 +20,7 @@ namespace StockSimulator.Core
 		/// <param name="runnableName">Name of the runnable to create</param>
 		/// <param name="instrumentData">Instrument data for this runnable to use</param>
 		/// <returns>The runnable object created</returns>
-		public static Runnable CreateRunnable(string runnableName, DataSeries instrumentData)
+		public static Runnable CreateRunnable(string runnableName, TickerData instrumentData)
 		{
 			Runnable createdRunnable = null;
 

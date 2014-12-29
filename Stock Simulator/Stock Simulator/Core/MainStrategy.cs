@@ -25,10 +25,9 @@ namespace StockSimulator.Core
 			// Load the config file with the instument list for all the symbols that we 
 			// want to test.
 			// TODO: for now just hard code it.
-			string[] instruments =
+			TickerExchangePair[] instruments =
 			{
-				"AAPL",
-				"AMD"
+				new TickerExchangePair("NASDAQ", "AAPL")
 			};
 
 			// Add all the symbols as dependent strategies using the bestofsubstrategies

@@ -14,12 +14,12 @@ namespace StockSimulator.Core
 	{
 		private StrategyTree _strategyTree;
 
-		public BestOfTask(string symbolName)
+		public BestOfTask(TickerExchangePair ticker)
 		{
-			// TODO: Get the data for this symbol.
-			DataSeries symbolData = new DataSeries();
+			// Get the data for the symbol.
+			TickerData tickerData = Program.Sim.DataStore.GetTickerData(ticker.Exchange, ticker.Ticker, new DateTime(2012, 1, 1), DateTime.Now);
 
-			_strategyTree = new StrategyTree("BestOfSubStrategies", symbolData);
+			_strategyTree = new StrategyTree("BestOfSubStrategies", tickerData);
 		}
 
 		public void RunAll()

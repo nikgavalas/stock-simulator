@@ -16,11 +16,11 @@ namespace StockSimulator.Core
 	class StrategyTree
 	{
 		List<Runnable> _runnables;
-		DataSeries _instrumentData;
+		TickerData _instrumentData;
 
  		/// <summary>
 		/// </summary>
-		public StrategyTree(string startingStrategyName, DataSeries instrumentData)
+		public StrategyTree(string startingStrategyName, TickerData instrumentData)
 		{
 			_runnables = new List<Runnable>();
 			_instrumentData = instrumentData;

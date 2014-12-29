@@ -8,15 +8,11 @@ namespace StockSimulator.Core
 {
 	public class Simulator
 	{
-		public SymbolDataStore DataStore
-		{
-			get;
-			set;
-		}
+		public TickerDataStore DataStore { get; set; }
 
 		public Simulator()
 		{
-
+			DataStore = new TickerDataStore();
 		}
 
 		public void Initialize()
