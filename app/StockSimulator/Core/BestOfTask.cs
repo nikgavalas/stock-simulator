@@ -14,10 +14,10 @@ namespace StockSimulator.Core
 	{
 		private StrategyTree _strategyTree;
 
-		public BestOfTask(TickerExchangePair ticker)
+		public BestOfTask(TickerExchangePair ticker, TickerDataStore dataStore)
 		{
 			// Get the data for the symbol.
-			TickerData tickerData = Program.Sim.DataStore.GetTickerData(ticker, new DateTime(2012, 1, 1), DateTime.Now);
+			TickerData tickerData = dataStore.GetTickerData(ticker, new DateTime(2012, 1, 1), DateTime.Now);
 
 			_strategyTree = new StrategyTree("BestOfSubStrategies", tickerData);
 		}
@@ -25,6 +25,8 @@ namespace StockSimulator.Core
 		public void RunAll()
 		{
 			_strategyTree.RunAll();
+
+			// After they are all simulated, find the highest strategy for each day.
 		}
 	}
 }

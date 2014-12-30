@@ -9,6 +9,7 @@ namespace StockSimulator.Core
 	public class Simulator
 	{
 		public TickerDataStore DataStore { get; set; }
+		public MainStrategy Strategy { get; set; }
 
 		public Simulator()
 		{
@@ -17,8 +18,13 @@ namespace StockSimulator.Core
 
 		public void Initialize()
 		{
-			MainStrategy mainStrategy = new MainStrategy();
-			mainStrategy.Initialize();
+			Strategy = new MainStrategy(DataStore);
+			Strategy.Initialize();
+		}
+
+		public void Run()
+		{
+			Strategy.Run();
 		}
 	}
 }

@@ -8,14 +8,31 @@ namespace StockSimulator.Core
 {
 	/// <summary>
 	/// The main strategy that will buy the best deemed stocks each day as long as we have money
+	/// 
+	/// CALL THE NUMBER BUY/SELL PRESSURE
+	/// 
 	/// </summary>
-	class MainStrategy
+	public class MainStrategy
 	{
 		/// <summary>
 		/// The list of all the instruments to be simulated to find the best
 		/// stocks to buy on a particular day.
 		/// </summary>
 		private BestOfTask[] _simulatedInstruments;
+
+		/// <summary>
+		/// Reference to the datastore for this simulation
+		/// </summary>
+		private TickerDataStore _dataStore;
+
+		/// <summary>
+		/// Constructor
+		/// </summary>
+		/// <param name="dataStore">Reference to the datastore for this simulation</param>
+		public MainStrategy(TickerDataStore dataStore)
+		{
+			_dataStore = dataStore;
+		}
 
 		/// <summary>
 		/// Initializes all the symbols that we are going to consider when buying.
@@ -34,13 +51,7 @@ namespace StockSimulator.Core
 			_simulatedInstruments = new BestOfTask[instruments.Length];
 			for (int i = 0; i < instruments.Length; i++)
 			{
-				_simulatedInstruments[i] = new BestOfTask(instruments[i]);
-			}
-
-			// Run all to start with so we have the data to simulate with.
-			for (int i = 0; i < _simulatedInstruments.Length; i++)
-			{
-				_simulatedInstruments[i].RunAll();
+				_simulatedInstruments[i] = new BestOfTask(instruments[i], _dataStore);
 			}
 		}
 
@@ -57,6 +68,19 @@ namespace StockSimulator.Core
 			// While we have money left
 			// Get the highest symbol that we don't own
 			// Buy the appropriate amount of shares based on how much money we want to invest per purchase
+		}
+
+		/// <summary>
+		/// Runs the strategy from start to finish.
+		/// </summary>
+		public void Run()
+		{
+			// Run all to start with so we have the data to simulate with.
+			for (int i = 0; i < _simulatedInstruments.Length; i++)
+			{
+				_simulatedInstruments[i].RunAll();
+			}
+
 		}
 	}
 }
