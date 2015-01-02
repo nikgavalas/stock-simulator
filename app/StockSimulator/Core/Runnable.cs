@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace StockSimulator.Core
 {
-	class Runnable : Configurable
+	public class Runnable : Configurable
 	{
 		/// <summary>
 		/// List of dependent runnables that need to be run before this one.
@@ -16,19 +17,23 @@ namespace StockSimulator.Core
 			get { return new string[0]; }
 		}
 
+		public List<Runnable> Dependents { get; set; }
+		protected TickerData Data { get; set; }
+
 		/// <summary>
 		/// Constructor for the runnable.
 		/// </summary>
-		public Runnable() : base()
+		public Runnable(TickerData tickerData) : base()
 		{
-		}
+			Data = tickerData;
 
-		/// <summary>
-		/// Adds another runnable to this runnables dependent list. This will ensure
-		/// that the dependents are run before this one.
-		/// </summary>
-		public void Add(Runnable newDependent)
-		{
+			// Create all the depenent runnables and save them.
+			Dependents = new List<Runnable>(DependentNames.Length);
+			for (int i = 0; i < DependentNames.Length; i++)
+			{
+				Runnable dependent = RunnableFactory.CreateRunnable(DependentNames[i], Data);
+				Dependents.Add(dependent);
+			}
 		}
 
 		/// <summary>
@@ -36,13 +41,10 @@ namespace StockSimulator.Core
 		/// </summary>
 		public virtual void Initialize()
 		{
-		}
-
-		/// <summary>
-		/// Called everytime there is a new bar of data.
-		/// </summary>
-		public virtual void OnBarUpdate()
-		{ 
+			foreach (Runnable runnable in Dependents)
+			{
+				runnable.Initialize();
+			}
 		}
 
 		/// <summary>
@@ -50,14 +52,50 @@ namespace StockSimulator.Core
 		/// </summary>
 		public virtual void Run()
 		{
+			// Run all the dependents before this one.
+			foreach (Runnable runnable in Dependents)
+			{
+				runnable.Run();
+			}
+
+			Debug.WriteLine("Running: " + ToString());
+
+			// Then run this one. Just use the closing data as the number of bars to run.
+			// The dependents will have all the other ticker data but they are all the same
+			// size lists.
+			for (int i = 0; i < Data.Close.Count; i++)
+			{
+				OnBarUpdate(i);
+			}
 		}
 
 		/// <summary>
 		/// Called when the simulation is finished.
 		/// </summary>
-		public virtual void ShutDown()
+		public virtual void Shutdown()
+		{
+			foreach (Runnable runnable in Dependents)
+			{
+				runnable.Shutdown();
+			}
+		}
+
+		/// <summary>
+		/// Returns the name of the runnable.
+		/// </summary>
+		/// <returns>The name of the runnable</returns>
+		public override string ToString()
+		{
+			return "PleaseNameMe!";
+		}
+
+		/// <summary>
+		/// Called everytime there is a new bar of data. This is called by run.
+		/// </summary>
+		protected virtual void OnBarUpdate(int currentBar)
 		{
 		}
 
+		// TODO: Check for circular depedents and throw an exception.
 	}
 }

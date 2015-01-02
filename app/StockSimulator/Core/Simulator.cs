@@ -45,7 +45,9 @@ namespace StockSimulator.Core
 			Instruments = new Dictionary<int, BestOfTask>();
 			for (int i = 0; i < instruments.Length; i++)
 			{
-				Instruments[instruments[i].GetHashCode()] = new BestOfTask(instruments[i]);
+				// Get the data for the symbol.
+				TickerData tickerData = DataStore.GetTickerData(instruments[i], config.startDate, config.endDate);
+				Instruments[instruments[i].GetHashCode()] = new BestOfTask(tickerData);
 			}
 		}
 
@@ -56,24 +58,9 @@ namespace StockSimulator.Core
 		{
 			foreach (KeyValuePair<int, BestOfTask> task in Instruments)
 			{
-				task.Value.Initialize(DataStore);
+				task.Value.Initialize();
 			}
 
-		}
-
-		/// <summary>
-		/// Called on each bar update. Will determine which stocks we should buy.
-		/// </summary>
-		public void OnBarUpdate()
-		{
-
-			// Update the broker to sell any shares that need a sellin'
-
-			// For each bar
-			// Get the value of bestof strategy for this bar. 
-			// While we have money left
-			// Get the highest symbol that we don't own
-			// Buy the appropriate amount of shares based on how much money we want to invest per purchase
 		}
 
 		/// <summary>
@@ -84,7 +71,7 @@ namespace StockSimulator.Core
 			// Run all to start with so we have the data to simulate with.
 			foreach (KeyValuePair<int, BestOfTask> task in Instruments)
 			{
-				task.Value.RunAll();
+				task.Value.Run();
 			}
 
 		}

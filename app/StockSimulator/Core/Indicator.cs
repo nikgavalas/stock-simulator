@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace StockSimulator.Core
 {
-	class Indicator : Runnable
+	public class Indicator : Runnable
 	{
+		public Indicator(TickerData tickerData) : base(tickerData)
+		{
+
+		}
 	}
 }

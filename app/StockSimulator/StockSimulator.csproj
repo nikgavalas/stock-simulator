@@ -94,7 +94,6 @@
     <Compile Include="Core\RunnableFactory.cs" />
     <Compile Include="Core\Simulator.cs" />
     <Compile Include="Core\Strategy.cs" />
-    <Compile Include="Core\StrategyTree.cs" />
     <Compile Include="Core\TickerData.cs" />
     <Compile Include="Core\TickerDataStore.cs" />
     <Compile Include="Core\TickerExchangePair.cs" />

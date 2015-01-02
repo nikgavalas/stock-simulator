@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace StockSimulator.Core
 {
-	class Configurable
+	public class Configurable
 	{
 	}
 }

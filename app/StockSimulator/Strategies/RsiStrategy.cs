@@ -10,7 +10,7 @@ namespace StockSimulator.Strategies
 {
 	class RsiStrategy : Runnable
 	{
-		public RsiStrategy() : base()
+		public RsiStrategy(TickerData tickerData) : base(tickerData)
 		{
 
 		}
@@ -30,10 +30,13 @@ namespace StockSimulator.Strategies
 			}
 		}
 
-		public override void Run()
+		/// <summary>
+		/// Returns the name of this strategy.
+		/// </summary>
+		/// <returns>The name of this strategy</returns>
+		public override string ToString()
 		{
-			base.Run();
-			Debug.WriteLine("RsiStrategy::Run()");
+			return "RsiStrategy";
 		}
 	}
 }

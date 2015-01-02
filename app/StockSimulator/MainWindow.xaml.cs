@@ -45,6 +45,9 @@ namespace StockSimulator
 
 			// Initializes all the instruments. Their status can then be updated in the gui.
 			Sim.Initialize();
+
+			// Runs the simulation.
+			Sim.Run();
 		}
 	}
 }

@@ -10,16 +10,18 @@ namespace StockSimulator.Indicators
 {
 	class Macd : Indicator
 	{
-		public Macd() : base()
+		public Macd(TickerData tickerData) : base(tickerData)
 		{
 
 		}
 
-
-		public override void Run()
+		/// <summary>
+		/// Returns the name of this indicator.
+		/// </summary>
+		/// <returns>The name of this indicator</returns>
+		public override string ToString()
 		{
-			base.Run();
-			Debug.WriteLine("Macd::Run()");
+			return "Macd";
 		}
 	}
 }

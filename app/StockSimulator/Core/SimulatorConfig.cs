@@ -24,8 +24,8 @@ namespace StockSimulator.Core
 
 		public SimulatorConfig()
 		{
-			startDate = DateTime.Parse("1/1/2014");
-			endDate = DateTime.Parse("12/31/2014");
+			startDate = DateTime.Parse("12/1/2014");
+			endDate = DateTime.Parse("12/5/2014");
 		}
 	}
 }

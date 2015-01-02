@@ -28,32 +28,32 @@ namespace StockSimulator.Core
 			{
 				// Indicators.
 				case "Macd":
-					createdRunnable = new Macd();
+					createdRunnable = new Macd(instrumentData);
 					break;
 
 				case "Rsi":
-					createdRunnable = new Rsi();
+					createdRunnable = new Rsi(instrumentData);
 					break;
 
 				case "Sma":
-					createdRunnable = new Sma();
+					createdRunnable = new Sma(instrumentData);
 					break;
 			
 				// Strategies.
 				case "BestOfSubStrategies":
-					createdRunnable = new BestOfSubStrategies();
+					createdRunnable = new BestOfSubStrategies(instrumentData);
 					break;
 
 				case "MacdStrategy":
-					createdRunnable = new MacdStrategy();
+					createdRunnable = new MacdStrategy(instrumentData);
 					break;
 
 				case "RsiStrategy":
-					createdRunnable = new RsiStrategy();
+					createdRunnable = new RsiStrategy(instrumentData);
 					break;
 
 				case "SmaStrategy":
-					createdRunnable = new SmaStrategy();
+					createdRunnable = new SmaStrategy(instrumentData);
 					break;
 
 				default:

@@ -10,15 +10,18 @@ namespace StockSimulator.Indicators
 {
 	class Rsi : Indicator
 	{
-		public Rsi() : base()
+		public Rsi(TickerData tickerData) : base(tickerData)
 		{
 
 		}
 
-		public override void Run()
+		/// <summary>
+		/// Returns the name of this indicator.
+		/// </summary>
+		/// <returns>The name of this indicator</returns>
+		public override string ToString()
 		{
-			base.Run();
-			Debug.WriteLine("Rsi::Run()");
+			return "Rsi";
 		}
 	}
 }
