@@ -19,6 +19,7 @@ namespace StockSimulator.Core
 		public List<double> High { get; set; }
 		public List<double> Low { get; set; }
 		public List<long> Volume { get; set; }
+		public int NumBars { get; set; }
 
 		// TODO: add things like the median and such and such.
 
@@ -99,6 +100,8 @@ namespace StockSimulator.Core
 				Low.AddRange(otherData.Low.GetRange(copyStartIndex, otherData.Low.Count - copyStartIndex));
 				Volume.AddRange(otherData.Volume.GetRange(copyStartIndex, otherData.Volume.Count - copyStartIndex));
 			}
+
+			NumBars = Dates.Count;
 		}
 
 		/// <summary>
