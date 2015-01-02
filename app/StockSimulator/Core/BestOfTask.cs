@@ -40,7 +40,7 @@ namespace StockSimulator.Core
 		/// Constructor.
 		/// </summary>
 		/// <param name="ticker">Ticker this task will be simulating</param>
-		public BestOfTask(TickerData tickerData) : base(tickerData)
+		public BestOfTask(TickerData tickerData, RunnableFactory factory) : base(tickerData, factory)
 		{
 		}
 

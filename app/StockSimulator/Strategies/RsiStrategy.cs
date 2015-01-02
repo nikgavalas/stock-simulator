@@ -10,7 +10,8 @@ namespace StockSimulator.Strategies
 {
 	class RsiStrategy : Runnable
 	{
-		public RsiStrategy(TickerData tickerData) : base(tickerData)
+		public RsiStrategy(TickerData tickerData, RunnableFactory factory) 
+			: base(tickerData, factory)
 		{
 
 		}

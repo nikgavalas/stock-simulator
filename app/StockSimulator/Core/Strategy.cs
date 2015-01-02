@@ -8,7 +8,7 @@ namespace StockSimulator.Core
 {
 	public class Strategy : Runnable
 	{
-		public Strategy(TickerData tickerData) : base(tickerData)
+		public Strategy(TickerData tickerData, RunnableFactory factory) : base(tickerData, factory)
 		{
 
 		}

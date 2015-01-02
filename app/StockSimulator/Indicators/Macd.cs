@@ -10,7 +10,8 @@ namespace StockSimulator.Indicators
 {
 	class Macd : Indicator
 	{
-		public Macd(TickerData tickerData) : base(tickerData)
+		public Macd(TickerData tickerData, RunnableFactory factory) 
+			: base(tickerData, factory)
 		{
 
 		}

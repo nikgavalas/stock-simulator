@@ -10,7 +10,8 @@ namespace StockSimulator.Indicators
 {
 	class Rsi : Indicator
 	{
-		public Rsi(TickerData tickerData) : base(tickerData)
+		public Rsi(TickerData tickerData, RunnableFactory factory) 
+			: base(tickerData, factory)
 		{
 
 		}

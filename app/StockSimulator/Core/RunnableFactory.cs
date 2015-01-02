@@ -12,56 +12,82 @@ namespace StockSimulator.Core
 	/// <summary>
 	/// Knows how to create other runables with and instrument and config data
 	/// </summary>
-	class RunnableFactory
+	public class RunnableFactory
 	{
+		private Dictionary<int, Runnable> _createdItems;
+		private TickerData _tickerData;
+
 		/// <summary>
-		/// Returns an new runnable object based on the name and the instrument.
+		/// Constructor
 		/// </summary>
-		/// <param name="runnableName">Name of the runnable to create</param>
-		/// <param name="instrumentData">Instrument data for this runnable to use</param>
-		/// <returns>The runnable object created</returns>
-		public static Runnable CreateRunnable(string runnableName, TickerData instrumentData)
+		public RunnableFactory(TickerData tickerData)
 		{
-			Runnable createdRunnable = null;
+			_tickerData = tickerData;
+			_createdItems = new Dictionary<int, Runnable>();
+		}
 
-			switch (runnableName)
+		/// <summary>
+		/// If the runnable has already been created, returns that object. If not then
+		/// returns an new runnable object based on the name and the instrument.
+		/// </summary>
+		/// <param name="runnableName">Name of the runnable</param>
+		/// <returns>The runnable object</returns>
+		public Runnable GetRunnable(string runnableName)
+		{
+			Runnable requestedItem = null;
+
+			// See if the runnable is created already and return that object if it is.
+			int key = runnableName.GetHashCode();
+			if (_createdItems.ContainsKey(key))
 			{
-				// Indicators.
-				case "Macd":
-					createdRunnable = new Macd(instrumentData);
-					break;
+				requestedItem = _createdItems[key];
+			}
+			else
+			{
+				switch (runnableName)
+				{
+					// Indicators.
+					case "Macd":
+						requestedItem = new Macd(_tickerData, this);
+						break;
 
-				case "Rsi":
-					createdRunnable = new Rsi(instrumentData);
-					break;
+					case "Rsi":
+						requestedItem = new Rsi(_tickerData, this);
+						break;
 
-				case "Sma":
-					createdRunnable = new Sma(instrumentData);
-					break;
-			
-				// Strategies.
-				case "BestOfSubStrategies":
-					createdRunnable = new BestOfSubStrategies(instrumentData);
-					break;
+					case "Sma":
+						requestedItem = new Sma(_tickerData, this);
+						break;
 
-				case "MacdStrategy":
-					createdRunnable = new MacdStrategy(instrumentData);
-					break;
+					// Strategies.
+					case "BestOfSubStrategies":
+						requestedItem = new BestOfSubStrategies(_tickerData, this);
+						break;
 
-				case "RsiStrategy":
-					createdRunnable = new RsiStrategy(instrumentData);
-					break;
+					case "MacdStrategy":
+						requestedItem = new MacdStrategy(_tickerData, this);
+						break;
 
-				case "SmaStrategy":
-					createdRunnable = new SmaStrategy(instrumentData);
-					break;
+					case "MacdCrossStrategy":
+						requestedItem = new MacdCrossStrategy(_tickerData, this);
+						break;
 
-				default:
-					Debug.WriteLine("Trying to create a runnable that doesn't exist");
-					break;
+					case "RsiStrategy":
+						requestedItem = new RsiStrategy(_tickerData, this);
+						break;
+
+					case "SmaStrategy":
+						requestedItem = new SmaStrategy(_tickerData, this);
+						break;
+
+					default:
+						throw new Exception("Trying to create a runnable that doesn't exist");
+				}
+
+				_createdItems[key] = requestedItem;
 			}
 
-			return createdRunnable;
+			return requestedItem;
 		}
 	}
 }

@@ -10,7 +10,8 @@ namespace StockSimulator.Strategies
 {
 	class SmaStrategy : Strategy
 	{
-		public SmaStrategy(TickerData tickerData) : base(tickerData)
+		public SmaStrategy(TickerData tickerData, RunnableFactory factory) 
+			: base(tickerData, factory)
 		{
 
 		}

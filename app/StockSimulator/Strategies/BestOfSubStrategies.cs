@@ -10,7 +10,8 @@ namespace StockSimulator.Strategies
 {
 	class BestOfSubStrategies : Strategy
 	{
-		public BestOfSubStrategies(TickerData tickerData) : base(tickerData)
+		public BestOfSubStrategies(TickerData tickerData, RunnableFactory factory) 
+			: base(tickerData, factory)
 		{
 
 		}
@@ -24,6 +25,7 @@ namespace StockSimulator.Strategies
 			{
 				string[] deps = {
 					"MacdStrategy",
+					"MacdCrossStrategy",
 					"RsiStrategy",
 					"SmaStrategy"
 				};

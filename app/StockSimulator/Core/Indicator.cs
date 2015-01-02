@@ -8,7 +8,7 @@ namespace StockSimulator.Core
 {
 	public class Indicator : Runnable
 	{
-		public Indicator(TickerData tickerData) : base(tickerData)
+		public Indicator(TickerData tickerData, RunnableFactory factory) : base(tickerData, factory)
 		{
 
 		}

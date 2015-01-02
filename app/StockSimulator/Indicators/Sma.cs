@@ -10,7 +10,8 @@ namespace StockSimulator.Indicators
 {
 	class Sma : Indicator
 	{
-		public Sma(TickerData tickerData) : base(tickerData)
+		public Sma(TickerData tickerData, RunnableFactory factory) 
+			: base(tickerData, factory)
 		{
 
 		}

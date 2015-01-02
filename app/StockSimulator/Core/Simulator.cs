@@ -47,7 +47,8 @@ namespace StockSimulator.Core
 			{
 				// Get the data for the symbol.
 				TickerData tickerData = DataStore.GetTickerData(instruments[i], config.startDate, config.endDate);
-				Instruments[instruments[i].GetHashCode()] = new BestOfTask(tickerData);
+				RunnableFactory factory = new RunnableFactory(tickerData);
+				Instruments[instruments[i].GetHashCode()] = new BestOfTask(tickerData, factory);
 			}
 		}
 

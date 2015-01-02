@@ -20,18 +20,21 @@ namespace StockSimulator.Core
 		public List<Runnable> Dependents { get; set; }
 		protected TickerData Data { get; set; }
 
+		private bool _isFinishedRunning;
+
 		/// <summary>
 		/// Constructor for the runnable.
 		/// </summary>
-		public Runnable(TickerData tickerData) : base()
+		public Runnable(TickerData tickerData, RunnableFactory factory) : base()
 		{
+			_isFinishedRunning = false;
 			Data = tickerData;
 
 			// Create all the depenent runnables and save them.
 			Dependents = new List<Runnable>(DependentNames.Length);
 			for (int i = 0; i < DependentNames.Length; i++)
 			{
-				Runnable dependent = RunnableFactory.CreateRunnable(DependentNames[i], Data);
+				Runnable dependent = factory.GetRunnable(DependentNames[i]);
 				Dependents.Add(dependent);
 			}
 		}
@@ -41,6 +44,7 @@ namespace StockSimulator.Core
 		/// </summary>
 		public virtual void Initialize()
 		{
+			_isFinishedRunning = false;
 			foreach (Runnable runnable in Dependents)
 			{
 				runnable.Initialize();
@@ -52,6 +56,12 @@ namespace StockSimulator.Core
 		/// </summary>
 		public virtual void Run()
 		{
+			// Don't need to run it multiple times in a simulation.
+			if (_isFinishedRunning == true)
+			{
+				return;
+			}
+
 			// Run all the dependents before this one.
 			foreach (Runnable runnable in Dependents)
 			{
@@ -67,6 +77,8 @@ namespace StockSimulator.Core
 			{
 				OnBarUpdate(i);
 			}
+
+			_isFinishedRunning = true;
 		}
 
 		/// <summary>
