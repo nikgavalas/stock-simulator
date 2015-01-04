@@ -8,11 +8,11 @@ namespace StockSimulator.Core
 {
 	public class Strategy : Runnable
 	{
-		public List<bool> WasFound;
+		public List<bool> WasFound { get; set; }
 
 		public Strategy(TickerData tickerData, RunnableFactory factory) : base(tickerData, factory)
 		{
-			WasFound = new List<bool>(tickerData.NumBars);
+			WasFound = Enumerable.Repeat(false, tickerData.NumBars).ToList();
 		}
 	}
 }

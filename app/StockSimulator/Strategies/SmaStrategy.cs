@@ -51,7 +51,7 @@ namespace StockSimulator.Strategies
 			Sma sma = (Sma)Dependents[0];
 			if (DataSeries.CrossAbove(Data.Close, sma.Avg, currentBar, 0) != -1)
 			{
-				WasFound.Insert(currentBar, true);
+				WasFound[currentBar] = true;
 			}
 		}
 	}

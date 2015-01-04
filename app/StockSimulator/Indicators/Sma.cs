@@ -10,14 +10,14 @@ namespace StockSimulator.Indicators
 {
 	class Sma : Indicator
 	{
-		private int _period = 4;
+		private int _period = 14;
 
 		public List<double> Avg { get; set; }
 
 		public Sma(TickerData tickerData, RunnableFactory factory) 
 			: base(tickerData, factory)
 		{
-			Avg = new List<double>(Data.NumBars);
+			Avg = Enumerable.Repeat(0d, Data.NumBars).ToList();
 		}
 
 		/// <summary>
@@ -39,7 +39,7 @@ namespace StockSimulator.Indicators
 
 			if (currentBar == 0)
 			{
-				Avg.Insert(currentBar, Data.Close[currentBar]);
+				Avg[currentBar] = Data.Close[currentBar];
 			}
 			else
 			{
@@ -47,11 +47,11 @@ namespace StockSimulator.Indicators
 
 				if (currentBar >= _period)
 				{
-					Avg.Insert(currentBar, (last + Data.Close[currentBar] - Data.Close[currentBar - _period]) / Math.Min(currentBar, _period));
+					Avg[currentBar] = (last + Data.Close[currentBar] - Data.Close[currentBar - _period]) / Math.Min(currentBar, _period);
 				}
 				else
 				{
-					Avg.Insert(currentBar, (last + Data.Close[currentBar]) / (Math.Min(currentBar, _period) + 1));
+					Avg[currentBar] = (last + Data.Close[currentBar]) / (Math.Min(currentBar, _period) + 1);
 				}
 			}
 		}

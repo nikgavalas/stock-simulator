@@ -250,6 +250,7 @@ namespace StockSimulator.Core
 						tickerData.Low.Add(Convert.ToDouble(splitData[3]));
 						tickerData.Close.Add(Convert.ToDouble(splitData[4]));
 						tickerData.Volume.Add(Convert.ToInt64(splitData[5]));
+						tickerData.NumBars = tickerData.Dates.Count;
 					}
 				} while (line != null);
 
