@@ -8,11 +8,11 @@ namespace StockSimulator.Core
 {
 	public class Strategy : Runnable
 	{
-		protected List<bool> wasFound;
+		public List<bool> WasFound;
 
 		public Strategy(TickerData tickerData, RunnableFactory factory) : base(tickerData, factory)
 		{
-			wasFound = new List<bool>(tickerData.NumBars);
+			WasFound = new List<bool>(tickerData.NumBars);
 		}
 	}
 }

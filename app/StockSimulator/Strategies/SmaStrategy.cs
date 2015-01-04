@@ -49,7 +49,10 @@ namespace StockSimulator.Strategies
 		protected override void OnBarUpdate(int currentBar)
 		{
 			Sma sma = (Sma)Dependents[0];
-			if sma.Avg[currentBar];
+			if (DataSeries.CrossAbove(Data.Close, sma.Avg, currentBar, 0) != -1)
+			{
+				WasFound.Insert(currentBar, true);
+			}
 		}
 	}
 }
