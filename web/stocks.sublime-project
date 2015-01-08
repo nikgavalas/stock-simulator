@@ -1,0 +1,17 @@
+{
+	"folders":
+	[
+		{
+			"folder_exclude_patterns":
+			[
+				"node_modules",
+				"build",
+				"build-debug",
+				".temp",
+				".sass-cache"
+			],
+			"follow_symlinks": true,
+			"path": "."
+		}
+	]
+}

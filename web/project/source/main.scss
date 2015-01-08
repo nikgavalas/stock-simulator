@@ -1,0 +1,26 @@
+/* Any bootstrap overrides go here */
+$font-family-base: 'Roboto Light' !default;
+
+/* Common styles for the entire web project. */
+@import "fonts/roboto/roboto";
+@import "bower-components/bootstrap-sass-official/assets/stylesheets/bootstrap";
+
+/* Main shared styles */
+
+@mixin full-screen {
+	width: 100%;
+	height: 100%;
+}
+
+html, body {
+	margin: 0;
+	@include full-screen;
+}
+
+.app-view {
+	@include full-screen;
+}
+
+.firstrow-container {
+	margin-top: $navbar-height + $navbar-margin-bottom;
+}
