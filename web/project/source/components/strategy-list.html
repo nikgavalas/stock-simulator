@@ -1,0 +1,21 @@
+<table class="table table-hover strategy-list">
+	<thead>
+		<th>Name</th>
+		<th>Win/Loss %</th>
+		<th>Gain</th>
+	</thead>
+	<tbody>
+		<tr ng-repeat="strategy in strategies" ng-click="strategyClicked(strategy)" class="hover-pointer">
+			<td>{{strategy.name}}</td>
+			<td>
+				<progress>
+					<bar type="success" value="strategy.winPercent"><span>{{strategy.winPercent}}%</span></bar>
+					<bar type="danger" value="strategy.lossPercent"><span>{{strategy.lossPercent}}%</span></bar>
+				</progress>
+			</td>
+			<td>
+				<span ng-class="{'text-danger': strategy.gain < 0, 'text-success': strategy.gain >= 0}">{{strategy.gain}}</span>
+			</td>
+		</tr>
+	</tbody>
+</table>

@@ -6,6 +6,7 @@
 @import "bower-components/bootstrap-sass-official/assets/stylesheets/bootstrap";
 
 /* Main shared styles */
+@import "source/components/strategy-list.scss";
 
 @mixin full-screen {
 	width: 100%;

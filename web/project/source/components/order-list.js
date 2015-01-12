@@ -1,10 +1,7 @@
 'use strict';
 
 mainApp.directive('orderList', [
-
-	function(
-		OrderListFactory
-	) {
+	function() {
 		return {
 			restrict: 'E',
 			replace: true,

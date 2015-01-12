@@ -1,0 +1,32 @@
+[
+	{
+		"name": "SMA",
+		"winPercent": 44,
+		"lossPercent": 56,
+		"gain": -44.55
+	},
+	{
+		"name": "MACD",
+		"winPercent": 80,
+		"lossPercent": 20,
+		"gain": 443.44
+	},
+	{
+		"name": "RSI",
+		"winPercent": 60,
+		"lossPercent": 40,
+		"gain": 1000
+	},
+	{
+		"name": "Aroon",
+		"winPercent": 30,
+		"lossPercent": 70,
+		"gain": -500
+	},
+	{
+		"name": "Fib",
+		"winPercent": 50,
+		"lossPercent": 50,
+		"gain": 0
+	}
+]

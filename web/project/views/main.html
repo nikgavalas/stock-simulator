@@ -37,19 +37,14 @@
 
 		</div>
 
-		<!-- The column for the aggregated strategies by the strategy name
-		or also by symbol -->		
+		<!-- The column for the aggregated strategies by the strategy name -->		
 		<div class="col-md-6">
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">Strategy performance</h3>
 				</div>
 				<div class="panel-body">
-					<!-- Toggle button to switch between strategy performance and also by symbol -->
-					<div class="btn-group">
-						<label class="btn btn-success" ng-model="bySymbol" btn-radio="'Overall'" uncheckable>Overall</label>
-						<label class="btn btn-success" ng-model="bySymbol" btn-radio="'BySymbol'" uncheckable>By Symbol</label>
-					</div>
+					<strategy-list></strategy-list>
 				</div>
 			</div>
 		</div>
