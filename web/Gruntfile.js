@@ -162,6 +162,7 @@ module.exports = function (grunt) {
 							lrSnippet,
 							mountFolder(connect, yeomanConfig.temp),
 							mountFolder(connect, yeomanConfig.root),
+							mountFolder(connect, '../output'),
 							corsMiddleware
 						];
 					}
@@ -171,7 +172,8 @@ module.exports = function (grunt) {
 				options: {
 					middleware: function (connect) {
 						return [
-							mountFolder(connect, yeomanConfig.build)
+							mountFolder(connect, yeomanConfig.build),
+							mountFolder(connect, '../output'),
 						];
 					}
 				}

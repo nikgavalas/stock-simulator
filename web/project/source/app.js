@@ -9,7 +9,7 @@ var mainApp = angular.module('mainApp', [
 	'ui.bootstrap',
 	'templates-mainApp'
 ])
-.config(['$routeProvider', '$httpProvider', function ($routeProvider, $httpProvider) {
+.config(['$routeProvider', '$httpProvider', '$locationProvider', function ($routeProvider, $httpProvider, $locationProvider) {
 	
 	// Setup CORS requests (cross domain ajax)
 	$httpProvider.defaults.useXDomain = true;
@@ -17,13 +17,15 @@ var mainApp = angular.module('mainApp', [
 
 	// Only one route and page for now.
 	$routeProvider
-		.when('/', {
+		.when('/:runName', {
 			templateUrl: 'views/main.html',
 			controller: 'MainCtrl'
 		})
 		.otherwise({
 			redirectTo: '/'
 		});
+
+	$locationProvider.html5Mode(false);
 }]);
 
 mainApp.factory('$exceptionHandler', [
