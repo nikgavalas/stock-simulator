@@ -1,0 +1,20 @@
+<table class="table table-hover">
+	<thead>
+		<th>Ticker</th>
+		<th>Buy</th>
+		<th>Sell</th>
+		<th>Shares</th>
+		<th>Gain</th>
+	</thead>
+	<tbody>
+		<tr ng-repeat="order in orders" ng-click="orderClicked(order)" class="hover-pointer">
+			<td>{{order.ticker}}</td>
+			<td>{{order.buyPrice}}</td>
+			<td>{{order.sellPrice}}</td>
+			<td>{{order.numShares}}</td>
+			<td>
+				<span ng-class="{'text-danger': order.gain < 0, 'text-success': order.gain >= 0}">{{order.gain}}</span>
+			</td>
+		</tr>
+	</tbody>
+</table>

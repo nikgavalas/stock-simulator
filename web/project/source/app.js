@@ -17,7 +17,7 @@ var mainApp = angular.module('mainApp', [
 
 	// Only one route and page for now.
 	$routeProvider
-		.when('/:runName', {
+		.when('/:runName?', {
 			templateUrl: 'views/main.html',
 			controller: 'MainCtrl'
 		})

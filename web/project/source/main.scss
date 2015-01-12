@@ -1,5 +1,5 @@
 /* Any bootstrap overrides go here */
-$font-family-base: 'Roboto Light' !default;
+//$font-family-base: 'Roboto Light' !default;
 
 /* Common styles for the entire web project. */
 @import "fonts/roboto/roboto";
@@ -23,4 +23,8 @@ html, body {
 
 .firstrow-container {
 	margin-top: $navbar-height + $navbar-margin-bottom;
+}
+
+.hover-pointer:hover {
+	cursor: pointer;
 }
