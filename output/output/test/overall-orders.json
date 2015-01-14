@@ -1,23 +1,26 @@
-[
-	{
+{
+	"1": {
 		"ticker": "AAPL",
+		"id": 1,
 		"buyPrice": 300,
 		"sellPrice": 400,
 		"numShares": 43,
 		"gain": 443.44
 	},
-	{
+	"2": {
 		"ticker": "AMD",
+		"id": 2,
 		"buyPrice": 300,
 		"sellPrice": 400,
 		"numShares": 43,
 		"gain": -443.44
 	},
-	{
-		"ticker": "INTL",
+	"3": {
+		"ticker": "INTC",
+		"id": 3,
 		"buyPrice": 300,
 		"sellPrice": 400,
 		"numShares": 43,
 		"gain": 443.44
 	}
-]
+}

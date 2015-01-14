@@ -1,0 +1,63 @@
+<div class="container">
+	<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="/">Stocks</a>
+			</div>
+			<div class="navbar-left">
+			</div>
+			<div class="navbar-right">
+			</div>
+		</div>
+	</div>
+
+	<!-- The row for the grid -->
+	<div class="row firstrow-container">
+
+		<div class="col-xs-12">
+
+			<h3>{{ticker}} <small>Order {{orderId}} on {{orderDate}}</small></h3>
+
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Charts</h3>
+				</div>
+				<div class="panel-body">
+
+					<!-- This will be where the chart goes -->
+					<div class="row">
+						<div class="col-xs-12">
+							<div class="well">Price chart placeholder</div>
+						</div>
+					</div>
+
+					<!-- Any other indicator charts will go here -->
+					<div class="row">
+						<div class="col-xs-12">
+							<div class="well">Indicator involved in the strategy chart placeholder</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-12">
+							<div class="well">Indicator involved in the strategy chart placeholder</div>
+						</div>
+					</div>
+
+				</div>
+			</div><!-- End chart panel -->
+
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Strategies</h3>
+				</div>
+				<div class="panel-body">
+
+					<strategy-list></strategy-list>
+
+				</div>
+			</div><!-- End strategy list panel -->
+		</div>
+
+	</div>
+
+ </div>

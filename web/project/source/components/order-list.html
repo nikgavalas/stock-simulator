@@ -7,7 +7,7 @@
 		<th>Gain</th>
 	</thead>
 	<tbody>
-		<tr ng-repeat="order in orders" ng-click="orderClicked(order)" class="hover-pointer">
+		<tr ng-repeat="order in orders" ng-click="orderClick(order)" class="hover-pointer">
 			<td>{{order.ticker}}</td>
 			<td>{{order.buyPrice}}</td>
 			<td>{{order.sellPrice}}</td>

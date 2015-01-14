@@ -16,7 +16,7 @@ mainApp.directive('overallTable', [
 			link: function($scope) {
 
 				// Get the data for the overall stats.
-				$http.get(ConfigFactory.getRunFolder() + 'overall.json').success(function(data) {
+				$http.get(ConfigFactory.getOutputFolder() + 'overall.json').success(function(data) {
 					$scope.fileData = data;
 				});
 			}

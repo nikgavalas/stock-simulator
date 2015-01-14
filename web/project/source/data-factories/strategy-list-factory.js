@@ -14,7 +14,7 @@ mainApp.factory('StrategyListFactory', [
 		factory.getOverallOrders = function() {
 			var deffered = $q.defer();
 
-			$http.get(ConfigFactory.getRunFolder() + 'overall-strategies.json').success(function(data) {
+			$http.get(ConfigFactory.getOutputFolder() + 'overall-strategies.json').success(function(data) {
 				deffered.resolve(data);
 			});
 

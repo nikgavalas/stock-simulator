@@ -7,12 +7,19 @@ mainApp.directive('orderList', [
 			replace: true,
 			templateUrl: 'source/components/order-list.html',
 			scope: {
-				orderData: '='
+				strategyName: '@'
 			},
 			controller: [
 				'$scope',
+				'$location',
+				'ConfigFactory',
 				'OrderListFactory',
-				function($scope, OrderListFactory) {
+				function(
+					$scope,
+					$location,
+					ConfigFactory,
+					OrderListFactory
+				) {
 	
 					$scope.orders = [];
 
@@ -20,9 +27,11 @@ mainApp.directive('orderList', [
 						$scope.orders = data;
 					});
 
-					$scope.orderClicked = function(order) {
-						console.log(order);
+					// Goto the order details for this order.
+					$scope.orderClick = function(order) {
+						$location.url(ConfigFactory.getOutputName() + '/order/' + order.ticker + '/' + order.id);
 					};
+
 				}
 			]
 		};
