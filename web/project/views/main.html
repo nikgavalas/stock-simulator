@@ -1,15 +1,5 @@
 <div class="container">
-	<div class="navbar navbar-default navbar-fixed-top" role="navigation">
-		<div class="container">
-			<div class="navbar-header">
-				<a class="navbar-brand" href="/">Stocks</a>
-			</div>
-			<div class="navbar-left">
-			</div>
-			<div class="navbar-right">
-			</div>
-		</div>
-	</div>
+	<navbar></navbar>
 
 	<!-- The row for the grid -->
 	<div class="row firstrow-container">
@@ -44,7 +34,7 @@
 					<h3 class="panel-title">Strategy performance</h3>
 				</div>
 				<div class="panel-body">
-					<strategy-list></strategy-list>
+					<strategy-list strategies="strategies" row-clicked="strategyClick"></strategy-list>
 				</div>
 			</div>
 		</div>

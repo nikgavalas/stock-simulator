@@ -7,24 +7,23 @@ mainApp.directive('strategyList', [
 			replace: true,
 			templateUrl: 'source/components/strategy-list.html',
 			scope: {
-				orderData: '='
+				strategies: '=',
+				rowClicked: '='
 			},
 			controller: [
 				'$scope',
 				'StrategyListFactory',
 				function($scope, StrategyListFactory) {
-	
-					$scope.strategies = [];
-
-					StrategyListFactory.getOverallOrders().then(function(data) {
-						$scope.strategies = data;
-					});
-
-					$scope.orderClicked = function(order) {
-						console.log(order);
+					// So it can be used in the scope.
+					$scope.abs = function(value) {
+						return Math.abs(value);
 					};
+
 				}
-			]
+			],
+			link: function($scope, $element, $attrs) {
+				$scope.showTickers = angular.isDefined($attrs.showTickers);
+			}
 		};
 	}
 ]);

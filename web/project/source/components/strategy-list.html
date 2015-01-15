@@ -1,12 +1,12 @@
 <table class="table table-hover strategy-list">
 	<thead>
-		<th>Name</th>
+		<th>{{showTickers ? 'Ticker' : 'Name'}}</th>
 		<th>Win/Loss %</th>
 		<th>Gain</th>
 	</thead>
 	<tbody>
-		<tr ng-repeat="strategy in strategies" ng-click="strategyClicked(strategy)" class="hover-pointer">
-			<td>{{strategy.name}}</td>
+		<tr ng-repeat="strategy in strategies" ng-click="rowClicked(strategy)" class="hover-pointer">
+			<td>{{showTickers ? strategy.ticker : strategy.name}}</td>
 			<td>
 				<progress>
 					<bar type="success" value="strategy.winPercent"><span>{{strategy.winPercent}}%</span></bar>
@@ -14,7 +14,7 @@
 				</progress>
 			</td>
 			<td>
-				<span ng-class="{'text-danger': strategy.gain < 0, 'text-success': strategy.gain >= 0}">{{strategy.gain}}</span>
+				<span ng-class="{'text-danger': strategy.gain < 0, 'text-success': strategy.gain >= 0}"><span class="glyphicon" ng-class="{'glyphicon-circle-arrow-up': strategy.gain >= 0, 'glyphicon-circle-arrow-down': strategy.gain < 0}"></span>&nbsp;{{abs(strategy.gain)}}</span>
 			</td>
 		</tr>
 	</tbody>

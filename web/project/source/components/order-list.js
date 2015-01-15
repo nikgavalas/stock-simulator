@@ -27,9 +27,22 @@ mainApp.directive('orderList', [
 						$scope.orders = data;
 					});
 
-					// Goto the order details for this order.
+					/**
+					 * Goto a location. TODO: rewrite
+					 * @param  {[type]} order [description]
+					 * @return {[type]}       [description]
+					 */
 					$scope.orderClick = function(order) {
 						$location.url(ConfigFactory.getOutputName() + '/order/' + order.ticker + '/' + order.id);
+					};
+
+					/**
+					 * Expose the absolute function to the scope html
+					 * @param  {Number} value Value to return the absolute value for
+					 * @return {Number}       Math.abs value
+					 */
+					$scope.abs = function(value) {
+						return Math.abs(value);
 					};
 
 				}

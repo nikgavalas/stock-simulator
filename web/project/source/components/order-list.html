@@ -13,7 +13,7 @@
 			<td>{{order.sellPrice}}</td>
 			<td>{{order.numShares}}</td>
 			<td>
-				<span ng-class="{'text-danger': order.gain < 0, 'text-success': order.gain >= 0}">{{order.gain}}</span>
+				<span ng-class="{'text-danger': order.gain < 0, 'text-success': order.gain >= 0}"><span class="glyphicon" ng-class="{'glyphicon-circle-arrow-up': order.gain >= 0, 'glyphicon-circle-arrow-down': order.gain < 0}"></span>&nbsp;{{abs(order.gain)}}</span>
 			</td>
 		</tr>
 	</tbody>
