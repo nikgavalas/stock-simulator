@@ -5,11 +5,13 @@ angular.module('mainApp').controller('StrategyDetailsCtrl', [
 	'$routeParams',
 	'$location',
 	'ConfigFactory',
+	'OrderListFactory',
 	function(
 		$scope,
 		$routeParams,
 		$location,
-		ConfigFactory
+		ConfigFactory,
+		OrderListFactory
 	) {
 		// Save since it will be used in the rest of the app.
 		ConfigFactory.setOutputFolder($routeParams.runName);
@@ -17,33 +19,10 @@ angular.module('mainApp').controller('StrategyDetailsCtrl', [
 		$scope.strategy = $routeParams.strategy;
 		$scope.ticker = $routeParams.ticker;
 
-		// TODO: get from data
-		$scope.orders = {
-			'1': {
-				'ticker': 'AAPL',
-				'id': 1,
-				'buyPrice': 300,
-				'sellPrice': 400,
-				'numShares': 43,
-				'gain': 443.44
-			},
-			'2': {
-				'ticker': 'APPL',
-				'id': 2,
-				'buyPrice': 300,
-				'sellPrice': 400,
-				'numShares': 43,
-				'gain': -443.44
-			},
-			'3': {
-				'ticker': 'APPL',
-				'id': 3,
-				'buyPrice': 300,
-				'sellPrice': 400,
-				'numShares': 43,
-				'gain': 443.44
-			}
-		};
+		$scope.orders = [];
+		OrderListFactory.getOrders($scope.strategy, $scope.ticker).then(function(data) {
+			$scope.orders = data.orders;
+		});
 
 		/**
 		 * Snap the chart to the order location.

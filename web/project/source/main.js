@@ -24,9 +24,9 @@ angular.module('mainApp').controller('MainCtrl', [
 			$scope.orders = data;
 		});
 
-		// Load all the overall orders.
+		// Load all the overall strategies.
 		$scope.strategies = [];
-		StrategyListFactory.getOverallOrders().then(function(data) {
+		StrategyListFactory.getOverallStrategies().then(function(data) {
 			$scope.strategies = data;
 		});
 

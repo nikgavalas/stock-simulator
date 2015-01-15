@@ -8,7 +8,8 @@ mainApp.directive('strategyList', [
 			templateUrl: 'source/components/strategy-list.html',
 			scope: {
 				strategies: '=',
-				rowClicked: '='
+				rowClicked: '=',
+				selected: '@'
 			},
 			controller: [
 				'$scope',

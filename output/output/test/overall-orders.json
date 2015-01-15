@@ -5,7 +5,27 @@
 		"buyPrice": 300,
 		"sellPrice": 400,
 		"numShares": 43,
-		"gain": 443.44
+		"gain": 443.44,
+		"strategies": [
+			{
+				"name": "SMA",
+				"winPercent": 11,
+				"lossPercent": 89,
+				"gain": -10000
+			},
+			{
+				"name": "MACD",
+				"winPercent": 33,
+				"lossPercent": 67,
+				"gain": -700
+			},
+			{
+				"name": "RSI",
+				"winPercent": 55,
+				"lossPercent": 45,
+				"gain": 1000
+			}
+		]
 	},
 	"2": {
 		"ticker": "AMD",
@@ -13,7 +33,27 @@
 		"buyPrice": 300,
 		"sellPrice": 400,
 		"numShares": 43,
-		"gain": -443.44
+		"gain": -443.44,
+		"strategies": [
+			{
+				"name": "SMA",
+				"winPercent": 90,
+				"lossPercent": 10,
+				"gain": 700
+			},
+			{
+				"name": "MACD",
+				"winPercent": 80,
+				"lossPercent": 20,
+				"gain": 443.44
+			},
+			{
+				"name": "RSI",
+				"winPercent": 95,
+				"lossPercent": 5,
+				"gain": 10000.50
+			}
+		]
 	},
 	"3": {
 		"ticker": "INTC",
@@ -21,6 +61,26 @@
 		"buyPrice": 300,
 		"sellPrice": 400,
 		"numShares": 43,
-		"gain": 443.44
+		"gain": 443.44,
+		"strategies": [
+			{
+				"name": "SMA",
+				"winPercent": 50,
+				"lossPercent": 50,
+				"gain": -44.55
+			},
+			{
+				"name": "MACD",
+				"winPercent": 50,
+				"lossPercent": 50,
+				"gain": 443.44
+			},
+			{
+				"name": "RSI",
+				"winPercent": 60,
+				"lossPercent": 40,
+				"gain": 1000
+			}
+		]
 	}
 }

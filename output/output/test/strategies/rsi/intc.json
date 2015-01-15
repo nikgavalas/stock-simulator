@@ -11,7 +11,7 @@
 	},
 	"orders": {
 		"4": {
-			"ticker": "AAPL",
+			"ticker": "INTC",
 			"id": 4,
 			"buyPrice": 300,
 			"sellPrice": 400,
@@ -19,7 +19,7 @@
 			"gain": 443.44
 		},
 		"5": {
-			"ticker": "AAPL",
+			"ticker": "INTC",
 			"id": 6,
 			"buyPrice": 300,
 			"sellPrice": 400,
@@ -27,7 +27,7 @@
 			"gain": 443.44
 		},
 		"6": {
-			"ticker": "AAPL",
+			"ticker": "INTC",
 			"id": 6,
 			"buyPrice": 300,
 			"sellPrice": 400,

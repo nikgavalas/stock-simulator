@@ -16,17 +16,5 @@
 		"winPercent": 60,
 		"lossPercent": 40,
 		"gain": 1000
-	},
-	{
-		"name": "Aroon",
-		"winPercent": 30,
-		"lossPercent": 70,
-		"gain": -500
-	},
-	{
-		"name": "Fib",
-		"winPercent": 50,
-		"lossPercent": 50,
-		"gain": 0
 	}
 ]

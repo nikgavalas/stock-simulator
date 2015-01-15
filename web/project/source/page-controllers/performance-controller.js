@@ -5,38 +5,24 @@ angular.module('mainApp').controller('PerformanceCtrl', [
 	'$routeParams',
 	'$location',
 	'ConfigFactory',
+	'StrategyListFactory',
 	function(
 		$scope,
 		$routeParams,
 		$location,
-		ConfigFactory
+		ConfigFactory,
+		StrategyListFactory
 	) {
 		// Save since it will be used in the rest of the app.
 		ConfigFactory.setOutputFolder($routeParams.runName);
 
 		$scope.strategy = $routeParams.strategy;
 
-		// TODO: get from data
-		$scope.strategies = [
-			{
-				'ticker': 'AAPL',
-				'winPercent': 44,
-				'lossPercent': 56,
-				'gain': -44.55
-			},
-			{
-				'ticker': 'AMD',
-				'winPercent': 80,
-				'lossPercent': 20,
-				'gain': 443.44
-			},
-			{
-				'ticker': 'INTC',
-				'winPercent': 60,
-				'lossPercent': 40,
-				'gain': 1000
-			}
-		];
+		// Load all the overall strategies.
+		$scope.strategies = [];
+		StrategyListFactory.getOverallForStrategy($scope.strategy).then(function(data) {
+			$scope.strategies = data;
+		});
 
 		/**
 		 * Called when the user clicks on a row in the strategy table

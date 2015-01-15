@@ -11,10 +11,28 @@ mainApp.factory('StrategyListFactory', [
 	) {
 		var factory = {};
 
-		factory.getOverallOrders = function() {
+		/**
+		 * Gets the data for the overall performance of all strategies
+		 * @return {Object} Deferred promise
+		 */
+		factory.getOverallStrategies = function() {
 			var deffered = $q.defer();
 
 			$http.get(ConfigFactory.getOutputFolder() + 'overall-strategies.json').success(function(data) {
+				deffered.resolve(data);
+			});
+
+			return deffered.promise;
+		};		
+
+		/**
+		 * Gets the data for the overall performance of a selected strategies
+		 * @return {Object} Deferred promise
+		 */
+		factory.getOverallForStrategy = function(strategyName) {
+			var deffered = $q.defer();
+
+			$http.get(ConfigFactory.getOutputFolder() + 'strategies/' + strategyName + '/overall.json').success(function(data) {
 				deffered.resolve(data);
 			});
 
