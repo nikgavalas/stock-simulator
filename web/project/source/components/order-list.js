@@ -7,7 +7,8 @@ mainApp.directive('orderList', [
 			replace: true,
 			templateUrl: 'source/components/order-list.html',
 			scope: {
-				strategyName: '@'
+				orders: '=',
+				orderClick: '='
 			},
 			controller: [
 				'$scope',
@@ -20,21 +21,6 @@ mainApp.directive('orderList', [
 					ConfigFactory,
 					OrderListFactory
 				) {
-	
-					$scope.orders = [];
-
-					OrderListFactory.getOverallOrders().then(function(data) {
-						$scope.orders = data;
-					});
-
-					/**
-					 * Goto a location. TODO: rewrite
-					 * @param  {[type]} order [description]
-					 * @return {[type]}       [description]
-					 */
-					$scope.orderClick = function(order) {
-						$location.url(ConfigFactory.getOutputName() + '/order/' + order.ticker + '/' + order.id);
-					};
 
 					/**
 					 * Expose the absolute function to the scope html

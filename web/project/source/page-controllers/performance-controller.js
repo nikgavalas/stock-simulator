@@ -3,10 +3,12 @@
 angular.module('mainApp').controller('PerformanceCtrl', [
 	'$scope',
 	'$routeParams',
+	'$location',
 	'ConfigFactory',
 	function(
 		$scope,
 		$routeParams,
+		$location,
 		ConfigFactory
 	) {
 		// Save since it will be used in the rest of the app.
@@ -37,11 +39,11 @@ angular.module('mainApp').controller('PerformanceCtrl', [
 		];
 
 		/**
-		 * Called when the user clicks on a row in the table.
-		 * @param  {Object} strategy Strategy object click
+		 * Called when the user clicks on a row in the strategy table
+		 * @param  {Object} strategy The strategy row that was clicked
 		 */
 		$scope.strategyClick = function(strategy) {
-			console.log(strategy);
+			$location.url(ConfigFactory.getOutputName() + '/strategy/' + $scope.strategy + '/' + strategy.ticker);
 		};
 
 	} // end controller

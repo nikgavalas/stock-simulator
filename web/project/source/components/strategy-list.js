@@ -14,7 +14,11 @@ mainApp.directive('strategyList', [
 				'$scope',
 				'StrategyListFactory',
 				function($scope, StrategyListFactory) {
-					// So it can be used in the scope.
+					/**
+					 * Expose the absolute function to the scope html
+					 * @param  {Number} value Value to return the absolute value for
+					 * @return {Number}       Math.abs value
+					 */
 					$scope.abs = function(value) {
 						return Math.abs(value);
 					};

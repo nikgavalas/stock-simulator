@@ -29,6 +29,10 @@ var mainApp = angular.module('mainApp', [
 			templateUrl: 'views/performance.html',
 			controller: 'PerformanceCtrl'
 		})
+		.when('/:runName/strategy/:strategy/:ticker', {
+			templateUrl: 'views/strategy-details.html',
+			controller: 'StrategyDetailsCtrl'
+		})
 		.otherwise({
 			redirectTo: '/'
 		});
