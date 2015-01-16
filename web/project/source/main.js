@@ -36,6 +36,11 @@ angular.module('mainApp').controller('MainCtrl', [
 		 * @return {[type]}       [description]
 		 */
 		$scope.orderClick = function(order) {
+			// TODO: Maybe show the order here on the charts instead. So when clicked
+			// Change chart to ticker
+			// Change to strategy that was used to buy this order and display stats
+			// Change indicators to match the strategy
+			// Show buy and sell locations on the chart
 			$location.url(ConfigFactory.getOutputName() + '/order/' + order.ticker + '/' + order.id);
 		};
 
