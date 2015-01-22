@@ -1,14 +1,9 @@
 {
 	"startDate": "12/1/2014",
 	"endDate": "12/31/2014",
-	"plotOnPrice": false,
-	"chartValues": {
-		"Zero Line": [
-			40.0,
-			50.3,
-			60.5
-		]
-	},
+	"indicators": [
+		"Rsi"
+	],
 	"orders": {
 		"4": {
 			"ticker": "AAPL",

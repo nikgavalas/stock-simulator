@@ -30,3 +30,8 @@ html, body {
 .hover-pointer:hover {
 	cursor: pointer;
 }
+
+.border-underline {
+	border-bottom: 1px solid $table-border-color;
+	margin-bottom: 30px;
+}

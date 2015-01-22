@@ -25,6 +25,19 @@ mainApp.factory('ChartDataFactory', [
 			return deffered.promise;
 		};		
 
+		/**
+		 * Returns the indicator data for the ticker and indicator.
+		 * @return {Object} Promise object for defered use
+		 */
+		factory.getIndicatorData = function(indicatorName, ticker) {
+			var deffered = $q.defer();
+
+			$http.get(ConfigFactory.getOutputFolder() + 'indicators/' + indicatorName + '/' + ticker + '.json').success(function(data) {
+				deffered.resolve(data);
+			});
+
+			return deffered.promise;
+		};		
 		return factory;
 	}
 ]);

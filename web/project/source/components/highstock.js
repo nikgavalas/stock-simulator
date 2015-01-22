@@ -5,6 +5,13 @@ mainApp.directive('highstock', [
 	function(
 		ChartDataFactory
 	) {
+		
+		// The chart so that we can manipulate it in the directive.
+		var chart = null;
+		var priceHeight = 450;
+		var indicatorHeight = 150;
+		var axisIds = [];
+
 		return {
 			restrict: 'E',
 			replace: true,
@@ -12,20 +19,124 @@ mainApp.directive('highstock', [
 			scope: {
 				ticker: '@'
 			},
-			// controller: [
-			// 	'$scope',
-			// 	function($scope) {
+			controller: [
+				'$scope',
+				function($scope) {
 
-			// 	}
-			// ],
+					$scope.setTotalHeightAndGetAxisTopAndHeights = function(numberOfyAxis) {
+						var heights = [];
+						var tops = [];
+						var extraAxis = numberOfyAxis - 1;
+						var totalHeight = priceHeight + (extraAxis * indicatorHeight);
+						var topTotal = 0;
+						// Percent height for the chart.
+						tops.push(topTotal + '%');
+						var newHeight = (priceHeight / totalHeight) * 100;
+						heights.push(newHeight + '%');
+						topTotal += newHeight;
+
+						for (var i = 0; i < extraAxis; i++) {
+							newHeight = (indicatorHeight / totalHeight) * 100;
+							heights.push(newHeight + '%');
+							tops.push(topTotal + '%');
+							topTotal += newHeight;
+						}
+
+						$scope.elementStyle = {
+							'height': totalHeight + 'px'
+						};
+
+						return {
+							heights: heights,
+							tops: tops
+						};
+					};
+
+					$scope.$on('AddIndicator', function(msgName, args) {
+						// Get the indicator data and once we have it add it to the chart.
+						ChartDataFactory.getIndicatorData(args.name, $scope.ticker).then(function(data) {
+							try {
+								var seriesName, seriesData, newSeries;
+
+								if (data.plotOnPrice) {
+									for (seriesName in data.series) {
+										seriesData = data.series[seriesName];
+										newSeries = chart.addSeries({
+											name: args.name,
+											data: seriesData.data,
+											type: seriesData.type
+										}, false);
+									}
+
+									chart.redraw();
+								}
+								else {
+									var axisId = args.name + '-axis';
+									axisIds.push(axisId);
+
+									chart.addAxis({
+										id: axisId,
+										labels: {
+											align: 'right',
+											x: -3
+										},
+										title: {
+												text: args.name
+										},
+										top: '15%',
+										height: '15%',
+										lineWidth: 2,
+										opposite: false
+									}, false, false);
+
+									for (seriesName in data.series) {
+										seriesData = data.series[seriesName];
+										newSeries = chart.addSeries({
+											name: args.name,
+											data: seriesData.data,
+											type: seriesData.type,
+											yAxis: axisId
+										}, false);
+									}
+
+									// Need to rebalance the percentages of the height.
+									var heightsAndTops = $scope.setTotalHeightAndGetAxisTopAndHeights(axisIds.length);
+
+									// Update all the heights of each chart.
+									for (var i = 0; i < axisIds.length; i++) {
+										var axis = chart.get(axisIds[i]);
+										axis.update({
+											top: heightsAndTops.tops[i],
+											height: heightsAndTops.heights[i],
+											labels: {
+												align: 'center',
+												x: -3
+											},
+										}, false);
+									}
+
+									chart.redraw();
+								}
+							}
+							catch (e) {
+								console.log(e);
+							}
+						});
+					});
+
+				}
+			],
 			link: function($scope, $element, $attrs) {
 
-				$scope.elementStyle = {
-					'height': '600px'
-				};
+				var heightsAndTops = $scope.setTotalHeightAndGetAxisTopAndHeights(2);
 
 				// Get the data first before creating the chart.
 				ChartDataFactory.getPriceData($scope.ticker).then(function(data) {
+
+					axisIds = [
+						'price-axis',
+						'volume-axis'
+					];
 
 					var ohlc = data.price;
 					var volume = data.volume;
@@ -44,50 +155,71 @@ mainApp.directive('highstock', [
 								text: $scope.ticker
 						},
 
-						yAxis: [{
-								labels: {
-										align: 'right',
-										x: -3
-								},
-								title: {
-										text: 'Candlestick'
-								},
-								height: '75%',
-								lineWidth: 2
-						}, {
-								labels: {
-										align: 'right',
-										x: -3
-								},
-								title: {
-										text: 'Volume'
-								},
-								top: '80%',
-								height: '15%',
-								offset: 0,
-								lineWidth: 2
-						}],
+						legend: {
+							enabled: true,
+							align: 'right',
+							backgroundColor: '#d9edf7',
+							borderColor: '#46b8da',
+							borderWidth: 1,
+							layout: 'vertical',
+							verticalAlign: 'top',
+							y: 100,
+							shadow: true
+						},
 
+						yAxis: [
+							{
+								// labels: {
+								// 	align: 'right',
+								// 	x: -3
+								// },
+								title: {
+									text: 'Candlestick'
+								},
+								top: heightsAndTops.tops[0],
+								height: heightsAndTops.heights[0],
+								lineWidth: 2,
+								id: axisIds[0]
+							},
+							{
+								// labels: {
+								// 	align: 'right',
+								// 	x: -3
+								// },
+								title: {
+									text: 'Volume'
+								},
+								top: heightsAndTops.tops[1],
+								height: heightsAndTops.heights[1],
+								offset: 0,
+								lineWidth: 2,
+								id: axisIds[1]
+							}
+						],
 						series: [
 							{
-									type: 'candlestick',
-									name: $scope.ticker,
-									data: ohlc,
-									dataGrouping: {
-											units: groupingUnits
-									}
+								type: 'candlestick',
+								name: $scope.ticker,
+								data: ohlc,
+								yAxis: axisIds[0],
+								dataGrouping: {
+									units: groupingUnits
+								}
 							},
 							{
 								type: 'column',
 								name: 'Volume',
 								data: volume,
-								yAxis: 1,
+								yAxis: axisIds[1],
 								dataGrouping: {
-										units: groupingUnits
+									units: groupingUnits
 								}
 							}
 						]
 					}); // end creating highcharts
+
+					// Save for later
+					chart = $element.highcharts();
 
 				}); // end $http.get
 			}

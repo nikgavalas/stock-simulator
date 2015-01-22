@@ -4,55 +4,44 @@
 	<!-- The row for the grid -->
 	<div class="row firstrow-container">
 
-		<div class="col-xs-12">
+		<div class="row">
+			<div class="col-xs-12 border-underline">
+				<h3>{{strategy}} <small>{{ticker}}</small></h3>
+			</div>
+		</div>
 
-			<h3>{{strategy}} <small>{{ticker}}</small></h3>
+		<div class="row">
+			<div class="col-xs-12">
 
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<h3 class="panel-title">Charts</h3>
-				</div>
-				<div class="panel-body">
-
-					<!-- This will be where the chart goes -->
-					<div class="row">
-						<div class="col-xs-12">
-							<div class="well">Price chart placeholder</div>
-						</div>
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">Charts</h3>
 					</div>
+					<div class="panel-body">
 
-					<!-- The chart showing the buy pressure (our indicator) -->
-					<div class="row">
-						<div class="col-xs-12">
-							<div class="well">Buy pressure (our indicator)</div>
+						<!-- This will be where the chart goes -->
+						<!-- indicators will have to be added to the directive so it can stack them accordingly -->
+						<div class="row">
+							<div class="col-xs-12">
+								<highstock ticker="{{ticker}}"></highstock>
+							</div>
 						</div>
+
+
 					</div>
+				</div><!-- End chart panel -->
 
-					<!-- Any other indicator charts will go here -->
-					<div class="row">
-						<div class="col-xs-12">
-							<div class="well">Indicator involved in the strategy chart placeholder</div>
-						</div>
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">Orders</h3>
 					</div>
-					<div class="row">
-						<div class="col-xs-12">
-							<div class="well">Indicator involved in the strategy chart placeholder</div>
-						</div>
+					<div class="panel-body">
+
+						<order-list orders="orders" order-click="orderClick"></order-list>
+
 					</div>
-
-				</div>
-			</div><!-- End chart panel -->
-
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<h3 class="panel-title">Orders</h3>
-				</div>
-				<div class="panel-body">
-
-					<order-list orders="orders" order-click="orderClick"></order-list>
-
-				</div>
-			</div><!-- End strategy list panel -->
+				</div><!-- End strategy list panel -->
+			</div>
 		</div>
 
 	</div>

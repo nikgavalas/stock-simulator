@@ -22,7 +22,13 @@ angular.module('mainApp').controller('StrategyDetailsCtrl', [
 		$scope.orders = [];
 		OrderListFactory.getOrders($scope.strategy, $scope.ticker).then(function(data) {
 			$scope.orders = data.orders;
+
+			// Add all the indicators to the chart.
+			for (var i = 0; i < data.indicators.length; i++) {
+				$scope.$broadcast('AddIndicator', { name: data.indicators[i] });
+			}
 		});
+
 
 		/**
 		 * Snap the chart to the order location.
