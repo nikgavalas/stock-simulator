@@ -86,7 +86,8 @@ mainApp.directive('highstock', [
 										top: '15%',
 										height: '15%',
 										lineWidth: 2,
-										opposite: false
+										opposite: true,
+										offset: 0
 									}, false, false);
 
 									for (seriesName in data.series) {
@@ -169,10 +170,10 @@ mainApp.directive('highstock', [
 
 						yAxis: [
 							{
-								// labels: {
-								// 	align: 'right',
-								// 	x: -3
-								// },
+								labels: {
+									align: 'right',
+									x: -3
+								},
 								title: {
 									text: 'Candlestick'
 								},
@@ -182,10 +183,10 @@ mainApp.directive('highstock', [
 								id: axisIds[0]
 							},
 							{
-								// labels: {
-								// 	align: 'right',
-								// 	x: -3
-								// },
+								labels: {
+									align: 'right',
+									x: -3
+								},
 								title: {
 									text: 'Volume'
 								},
