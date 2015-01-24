@@ -23,6 +23,8 @@ angular.module('mainApp').controller('StrategyDetailsCtrl', [
 		OrderListFactory.getOrders($scope.strategy, $scope.ticker).then(function(data) {
 			$scope.orders = data.orders;
 
+			$scope.chartEvents = OrderListFactory.convertOrdersToDataSeries(data.orders);
+			
 			// Add all the indicators to the chart.
 			for (var i = 0; i < data.indicators.length; i++) {
 				$scope.$broadcast('AddIndicator', { name: data.indicators[i] });

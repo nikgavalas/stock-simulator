@@ -6,28 +6,34 @@
 	],
 	"orders": {
 		"4": {
-			"ticker": "AMD",
+			"ticker": "AAPL",
 			"id": 4,
 			"buyPrice": 300,
 			"sellPrice": 400,
+			"buyDate": "9/1/2014",
+			"sellDate": "9/10/2014",
 			"numShares": 43,
-			"gain": 2443.44
+			"gain": 1443.44
 		},
 		"5": {
-			"ticker": "AMD",
-			"id": 6,
+			"ticker": "AAPL",
+			"id": 5,
 			"buyPrice": 300,
 			"sellPrice": 400,
+			"buyDate": "10/21/2014",
+			"sellDate": "11/10/2014",
 			"numShares": 43,
-			"gain": 2443.44
+			"gain": 1443.44
 		},
 		"6": {
-			"ticker": "AMD",
+			"ticker": "AAPL",
 			"id": 6,
 			"buyPrice": 300,
 			"sellPrice": 400,
+			"buyDate": "10/1/2014",
+			"sellDate": "10/10/2014",
 			"numShares": 43,
-			"gain": 2443.44
+			"gain": 1443.44
 		}
 	}
 }

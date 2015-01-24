@@ -17,7 +17,8 @@ mainApp.directive('highstock', [
 			replace: true,
 			template: '<div ng-style="elementStyle"></div>',
 			scope: {
-				ticker: '@'
+				ticker: '@',
+				events: '='
 			},
 			controller: [
 				'$scope',
@@ -213,6 +214,7 @@ mainApp.directive('highstock', [
 								type: 'candlestick',
 								name: $scope.ticker,
 								data: ohlc,
+								id: 'price-series',
 								yAxis: axisIds[0],
 								dataGrouping: {
 									units: groupingUnits
@@ -233,6 +235,18 @@ mainApp.directive('highstock', [
 					// Save for later
 					chart = $element.highcharts();
 
+					// Add the events to the chart.
+					$scope.$watch('events', function(eventData) {
+						var newSeries = chart.addSeries({
+							data: eventData,
+							name: 'Events',
+							type: 'flags',
+							onSeries: 'price-series',
+							shape: 'squarepin',
+							width: 16,
+							color: '#ff0000'
+						}, false);
+					});
 				}); // end $http.get
 			}
 		};
