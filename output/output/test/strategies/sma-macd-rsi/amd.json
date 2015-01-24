@@ -2,32 +2,34 @@
 	"startDate": "12/1/2014",
 	"endDate": "12/31/2014",
 	"indicators": [
-		"Macd"
+		"Sma",
+		"Macd",
+		"Rsi"
 	],
 	"orders": {
 		"4": {
-			"ticker": "AMD",
+			"ticker": "AAPL",
 			"id": 4,
 			"buyPrice": 300,
 			"sellPrice": 400,
 			"numShares": 43,
-			"gain": 7443.44
+			"gain": 1443.44
 		},
 		"5": {
-			"ticker": "AMD",
+			"ticker": "AAPL",
 			"id": 6,
 			"buyPrice": 300,
 			"sellPrice": 400,
 			"numShares": 43,
-			"gain": 7443.44
+			"gain": 1443.44
 		},
 		"6": {
-			"ticker": "AMD",
+			"ticker": "AAPL",
 			"id": 6,
 			"buyPrice": 300,
 			"sellPrice": 400,
 			"numShares": 43,
-			"gain": 7443.44
+			"gain": 1443.44
 		}
 	}
 }

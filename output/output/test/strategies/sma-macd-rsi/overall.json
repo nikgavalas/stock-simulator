@@ -1,0 +1,20 @@
+[
+	{
+		"ticker": "AAPL",
+		"winPercent": 10,
+		"lossPercent": 90,
+		"gain": -44.55
+	},
+	{
+		"ticker": "AMD",
+		"winPercent": 10,
+		"lossPercent": 90,
+		"gain": -44.55
+	},
+	{
+		"ticker": "INTC",
+		"winPercent": 10,
+		"lossPercent": 90,
+		"gain": -44.55
+	}
+]

@@ -9,7 +9,7 @@ mainApp.directive('highstock', [
 		// The chart so that we can manipulate it in the directive.
 		var chart = null;
 		var priceHeight = 450;
-		var indicatorHeight = 150;
+		var indicatorHeight = 180;
 		var axisIds = [];
 
 		return {
@@ -21,7 +21,8 @@ mainApp.directive('highstock', [
 			},
 			controller: [
 				'$scope',
-				function($scope) {
+				'$timeout',
+				function($scope, $timeout) {
 
 					$scope.setTotalHeightAndGetAxisTopAndHeights = function(numberOfyAxis) {
 						var heights = [];
@@ -69,6 +70,7 @@ mainApp.directive('highstock', [
 									}
 
 									chart.redraw();
+									chart.reflow();
 								}
 								else {
 									var axisId = args.name + '-axis';
@@ -93,7 +95,7 @@ mainApp.directive('highstock', [
 									for (seriesName in data.series) {
 										seriesData = data.series[seriesName];
 										newSeries = chart.addSeries({
-											name: args.name,
+											name: seriesName,
 											data: seriesData.data,
 											type: seriesData.type,
 											yAxis: axisId
@@ -116,7 +118,10 @@ mainApp.directive('highstock', [
 										}, false);
 									}
 
-									chart.redraw();
+									$timeout(function() {
+										chart.redraw();
+										chart.reflow();
+									}, 500);
 								}
 							}
 							catch (e) {
@@ -154,6 +159,12 @@ mainApp.directive('highstock', [
 
 						title: {
 								text: $scope.ticker
+						},
+
+						tooltip: {
+							positioner: function () {
+								return { x: 10, y: 35 };
+							}
 						},
 
 						legend: {

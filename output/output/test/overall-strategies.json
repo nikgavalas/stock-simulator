@@ -16,5 +16,11 @@
 		"winPercent": 60,
 		"lossPercent": 40,
 		"gain": 1000
+	},
+	{
+		"name": "SMA-MACD-RSI",
+		"winPercent": 60,
+		"lossPercent": 40,
+		"gain": 1000
 	}
 ]
