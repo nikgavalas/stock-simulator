@@ -39,6 +39,20 @@ mainApp.factory('StrategyListFactory', [
 			return deffered.promise;
 		};		
 
+		/**
+		 * Gets the orders a strategy and symbol.
+		 * @return {Object} Promise object for defered use
+		 */
+		factory.getStrategy = function(strategyName, ticker) {
+			var deffered = $q.defer();
+
+			$http.get(ConfigFactory.getOutputFolder() + 'strategies/' + strategyName + '/' + ticker + '.json').success(function(data) {
+				deffered.resolve(data);
+			});
+
+			return deffered.promise;
+		};		
+
 		return factory;
 	}
 ]);

@@ -236,7 +236,11 @@ mainApp.directive('highstock', [
 					chart = $element.highcharts();
 
 					// Add the events to the chart.
-					$scope.$watch('events', function(eventData) {
+					$scope.$watch('events', function(eventData, oldEventData) {
+						if (eventData === oldEventData) {
+							return;
+						}
+						
 						var newSeries = chart.addSeries({
 							data: eventData,
 							name: 'Events',

@@ -26,20 +26,6 @@ mainApp.factory('OrderListFactory', [
 		};		
 
 		/**
-		 * Gets the orders a strategy and symbol.
-		 * @return {Object} Promise object for defered use
-		 */
-		factory.getOrders = function(strategyName, ticker) {
-			var deffered = $q.defer();
-
-			$http.get(ConfigFactory.getOutputFolder() + 'strategies/' + strategyName + '/' + ticker + '.json').success(function(data) {
-				deffered.resolve(data);
-			});
-
-			return deffered.promise;
-		};		
-
-		/**
 		 * Converts all orders to an array of events to use with highstocks
 		 * @param  {Object} orders The orders from the data
 		 * @return {Array}        Array of events

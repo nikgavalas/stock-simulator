@@ -1,4 +1,4 @@
-<div class="container container-padding">
+<div class="container-fluid container-padding">
 	<navbar></navbar>
 	
 	<!-- The row for the grid -->
@@ -23,7 +23,7 @@
 						<!-- indicators will have to be added to the directive so it can stack them accordingly -->
 						<div class="row">
 							<div class="col-xs-12">
-								<highstock ticker="{{ticker}}"></highstock>
+								<highstock ticker="{{ticker}}" events="chartEvents"></highstock>
 							</div>
 						</div>
 

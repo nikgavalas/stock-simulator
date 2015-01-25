@@ -6,12 +6,14 @@ angular.module('mainApp').controller('StrategyDetailsCtrl', [
 	'$location',
 	'ConfigFactory',
 	'OrderListFactory',
+	'StrategyListFactory',
 	function(
 		$scope,
 		$routeParams,
 		$location,
 		ConfigFactory,
-		OrderListFactory
+		OrderListFactory,
+		StrategyListFactory
 	) {
 		// Save since it will be used in the rest of the app.
 		ConfigFactory.setOutputFolder($routeParams.runName);
@@ -20,11 +22,11 @@ angular.module('mainApp').controller('StrategyDetailsCtrl', [
 		$scope.ticker = $routeParams.ticker;
 
 		$scope.orders = [];
-		OrderListFactory.getOrders($scope.strategy, $scope.ticker).then(function(data) {
+		StrategyListFactory.getStrategy($scope.strategy, $scope.ticker).then(function(data) {
 			$scope.orders = data.orders;
 
 			$scope.chartEvents = OrderListFactory.convertOrdersToDataSeries(data.orders);
-			
+
 			// Add all the indicators to the chart.
 			for (var i = 0; i < data.indicators.length; i++) {
 				$scope.$broadcast('AddIndicator', { name: data.indicators[i] });

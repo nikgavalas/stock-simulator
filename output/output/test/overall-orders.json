@@ -4,6 +4,8 @@
 		"id": 1,
 		"buyPrice": 300,
 		"sellPrice": 400,
+		"buyDate": "11/10/2014",
+		"sellDate": "11/25/2014",
 		"numShares": 43,
 		"gain": 443.44,
 		"strategies": [
@@ -32,6 +34,8 @@
 		"id": 2,
 		"buyPrice": 300,
 		"sellPrice": 400,
+		"buyDate": "10/16/2014",
+		"sellDate": "10/22/2014",
 		"numShares": 43,
 		"gain": -443.44,
 		"strategies": [
@@ -49,8 +53,8 @@
 			},
 			{
 				"name": "RSI",
-				"winPercent": 95,
-				"lossPercent": 5,
+				"winPercent": 70,
+				"lossPercent": 30,
 				"gain": 10000.50
 			}
 		]
@@ -60,6 +64,8 @@
 		"id": 3,
 		"buyPrice": 300,
 		"sellPrice": 400,
+		"buyDate": "9/9/2014",
+		"sellDate": "9/15/2014",
 		"numShares": 43,
 		"gain": 443.44,
 		"strategies": [
@@ -71,8 +77,8 @@
 			},
 			{
 				"name": "MACD",
-				"winPercent": 50,
-				"lossPercent": 50,
+				"winPercent": 80,
+				"lossPercent": 20,
 				"gain": 443.44
 			},
 			{

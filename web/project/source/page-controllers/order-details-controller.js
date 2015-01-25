@@ -6,12 +6,14 @@ angular.module('mainApp').controller('OrderDetailsCtrl', [
 	'$location',
 	'ConfigFactory',
 	'OrderListFactory',
+	'StrategyListFactory',
 	function(
 		$scope,
 		$routeParams,
 		$location,
 		ConfigFactory,
-		OrderListFactory
+		OrderListFactory,
+		StrategyListFactory
 	) {
 		var orderData = null;
 
@@ -21,8 +23,7 @@ angular.module('mainApp').controller('OrderDetailsCtrl', [
 		$scope.ticker = $routeParams.ticker;
 		$scope.orderId = $routeParams.orderId;
 
-		// TODO: get from data.
-		$scope.orderDate = '12/22/2014';
+		$scope.orderDate = '';
 
 		// Load all the overall strategies.
 		$scope.strategies = [];
@@ -30,6 +31,28 @@ angular.module('mainApp').controller('OrderDetailsCtrl', [
 		OrderListFactory.getOverallOrders().then(function(data) {
 			orderData = data[$scope.orderId];
 			$scope.strategies = orderData.strategies;
+			$scope.orderDate = orderData.buyDate;
+			
+			// Sort so the strategy with the highest is at the top and that is the one that is shown first.
+			$scope.strategies.sort(function(a, b) {
+				return b.winPercent - a.winPercent;
+			});
+
+			// Display the indicators from the winning strategy.
+			var winningStrategy = $scope.strategies[0];
+			if (winningStrategy) {
+				StrategyListFactory.getStrategy(winningStrategy.name, $scope.ticker).then(function(data) {
+					// Create an object for the order to be in so we can convert it to events.
+					var order = {};
+					order[$scope.orderId] = orderData;
+					$scope.chartEvents = OrderListFactory.convertOrdersToDataSeries(order);
+					
+					// Add all the indicators to the chart.
+					for (var i = 0; i < data.indicators.length; i++) {
+						$scope.$broadcast('AddIndicator', { name: data.indicators[i] });
+					}
+				});
+			}
 		});
 
 
