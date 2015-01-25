@@ -18,7 +18,8 @@ mainApp.directive('highstock', [
 			template: '<div ng-style="elementStyle"></div>',
 			scope: {
 				ticker: '@',
-				events: '='
+				events: '=',
+				extremes: '='
 			},
 			controller: [
 				'$scope',
@@ -164,7 +165,7 @@ mainApp.directive('highstock', [
 
 						tooltip: {
 							positioner: function () {
-								return { x: 10, y: 35 };
+								return { x: 10, y: 80 };
 							}
 						},
 
@@ -176,7 +177,7 @@ mainApp.directive('highstock', [
 							borderWidth: 1,
 							layout: 'vertical',
 							verticalAlign: 'top',
-							y: 100,
+							y: 200,
 							shadow: true
 						},
 
@@ -237,10 +238,10 @@ mainApp.directive('highstock', [
 
 					// Add the events to the chart.
 					$scope.$watch('events', function(eventData, oldEventData) {
-						if (eventData === oldEventData) {
+						if (!eventData) {
 							return;
 						}
-						
+
 						var newSeries = chart.addSeries({
 							data: eventData,
 							name: 'Events',
@@ -251,6 +252,15 @@ mainApp.directive('highstock', [
 							color: '#ff0000'
 						}, false);
 					});
+
+					$scope.$watch('extremes', function(newExtremes, oldExtremes) {
+						if (newExtremes === oldExtremes) {
+							return;
+						}
+
+						chart.xAxis[0].setExtremes(newExtremes.min, newExtremes.max);
+					});
+
 				}); // end $http.get
 			}
 		};

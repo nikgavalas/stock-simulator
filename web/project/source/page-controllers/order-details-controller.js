@@ -47,6 +47,16 @@ angular.module('mainApp').controller('OrderDetailsCtrl', [
 					order[$scope.orderId] = orderData;
 					$scope.chartEvents = OrderListFactory.convertOrdersToDataSeries(order);
 					
+					// Set the chart to position to these dates.
+					var buyDate = new Date($scope.orderDate);
+					var range = 30; // Days
+					$scope.extremes = {
+						min: new Date(),
+						max: new Date()
+					};
+					$scope.extremes.min.setTime(buyDate.getTime() - (range * 24 * 60 * 60 * 1000));
+					$scope.extremes.max.setTime(buyDate.getTime() + (range * 24 * 60 * 60 * 1000));
+					
 					// Add all the indicators to the chart.
 					for (var i = 0; i < data.indicators.length; i++) {
 						$scope.$broadcast('AddIndicator', { name: data.indicators[i] });

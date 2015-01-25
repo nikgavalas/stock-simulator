@@ -39,7 +39,15 @@ angular.module('mainApp').controller('StrategyDetailsCtrl', [
 		 * @param  {Object} order Order that was clicked
 		 */
 		$scope.orderClick = function(order) {
-			console.log('Snap the chart to the order location');
+			// Set the chart to position to these dates.
+			var buyDate = new Date(order.buyDate);
+			var range = 30; // Days
+			$scope.extremes = {
+				min: new Date(),
+				max: new Date()
+			};
+			$scope.extremes.min.setTime(buyDate.getTime() - (range * 24 * 60 * 60 * 1000));
+			$scope.extremes.max.setTime(buyDate.getTime() + (range * 24 * 60 * 60 * 1000));
 		};
 
 	} // end controller
