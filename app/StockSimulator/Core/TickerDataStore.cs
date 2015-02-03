@@ -35,7 +35,7 @@ namespace StockSimulator.Core
 		/// <returns>Data (price, volume, etc) for the ticker</returns>
 		public TickerData GetTickerData(TickerExchangePair ticker, DateTime start, DateTime end)
 		{
-			TickerData data = new TickerData();
+			TickerData data = new TickerData(ticker);
 
 			// The symbol exists in memory already.
 			int key = ticker.GetHashCode();
@@ -191,7 +191,7 @@ namespace StockSimulator.Core
 				}
 				else
 				{
-					return CreateTickerDataFromString(resultValue, start, end);
+					return CreateTickerDataFromString(resultValue, ticker, start, end);
 				}
 			}
 		}
@@ -203,7 +203,7 @@ namespace StockSimulator.Core
 		/// <param name="start">Start date of the data</param>
 		/// <param name="end">End date of the data</param>
 		/// <returns>Returns an object created from the ticker data string</returns>
-		private TickerData CreateTickerDataFromString(string data, DateTime start, DateTime end)
+		private TickerData CreateTickerDataFromString(string data, TickerExchangePair ticker, DateTime start, DateTime end)
 		{
 			if (string.IsNullOrEmpty(data))
 			{
@@ -220,7 +220,7 @@ namespace StockSimulator.Core
 					reader.ReadLine();
 				}
 
-				TickerData tickerData = new TickerData(start, end);
+				TickerData tickerData = new TickerData(ticker, start, end);
 
 				// Read each line of the string and convert it into numerical data and dates.
 				do

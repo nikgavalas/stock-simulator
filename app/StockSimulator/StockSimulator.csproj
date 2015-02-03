@@ -36,6 +36,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -71,7 +72,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Core\ComboSet.cs" />
+    <Compile Include="Core\DataOutputter.cs" />
+    <Compile Include="Core\Order.cs" />
     <Compile Include="Core\SimulatorConfig.cs" />
+    <Compile Include="Core\StrategyStatistics.cs" />
     <Compile Include="Strategies\BestOfSubStrategies.cs" />
     <Compile Include="Strategies\MacdStrategy.cs" />
     <Compile Include="Strategies\RsiStrategy.cs" />
@@ -84,7 +89,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Core\BestOfTask.cs" />
     <Compile Include="Core\Broker.cs" />
     <Compile Include="Core\Configurable.cs" />
     <Compile Include="Core\DataSeries.cs" />

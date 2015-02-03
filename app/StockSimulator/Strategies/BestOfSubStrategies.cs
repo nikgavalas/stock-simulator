@@ -8,12 +8,48 @@ using StockSimulator.Core;
 
 namespace StockSimulator.Strategies
 {
-	class BestOfSubStrategies : Strategy
+	/// <summary>
+	/// Strategy that takes stores the best sub strategies for each day along with each ones statistcis
+	/// to the day it was found.
+	/// </summary>
+	public class BestOfSubStrategies : Strategy
 	{
+		/// <summary>
+		/// For each bar the percent of the highest strategy that was found and 
+		/// a list of all other percents for the other strategies that weren't as high.
+		/// </summary>
+		public class BarStatistics
+		{
+			public double HighestPercent { get; set; }
+			public List<StrategyStatistics> Statistics { get; set; }
+
+			public BarStatistics()
+			{
+				HighestPercent = 0.0;
+				Statistics = new List<StrategyStatistics>();
+			}
+
+			public BarStatistics(double percent, List<StrategyStatistics> statistics)
+			{
+				HighestPercent = percent;
+				Statistics = statistics;
+			}
+		}
+
+		/// <summary>
+		/// List of bar data.
+		/// </summary>
+		public List<BarStatistics> Bars { get; set; }
+
+		/// <summary>
+		/// Construct the class and initialize the bar data to default values.
+		/// </summary>
+		/// <param name="tickerData">Ticker for the strategy</param>
+		/// <param name="factory">Factory for creating dependents</param>
 		public BestOfSubStrategies(TickerData tickerData, RunnableFactory factory) 
 			: base(tickerData, factory)
 		{
-
+			Bars = Enumerable.Repeat(new BarStatistics(), tickerData.NumBars).ToList();
 		}
 
 		/// <summary>
@@ -41,6 +77,89 @@ namespace StockSimulator.Strategies
 		public override string ToString()
 		{
 			return "BestOfSubStrategies";
+		}
+
+		/// <summary>
+		/// Sees which strategies were found on this far and places orders for all 
+		/// the combos of those strategies. The value of this strategy is the best 
+		/// strategy that was found on this bar based on the success of the history
+		/// of that strategy.
+		/// </summary>
+		/// <param name="currentBar">Current bar of the simulation</param>
+		protected override void OnBarUpdate(int currentBar)
+		{
+			base.OnBarUpdate(currentBar);
+
+			List<List<Strategy>> combos = GetComboList(currentBar);
+
+			// Place orders for all the combos.
+			List<StrategyStatistics> stats = new List<StrategyStatistics>();
+			for (int i = 0; i < combos.Count; i++)
+			{
+				List<Strategy> comboList = combos[i];
+				string comboName = "";
+				for (int j = 0; j < comboList.Count; j++)
+				{
+					comboName += comboList[i].ToString();
+					comboName += "-";
+				}
+
+				// Trim off the last '-'
+				if (comboList.Count > 0)
+				{
+					comboName.TrimEnd('-');
+				}
+
+				// Now that the name of the strategy is found, enter the order.
+				Order placedOrder = EnterOrder(comboName, currentBar);
+				stats.Add(placedOrder.StartStatistics);
+			}
+
+			// For each combo we want to find out the winning % and the gain
+			// for it and save those values for the bar.
+			double highestWinPercent = 0;
+			for (int i = 0; i < stats.Count; i++)
+			{
+				if (stats[i].WinPercent > highestWinPercent)
+				{
+					highestWinPercent = stats[i].WinPercent;
+				}
+			}
+
+			Bars[currentBar] = new BarStatistics(highestWinPercent, stats);
+		}
+
+		/// <summary>
+		/// Builds a list of all the possible combos found on this bar.
+		/// </summary>
+		/// <param name="currentBar">Current bar to search for combos.=</param>
+		/// <returns>List of all the combo lists for this bar</returns>
+		private List<List<Strategy>> GetComboList(int currentBar)
+		{
+			// Get all the strategies that were found on today.
+			List<Strategy> foundStrategies = new List<Strategy>();
+			for (int i = 0; i < Dependents.Count; i++)
+			{
+				Strategy dependentStrategy = (Strategy)Dependents[i];
+				// TODO: We could implement logic here that searches the current bar
+				// and back a few days to make the finding not so exact. That could add
+				// for some more leeway when finding combos as finding multiple
+				// strategies on exact bars may only happen a few times.
+				if (dependentStrategy.WasFound[currentBar])
+				{
+					foundStrategies.Add(dependentStrategy);
+				}
+			}
+
+			// Create all the possible combos of these strategies.
+			// TODO: If we have it where we are finding more than 5
+			// strategies on a day we probably don't need to bother
+			// with tracking more than that since the likelyhood
+			// of finding a point all of those 5 strategies again is small.
+			// So we might want to set a max.
+			ComboSet<Strategy> comboSet = new ComboSet<Strategy>(foundStrategies);
+			List<List<Strategy>> combos = comboSet.GetSet(1);
+			return combos;
 		}
 	}
 }

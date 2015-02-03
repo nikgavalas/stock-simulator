@@ -20,14 +20,16 @@ namespace StockSimulator.Core
 		public List<double> Low { get; set; }
 		public List<long> Volume { get; set; }
 		public int NumBars { get; set; }
+		public TickerExchangePair TickerAndExchange { get; set; }
 
 		// TODO: add things like the median and such and such.
 
 		/// <summary>
 		/// Creates an empty object.
 		/// </summary>
-		public TickerData()
+		public TickerData(TickerExchangePair tickerAndExchange)
 		{
+			TickerAndExchange = tickerAndExchange;
 			Start = DateTime.Now;
 			End = DateTime.Now;
 		}
@@ -37,8 +39,9 @@ namespace StockSimulator.Core
 		/// </summary>
 		/// <param name="start">Starting date of the data</param>
 		/// <param name="end">Ending date of the data</param>
-		public TickerData(DateTime start, DateTime end)
+		public TickerData(TickerExchangePair tickerAndExchange, DateTime start, DateTime end)
 		{
+			TickerAndExchange = tickerAndExchange;
 			Start = start;
 			End = end;
 

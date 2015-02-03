@@ -48,6 +48,8 @@ namespace StockSimulator.Strategies
 		/// <param name="currentBar">The current bar of the simulation</param>
 		protected override void OnBarUpdate(int currentBar)
 		{
+			base.OnBarUpdate(currentBar);
+
 			Sma sma = (Sma)Dependents[0];
 			if (DataSeries.CrossAbove(Data.Close, sma.Avg, currentBar, 0) != -1)
 			{

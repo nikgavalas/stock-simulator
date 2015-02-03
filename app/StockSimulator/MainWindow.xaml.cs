@@ -48,6 +48,9 @@ namespace StockSimulator
 
 			// Runs the simulation.
 			Sim.Run();
+
+			// Output all the data.
+			Sim.Shutdown();
 		}
 	}
 }
