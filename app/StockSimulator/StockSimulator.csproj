@@ -36,6 +36,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -74,6 +75,7 @@
     </ApplicationDefinition>
     <Compile Include="Core\ComboSet.cs" />
     <Compile Include="Core\DataOutputter.cs" />
+    <Compile Include="Core\MainStrategyOrder.cs" />
     <Compile Include="Core\Order.cs" />
     <Compile Include="Core\SimulatorConfig.cs" />
     <Compile Include="Core\StrategyStatistics.cs" />

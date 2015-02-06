@@ -31,10 +31,17 @@ namespace StockSimulator.Core
 		/// </summary>
 		public static SimulatorConfig Config { get; set; }
 
+		public static int NumberOfBars { get; set; }
+
 		/// <summary>
 		/// Outputs all the data to json
 		/// </summary>
 		private DataOutputter _dataOutput;
+
+		/// <summary>
+		/// List of all the orders that are not closed.
+		/// </summary>
+		private List<MainStrategyOrder> _activeOrders { get; set; }
 
 		private double _accountValue;
 
@@ -44,7 +51,9 @@ namespace StockSimulator.Core
 		public Simulator()
 		{
 			DataStore = new TickerDataStore();
+			NumberOfBars = 0;
 			_dataOutput = new DataOutputter();
+			_activeOrders = new List<MainStrategyOrder>();
 		}
 
 		/// <summary>
@@ -71,6 +80,10 @@ namespace StockSimulator.Core
 				// Get the data for the symbol and save it for later so we can output it.
 				TickerData tickerData = DataStore.GetTickerData(instruments[i], config.startDate, config.endDate);
 				_dataOutput.SaveTickerData(tickerData);
+				if (NumberOfBars == 0)
+				{
+					NumberOfBars = tickerData.Dates.Count;
+				}
 
 				// The factory is responsible for creating each runnable. There should only be 1 per ticker
 				// so that we don't recreate the same runnable per ticker. 
@@ -107,6 +120,10 @@ namespace StockSimulator.Core
 			}
 
 			// Loop each bar and find the best one of each bar.
+			for (int i = 0; i < NumberOfBars; i++)
+			{
+				OnBarUpdate(i);
+			}
 		}
 
 		/// <summary>
@@ -114,7 +131,7 @@ namespace StockSimulator.Core
 		/// </summary>
 		public void Shutdown()
 		{
-			// Call dataoutputter to output all the json.
+			_dataOutput.OutputData();
 		}
 
 		/// <summary>
@@ -127,18 +144,88 @@ namespace StockSimulator.Core
 			SortedList<double, BestOfSubStrategies> buyList = new SortedList<double, BestOfSubStrategies>();
 
 			// Add all the tickers that are at least showing some sort of activity.
-			for (int i = 0; i < Instruments.Count; i++)
+			foreach (KeyValuePair<int, BestOfSubStrategies> instrument in Instruments)
 			{
-				if (Instruments[i].Bars[currentBar].HighestPercent > 0)
+				if (instrument.Value.Bars[currentBar].HighestPercent > 0)
 				{
-					buyList.Add(Instruments[i].Bars[currentBar].HighestPercent, Instruments[i]);
+					buyList.Add(instrument.Value.Bars[currentBar].HighestPercent, instrument.Value);
 				}
 			}
 
 			// Output the buy list for each day.
 			_dataOutput.OutputBuyList(currentBar);
 
+			// Update all the active orders before placing new ones.
+			UpdateOrders(currentBar);
 
+			// Buy stocks if we it's a good time.
+			int currentCount = 0;
+			for (int i = 0; i < buyList.Count; i++)
+			{
+				// If the highest percent is enough for a buy, then do it.
+				// If not then since the list is sorted, no other ones will
+				// be high enough and we can early out of the loop.
+				if (buyList.Keys[i] > Config.PercentForBuy)
+				{
+					EnterOrder(buyList[i].Bars[currentBar].Statistics, buyList[i].Data, currentBar);
+					++currentCount;
+				}
+				else
+				{
+					break;
+				}
+
+				// We only allow a set number of buys per frame. This is so we don't just buy
+				// everything all on one frame so that we can try and get different
+				// stocks when we need to.
+				if (currentCount >= Config.MaxBuysPerBar)
+				{
+					break;
+				}
+			}
 		}
+
+		/// <summary>
+		/// Updates all the orders. Adds and subtracts money spent buying and selling.
+		/// </summary>
+		/// <param name="currentBar">Current bar of the simulation</param>
+		private void UpdateOrders(int currentBar)
+		{
+			// Update all the open orders.
+			for (int i = 0; i < _activeOrders.Count; i++)
+			{
+				Order order = _activeOrders[i];
+
+				// Save the previous status befure the update so we can see if it got filled this update.
+				Order.OrderStatus previousStatus = order.Status;
+				order.Update(currentBar);
+
+				// If the order has just been filled, then subtract that amount from the account.
+				if (previousStatus == Order.OrderStatus.Open && order.Status == Order.OrderStatus.Filled)
+				{
+					_accountValue -= order.Value;
+				}
+				// If the order just finished then add the value back.
+				else if (previousStatus == Order.OrderStatus.Filled && order.IsFinished())
+				{
+					_accountValue += order.Value;
+				}
+			}
+
+			// Remove the orders that are finished. This will just remove them from
+			// this array but they order will still be saved in the order history.
+			_activeOrders.RemoveAll(order => order.IsFinished());
+		}
+
+		/// <summary>
+		/// Place an order for the main strategy.
+		/// </summary>
+		private void EnterOrder(List<StrategyStatistics> stats, TickerData ticker, int currentBar)
+		{
+			MainStrategyOrder order = new MainStrategyOrder(stats, Order.OrderType.Long, ticker, "MainStrategy", currentBar);
+			Simulator.Orders.AddOrder(order);
+			_activeOrders.Add(order);
+		}
+
 	}
 }

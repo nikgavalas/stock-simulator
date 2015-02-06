@@ -140,14 +140,17 @@ namespace StockSimulator.Strategies
 			List<Strategy> foundStrategies = new List<Strategy>();
 			for (int i = 0; i < Dependents.Count; i++)
 			{
-				Strategy dependentStrategy = (Strategy)Dependents[i];
-				// TODO: We could implement logic here that searches the current bar
-				// and back a few days to make the finding not so exact. That could add
-				// for some more leeway when finding combos as finding multiple
-				// strategies on exact bars may only happen a few times.
-				if (dependentStrategy.WasFound[currentBar])
+				if (Dependents[i].GetType() == typeof(Strategy))
 				{
-					foundStrategies.Add(dependentStrategy);
+					Strategy dependentStrategy = (Strategy)Dependents[i];
+					// TODO: We could implement logic here that searches the current bar
+					// and back a few days to make the finding not so exact. That could add
+					// for some more leeway when finding combos as finding multiple
+					// strategies on exact bars may only happen a few times.
+					if (dependentStrategy.WasFound[currentBar])
+					{
+						foundStrategies.Add(dependentStrategy);
+					}
 				}
 			}
 

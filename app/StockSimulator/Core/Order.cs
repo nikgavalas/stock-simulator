@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace StockSimulator.Core
 {
+	[DataContract]
 	public class Order
 	{
 		/// <summary>
@@ -43,6 +45,7 @@ namespace StockSimulator.Core
 		public long OrderId { get; set; }
 		public TickerData Ticker { get; set; }
 		public int NumberOfShares { get; set; }
+		public double Value { get; set; }
 		public StrategyStatistics StartStatistics { get; set; }
 		public StrategyStatistics EndStatistics { get; set; }
 
@@ -84,6 +87,9 @@ namespace StockSimulator.Core
 				BuyPrice = Ticker.Open[curBar];
 				Status = OrderStatus.Filled;
 
+				NumberOfShares = BuyPrice > 0.0 ? Convert.ToInt32(Math.Floor(Simulator.Config.SizeOfOrder / BuyPrice)) : 0;
+				Value = NumberOfShares * BuyPrice;
+
 				int direction = Type == OrderType.Long ? 1 : -1;
 
 				// Set prices to exit.
@@ -103,6 +109,8 @@ namespace StockSimulator.Core
 			// Close any orders that need to be closed
 			else if (Status == OrderStatus.Filled)
 			{
+				Value = NumberOfShares * Ticker.Close[curBar];
+
 				if (IsMore(Ticker.Open[curBar], ProfitTargetPrice, Type))
 				{
 					FinishOrder(Ticker.Open[curBar], curBar, OrderStatus.ProfitTarget);
@@ -200,6 +208,7 @@ namespace StockSimulator.Core
 			SellBar = currentBar;
 			SellDate = Ticker.Dates[currentBar];
 			Status = sellStatus;
+			Value = NumberOfShares * SellPrice;
 
 			// Get things like win/loss percent up to the point this order was finished.
 			// TODO: not sure if this is needed.

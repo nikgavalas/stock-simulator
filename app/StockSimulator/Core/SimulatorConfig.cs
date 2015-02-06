@@ -71,6 +71,10 @@ namespace StockSimulator.Core
 		[Description("Amount of money the trade account starts with")]
 		public int InitialAccountBalance { get; set; }
 
+		[Category("Main Strategy")]
+		[DisplayName("Percent For Buy")]
+		[Description("Percent returned from best of strategy to buy for the main strategy.")]
+		public double PercentForBuy { get; set; }
 
 
 		public SimulatorConfig()
@@ -87,6 +91,7 @@ namespace StockSimulator.Core
 
 			MaxBuysPerBar = 3;
 			InitialAccountBalance = 100000;
+			PercentForBuy = 70;
 		}
 	}
 }

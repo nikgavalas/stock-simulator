@@ -18,7 +18,7 @@ namespace StockSimulator.Core
 		}
 
 		public List<Runnable> Dependents { get; set; }
-		protected TickerData Data { get; set; }
+		public TickerData Data { get; set; }
 
 		private bool _isFinishedRunning;
 

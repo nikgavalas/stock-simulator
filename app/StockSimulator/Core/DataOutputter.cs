@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
@@ -14,7 +15,8 @@ namespace StockSimulator.Core
 	class DataOutputter
 	{
 		private Dictionary<int, TickerData> _tickerData;
-		private string _outputFolder = "C:\\Users\\Nik\\Documents\\Code\\github\\stock-simulator\\output\\output\\";
+		//private string _outputFolder = "C:\\Users\\Nik\\Documents\\Code\\github\\stock-simulator\\output\\output";
+		private string _outputFolder = "C:\\Users\\Nik\\Documents\\github\\stock-simulator\\output\\output";
 
 		/// <summary>
 		/// Constructor
@@ -56,16 +58,33 @@ namespace StockSimulator.Core
 			string jsonOutput = null;
 			string filename = null;
 
-			string timeString = DateTime.Now.ToLongDateString();
-			string saveFolderName = _outputFolder + timeString;
+			string timeString = DateTime.Now.ToString("MM-dd-yyyyTHH-mm-ss-ffff");
+			string saveFolderName = GetOutputFolder(timeString);
+			Directory.CreateDirectory(saveFolderName.TrimEnd('\\'));
+
+			List<StrategyStatistics> allStrategyStatistics = new List<StrategyStatistics>();
 
 			foreach (KeyValuePair<int, List<Order>> strategy in Simulator.Orders.StrategyDictionary)
 			{
+				// TODO: skip main strategy here. Later get main strategy and then for each 
+				// order add it to a class that holds all the list items so that it can
+				// output all the orders when serialized.
+				// Also need a class that holds the win/loss percent ect and should be 
+				// calculated when looping through the orders as well. Then that class can be serialized
+				// using the normal methods.
+
 				List<Order> orders = strategy.Value;
 				if (orders.Count > 0)
 				{
+					// Get the strategy name but skip the main strategy as it gets process differently.
 					string strategyName = orders[0].StrategyName;
+					if (strategyName == "MainStrategy")
+					{
+						continue;
+					}
+
 					Dictionary<int, StrategyTicker> tickersForThisStrategy = new Dictionary<int, StrategyTicker>();
+					StrategyStatistics stratStats = new StrategyStatistics(strategyName);
 
 					// Catagorize and total all the orders for this strategy by the ticker they are associated with.
 					for (int i = 0; i < orders.Count; i++)
@@ -80,7 +99,11 @@ namespace StockSimulator.Core
 						}
 
 						tickersForThisStrategy[tickerHash].AddOrder(orders[i]);
+						stratStats.AddOrder(orders[i]);
 					}
+
+					stratStats.CalculateStatistics();
+					allStrategyStatistics.Add(stratStats);
 
 					// Output the info about each ticker for this strategy.
 					List<JsonOverallStrategy> overallList = new List<JsonOverallStrategy>();
@@ -101,8 +124,35 @@ namespace StockSimulator.Core
 
 				}
 			}
-		 
-	
+
+			////////////////////// Main info about all strategies ///////////////////////
+			//MemoryStream serializerStream = new MemoryStream();
+			//DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(StrategyStatistics));
+			//serializer.WriteObject(serializerStream, p);
+			jsonOutput = jsonSerializer.Serialize(allStrategyStatistics);
+			filename = GetOutputFolder(timeString) + "overall-strategies.json";
+			File.WriteAllText(filename, jsonOutput);
+
+			///////////////////// Process main strategy /////////////////////////////////
+			if (Simulator.Orders.StrategyDictionary.ContainsKey("MainStrategy".GetHashCode()))
+			{
+				List<Order> mainStrategyOrders = Simulator.Orders.StrategyDictionary["MainStrategy".GetHashCode()];
+				StrategyStatistics mainStratStats = new StrategyStatistics("MainStrategy");
+				for (int i = 0; i < mainStrategyOrders.Count; i++)
+				{
+					Order order = mainStrategyOrders[i];
+					mainStratStats.AddOrder(order);
+				}
+
+				jsonOutput = jsonSerializer.Serialize(mainStratStats);
+				filename = GetOutputFolder(timeString) + "overall.json";
+				File.WriteAllText(filename, jsonOutput);
+
+				jsonOutput = jsonSerializer.Serialize(mainStrategyOrders);
+				filename = GetOutputFolder(timeString) + "overall-orders.json";
+				File.WriteAllText(filename, jsonOutput);
+			}
+
 			return saveFolderName;
 		}
 
