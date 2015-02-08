@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace StockSimulator.Core
 {
-	[DataContract]
+	[JsonObject(MemberSerialization.OptIn)]
 	public class Order
 	{
 		/// <summary>
@@ -31,20 +31,35 @@ namespace StockSimulator.Core
 			LengthExceeded
 		}
 
-		public OrderStatus Status { get; set; }
+		[JsonProperty("buyPrice")]
 		public double BuyPrice { get; set; }
+		
+		[JsonProperty("sellPrice")]
 		public double SellPrice { get; set; }
-		public int BuyBar { get; set; }
-		public DateTime BuyDate { get; set; }
-		public int SellBar { get; set; }
+
+		[JsonProperty("sellDate")]
 		public DateTime SellDate { get; set; }
+
+		[JsonProperty("buyDate")]
+		public DateTime BuyDate { get; set; }
+
+		[JsonProperty("numShares")]
+		public int NumberOfShares { get; set; }
+
+		[JsonProperty("id")]
+		public long OrderId { get; set; }
+
+		[JsonProperty("gain")]
+		public double Gain { get; set; }
+
+		public OrderStatus Status { get; set; }
+		public int BuyBar { get; set; }
+		public int SellBar { get; set; }
 		public OrderType Type { get; set; }
 		public double ProfitTargetPrice { get; set; }
 		public double StopPrice { get; set; }
 		public string StrategyName { get; set; }
-		public long OrderId { get; set; }
 		public TickerData Ticker { get; set; }
-		public int NumberOfShares { get; set; }
 		public double Value { get; set; }
 		public StrategyStatistics StartStatistics { get; set; }
 		public StrategyStatistics EndStatistics { get; set; }
@@ -148,16 +163,6 @@ namespace StockSimulator.Core
 		}
 
 		/// <summary>
-		/// Returns the amount of money this order gained.
-		/// </summary>
-		/// <returns>The amount of money this order gained</returns>
-		public double GetGain()
-		{
-			// TODO: write this.
-			return 0;
-		}
-
-		/// <summary>
 		/// Util function to return if a is more than b depending on if the order type is for a
 		/// positive or negative order.
 		/// </summary>
@@ -209,6 +214,7 @@ namespace StockSimulator.Core
 			SellDate = Ticker.Dates[currentBar];
 			Status = sellStatus;
 			Value = NumberOfShares * SellPrice;
+			Gain = Value - (NumberOfShares * BuyPrice);
 
 			// Get things like win/loss percent up to the point this order was finished.
 			// TODO: not sure if this is needed.

@@ -1,5 +1,8 @@
 obj/
 bin/
+output/output
+!output/output/test
+
 *.exe
 *.pdb
 *.exe.manifest

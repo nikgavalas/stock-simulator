@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace StockSimulator.Core
 {
-	[DataContract]
 	class MainStrategyOrder : Order
 	{
 		/// <summary>
 		/// Holds the stats for all the strategies that were involved in making this purchase.
 		/// </summary>
-		[DataMember(Name="strategies")]
+		[JsonProperty("strategies")]
 		public List<StrategyStatistics> Statistics { get; set; }
 
 		/// <summary>

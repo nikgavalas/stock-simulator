@@ -79,7 +79,7 @@ namespace StockSimulator.Core
 
 		public SimulatorConfig()
 		{
-			startDate = DateTime.Parse("11/1/2014");
+			startDate = DateTime.Parse("1/1/2010");
 			endDate = DateTime.Parse("12/31/2014");
 			MinOrders = 3;
 			MaxLookBackBars = 300;

@@ -131,7 +131,8 @@ namespace StockSimulator.Core
 		/// </summary>
 		public void Shutdown()
 		{
-			_dataOutput.OutputData();
+			string outputName = _dataOutput.OutputData();
+			System.Diagnostics.Process.Start("http://localhost:9000/#/" + outputName + "/");
 		}
 
 		/// <summary>
@@ -160,14 +161,14 @@ namespace StockSimulator.Core
 
 			// Buy stocks if we it's a good time.
 			int currentCount = 0;
-			for (int i = 0; i < buyList.Count; i++)
+			foreach (KeyValuePair<double, BestOfSubStrategies> item in buyList)
 			{
 				// If the highest percent is enough for a buy, then do it.
 				// If not then since the list is sorted, no other ones will
 				// be high enough and we can early out of the loop.
-				if (buyList.Keys[i] > Config.PercentForBuy)
+				if (item.Value.Bars[currentBar].HighestPercent > Config.PercentForBuy)
 				{
-					EnterOrder(buyList[i].Bars[currentBar].Statistics, buyList[i].Data, currentBar);
+					EnterOrder(item.Value.Bars[currentBar].Statistics, item.Value.Data, currentBar);
 					++currentCount;
 				}
 				else

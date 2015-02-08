@@ -6,6 +6,7 @@ using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
+using Newtonsoft.Json;
 
 namespace StockSimulator.Core
 {
@@ -15,8 +16,10 @@ namespace StockSimulator.Core
 	class DataOutputter
 	{
 		private Dictionary<int, TickerData> _tickerData;
-		//private string _outputFolder = "C:\\Users\\Nik\\Documents\\Code\\github\\stock-simulator\\output\\output";
-		private string _outputFolder = "C:\\Users\\Nik\\Documents\\github\\stock-simulator\\output\\output";
+		// Desktop
+		private string _outputFolder = "C:\\Users\\Nik\\Documents\\Code\\github\\stock-simulator\\output\\output";
+		// Laptop
+		//private string _outputFolder = "C:\\Users\\Nik\\Documents\\github\\stock-simulator\\output\\output";
 
 		/// <summary>
 		/// Constructor
@@ -57,6 +60,7 @@ namespace StockSimulator.Core
 			JavaScriptSerializer jsonSerializer = new JavaScriptSerializer();
 			string jsonOutput = null;
 			string filename = null;
+			string folderName = null;
 
 			string timeString = DateTime.Now.ToString("MM-dd-yyyyTHH-mm-ss-ffff");
 			string saveFolderName = GetOutputFolder(timeString);
@@ -110,7 +114,9 @@ namespace StockSimulator.Core
 					foreach (KeyValuePair<int, StrategyTicker> item in tickersForThisStrategy)
 					{
 						jsonOutput = jsonSerializer.Serialize(item.Value.GetAsJson());
-						filename = GetOutputFolder(timeString) + "strategies\\" + strategyName + "\\" + item.Value.TickerName + ".json";
+						folderName = GetOutputFolder(timeString) + "strategies\\" + strategyName;
+						filename = folderName + "\\" + item.Value.TickerName + ".json";
+						Directory.CreateDirectory(folderName);
 						File.WriteAllText(filename, jsonOutput);
 
 						// Save for the overall stats to be outputted later.
@@ -119,19 +125,19 @@ namespace StockSimulator.Core
 
 					// Output the overall stats for this strategy.
 					jsonOutput = jsonSerializer.Serialize(overallList);
-					filename = GetOutputFolder(timeString) + "strategies\\" + strategyName + "\\overall.json";
+					folderName = GetOutputFolder(timeString) + "strategies\\" + strategyName;
+					filename = folderName + "\\overall.json";
+					Directory.CreateDirectory(folderName);
 					File.WriteAllText(filename, jsonOutput);
 
 				}
 			}
 
 			////////////////////// Main info about all strategies ///////////////////////
-			//MemoryStream serializerStream = new MemoryStream();
-			//DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(StrategyStatistics));
-			//serializer.WriteObject(serializerStream, p);
-			jsonOutput = jsonSerializer.Serialize(allStrategyStatistics);
+			jsonOutput = JsonConvert.SerializeObject(allStrategyStatistics, Formatting.Indented);
 			filename = GetOutputFolder(timeString) + "overall-strategies.json";
 			File.WriteAllText(filename, jsonOutput);
+
 
 			///////////////////// Process main strategy /////////////////////////////////
 			if (Simulator.Orders.StrategyDictionary.ContainsKey("MainStrategy".GetHashCode()))
@@ -144,16 +150,16 @@ namespace StockSimulator.Core
 					mainStratStats.AddOrder(order);
 				}
 
-				jsonOutput = jsonSerializer.Serialize(mainStratStats);
+				jsonOutput = JsonConvert.SerializeObject(mainStratStats, Formatting.Indented);
 				filename = GetOutputFolder(timeString) + "overall.json";
 				File.WriteAllText(filename, jsonOutput);
 
-				jsonOutput = jsonSerializer.Serialize(mainStrategyOrders);
+				jsonOutput = JsonConvert.SerializeObject(mainStrategyOrders, Formatting.Indented);
 				filename = GetOutputFolder(timeString) + "overall-orders.json";
 				File.WriteAllText(filename, jsonOutput);
 			}
 
-			return saveFolderName;
+			return timeString;
 		}
 
 		/// <summary>
@@ -202,6 +208,12 @@ namespace StockSimulator.Core
 		{
 			public List<string> indicators { get; set; }
 			public Dictionary<string, JsonOrder> orders { get; set; }
+
+			public JsonStrategyTicker()
+			{
+				indicators = new List<string>();
+				orders = new Dictionary<string, JsonOrder>();
+			}
 		}
 
 		/// <summary>
@@ -238,7 +250,7 @@ namespace StockSimulator.Core
 			{
 				if (order.IsFinished())
 				{
-					if (order.GetGain() >= 0)
+					if (order.Gain >= 0)
 					{
 						++_numberOfWiners;
 					}
@@ -247,7 +259,7 @@ namespace StockSimulator.Core
 						++_numberOfLosers;
 					}
 
-					_totalGain += order.GetGain();
+					_totalGain += order.Gain;
 					_orders.Add(order);
 				}
 			}
@@ -260,7 +272,8 @@ namespace StockSimulator.Core
 			{
 				JsonStrategyTicker json = new JsonStrategyTicker();
 				string strategyName = _orders[0].StrategyName;
-				json.indicators.AddRange(strategyName.Split('-'));
+				string[] indicators = strategyName.Split('-');
+				json.indicators.AddRange(indicators);
 
 				for (int i = 0; i < _orders.Count; i++)
 				{
@@ -273,7 +286,7 @@ namespace StockSimulator.Core
 					jsonOrder.buyDate = o.BuyDate.ToShortDateString();
 					jsonOrder.sellDate = o.SellDate.ToShortDateString();
 					jsonOrder.numShares = o.NumberOfShares;
-					jsonOrder.gain = Math.Round(o.GetGain(), 2);
+					jsonOrder.gain = Math.Round(o.Gain, 2);
 					json.orders[o.OrderId.ToString()] = jsonOrder;
 				}
 				return json;

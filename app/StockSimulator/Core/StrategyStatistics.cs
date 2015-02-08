@@ -3,29 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Runtime.Serialization;
+using Newtonsoft.Json;
 
 namespace StockSimulator.Core
 {
 	/// <summary>
 	/// Class to hold all the statistics for a strategy.
 	/// </summary>
-	[DataContract]
 	public class StrategyStatistics
 	{
-		[DataMember(Name="winPercent")]
+		[JsonProperty("winPercent")]
 		public double WinPercent { get; set; }
 
-		[DataMember(Name="lossPercent")]
+		[JsonProperty("lossPercent")]
 		public double LossPercent { get; set; }
 
-		[DataMember(Name="gain")]
+		[JsonProperty("gain")]
 		public double Gain { get; set; }
 
-		[DataMember(Name="strategyName")]
+		[JsonProperty("strategyName")]
 		public string StrategyName { get; set; }
 
 		// Not serialized!
+		[JsonIgnore]
 		public List<Order> Orders { get; set; }
 
 		/// <summary>
@@ -83,17 +83,20 @@ namespace StockSimulator.Core
 			for (int i = 0; i < Orders.Count; i++)
 			{
 				Order o = Orders[i];
-				++numberOfOrders;
-				if (o.GetGain() > 0)
+				if (o.IsFinished())
 				{
-					++numberOfWins;
-				}
-				else
-				{
-					++numberOfLosses;
-				}
+					++numberOfOrders;
+					if (o.Gain > 0)
+					{
+						++numberOfWins;
+					}
+					else
+					{
+						++numberOfLosses;
+					}
 
-				totalGain = o.GetGain();
+					totalGain += o.Gain;
+				}
 			}
 
 			WinPercent = 0;

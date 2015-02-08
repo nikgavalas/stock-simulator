@@ -38,7 +38,7 @@ namespace StockSimulator.Core
 		/// <returns>String of the exchange plus the ticker.</returns>
 		public override string ToString()
 		{
-			return Exchange + ':' + Ticker;
+			return Exchange + '-' + Ticker;
 		}
 
 		/// <summary>

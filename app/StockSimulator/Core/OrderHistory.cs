@@ -64,23 +64,25 @@ namespace StockSimulator.Core
 			int numberOfOrders = 0;
 			double totalGain = 0;
 
-			List<Order> strategyOrders = StrategyDictionary[strategyName.GetHashCode()];
-			for (int i = 0; i < strategyOrders.Count; i++)
+			int strategyHash = strategyName.GetHashCode();
+			if (StrategyDictionary.ContainsKey(strategyHash))
 			{
-				Order order = strategyOrders[i];
-				if (order.BuyBar >= cutoffBar && order.IsFinished())
+				List<Order> strategyOrders = StrategyDictionary[strategyHash];
+				for (int i = 0; i < strategyOrders.Count; i++)
 				{
-					++numberOfOrders;
-
-					double gain = order.GetGain();
-					totalGain += gain;
-					if (gain >= 0)
+					Order order = strategyOrders[i];
+					if (order.BuyBar >= cutoffBar && order.IsFinished())
 					{
-						++numberOfWins;
-					}
-					else
-					{
-						++numberOfLosses;
+						++numberOfOrders;
+						totalGain += order.Gain;
+						if (order.Gain >= 0)
+						{
+							++numberOfWins;
+						}
+						else
+						{
+							++numberOfLosses;
+						}
 					}
 				}
 			}

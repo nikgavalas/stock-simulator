@@ -107,12 +107,15 @@ namespace StockSimulator.Strategies
 				// Trim off the last '-'
 				if (comboList.Count > 0)
 				{
-					comboName.TrimEnd('-');
+					comboName = comboName.TrimEnd('-');
 				}
 
 				// Now that the name of the strategy is found, enter the order.
 				Order placedOrder = EnterOrder(comboName, currentBar);
-				stats.Add(placedOrder.StartStatistics);
+				if (placedOrder != null)
+				{
+					stats.Add(placedOrder.StartStatistics);
+				}
 			}
 
 			// For each combo we want to find out the winning % and the gain
@@ -140,7 +143,7 @@ namespace StockSimulator.Strategies
 			List<Strategy> foundStrategies = new List<Strategy>();
 			for (int i = 0; i < Dependents.Count; i++)
 			{
-				if (Dependents[i].GetType() == typeof(Strategy))
+				if (Dependents[i] is Strategy)
 				{
 					Strategy dependentStrategy = (Strategy)Dependents[i];
 					// TODO: We could implement logic here that searches the current bar
