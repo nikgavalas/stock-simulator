@@ -79,10 +79,14 @@
     </ApplicationDefinition>
     <Compile Include="Core\ComboSet.cs" />
     <Compile Include="Core\DataOutputter.cs" />
+    <Compile Include="Core\JsonConverters\RoundedDoubleConverter.cs" />
+    <Compile Include="Core\JsonConverters\ShortDateTimeConverter.cs" />
+    <Compile Include="Core\JsonConverters\TickerDataStringConverter.cs" />
     <Compile Include="Core\MainStrategyOrder.cs" />
     <Compile Include="Core\Order.cs" />
     <Compile Include="Core\SimulatorConfig.cs" />
     <Compile Include="Core\StrategyStatistics.cs" />
+    <Compile Include="Core\StrategyTickerPairStatistics.cs" />
     <Compile Include="Strategies\BestOfSubStrategies.cs" />
     <Compile Include="Strategies\MacdStrategy.cs" />
     <Compile Include="Strategies\RsiStrategy.cs" />

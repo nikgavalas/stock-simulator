@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using StockSimulator.Core.JsonConverters;
 using Newtonsoft.Json;
 
 namespace StockSimulator.Core
@@ -32,16 +33,20 @@ namespace StockSimulator.Core
 		}
 
 		[JsonProperty("buyPrice")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
 		public double BuyPrice { get; set; }
 		
 		[JsonProperty("sellPrice")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
 		public double SellPrice { get; set; }
 
-		[JsonProperty("sellDate")]
-		public DateTime SellDate { get; set; }
-
 		[JsonProperty("buyDate")]
+		[JsonConverter(typeof(ShortDateTimeConverter))]
 		public DateTime BuyDate { get; set; }
+
+		[JsonProperty("sellDate")]
+		[JsonConverter(typeof(ShortDateTimeConverter))]
+		public DateTime SellDate { get; set; }
 
 		[JsonProperty("numShares")]
 		public int NumberOfShares { get; set; }
@@ -50,7 +55,12 @@ namespace StockSimulator.Core
 		public long OrderId { get; set; }
 
 		[JsonProperty("gain")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
 		public double Gain { get; set; }
+
+		[JsonProperty("ticker")]
+		[JsonConverter(typeof(TickerDataStringConverter))]
+		public TickerData Ticker { get; set; }
 
 		public OrderStatus Status { get; set; }
 		public int BuyBar { get; set; }
@@ -59,7 +69,6 @@ namespace StockSimulator.Core
 		public double ProfitTargetPrice { get; set; }
 		public double StopPrice { get; set; }
 		public string StrategyName { get; set; }
-		public TickerData Ticker { get; set; }
 		public double Value { get; set; }
 		public StrategyStatistics StartStatistics { get; set; }
 		public StrategyStatistics EndStatistics { get; set; }

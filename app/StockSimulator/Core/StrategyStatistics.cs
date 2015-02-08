@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using StockSimulator.Core.JsonConverters;
 
 namespace StockSimulator.Core
 {
@@ -13,15 +14,18 @@ namespace StockSimulator.Core
 	public class StrategyStatistics
 	{
 		[JsonProperty("winPercent")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
 		public double WinPercent { get; set; }
 
 		[JsonProperty("lossPercent")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
 		public double LossPercent { get; set; }
 
 		[JsonProperty("gain")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
 		public double Gain { get; set; }
 
-		[JsonProperty("strategyName")]
+		[JsonProperty("name")]
 		public string StrategyName { get; set; }
 
 		// Not serialized!
@@ -46,8 +50,8 @@ namespace StockSimulator.Core
 			LossPercent = 0;
 			if (numOrders > 0)
 			{
-				WinPercent = Math.Round((wins / numOrders) * 100.0);
-				LossPercent = Math.Round((losses / numOrders) * 100.0);
+				WinPercent = Math.Round(((double)wins / numOrders) * 100.0);
+				LossPercent = Math.Round(((double)losses / numOrders) * 100.0);
 			}
 		}
 
@@ -67,7 +71,10 @@ namespace StockSimulator.Core
 		/// <param name="order"></param>
 		public void AddOrder(Order order)
 		{
-			Orders.Add(order);
+			if (order.IsFinished())
+			{
+				Orders.Add(order);
+			}
 		}
 
 		/// <summary>
@@ -99,12 +106,13 @@ namespace StockSimulator.Core
 				}
 			}
 
+			Gain = totalGain;
 			WinPercent = 0;
 			LossPercent = 0;
 			if (numberOfOrders > 0)
 			{
-				WinPercent = Math.Round((numberOfWins / numberOfOrders) * 100.0);
-				LossPercent = Math.Round((numberOfLosses / numberOfOrders) * 100.0);
+				WinPercent = Math.Round(((double)numberOfWins / numberOfOrders) * 100.0);
+				LossPercent = Math.Round(((double)numberOfLosses / numberOfOrders) * 100.0);
 			}
 		}
 	}

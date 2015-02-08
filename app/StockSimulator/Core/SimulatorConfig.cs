@@ -91,7 +91,7 @@ namespace StockSimulator.Core
 
 			MaxBuysPerBar = 3;
 			InitialAccountBalance = 100000;
-			PercentForBuy = 70;
+			PercentForBuy = 25;
 		}
 	}
 }

@@ -15,20 +15,7 @@
 				</div>
 			</div>
 
-			<!-- List of all the orders that contributes to the overall stats -->
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<h3 class="panel-title">Orders</h3>
-				</div>
-				<div class="panel-body">
-					<order-list orders="orders" order-click="orderClick"></order-list>
-				</div>
-			</div>
-
-		</div>
-
-		<!-- The column for the aggregated strategies by the strategy name -->		
-		<div class="col-md-6">
+			<!-- The column for the aggregated strategies by the strategy name -->		
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">Strategy performance</h3>
@@ -37,7 +24,21 @@
 					<strategy-list strategies="strategies" row-clicked="strategyClick"></strategy-list>
 				</div>
 			</div>
+
 		</div>
+
+		<!-- List of all the orders that contributes to the overall stats -->
+		<div class="col-md-6">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Orders</h3>
+				</div>
+				<div class="panel-body">
+					<order-list orders="orders" order-click="orderClick"></order-list>
+				</div>
+			</div>
+		</div>
+
 
 	</div>
 

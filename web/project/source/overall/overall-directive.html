@@ -11,29 +11,32 @@
 				<bar type="danger" value="fileData.lossPercent"><span>{{fileData.lossPercent}}%</span></bar>
 			</progress>
 		</div>
-<!-- 
+	</div>
+
+	<!-- Left side stats -->
+	<div class="row">
 		<div class="col-sm-6">
-			<div class="input-group">
-				<span class="input-group-addon" id="win-addon">Win %</span>
-				<input type="text" class="form-control" aria-describedby="win-addon">
-			</div>
+			<table class="table">
+				<tbody>
+					<tr>
+						<td><strong>Gain</strong></td>
+						<td><span ng-class="{'text-danger': fileData.gain < 0, 'text-success': fileData.gain >= 0}"><span class="glyphicon" ng-class="{'glyphicon-circle-arrow-up': fileData.gain >= 0, 'glyphicon-circle-arrow-down': fileData.gain < 0}"></span>&nbsp;{{abs(fileData.gain)}}</span></td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
 
+		<!-- Right side stats -->
 		<div class="col-sm-6">
-			<div class="input-group">
-				<span class="input-group-addon" id="loss-addon">Loss %</span>
-				<input type="text" class="form-control" aria-describedby="loss-addon">
-			</div>
+			<table class="table">
+				<tbody>
+					<tr>
+						<td><strong>TODO</strong></td>
+						<td>TODO</td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
-
-		<div class="col-sm-4">
-			<div class="input-group">
-				<span class="input-group-addon" id="win-addon">Win %</span>
-				<input type="text" class="form-control" aria-describedby="win-addon">
-			</div>
-		</div>
- -->
-
 	</div>
 
 </div>
