@@ -5,15 +5,34 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using StockSimulator.Core;
+using Newtonsoft.Json;
 
 namespace StockSimulator.Indicators
 {
+	/// <summary>
+	/// Sma indicator
+	/// </summary>
+	[JsonObject(MemberSerialization.OptIn)]
 	class Sma : Indicator
 	{
 		private int _period = 14;
 
 		public List<double> Avg { get; set; }
 
+		/// <summary>
+		/// This indicator is plotted on the price bars.
+		/// </summary>
+		[JsonProperty("plotOnPrice")]
+		public override bool PlotOnPrice
+		{
+			get { return true; }
+		}
+
+		/// <summary>
+		/// Constructor
+		/// </summary>
+		/// <param name="tickerData">Ticker data for the indicator</param>
+		/// <param name="factory">Factory to create the dependent runnables</param>
 		public Sma(TickerData tickerData, RunnableFactory factory) 
 			: base(tickerData, factory)
 		{
@@ -27,6 +46,26 @@ namespace StockSimulator.Indicators
 		public override string ToString()
 		{
 			return "Sma";
+		}
+
+		/// <summary>
+		/// Save the indicator data in a serialization friendly way.
+		/// </summary>
+		public override void PrepareForSerialization()
+		{
+			base.PrepareForSerialization();
+
+			// Add the sma avg to the the data for plotting.
+			PlotSeries smaPlot = new PlotSeries("line");
+			ChartPlots["Sma"] = smaPlot; 
+			for (int i = 0; i < Data.Dates.Count; i++)
+			{
+				smaPlot.PlotData.Add(new List<object>()
+				{
+					ExtensionMethods.UnixTicks(Data.Dates[i]),
+					Avg[i]
+				});
+			}
 		}
 
 		/// <summary>

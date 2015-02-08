@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace StockSimulator.Core
 {
 	/// <summary>
 	/// Holds all the data for a symbol (stock, whatever)
 	/// </summary>
+	[JsonObject(MemberSerialization.OptIn)]
 	public class TickerData
 	{
 		public DateTime Start { get; set; }
@@ -21,6 +23,13 @@ namespace StockSimulator.Core
 		public List<long> Volume { get; set; }
 		public int NumBars { get; set; }
 		public TickerExchangePair TickerAndExchange { get; set; }
+
+		// For serialization
+		[JsonProperty("price")]
+		public List<List<object>> PriceData { get; set; }
+
+		[JsonProperty("volume")]
+		public List<List<object>> VolumeData { get; set; }
 
 		// TODO: add things like the median and such and such.
 
@@ -126,6 +135,33 @@ namespace StockSimulator.Core
 			}
 
 			return output;
+		}
+
+		/// <summary>
+		/// Inits the list so they can be outputted in a json/highcharts friendly way.
+		/// </summary>
+		public void PrepareForSerialization()
+		{
+			PriceData = new List<List<object>>();
+			VolumeData = new List<List<object>>();
+
+			for (int i = 0; i < Dates.Count; i++)
+			{
+				PriceData.Add(new List<object>()
+				{
+					ExtensionMethods.UnixTicks(Dates[i]),
+					Math.Round(Open[i], 2),
+					Math.Round(High[i], 2),
+					Math.Round(Low[i], 2),
+					Math.Round(Close[i], 2),
+				});
+
+				VolumeData.Add(new List<object>()
+				{
+					ExtensionMethods.UnixTicks(Dates[i]),
+					Volume[i]
+				});
+			}
 		}
 	}
 }

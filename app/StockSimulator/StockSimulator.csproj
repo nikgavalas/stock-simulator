@@ -79,6 +79,7 @@
     </ApplicationDefinition>
     <Compile Include="Core\ComboSet.cs" />
     <Compile Include="Core\DataOutputter.cs" />
+    <Compile Include="Core\ExtentionMethods.cs" />
     <Compile Include="Core\JsonConverters\RoundedDoubleConverter.cs" />
     <Compile Include="Core\JsonConverters\ShortDateTimeConverter.cs" />
     <Compile Include="Core\JsonConverters\TickerDataStringConverter.cs" />

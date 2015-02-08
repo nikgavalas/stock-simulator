@@ -12,12 +12,12 @@
 		<tr ng-repeat="order in orders" ng-click="orderClick(order)" class="hover-pointer">
 			<td>{{order.ticker}}</td>
 			<td>{{order.buyDate}}</td>
-			<td>{{order.buyPrice}}</td>
+			<td>${{order.buyPrice}}</td>
 			<td>{{order.sellDate}}</td>
-			<td>{{order.sellPrice}}</td>
+			<td>${{order.sellPrice}}</td>
 			<td>{{order.numShares}}</td>
 			<td>
-				<span ng-class="{'text-danger': order.gain < 0, 'text-success': order.gain >= 0}"><span class="glyphicon" ng-class="{'glyphicon-circle-arrow-up': order.gain >= 0, 'glyphicon-circle-arrow-down': order.gain < 0}"></span>&nbsp;{{abs(order.gain)}}</span>
+				<span ng-class="{'text-danger': order.gain < 0, 'text-success': order.gain >= 0}"><span class="glyphicon" ng-class="{'glyphicon-circle-arrow-up': order.gain >= 0, 'glyphicon-circle-arrow-down': order.gain < 0}"></span>&nbsp;${{abs(order.gain)}}</span>
 			</td>
 		</tr>
 	</tbody>

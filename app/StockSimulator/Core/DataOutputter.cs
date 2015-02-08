@@ -13,9 +13,12 @@ namespace StockSimulator.Core
 	/// <summary>
 	/// Handles storing data for output and outputting it to json
 	/// </summary>
-	class DataOutputter
+	public class DataOutputter
 	{
 		private Dictionary<int, TickerData> _tickerData;
+
+		private Dictionary<int, Indicator> _indicators;
+
 		// Desktop
 		private string _outputFolder = "C:\\Users\\Nik\\Documents\\Code\\github\\stock-simulator\\output\\output";
 		// Laptop
@@ -27,6 +30,7 @@ namespace StockSimulator.Core
 		public DataOutputter()
 		{
 			_tickerData = new Dictionary<int, TickerData>();
+			_indicators = new Dictionary<int, Indicator>();
 		}
 
 		/// <summary>
@@ -39,6 +43,19 @@ namespace StockSimulator.Core
 			if (!_tickerData.ContainsKey(key))
 			{
 				_tickerData[key] = data;
+			}
+		}
+
+		/// <summary>
+		/// Saves the indicator data so it can be outtputed at the end.
+		/// </summary>
+		/// <param name="indicator">The indicator to save</param>
+		public void SaveIndicator(Indicator indicator)
+		{
+			int key = (indicator.Data.TickerAndExchange.ToString() + indicator.ToString()).GetHashCode();
+			if (!_indicators.ContainsKey(key))
+			{
+				_indicators[key] = indicator;
 			}
 		}
 
@@ -133,13 +150,41 @@ namespace StockSimulator.Core
 				}
 			}
 
+			////////////////////// Price data for each ticker ///////////////////////////
+
+			folderName = GetOutputFolder(timeString) + "pricedata";
+			Directory.CreateDirectory(folderName);
+			foreach (KeyValuePair<int, TickerData> item in _tickerData)
+			{
+				item.Value.PrepareForSerialization();
+				jsonOutput = JsonConvert.SerializeObject(item.Value, Formatting.Indented);
+				filename = folderName + "\\" + item.Value.TickerAndExchange.ToString() + ".json";
+				File.WriteAllText(filename, jsonOutput);
+			}
+
+			////////////////////// Indicator data for each ticker ///////////////////////
+
+			folderName = GetOutputFolder(timeString) + "indicators";
+			Directory.CreateDirectory(folderName);
+			foreach (KeyValuePair<int, Indicator> item in _indicators)
+			{
+				item.Value.PrepareForSerialization();
+				jsonOutput = JsonConvert.SerializeObject(item.Value, Formatting.Indented);
+				folderName = GetOutputFolder(timeString) + "indicators\\" + item.Value.ToString();
+				filename = folderName + "\\" + item.Value.Data.TickerAndExchange.ToString() + ".json";
+				Directory.CreateDirectory(folderName);
+				File.WriteAllText(filename, jsonOutput);
+			}
+
 			////////////////////// Main info about all strategies ///////////////////////
+			
 			jsonOutput = JsonConvert.SerializeObject(allStrategyStatistics, Formatting.Indented);
 			filename = GetOutputFolder(timeString) + "overall-strategies.json";
 			File.WriteAllText(filename, jsonOutput);
 
 
 			///////////////////// Process main strategy /////////////////////////////////
+			
 			if (Simulator.Orders.StrategyDictionary.ContainsKey("MainStrategy".GetHashCode()))
 			{
 				List<Order> mainStrategyOrders = Simulator.Orders.StrategyDictionary["MainStrategy".GetHashCode()];

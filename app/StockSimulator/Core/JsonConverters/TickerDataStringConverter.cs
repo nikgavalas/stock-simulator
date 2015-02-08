@@ -52,5 +52,13 @@ namespace StockSimulator.Core.JsonConverters
 		{
 			throw new NotImplementedException();
 		}
+
+		/// <summary>
+		/// Read is not implemented
+		/// </summary>
+		public override bool CanRead
+		{
+			get { return false; }
+		}
 	}
 }

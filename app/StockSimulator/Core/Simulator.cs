@@ -31,12 +31,15 @@ namespace StockSimulator.Core
 		/// </summary>
 		public static SimulatorConfig Config { get; set; }
 
+		/// <summary>
+		/// Number of bars for this sim run.
+		/// </summary>
 		public static int NumberOfBars { get; set; }
 
 		/// <summary>
-		/// Outputs all the data to json
+		/// Outputs all the data to json.
 		/// </summary>
-		private DataOutputter _dataOutput;
+		public static DataOutputter DataOutput { get; set; }
 
 		/// <summary>
 		/// List of all the orders that are not closed.
@@ -52,7 +55,7 @@ namespace StockSimulator.Core
 		{
 			DataStore = new TickerDataStore();
 			NumberOfBars = 0;
-			_dataOutput = new DataOutputter();
+			DataOutput = new DataOutputter();
 			_activeOrders = new List<MainStrategyOrder>();
 		}
 
@@ -79,7 +82,7 @@ namespace StockSimulator.Core
 			{
 				// Get the data for the symbol and save it for later so we can output it.
 				TickerData tickerData = DataStore.GetTickerData(instruments[i], config.startDate, config.endDate);
-				_dataOutput.SaveTickerData(tickerData);
+				DataOutput.SaveTickerData(tickerData);
 				if (NumberOfBars == 0)
 				{
 					NumberOfBars = tickerData.Dates.Count;
@@ -131,7 +134,7 @@ namespace StockSimulator.Core
 		/// </summary>
 		public void Shutdown()
 		{
-			string outputName = _dataOutput.OutputData();
+			string outputName = DataOutput.OutputData();
 			System.Diagnostics.Process.Start("http://localhost:9000/#/" + outputName + "/");
 		}
 
@@ -154,7 +157,7 @@ namespace StockSimulator.Core
 			}
 
 			// Output the buy list for each day.
-			_dataOutput.OutputBuyList(currentBar);
+			DataOutput.OutputBuyList(currentBar);
 
 			// Update all the active orders before placing new ones.
 			UpdateOrders(currentBar);
