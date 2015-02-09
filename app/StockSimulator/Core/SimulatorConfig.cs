@@ -76,6 +76,10 @@ namespace StockSimulator.Core
 		[Description("Percent returned from best of strategy to buy for the main strategy.")]
 		public double PercentForBuy { get; set; }
 
+		[Category("Main Strategy")]
+		[DisplayName("Stock List File")]
+		[Description("File with a list of stocks to run the sim on")]
+		public string InstrumentListFile { get; set; }
 
 		public SimulatorConfig()
 		{
@@ -92,6 +96,7 @@ namespace StockSimulator.Core
 			MaxBuysPerBar = 3;
 			InitialAccountBalance = 100000;
 			PercentForBuy = 25;
+			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\nasdaq100list.csv";
 		}
 	}
 }

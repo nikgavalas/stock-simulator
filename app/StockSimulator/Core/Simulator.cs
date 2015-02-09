@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 using StockSimulator.Strategies;
 
@@ -70,15 +71,25 @@ namespace StockSimulator.Core
 
 			// Load the config file with the instument list for all the symbols that we 
 			// want to test.
-			// TODO: for now just hard code it.
-			TickerExchangePair[] instruments =
+			List<TickerExchangePair> instruments = new List<TickerExchangePair>();
+			string line;
+			try
 			{
-				new TickerExchangePair("NASDAQ", "AAPL")
-			};
+				StreamReader file = new StreamReader(Config.InstrumentListFile);
+				while ((line = file.ReadLine()) != null)
+				{
+					string[] pair = line.Split(',');
+					instruments.Add(new TickerExchangePair(pair[1], pair[0]));
+				}
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine("Error loading instrument file!\n" + e.Message);
+			}
 
 			// Add all the symbols as dependent strategies using the bestofsubstrategies
 			Instruments = new Dictionary<int, BestOfSubStrategies>();
-			for (int i = 0; i < instruments.Length; i++)
+			for (int i = 0; i < instruments.Count; i++)
 			{
 				// Get the data for the symbol and save it for later so we can output it.
 				TickerData tickerData = DataStore.GetTickerData(instruments[i], config.startDate, config.endDate);
@@ -88,12 +99,20 @@ namespace StockSimulator.Core
 					NumberOfBars = tickerData.Dates.Count;
 				}
 
-				// The factory is responsible for creating each runnable. There should only be 1 per ticker
-				// so that we don't recreate the same runnable per ticker. 
-				RunnableFactory factory = new RunnableFactory(tickerData);
+				// Make sure everything we're working with has the same number of bars.
+				if (tickerData.Dates.Count == NumberOfBars)
+				{
+					// The factory is responsible for creating each runnable. There should only be 1 per ticker
+					// so that we don't recreate the same runnable per ticker. 
+					RunnableFactory factory = new RunnableFactory(tickerData);
 
-				// This strategy will find the best strategy for this instrument everyday and save the value.
-				Instruments[instruments[i].GetHashCode()] = new BestOfSubStrategies(tickerData, factory);
+					// This strategy will find the best strategy for this instrument everyday and save the value.
+					Instruments[instruments[i].GetHashCode()] = new BestOfSubStrategies(tickerData, factory);
+				}
+				else
+				{
+					Console.WriteLine("Bars not equal for ticker " + tickerData.TickerAndExchange.ToString());
+				}
 			}
 		}
 
@@ -145,16 +164,19 @@ namespace StockSimulator.Core
 		/// <param name="currentBar"></param>
 		private void OnBarUpdate(int currentBar)
 		{
-			SortedList<double, BestOfSubStrategies> buyList = new SortedList<double, BestOfSubStrategies>();
+			List<BestOfSubStrategies> buyList = new List<BestOfSubStrategies>();
 
 			// Add all the tickers that are at least showing some sort of activity.
 			foreach (KeyValuePair<int, BestOfSubStrategies> instrument in Instruments)
 			{
 				if (instrument.Value.Bars[currentBar].HighestPercent > 0)
 				{
-					buyList.Add(instrument.Value.Bars[currentBar].HighestPercent, instrument.Value);
+					buyList.Add(instrument.Value);
 				}
 			}
+
+			// Sort the list so the instruments that have the highest buy value are first in the list.
+			buyList.Sort((x, y) => x.Bars[currentBar].HighestPercent.CompareTo(y.Bars[currentBar].HighestPercent));
 
 			// Output the buy list for each day.
 			DataOutput.OutputBuyList(currentBar);
@@ -164,14 +186,14 @@ namespace StockSimulator.Core
 
 			// Buy stocks if we it's a good time.
 			int currentCount = 0;
-			foreach (KeyValuePair<double, BestOfSubStrategies> item in buyList)
+			for (int i = 0; i < buyList.Count; i++)
 			{
 				// If the highest percent is enough for a buy, then do it.
 				// If not then since the list is sorted, no other ones will
 				// be high enough and we can early out of the loop.
-				if (item.Value.Bars[currentBar].HighestPercent > Config.PercentForBuy)
+				if (buyList[i].Bars[currentBar].HighestPercent > Config.PercentForBuy)
 				{
-					EnterOrder(item.Value.Bars[currentBar].Statistics, item.Value.Data, currentBar);
+					EnterOrder(buyList[i].Bars[currentBar].Statistics, buyList[i].Data, currentBar);
 					++currentCount;
 				}
 				else
