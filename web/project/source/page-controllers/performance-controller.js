@@ -29,7 +29,7 @@ angular.module('mainApp').controller('PerformanceCtrl', [
 		 * @param  {Object} strategy The strategy row that was clicked
 		 */
 		$scope.strategyClick = function(strategy) {
-			$location.url(ConfigFactory.getOutputName() + '/strategy/' + $scope.strategy + '/' + strategy.ticker);
+			$location.url(ConfigFactory.getOutputName() + '/strategy/' + $scope.strategy + '/' + strategy.name);
 		};
 
 	} // end controller

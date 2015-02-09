@@ -27,9 +27,42 @@
 							</div>
 						</div>
 
-
 					</div>
 				</div><!-- End chart panel -->
+
+				<!-- Stats for the strategy -->
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">Strategy Details</h3>
+					</div>
+					<div class="panel-body">
+						<div class="row">
+							<div class="col-sm-12">
+								<h4 class="text-center">Win/Loss Percent</h4>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-sm-12">
+								<progress>
+									<bar type="success" value="strategyData.winPercent"><span>{{strategyData.winPercent}}%</span></bar>
+									<bar type="danger" value="strategyData.lossPercent"><span>{{strategyData.lossPercent}}%</span></bar>
+								</progress>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-6">
+								<table class="table">
+									<tbody>
+										<tr>
+											<td><strong>Gain</strong></td>
+											<td><span ng-class="{'text-danger': strategyData.gain < 0, 'text-success': strategyData.gain >= 0}"><span class="glyphicon" ng-class="{'glyphicon-circle-arrow-up': strategyData.gain >= 0, 'glyphicon-circle-arrow-down': strategyData.gain < 0}"></span>&nbsp;${{abs(strategyData.gain)}}</span></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
 
 			</div>
 

@@ -36,6 +36,24 @@ namespace StockSimulator.Core
 		}
 
 		/// <summary>
+		/// Gets all the indicator names that this strategy depends on.
+		/// </summary>
+		/// <returns></returns>
+		public List<string> GetDependentIndicatorNames()
+		{
+			List<string> ret = new List<string>();
+			for (int i = 0; i < Dependents.Count; i++)
+			{
+				if (Dependents[i] is Indicator)
+				{
+					ret.Add(Dependents[i].ToString());
+				}
+			}
+
+			return ret;
+		}
+
+		/// <summary>
 		/// Updates the orders that are from this strategy.
 		/// </summary>
 		/// <param name="currentBar">The current bar in the simulation</param>
@@ -60,8 +78,9 @@ namespace StockSimulator.Core
 		/// </summary>
 		/// <param name="strategyName">Name of the strategy that placed the order</param>
 		/// <param name="currentBar">Bar the order was placed on</param>
+		/// <param name="dependentIndicatorNames">List of all the dependent indicator names</param>
 		/// <returns>The order that was placed or null if none was placed</returns>
-		protected Order EnterOrder(string strategyName, int currentBar)
+		protected Order EnterOrder(string strategyName, int currentBar, List<string> dependentIndicatorNames)
 		{
 			Order order = null;
 
@@ -78,7 +97,7 @@ namespace StockSimulator.Core
 			// Only place the order if it's less than the allowed amount of concurrent orders allowed.
 			if (openOrders < Simulator.Config.MaxConcurrentOrders)
 			{
-				order = new Order(_orderType, Data, strategyName, currentBar);
+				order = new Order(_orderType, Data, strategyName, currentBar, dependentIndicatorNames);
 				Simulator.Orders.AddOrder(order);
 				_activeOrders.Add(order);
 			}

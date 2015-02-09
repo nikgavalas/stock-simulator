@@ -24,7 +24,7 @@ namespace StockSimulator.Core
 		/// <param name="fromStrategyName">The name of the strategy that placed this order</param>
 		/// <param name="currentBar">Current bar that the order was placed</param>
 		public MainStrategyOrder(List<StrategyStatistics> stats, Order.OrderType type, TickerData tickerData, string fromStrategyName, int currentBar)
-			: base(type, tickerData, fromStrategyName, currentBar)
+			: base(type, tickerData, fromStrategyName, currentBar, null)
 		{
 			Statistics = stats;
 		}

@@ -31,11 +31,12 @@ namespace StockSimulator.Core
 		[JsonProperty("name")]
 		public string StrategyName { get; set; }
 
+		[JsonProperty("indicators")]
+		public List<string> Indicators { get; set; }
+
 		[JsonProperty("orders")]
 		public List<Order> Orders { get; set; }
 
-		[JsonProperty("indicators")]
-		public List<string> Indicators { get; set; }
 		
 		/////////////////// Ignored /////////////////////
 		
@@ -59,18 +60,16 @@ namespace StockSimulator.Core
 		/// </summary>
 		/// <param name="strategyName">The strategy these statistics are for</param>
 		/// <param name="tickerName">Name of the ticker this strategy is working with</param>
-		public StrategyTickerPairStatistics(string strategyName, string tickerName)
+		public StrategyTickerPairStatistics(string strategyName, string tickerName, List<string> dependentIndicatorNames)
 		{
 			TickerName = tickerName;
 			StrategyName = strategyName;
 			Orders = new List<Order>();
+			Indicators = dependentIndicatorNames; 
 			_numberOfWins = 0;
 			_numberOfLosses = 0;
 			_numberOfOrders = 0;
 			_totalGain = 0;
-
-			// TODO: get the list of indicators used in this strategy.
-			Indicators = new List<string>();
 		}
 
 		/// <summary>

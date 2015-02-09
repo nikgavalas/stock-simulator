@@ -72,17 +72,19 @@ namespace StockSimulator.Core
 		public double Value { get; set; }
 		public StrategyStatistics StartStatistics { get; set; }
 		public StrategyStatistics EndStatistics { get; set; }
+		public List<string> DependentIndicatorNames { get; set; }
 
 		/// <summary>
 		/// Contructor for the order.
 		/// </summary>
 		/// <param name="tickerData">Ticker data</param>
-		public Order(OrderType type, TickerData tickerData, string fromStrategyName, int currentBar)
+		public Order(OrderType type, TickerData tickerData, string fromStrategyName, int currentBar, List<string> dependentIndicatorNames)
 		{
 			StrategyName = fromStrategyName;
 			OrderId = GetUniqueId();
 			Type = type;
 			Ticker = tickerData;
+			DependentIndicatorNames = dependentIndicatorNames;
 
 			// Get things like win/loss percent up to the point this order was finished.
 			StartStatistics = Simulator.Orders.GetStrategyStatistics(StrategyName,

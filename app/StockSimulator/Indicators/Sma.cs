@@ -63,7 +63,7 @@ namespace StockSimulator.Indicators
 				smaPlot.PlotData.Add(new List<object>()
 				{
 					ExtensionMethods.UnixTicks(Data.Dates[i]),
-					Avg[i]
+					Math.Round(Avg[i], 2)
 				});
 			}
 		}

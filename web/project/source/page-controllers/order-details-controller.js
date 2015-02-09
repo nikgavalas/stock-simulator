@@ -29,7 +29,15 @@ angular.module('mainApp').controller('OrderDetailsCtrl', [
 		$scope.strategies = [];
 
 		OrderListFactory.getOverallOrders().then(function(data) {
-			orderData = data[$scope.orderId];
+			// Find the order
+			var orderId = parseInt($scope.orderId, 10);
+			for (var i = 0; i < data.length; i++) {
+				if (orderId === data[i].id) {
+					orderData = data[i];
+					break;
+				}
+			}
+
 			$scope.strategies = orderData.strategies;
 			$scope.orderDate = orderData.buyDate;
 			

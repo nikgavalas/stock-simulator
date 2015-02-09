@@ -108,7 +108,7 @@ namespace StockSimulator.Core
 						// If we haven't created the output for this ticker then creat it.
 						if (!tickersForThisStrategy.ContainsKey(tickerHash))
 						{
-							tickersForThisStrategy[tickerHash] = new StrategyTickerPairStatistics(strategyName, tickerName);
+							tickersForThisStrategy[tickerHash] = new StrategyTickerPairStatistics(strategyName, tickerName, orders[i].DependentIndicatorNames);
 						}
 
 						tickersForThisStrategy[tickerHash].AddOrder(orders[i]);

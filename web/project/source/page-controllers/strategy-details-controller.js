@@ -24,6 +24,7 @@ angular.module('mainApp').controller('StrategyDetailsCtrl', [
 		$scope.orders = [];
 		StrategyListFactory.getStrategy($scope.strategy, $scope.ticker).then(function(data) {
 			$scope.orders = data.orders;
+			$scope.strategyData = data;
 
 			$scope.chartEvents = OrderListFactory.convertOrdersToDataSeries(data.orders);
 
@@ -48,6 +49,15 @@ angular.module('mainApp').controller('StrategyDetailsCtrl', [
 			};
 			$scope.extremes.min.setTime(buyDate.getTime() - (range * 24 * 60 * 60 * 1000));
 			$scope.extremes.max.setTime(buyDate.getTime() + (range * 24 * 60 * 60 * 1000));
+		};
+
+		/**
+		 * Expose the absolute function to the scope html
+		 * @param  {Number} value Value to return the absolute value for
+		 * @return {Number}       Math.abs value
+		 */
+		$scope.abs = function(value) {
+			return Math.abs(value);
 		};
 
 	} // end controller

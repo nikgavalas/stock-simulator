@@ -97,11 +97,15 @@ namespace StockSimulator.Strategies
 			for (int i = 0; i < combos.Count; i++)
 			{
 				List<Strategy> comboList = combos[i];
+				List<string> dependentIndicators = new List<string>();
 				string comboName = "";
 				for (int j = 0; j < comboList.Count; j++)
 				{
 					comboName += comboList[i].ToString();
 					comboName += "-";
+
+					// Keep track of the dependent indicators for this strategy.
+					dependentIndicators.AddRange(comboList[i].GetDependentIndicatorNames());
 				}
 
 				// Trim off the last '-'
@@ -111,7 +115,7 @@ namespace StockSimulator.Strategies
 				}
 
 				// Now that the name of the strategy is found, enter the order.
-				Order placedOrder = EnterOrder(comboName, currentBar);
+				Order placedOrder = EnterOrder(comboName, currentBar, dependentIndicators);
 				if (placedOrder != null)
 				{
 					stats.Add(placedOrder.StartStatistics);
