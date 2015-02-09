@@ -93,25 +93,32 @@ namespace StockSimulator.Core
 			{
 				// Get the data for the symbol and save it for later so we can output it.
 				TickerData tickerData = DataStore.GetTickerData(instruments[i], config.startDate, config.endDate);
-				DataOutput.SaveTickerData(tickerData);
-				if (NumberOfBars == 0)
+				if (tickerData != null)
 				{
-					NumberOfBars = tickerData.Dates.Count;
-				}
+					DataOutput.SaveTickerData(tickerData);
+					if (NumberOfBars == 0)
+					{
+						NumberOfBars = tickerData.Dates.Count;
+					}
 
-				// Make sure everything we're working with has the same number of bars.
-				if (tickerData.Dates.Count == NumberOfBars)
-				{
-					// The factory is responsible for creating each runnable. There should only be 1 per ticker
-					// so that we don't recreate the same runnable per ticker. 
-					RunnableFactory factory = new RunnableFactory(tickerData);
+					// Make sure everything we're working with has the same number of bars.
+					if (tickerData.Dates.Count == NumberOfBars)
+					{
+						// The factory is responsible for creating each runnable. There should only be 1 per ticker
+						// so that we don't recreate the same runnable per ticker. 
+						RunnableFactory factory = new RunnableFactory(tickerData);
 
-					// This strategy will find the best strategy for this instrument everyday and save the value.
-					Instruments[instruments[i].GetHashCode()] = new BestOfSubStrategies(tickerData, factory);
+						// This strategy will find the best strategy for this instrument everyday and save the value.
+						Instruments[instruments[i].GetHashCode()] = new BestOfSubStrategies(tickerData, factory);
+					}
+					else
+					{
+						Console.WriteLine("Bars not equal for ticker " + tickerData.TickerAndExchange.ToString());
+					}
 				}
 				else
 				{
-					Console.WriteLine("Bars not equal for ticker " + tickerData.TickerAndExchange.ToString());
+					Console.WriteLine("No ticker data for " + instruments[i].ToString());
 				}
 			}
 		}

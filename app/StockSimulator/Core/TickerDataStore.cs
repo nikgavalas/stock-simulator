@@ -7,6 +7,7 @@ using System.Net;
 using System.IO;
 
 using StockSimulator.GoogleFinanceDownloader;
+using StockSimulator.YahooFinanceDownloader;
 
 namespace StockSimulator.Core
 {
@@ -77,7 +78,7 @@ namespace StockSimulator.Core
 			{
 				try
 				{
-					data = GetDataFromServer(ticker, start, end);
+					data = GetDataFromYahooServer(ticker, start, end);
 					AppendNewData(ticker, data);
 
 					// TODO: Save this new data to the disk so we don't have to query
@@ -116,12 +117,12 @@ namespace StockSimulator.Core
 				// exists, we don't have to worry about their being any gaps in that data.
 				if (newData.End < existingData.Start)
 				{
-					TickerData stitch = GetDataFromServer(ticker, newData.End, existingData.Start);
+					TickerData stitch = GetDataFromYahooServer(ticker, newData.End, existingData.Start);
 					existingData.AppendData(stitch);
 				}
 				if (newData.Start > existingData.End)
 				{
-					TickerData stitch = GetDataFromServer(ticker, existingData.End, newData.Start);
+					TickerData stitch = GetDataFromYahooServer(ticker, existingData.End, newData.Start);
 					existingData.AppendData(stitch);
 				}
 
@@ -163,7 +164,7 @@ namespace StockSimulator.Core
 		/// <param name="start">Start date for the data</param>
 		/// <param name="end">End date for the data</param>
 		/// <returns>Data (price, volume, etc) for the ticker</returns>
-		private TickerData GetDataFromServer(TickerExchangePair ticker, DateTime start, DateTime end)
+		private TickerData GetDataFromGoogleServer(TickerExchangePair ticker, DateTime start, DateTime end)
 		{
 			string downloadedData;
 
@@ -193,6 +194,47 @@ namespace StockSimulator.Core
 				{
 					return CreateTickerDataFromString(resultValue, ticker, start, end);
 				}
+			}
+		}
+
+		/// <summary>
+		/// Gets the data from the webserver and saves it onto disk for later usage.
+		/// </summary>
+		/// <param name="ticker">ticker to get data for</param>
+		/// <param name="start">Start date for the data</param>
+		/// <param name="end">End date for the data</param>
+		/// <returns>Data (price, volume, etc) for the ticker</returns>
+		private TickerData GetDataFromYahooServer(TickerExchangePair ticker, DateTime start, DateTime end)
+		{
+			string downloadedData;
+
+			YahooFinanceUriBuilder uriBuilder = new YahooFinanceUriBuilder();
+			string uri = uriBuilder.GetDailyDataUrl(ticker.Ticker, start, end);
+
+			using (WebClient wClient = new WebClient())
+			{
+				downloadedData = wClient.DownloadString(uri);
+			}
+
+			using (MemoryStream ms = new MemoryStream(System.Text.Encoding.Default.GetBytes(downloadedData)))
+			{
+				StreamReader sr = new StreamReader(ms);
+				string line;
+				List<string> lines = new List<string>();
+				while ((line = sr.ReadLine()) != null)
+				{
+					lines.Add(line);
+				}
+
+				// Read all the lines from back to front and ignore the headers in the beginning of the file.
+				StringBuilder sb = new StringBuilder();
+				for (int i = lines.Count - 1; i > 0; i--)
+				{
+					sb.AppendLine(lines[i]);
+				}
+
+				string resultValue = sb.ToString();
+				return CreateTickerDataFromString(resultValue, ticker, start, end);
 			}
 		}
 
@@ -251,6 +293,16 @@ namespace StockSimulator.Core
 						tickerData.Close.Add(Convert.ToDouble(splitData[4]));
 						tickerData.Volume.Add(Convert.ToInt64(splitData[5]));
 						tickerData.NumBars = tickerData.Dates.Count;
+
+						// Some error checking.
+						if (tickerData.Open[tickerData.Open.Count - 1] <= 0)
+						{
+							throw new Exception("Open price 0 for this bar!");
+						}
+						if (tickerData.Close[tickerData.Close.Count - 1] <= 0)
+						{
+							throw new Exception("Close price 0 for this bar!");
+						}
 					}
 				} while (line != null);
 

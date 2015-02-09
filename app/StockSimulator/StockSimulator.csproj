@@ -92,6 +92,7 @@
     <Compile Include="Strategies\MacdStrategy.cs" />
     <Compile Include="Strategies\RsiStrategy.cs" />
     <Compile Include="Strategies\SmaStrategy.cs" />
+    <Compile Include="YahooFinanceDownloader\YahooFinanceDownloader.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
