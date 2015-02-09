@@ -88,7 +88,7 @@ namespace StockSimulator.Core
 
 			// Get things like win/loss percent up to the point this order was finished.
 			StartStatistics = Simulator.Orders.GetStrategyStatistics(StrategyName,
-				Ticker.TickerAndExchange.ToString(),
+				Ticker.TickerAndExchange,
 				currentBar,
 				Simulator.Config.MaxLookBackBars);
 		}

@@ -67,6 +67,11 @@ namespace StockSimulator.Core
 		public int MaxBuysPerBar { get; set; }
 
 		[Category("Main Strategy")]
+		[DisplayName("Min Required Orders")]
+		[Description("Number of orders needed before we start counting the statistics as valid")]
+		public int MinRequiredOrders { get; set; }
+
+		[Category("Main Strategy")]
 		[DisplayName("Initial Account Balance")]
 		[Description("Amount of money the trade account starts with")]
 		public int InitialAccountBalance { get; set; }
@@ -94,6 +99,7 @@ namespace StockSimulator.Core
 			SizeOfOrder = 10000;
 
 			MaxBuysPerBar = 3;
+			MinRequiredOrders = 3;
 			InitialAccountBalance = 100000;
 			PercentForBuy = 25;
 			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\nasdaq100list.csv";

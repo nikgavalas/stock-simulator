@@ -46,11 +46,11 @@ namespace StockSimulator.Core
 		/// Calculates things like win/loss percent, gain, etc. for the strategy used on the ticker.
 		/// </summary>
 		/// <param name="strategyName">Name of the strategy the statistics are for</param>
-		/// <param name="tickerName">Ticker the strategy used</param>
+		/// <param name="tickerAndExchange">Ticker the strategy used</param>
 		/// <param name="currentBar">Current bar of the simulation</param>
 		/// <param name="maxBarsAgo">Maximum number of bars in the past to consider for calculating</param>
 		/// <returns>Class holding the statistics calculated</returns>
-		public StrategyStatistics GetStrategyStatistics(string strategyName, string tickerName, int currentBar, int maxBarsAgo)
+		public StrategyStatistics GetStrategyStatistics(string strategyName, TickerExchangePair tickerAndExchange, int currentBar, int maxBarsAgo)
 		{
 			// Orders that started less than this bar will not be considered.
 			int cutoffBar = currentBar - maxBarsAgo;
@@ -71,7 +71,7 @@ namespace StockSimulator.Core
 				for (int i = 0; i < strategyOrders.Count; i++)
 				{
 					Order order = strategyOrders[i];
-					if (order.BuyBar >= cutoffBar && order.IsFinished())
+					if (order.BuyBar >= cutoffBar && order.IsFinished() && order.Ticker.TickerAndExchange == tickerAndExchange)
 					{
 						++numberOfOrders;
 						totalGain += order.Gain;
@@ -87,12 +87,19 @@ namespace StockSimulator.Core
 				}
 			}
 
-			StrategyStatistics stats = new StrategyStatistics(
-				strategyName,
-				numberOfOrders,
-				numberOfWins,
-				numberOfLosses,
-				totalGain);
+			// Only count the statistics if we have a bit more data to deal with.
+			// We want to avoid having a strategy say it's 100% correct when it 
+			// only has 1 winning trade.
+			StrategyStatistics stats = new StrategyStatistics(strategyName);
+			if (numberOfOrders > Simulator.Config.MinRequiredOrders)
+			{
+				stats = new StrategyStatistics(
+					strategyName,
+					numberOfOrders,
+					numberOfWins,
+					numberOfLosses,
+					totalGain);
+			}
 
 			return stats;
 		}

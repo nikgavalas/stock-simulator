@@ -50,5 +50,58 @@ namespace StockSimulator.Core
 		{
 			return ToString().GetHashCode();
 		}
+
+		/// <summary>
+		/// Checks if two tickers are equal.
+		/// </summary>
+		/// <param name="a">First ticker to compare</param>
+		/// <param name="b">Second ticker to compare</param>
+		/// <returns>True if the two tickers are equal</returns>
+		public static bool operator ==(TickerExchangePair a, TickerExchangePair b)
+		{
+			if (Object.ReferenceEquals(a, b))
+			{
+				return true;
+			}
+
+			if (((object)a == null) || ((object)b == null))
+			{
+				return false;
+			}
+
+			return a.Ticker == b.Ticker && a.Exchange == b.Exchange;
+		}
+
+		/// <summary>
+		/// Check if the object is equal to another.
+		/// </summary>
+		/// <param name="obj">Object to compare</param>
+		/// <returns>True if the object passed in is equal to this object</returns>
+		public override bool Equals(object obj)
+		{
+			if (obj == null)
+			{
+				return false;
+			}
+
+			TickerExchangePair ticker = obj as TickerExchangePair;
+			if ((object)ticker == null)
+			{
+				return false;
+			}
+
+			return ticker.Ticker == Ticker && ticker.Exchange == Exchange;
+		}
+
+		/// <summary>
+		/// Check if the two tickers are not equal.
+		/// </summary>
+		/// <param name="a">First ticker to compare</param>
+		/// <param name="b">Second ticker to compare</param>
+		/// <returns>True if the two tickers are not equal</returns>
+		public static bool operator !=(TickerExchangePair a, TickerExchangePair b)
+		{
+			return !(a == b);
+		}
 	}
 }
