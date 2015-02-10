@@ -111,9 +111,6 @@ namespace StockSimulator.Core
 		{
 			// TODO: get from config.
 			bool UseATR = false;
-			double ProfitTarget = 0.03;
-			double StopTarget = 0.02;
-			int MaxDaysOrderOpen = 20;
 
 			// If the order is open and not filled we need to fill it.
 			if (Status == OrderStatus.Open)
@@ -131,8 +128,8 @@ namespace StockSimulator.Core
 				// Set prices to exit.
 				if (!UseATR)
 				{
-					ProfitTargetPrice = BuyPrice + ((BuyPrice * ProfitTarget) * direction);
-					StopPrice = BuyPrice - ((BuyPrice * StopTarget) * direction);
+					ProfitTargetPrice = BuyPrice + ((BuyPrice * Simulator.Config.ProfitTarget) * direction);
+					StopPrice = BuyPrice - ((BuyPrice * Simulator.Config.StopTarget) * direction);
 				}
 				else
 				{
@@ -165,7 +162,7 @@ namespace StockSimulator.Core
 				}
 
 				// Limit the order since we won't want to be in the market forever.
-				if (BuyBar - curBar >= MaxDaysOrderOpen)
+				if (BuyBar - curBar >= Simulator.Config.MaxBarsOrderOpen)
 				{
 					FinishOrder(Ticker.Close[curBar], curBar, OrderStatus.LengthExceeded);
 				}
