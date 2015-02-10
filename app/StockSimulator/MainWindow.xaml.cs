@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using Xceed.Wpf.Toolkit;
 
 using StockSimulator.Core;
+using System.Threading;
 
 namespace StockSimulator
 {
@@ -26,24 +27,43 @@ namespace StockSimulator
 		public SimulatorConfig Config { get; set; }
 		public Simulator Sim { get; set; }
 
+		private CancellationTokenSource _cancelToken;
+
 		public MainWindow()
 		{
 			InitializeComponent();
 
+			_cancelToken = new CancellationTokenSource();
 			Config = new SimulatorConfig();
 			_propertyGrid.SelectedObject = Config;
 		}
 
-		private void _runButton_Click(object sender, RoutedEventArgs e)
+		private async void _runButton_Click(object sender, RoutedEventArgs e)
 		{
-			Sim = new Simulator();
+			// Disable the button while running.
+			_runButton.IsEnabled = false;
 
-			// Create the simulator and then add an item to display it status.
+			Progress<string> progress = new Progress<string>(data => UpdateStatus(data));
+			try
+			{
+				await Task.Run(() => RunSim(progress, _cancelToken.Token));
+			}
+			catch (OperationCanceledException)
+			{
+				// TODO: Update the gui to indicator the method was canceled.
+			}
+
+			_runButton.IsEnabled = true;
+		}
+
+		private void RunSim(IProgress<string> progress, CancellationToken cancelToken)
+		{
+			Sim = new Simulator(progress, cancelToken);
+
+			// Create the simulator.
 			Sim.CreateFromConfig(Config);
-			// For each instrument
-			// create list item
 
-			// Initializes all the instruments. Their status can then be updated in the gui.
+			// Initializes all the instruments.
 			Sim.Initialize();
 
 			// Runs the simulation.
@@ -51,6 +71,11 @@ namespace StockSimulator
 
 			// Output all the data.
 			Sim.Shutdown();
+		}
+
+		private void UpdateStatus(string message)
+		{
+			_statusLabel.Content = message;
 		}
 	}
 }

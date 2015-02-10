@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 using System.IO;
 
 using StockSimulator.Strategies;
@@ -48,16 +49,20 @@ namespace StockSimulator.Core
 		private List<MainStrategyOrder> _activeOrders { get; set; }
 
 		private double _accountValue;
+		private IProgress<string> _progress;
+		private CancellationToken _cancelToken;
 
 		/// <summary>
 		/// Constructor
 		/// </summary>
-		public Simulator()
+		public Simulator(IProgress<string> progress, CancellationToken cancelToken)
 		{
 			DataStore = new TickerDataStore();
 			NumberOfBars = 0;
 			DataOutput = new DataOutputter();
 			_activeOrders = new List<MainStrategyOrder>();
+			_progress = progress;
+			_cancelToken = cancelToken;
 		}
 
 		/// <summary>
@@ -86,6 +91,8 @@ namespace StockSimulator.Core
 			{
 				Console.WriteLine("Error loading instrument file!\n" + e.Message);
 			}
+
+			_progress.Report("Getting ticker data from yahoo");
 
 			// Add all the symbols as dependent strategies using the bestofsubstrategies
 			Instruments = new Dictionary<int, BestOfSubStrategies>();
@@ -128,6 +135,8 @@ namespace StockSimulator.Core
 		/// </summary>
 		public void Initialize()
 		{
+			_progress.Report("Initializing all the strategies");
+
 			// Reinit all the orders
 			Orders = new OrderHistory();
 
@@ -142,11 +151,15 @@ namespace StockSimulator.Core
 		/// </summary>
 		public void Run()
 		{
+			_progress.Report("Running historical analysis");
+
 			// Run all to start with so we have the data to simulate with.
 			foreach (KeyValuePair<int, BestOfSubStrategies> task in Instruments)
 			{
 				task.Value.Run();
 			}
+
+			_progress.Report("Running main strategy based on historical analysis");
 
 			// Loop each bar and find the best one of each bar.
 			for (int i = 0; i < NumberOfBars; i++)
@@ -160,7 +173,11 @@ namespace StockSimulator.Core
 		/// </summary>
 		public void Shutdown()
 		{
+			_progress.Report("Outputting data for web");
 			string outputName = DataOutput.OutputData();
+
+			_progress.Report("Idle");
+
 			System.Diagnostics.Process.Start("http://localhost:9000/#/" + outputName + "/");
 		}
 

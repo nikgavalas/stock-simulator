@@ -3,41 +3,17 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 				xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         Title="MainWindow" Height="800" Width="800">
+	
 	<Grid>
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition/>
 		</Grid.ColumnDefinitions>
-		<TabControl>
-			<TabItem Header="Start">
-				<Grid Background="#FFE5E5E5" Margin="0,6,0,-6">
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition/>
-						<ColumnDefinition/>
-					</Grid.ColumnDefinitions>
-					<xctk:PropertyGrid x:Name="_propertyGrid" Width="Auto" Margin="10,10,10,50"
-                                     AutoGenerateProperties="True">
-					</xctk:PropertyGrid>
-					<Button x:Name="_runButton" Content="Run Simulation" Margin="10,0,10,10" VerticalAlignment="Bottom" Height="30" Click="_runButton_Click"/>
-					<Grid Grid.Column="1" Margin="10,10,10,0" VerticalAlignment="Top">
-						<Grid.RowDefinitions>
-							<RowDefinition Height="30"/>
-							<RowDefinition Height="40"/>
-						</Grid.RowDefinitions>
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="150*"/>
-							<ColumnDefinition Width="221*"/>
-						</Grid.ColumnDefinitions>
-						<Label Content="Simulation Status" VerticalAlignment="Top" HorizontalAlignment="Left" FontSize="14"/>
-						<Label Content="Idle" Grid.Column="1" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" FontSize="14" />
-						<ProgressBar Height="20" Margin="10,10,10,0" Grid.Row="1" Grid.ColumnSpan="2" VerticalAlignment="Top"/>
-					</Grid>
-
-				</Grid>
-			</TabItem>
-			<TabItem Header="Results">
-				<Grid Background="#FFE5E5E5"/>
-			</TabItem>
-		</TabControl>
+		<xctk:PropertyGrid x:Name="_propertyGrid" Width="Auto" Margin="10,10,10,100"
+                                    AutoGenerateProperties="True">
+		</xctk:PropertyGrid>
+		<Button x:Name="_runButton" Content="Run Simulation" Margin="10,0,10,10" VerticalAlignment="Bottom" Height="30" Click="_runButton_Click"/>
+		<Label x:Name="_statusLabel" Content="Idle" HorizontalAlignment="Left" Margin="10,0,0,50" VerticalAlignment="Bottom" FontSize="20"/>
 
 	</Grid>
+
 </Window>
