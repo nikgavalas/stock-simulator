@@ -49,6 +49,7 @@ namespace StockSimulator.Core
 		private List<MainStrategyOrder> _activeOrders { get; set; }
 
 		private double _accountValue;
+		private double _totalGain;
 		private IProgress<string> _progress;
 		private CancellationToken _cancelToken;
 
@@ -73,6 +74,7 @@ namespace StockSimulator.Core
 		{
 			Config = config;
 			_accountValue = Config.InitialAccountBalance;
+			_totalGain = 0;
 
 			// Load the config file with the instument list for all the symbols that we 
 			// want to test.
@@ -200,7 +202,7 @@ namespace StockSimulator.Core
 			}
 
 			// Sort the list so the instruments that have the highest buy value are first in the list.
-			buyList.Sort((x, y) => x.Bars[currentBar].HighestPercent.CompareTo(y.Bars[currentBar].HighestPercent));
+			buyList.Sort((x, y) => -1 * x.Bars[currentBar].HighestPercent.CompareTo(y.Bars[currentBar].HighestPercent));
 
 			// Output the buy list for each day.
 			DataOutput.OutputBuyList(currentBar);
@@ -217,8 +219,14 @@ namespace StockSimulator.Core
 				// be high enough and we can early out of the loop.
 				if (buyList[i].Bars[currentBar].HighestPercent > Config.PercentForBuy)
 				{
-					EnterOrder(buyList[i].Bars[currentBar].Statistics, buyList[i].Data, currentBar);
-					++currentCount;
+					// Don't want to order to late in the strategy where the order can't run it's course.
+					// Also, need to have enough money to buy stocks.
+					if (currentBar < NumberOfBars - Config.MaxBarsOrderOpen &&
+						_accountValue > Config.SizeOfOrder * 2)
+					{
+						EnterOrder(buyList[i].Bars[currentBar].Statistics, buyList[i].Data, currentBar);
+						++currentCount;
+					}
 				}
 				else
 				{
@@ -259,6 +267,10 @@ namespace StockSimulator.Core
 				else if (previousStatus == Order.OrderStatus.Filled && order.IsFinished())
 				{
 					_accountValue += order.Value;
+					order.AccountValue = _accountValue;
+					
+					_totalGain += order.Gain;
+					order.TotalGain = _totalGain;
 				}
 			}
 

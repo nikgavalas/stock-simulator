@@ -32,7 +32,10 @@ mainApp.directive('orderList', [
 					};
 
 				}
-			]
+			],
+			link: function($scope, $element, $attrs) {
+				$scope.showValue = angular.isDefined($attrs.showValue);
+			}
 		};
 	}
 ]);

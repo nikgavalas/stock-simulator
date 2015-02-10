@@ -25,6 +25,10 @@ namespace StockSimulator.Core
 		[JsonConverter(typeof(RoundedDoubleConverter))]
 		public double Gain { get; set; }
 
+		[JsonProperty("accountValue")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
+		public double AccountValue { get; set; }
+
 		[JsonProperty("name")]
 		public string StrategyName { get; set; }
 
@@ -44,6 +48,7 @@ namespace StockSimulator.Core
 		{
 			StrategyName = strategyName;
 			Gain = gain;
+			AccountValue = 0;
 
 			// Calculate the percentages.
 			WinPercent = 0;
@@ -86,6 +91,7 @@ namespace StockSimulator.Core
 			int numberOfWins = 0;
 			int numberOfLosses = 0;
 			double totalGain = 0;
+			DateTime dateLastOrderSold = new DateTime(1970, 1, 1);
 
 			for (int i = 0; i < Orders.Count; i++)
 			{
@@ -103,6 +109,12 @@ namespace StockSimulator.Core
 					}
 
 					totalGain += o.Gain;
+
+					if (o.SellDate > dateLastOrderSold)
+					{
+						dateLastOrderSold = o.SellDate;
+						AccountValue = o.AccountValue;
+					}
 				}
 			}
 

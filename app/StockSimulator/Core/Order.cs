@@ -58,6 +58,14 @@ namespace StockSimulator.Core
 		[JsonConverter(typeof(RoundedDoubleConverter))]
 		public double Gain { get; set; }
 
+		[JsonProperty("totalGain")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
+		public double TotalGain { get; set; }
+
+		[JsonProperty("accountValue")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
+		public double AccountValue { get; set; }
+
 		[JsonProperty("ticker")]
 		[JsonConverter(typeof(TickerDataStringConverter))]
 		public TickerData Ticker { get; set; }
@@ -85,6 +93,8 @@ namespace StockSimulator.Core
 			Type = type;
 			Ticker = tickerData;
 			DependentIndicatorNames = dependentIndicatorNames;
+			AccountValue = 0;
+			TotalGain = 0;
 
 			// Get things like win/loss percent up to the point this order was finished.
 			StartStatistics = Simulator.Orders.GetStrategyStatistics(StrategyName,
