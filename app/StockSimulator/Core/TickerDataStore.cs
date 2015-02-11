@@ -78,7 +78,7 @@ namespace StockSimulator.Core
 			{
 				try
 				{
-					data = GetDataFromYahooServer(ticker, start, end);
+					data = GetDataFromGoogleServerAlt(ticker, start, end);
 					AppendNewData(ticker, data);
 
 					// TODO: Save this new data to the disk so we don't have to query
@@ -117,12 +117,12 @@ namespace StockSimulator.Core
 				// exists, we don't have to worry about their being any gaps in that data.
 				if (newData.End < existingData.Start)
 				{
-					TickerData stitch = GetDataFromYahooServer(ticker, newData.End, existingData.Start);
+					TickerData stitch = GetDataFromGoogleServerAlt(ticker, newData.End, existingData.Start);
 					existingData.AppendData(stitch);
 				}
 				if (newData.Start > existingData.End)
 				{
-					TickerData stitch = GetDataFromYahooServer(ticker, existingData.End, newData.Start);
+					TickerData stitch = GetDataFromGoogleServerAlt(ticker, existingData.End, newData.Start);
 					existingData.AppendData(stitch);
 				}
 
@@ -210,6 +210,51 @@ namespace StockSimulator.Core
 
 			YahooFinanceUriBuilder uriBuilder = new YahooFinanceUriBuilder();
 			string uri = uriBuilder.GetDailyDataUrl(ticker.Ticker, start, end);
+
+			using (WebClient wClient = new WebClient())
+			{
+				downloadedData = wClient.DownloadString(uri);
+			}
+
+			using (MemoryStream ms = new MemoryStream(System.Text.Encoding.Default.GetBytes(downloadedData)))
+			{
+				StreamReader sr = new StreamReader(ms);
+				string line;
+				List<string> lines = new List<string>();
+				while ((line = sr.ReadLine()) != null)
+				{
+					lines.Add(line);
+				}
+
+				// Read all the lines from back to front and ignore the headers in the beginning of the file.
+				StringBuilder sb = new StringBuilder();
+				for (int i = lines.Count - 1; i > 0; i--)
+				{
+					sb.AppendLine(lines[i]);
+				}
+
+				string resultValue = sb.ToString();
+				return CreateTickerDataFromString(resultValue, ticker, start, end);
+			}
+		}
+
+		/// <summary>
+		/// Gets the data from the webserver and saves it onto disk for later usage.
+		/// </summary>
+		/// <param name="ticker">ticker to get data for</param>
+		/// <param name="start">Start date for the data</param>
+		/// <param name="end">End date for the data</param>
+		/// <returns>Data (price, volume, etc) for the ticker</returns>
+		private TickerData GetDataFromGoogleServerAlt(TickerExchangePair ticker, DateTime start, DateTime end)
+		{
+			string downloadedData;
+
+			string baseUrl = "http://www.google.com/finance/historical?output=csv&q={0}&startdate={1}&enddate={2}";
+			string uri = string.Format(baseUrl,
+				ticker.Ticker,
+				start.ToString(@"MMM+d\%2C+yyyy"),
+				end.ToString(@"MMM+d\%2C+yyyy")
+			);
 
 			using (WebClient wClient = new WebClient())
 			{
