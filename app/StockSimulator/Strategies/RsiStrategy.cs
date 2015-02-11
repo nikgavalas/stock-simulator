@@ -50,7 +50,7 @@ namespace StockSimulator.Strategies
 			base.OnBarUpdate(currentBar);
 
 			Rsi rsi = (Rsi)Dependents[0];
-			if (DataSeries.CrossAbove(rsi.Value, 20, currentBar, 0) != -1)
+			if (DataSeries.CrossAbove(rsi.Value, 30, currentBar, 0) != -1)
 			{
 				WasFound[currentBar] = true;
 			}

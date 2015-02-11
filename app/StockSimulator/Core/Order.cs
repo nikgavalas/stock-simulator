@@ -162,7 +162,7 @@ namespace StockSimulator.Core
 				}
 
 				// Limit the order since we won't want to be in the market forever.
-				if (BuyBar - curBar >= Simulator.Config.MaxBarsOrderOpen)
+				if (curBar - BuyBar >= Simulator.Config.MaxBarsOrderOpen)
 				{
 					FinishOrder(Ticker.Close[curBar], curBar, OrderStatus.LengthExceeded);
 				}

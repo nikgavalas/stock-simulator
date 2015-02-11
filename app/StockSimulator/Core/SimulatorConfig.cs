@@ -91,17 +91,17 @@ namespace StockSimulator.Core
 			startDate = DateTime.Parse("1/1/2010");
 			endDate = DateTime.Parse("12/31/2014");
 			MinOrders = 3;
-			MaxLookBackBars = 300;
+			MaxLookBackBars = 400;
 			MaxConcurrentOrders = 1;
-			ProfitTarget = 0.03;
-			StopTarget = 0.02;
-			MaxBarsOrderOpen = 20;
+			ProfitTarget = 0.05;
+			StopTarget = 0.04;
+			MaxBarsOrderOpen = 15;
 			SizeOfOrder = 10000;
 
 			MaxBuysPerBar = 3;
 			MinRequiredOrders = 3;
 			InitialAccountBalance = 100000;
-			PercentForBuy = 25;
+			PercentForBuy = 70;
 			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\nasdaq3.csv";
 		}
 	}
