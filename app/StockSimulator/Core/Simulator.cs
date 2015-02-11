@@ -94,7 +94,7 @@ namespace StockSimulator.Core
 				Console.WriteLine("Error loading instrument file!\n" + e.Message);
 			}
 
-			_progress.Report("Getting ticker data from yahoo");
+			_progress.Report("Downloading ticker data from internet");
 
 			// Add all the symbols as dependent strategies using the bestofsubstrategies
 			Instruments = new Dictionary<int, BestOfSubStrategies>();
