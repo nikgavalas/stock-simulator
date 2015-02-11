@@ -60,10 +60,10 @@ namespace StockSimulator.Strategies
 			get
 			{
 				string[] deps = {
-					"MacdStrategy",
-					"MacdCrossStrategy",
-					"RsiStrategy",
-					"SmaStrategy"
+					"MacdCrossover",
+					"MomentumCrossover",
+					"RsiCrossover30",
+					"SmaCrossover"
 				};
 
 				return deps;

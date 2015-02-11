@@ -33,6 +33,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>favicon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -88,10 +91,12 @@
     <Compile Include="Core\SimulatorConfig.cs" />
     <Compile Include="Core\StrategyStatistics.cs" />
     <Compile Include="Core\StrategyTickerPairStatistics.cs" />
+    <Compile Include="Indicators\Momentum.cs" />
     <Compile Include="Strategies\BestOfSubStrategies.cs" />
-    <Compile Include="Strategies\MacdStrategy.cs" />
-    <Compile Include="Strategies\RsiStrategy.cs" />
-    <Compile Include="Strategies\SmaStrategy.cs" />
+    <Compile Include="Strategies\MacdCrossover.cs" />
+    <Compile Include="Strategies\MomentumCrossover.cs" />
+    <Compile Include="Strategies\RsiCrossover30.cs" />
+    <Compile Include="Strategies\SmaCrossover.cs" />
     <Compile Include="YahooFinanceDownloader\YahooFinanceDownloader.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -150,6 +155,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="favicon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

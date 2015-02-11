@@ -59,25 +59,29 @@ namespace StockSimulator.Core
 						requestedItem = new Sma(_tickerData, this);
 						break;
 
+					case "Momentum14":
+						requestedItem = new Momentum(_tickerData, this, 14);
+						break;
+
 					// Strategies.
 					case "BestOfSubStrategies":
 						requestedItem = new BestOfSubStrategies(_tickerData, this);
 						break;
 
-					case "MacdStrategy":
-						requestedItem = new MacdStrategy(_tickerData, this);
+					case "MacdCrossover":
+						requestedItem = new MacdCrossover(_tickerData, this);
 						break;
 
-					case "MacdCrossStrategy":
-						requestedItem = new MacdCrossStrategy(_tickerData, this);
+					case "RsiCrossover30":
+						requestedItem = new RsiCrossover30(_tickerData, this);
 						break;
 
-					case "RsiStrategy":
-						requestedItem = new RsiStrategy(_tickerData, this);
+					case "SmaCrossover":
+						requestedItem = new SmaCrossover(_tickerData, this);
 						break;
 
-					case "SmaStrategy":
-						requestedItem = new SmaStrategy(_tickerData, this);
+					case "MomentumCrossover":
+						requestedItem = new MomentumCrossover(_tickerData, this);
 						break;
 
 					default:
