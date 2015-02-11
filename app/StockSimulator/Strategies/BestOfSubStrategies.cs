@@ -101,11 +101,11 @@ namespace StockSimulator.Strategies
 				string comboName = "";
 				for (int j = 0; j < comboList.Count; j++)
 				{
-					comboName += comboList[i].ToString();
+					comboName += comboList[j].ToString();
 					comboName += "-";
 
 					// Keep track of the dependent indicators for this strategy.
-					dependentIndicators.AddRange(comboList[i].GetDependentIndicatorNames());
+					dependentIndicators.AddRange(comboList[j].GetDependentIndicatorNames());
 				}
 
 				// Trim off the last '-'

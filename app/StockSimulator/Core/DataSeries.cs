@@ -22,11 +22,14 @@ namespace StockSimulator.Core
 		public static int CrossAbove(List<double> series1, double value, int startBar, int lookBackPeriod)
 		{
 			int beginBar = startBar - lookBackPeriod;
-			for (int i = beginBar; i <= startBar; i++)
+			if (beginBar > 0)
 			{
-				if (series1[i] > value && series1[i - 1] <= value)
+				for (int i = beginBar; i <= startBar; i++)
 				{
-					return i;
+					if (series1[i] > value && series1[i - 1] <= value)
+					{
+						return i;
+					}
 				}
 			}
 			return -1;
@@ -43,11 +46,14 @@ namespace StockSimulator.Core
 		public static int CrossAbove(List<double> series1, List<double> series2, int startBar, int lookBackPeriod)
 		{
 			int beginBar = startBar - lookBackPeriod;
-			for (int i = beginBar; i <= startBar; i++)
+			if (beginBar > 0)
 			{
-				if (series1[i] > series2[i] && series1[i - 1] <= series2[i - 1])
+				for (int i = beginBar; i <= startBar; i++)
 				{
-					return i;
+					if (series1[i] > series2[i] && series1[i - 1] <= series2[i - 1])
+					{
+						return i;
+					}
 				}
 			}
 			return -1;
@@ -67,11 +73,14 @@ namespace StockSimulator.Core
 		public static int CrossBelow(List<double> series1, double value, int startBar, int lookBackPeriod)
 		{
 			int beginBar = startBar - lookBackPeriod;
-			for (int i = beginBar; i <= startBar; i++)
+			if (beginBar > 0)
 			{
-				if (series1[i] < value && series1[i - 1] >= value)
+				for (int i = beginBar; i <= startBar; i++)
 				{
-					return i;
+					if (series1[i] < value && series1[i - 1] >= value)
+					{
+						return i;
+					}
 				}
 			}
 			return -1;
@@ -88,11 +97,14 @@ namespace StockSimulator.Core
 		public static int CrossBelow(List<double> series1, List<double> series2, int startBar, int lookBackPeriod)
 		{
 			int beginBar = startBar - lookBackPeriod;
-			for (int i = beginBar; i <= startBar; i++)
+			if (beginBar > 0)
 			{
-				if (series1[i] < series2[i] && series1[i - 1] >= series2[i - 1])
+				for (int i = beginBar; i <= startBar; i++)
 				{
-					return i;
+					if (series1[i] < series2[i] && series1[i - 1] >= series2[i - 1])
+					{
+						return i;
+					}
 				}
 			}
 			return -1;

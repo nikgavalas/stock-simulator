@@ -51,8 +51,8 @@ namespace StockSimulator.Core
 						requestedItem = new Macd(_tickerData, this);
 						break;
 
-					case "Rsi":
-						requestedItem = new Rsi(_tickerData, this);
+					case "Rsi14":
+						requestedItem = new Rsi(_tickerData, this, 14);
 						break;
 
 					case "Sma":
