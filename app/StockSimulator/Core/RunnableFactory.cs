@@ -47,8 +47,16 @@ namespace StockSimulator.Core
 				switch (runnableName)
 				{
 					// Indicators.
+					case "Cci14":
+						requestedItem = new Cci(_tickerData, this, 14);
+						break;
+
 					case "Macd":
 						requestedItem = new Macd(_tickerData, this);
+						break;
+
+					case "Momentum14":
+						requestedItem = new Momentum(_tickerData, this, 14);
 						break;
 
 					case "Rsi14":
@@ -59,17 +67,21 @@ namespace StockSimulator.Core
 						requestedItem = new Sma(_tickerData, this);
 						break;
 
-					case "Momentum14":
-						requestedItem = new Momentum(_tickerData, this, 14);
-						break;
-
 					// Strategies.
 					case "BestOfSubStrategies":
 						requestedItem = new BestOfSubStrategies(_tickerData, this);
 						break;
 
+					case "CciCrossover":
+						requestedItem = new CciCrossover(_tickerData, this);
+						break;
+
 					case "MacdCrossover":
 						requestedItem = new MacdCrossover(_tickerData, this);
+						break;
+
+					case "MomentumCrossover":
+						requestedItem = new MomentumCrossover(_tickerData, this);
 						break;
 
 					case "RsiCrossover30":
@@ -78,10 +90,6 @@ namespace StockSimulator.Core
 
 					case "SmaCrossover":
 						requestedItem = new SmaCrossover(_tickerData, this);
-						break;
-
-					case "MomentumCrossover":
-						requestedItem = new MomentumCrossover(_tickerData, this);
 						break;
 
 					default:

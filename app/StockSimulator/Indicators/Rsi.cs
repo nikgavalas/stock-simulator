@@ -70,7 +70,7 @@ namespace StockSimulator.Indicators
 		{
 			base.OnBarUpdate(currentBar);
 
-			if (currentBar - 1 < _period)
+			if (currentBar == 0)
 			{
 				return;
 			}
@@ -78,11 +78,16 @@ namespace StockSimulator.Indicators
 			_down[currentBar] = Math.Max(Data.Close[currentBar - 1] - Data.Close[currentBar], 0);
 			_up[currentBar] = Math.Max(Data.Close[currentBar] - Data.Close[currentBar - 1], 0);
 
+			if (currentBar + 1 < _period)
+			{
+				return;
+			}
+
 			if ((currentBar + 1) == _period)
 			{
 				// First averages 
-				_avgDown[currentBar] = _down.Average();
-				_avgUp[currentBar] = _up.Average();
+				_avgDown[currentBar] = _down.GetRange(0, _period).Average();
+				_avgUp[currentBar] = _up.GetRange(0, _period).Average();
 			}
 			else
 			{

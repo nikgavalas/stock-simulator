@@ -82,7 +82,7 @@ namespace StockSimulator.Indicators
 			}
 			else
 			{
-				double last = Data.Close[currentBar - 1] * Math.Min(currentBar, _period);
+				double last = Avg[currentBar - 1] * Math.Min(currentBar, _period);
 
 				if (currentBar >= _period)
 				{

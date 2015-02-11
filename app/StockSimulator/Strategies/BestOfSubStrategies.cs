@@ -60,6 +60,7 @@ namespace StockSimulator.Strategies
 			get
 			{
 				string[] deps = {
+					"CciCrossover",
 					"MacdCrossover",
 					"MomentumCrossover",
 					"RsiCrossover30",

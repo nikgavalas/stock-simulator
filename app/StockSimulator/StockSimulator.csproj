@@ -91,8 +91,10 @@
     <Compile Include="Core\SimulatorConfig.cs" />
     <Compile Include="Core\StrategyStatistics.cs" />
     <Compile Include="Core\StrategyTickerPairStatistics.cs" />
+    <Compile Include="Indicators\Cci.cs" />
     <Compile Include="Indicators\Momentum.cs" />
     <Compile Include="Strategies\BestOfSubStrategies.cs" />
+    <Compile Include="Strategies\CciCrossover.cs" />
     <Compile Include="Strategies\MacdCrossover.cs" />
     <Compile Include="Strategies\MomentumCrossover.cs" />
     <Compile Include="Strategies\RsiCrossover30.cs" />

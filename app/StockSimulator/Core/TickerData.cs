@@ -20,6 +20,8 @@ namespace StockSimulator.Core
 		public List<double> Close { get; set; }
 		public List<double> High { get; set; }
 		public List<double> Low { get; set; }
+		public List<double> Typical { get; set; }
+		public List<double> Median { get; set; }
 		public List<long> Volume { get; set; }
 		public int NumBars { get; set; }
 		public TickerExchangePair TickerAndExchange { get; set; }
@@ -59,6 +61,8 @@ namespace StockSimulator.Core
 			Close = new List<double>();
 			High = new List<double>();
 			Low = new List<double>();
+			Typical = new List<double>();
+			Median = new List<double>();
 			Volume = new List<long>();
 		}
 
@@ -88,6 +92,8 @@ namespace StockSimulator.Core
 				Close.InsertRange(0, otherData.Close.GetRange(0, copyEndIndex));
 				High.InsertRange(0, otherData.High.GetRange(0, copyEndIndex));
 				Low.InsertRange(0, otherData.Low.GetRange(0, copyEndIndex));
+				Typical.InsertRange(0, otherData.Typical.GetRange(0, copyEndIndex));
+				Median.InsertRange(0, otherData.Median.GetRange(0, copyEndIndex));
 				Volume.InsertRange(0, otherData.Volume.GetRange(0, copyEndIndex));
 			}
 
@@ -110,6 +116,8 @@ namespace StockSimulator.Core
 				Close.AddRange(otherData.Close.GetRange(copyStartIndex, otherData.Close.Count - copyStartIndex));
 				High.AddRange(otherData.High.GetRange(copyStartIndex, otherData.High.Count - copyStartIndex));
 				Low.AddRange(otherData.Low.GetRange(copyStartIndex, otherData.Low.Count - copyStartIndex));
+				Typical.AddRange(otherData.Typical.GetRange(copyStartIndex, otherData.Typical.Count - copyStartIndex));
+				Median.AddRange(otherData.Median.GetRange(copyStartIndex, otherData.Median.Count - copyStartIndex));
 				Volume.AddRange(otherData.Volume.GetRange(copyStartIndex, otherData.Volume.Count - copyStartIndex));
 			}
 
@@ -129,6 +137,8 @@ namespace StockSimulator.Core
 				output += Open[i].ToString() + ',';
 				output += High[i].ToString() + ',';
 				output += Low[i].ToString() + ',';
+				output += Typical[i].ToString() + ',';
+				output += Median[i].ToString() + ',';
 				output += Close[i].ToString() + ',';
 				output += Volume[i].ToString();
 				output += Environment.NewLine;

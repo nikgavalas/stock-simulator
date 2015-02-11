@@ -9,15 +9,15 @@ using StockSimulator.Core;
 namespace StockSimulator.Indicators
 {
 	/// <summary>
-	/// Momentum indicator
+	/// CCI indicator
 	/// </summary>
-	class Momentum : Indicator
+	class Cci : Indicator
 	{
 		public List<double> Value { get; set; }
 
 		private int _period = 14;
 
-		public Momentum(TickerData tickerData, RunnableFactory factory, int period) 
+		public Cci(TickerData tickerData, RunnableFactory factory, int period)
 			: base(tickerData, factory)
 		{
 			Value = Enumerable.Repeat(0d, Data.NumBars).ToList();
@@ -30,7 +30,7 @@ namespace StockSimulator.Indicators
 		/// <returns>The name of this indicator</returns>
 		public override string ToString()
 		{
-			return "Momentum" + _period.ToString();
+			return "Cci" + _period.ToString();
 		}
 
 		/// <summary>
@@ -42,7 +42,7 @@ namespace StockSimulator.Indicators
 
 			// Add the rsi for plotting
 			PlotSeries plot = new PlotSeries("line");
-			ChartPlots["Momentum"] = plot;
+			ChartPlots["Cci"] = plot;
 			for (int i = 0; i < Data.Dates.Count; i++)
 			{
 				plot.PlotData.Add(new List<object>()
@@ -63,8 +63,17 @@ namespace StockSimulator.Indicators
 
 			if (currentBar > 0)
 			{
-				Value[currentBar] = Data.Close[currentBar] - Data.Close[currentBar - Math.Min(currentBar, _period)];
+				double mean = 0;
+				int avgStartIndex = currentBar - Math.Min(currentBar, _period - 1);
+				double avg = Data.Typical.GetRange(avgStartIndex, Math.Min(currentBar, _period)).Average();
+				for (int idx = Math.Min(currentBar, _period - 1); idx >= 0; idx--)
+				{
+					mean += Math.Abs(Data.Typical[currentBar - idx] - avg);
+				}
+				
+				Value[currentBar] = (Data.Typical[currentBar] - avg) / (mean == 0 ? 1 : (0.015 * (mean / Math.Min(_period, currentBar + 1))));
 			}
+
 		}
 	}
 }

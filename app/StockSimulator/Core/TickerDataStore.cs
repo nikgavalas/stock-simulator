@@ -286,13 +286,22 @@ namespace StockSimulator.Core
 						}
 
 						// Add the data to our object.
+						double open = Convert.ToDouble(splitData[1]);
+						double high = Convert.ToDouble(splitData[2]);
+						double low = Convert.ToDouble(splitData[3]);
+						double close = Convert.ToDouble(splitData[4]);
+
 						tickerData.Dates.Add(lineDate);
-						tickerData.Open.Add(Convert.ToDouble(splitData[1]));
-						tickerData.High.Add(Convert.ToDouble(splitData[2]));
-						tickerData.Low.Add(Convert.ToDouble(splitData[3]));
-						tickerData.Close.Add(Convert.ToDouble(splitData[4]));
+						tickerData.Open.Add(open);
+						tickerData.High.Add(high);
+						tickerData.Low.Add(low);
+						tickerData.Close.Add(close);
 						tickerData.Volume.Add(Convert.ToInt64(splitData[5]));
 						tickerData.NumBars = tickerData.Dates.Count;
+
+						// Extra non-downloaded data.
+						tickerData.Typical.Add((high + low + close) / 3);
+						tickerData.Median.Add((high + low) / 2);
 
 						// Some error checking.
 						if (tickerData.Open[tickerData.Open.Count - 1] <= 0)

@@ -90,6 +90,9 @@ namespace StockSimulator.Core
 		{
 			startDate = DateTime.Parse("1/1/2010");
 			endDate = DateTime.Parse("12/31/2014");
+			// Test dates for indicator correctness.
+			//startDate = DateTime.Parse("12/31/2013");
+			//endDate = DateTime.Parse("12/31/2014");
 			MinOrders = 3;
 			MaxLookBackBars = 400;
 			MaxConcurrentOrders = 1;
