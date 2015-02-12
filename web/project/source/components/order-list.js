@@ -8,7 +8,8 @@ mainApp.directive('orderList', [
 			templateUrl: 'source/components/order-list.html',
 			scope: {
 				orders: '=',
-				orderClick: '='
+				orderClick: '=',
+				activeOrder: '='
 			},
 			controller: [
 				'$scope',

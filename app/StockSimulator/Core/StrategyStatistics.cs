@@ -13,6 +13,9 @@ namespace StockSimulator.Core
 	/// </summary>
 	public class StrategyStatistics
 	{
+		[JsonProperty("numberOfOrders")]
+		public int NumberOfOrders { get; set; }
+
 		[JsonProperty("winPercent")]
 		[JsonConverter(typeof(RoundedDoubleConverter))]
 		public double WinPercent { get; set; }
@@ -121,6 +124,7 @@ namespace StockSimulator.Core
 			Gain = totalGain;
 			WinPercent = 0;
 			LossPercent = 0;
+			NumberOfOrders = numberOfOrders;
 			if (numberOfOrders > 0)
 			{
 				WinPercent = Math.Round(((double)numberOfWins / numberOfOrders) * 100.0);

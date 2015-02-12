@@ -20,6 +20,7 @@ angular.module('mainApp').controller('StrategyDetailsCtrl', [
 
 		$scope.strategy = $routeParams.strategy;
 		$scope.ticker = $routeParams.ticker;
+		$scope.activeOrder = null;
 
 		$scope.orders = [];
 		StrategyListFactory.getStrategy($scope.strategy, $scope.ticker).then(function(data) {
@@ -40,6 +41,8 @@ angular.module('mainApp').controller('StrategyDetailsCtrl', [
 		 * @param  {Object} order Order that was clicked
 		 */
 		$scope.orderClick = function(order) {
+			$scope.activeOrder = order;
+			
 			// Set the chart to position to these dates.
 			var buyDate = new Date(order.buyDate);
 			var range = 30; // Days

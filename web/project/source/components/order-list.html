@@ -11,7 +11,7 @@
 		<th ng-show="showValue">Total Gain</th>
 	</thead>
 	<tbody>
-		<tr ng-repeat="order in orders" ng-click="orderClick(order)" class="hover-pointer">
+		<tr ng-repeat="order in orders" ng-click="orderClick(order)" class="hover-pointer" ng-class="{'info': activeOrder === order}">
 			<td>{{order.ticker}}</td>
 			<td>{{order.buyDate}}</td>
 			<td>${{order.buyPrice}}</td>

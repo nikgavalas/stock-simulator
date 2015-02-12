@@ -60,6 +60,16 @@
 									</tbody>
 								</table>
 							</div>
+							<div class="col-xs-6">
+								<table class="table">
+									<tbody>
+										<tr>
+											<td><strong>Number of Orders</strong></td>
+											<td>{{strategyData.numberOfOrders}}</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -73,7 +83,7 @@
 					</div>
 					<div class="panel-body">
 
-						<order-list orders="orders" order-click="orderClick"></order-list>
+						<order-list orders="orders" order-click="orderClick" active-order="activeOrder"></order-list>
 
 					</div>
 				</div><!-- End strategy list panel -->

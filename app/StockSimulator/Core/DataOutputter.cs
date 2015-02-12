@@ -137,6 +137,7 @@ namespace StockSimulator.Core
 						tickerStats.WinPercent = item.Value.WinPercent;
 						tickerStats.LossPercent = item.Value.LossPercent;
 						tickerStats.Gain = item.Value.Gain;
+						tickerStats.NumberOfOrders = item.Value.NumberOfOrders;
 						overallList.Add(tickerStats);
 					}
 

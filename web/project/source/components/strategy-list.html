@@ -1,12 +1,14 @@
 <table class="table table-hover strategy-list">
 	<thead>
 		<th>{{showTickers ? 'Ticker' : 'Name'}}</th>
+		<td>Num Orders</td>
 		<th>Win/Loss %</th>
 		<th>Gain</th>
 	</thead>
 	<tbody>
 		<tr ng-repeat="strategy in strategies" ng-click="rowClicked(strategy)" ng-class="{'info': $index == selected}" class="hover-pointer">
 			<td>{{strategy.name}}</td>
+			<td>{{strategy.numberOfOrders}}</td>
 			<td>
 				<progress>
 					<bar type="success" value="strategy.winPercent"><span>{{strategy.winPercent}}%</span></bar>
