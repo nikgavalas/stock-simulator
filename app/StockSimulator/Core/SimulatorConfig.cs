@@ -93,7 +93,7 @@ namespace StockSimulator.Core
 
 		public SimulatorConfig()
 		{
-			startDate = DateTime.Parse("1/1/2010");
+			startDate = DateTime.Parse("1/4/2010");
 			endDate = DateTime.Parse("12/31/2014");
 			// Test dates for indicator correctness.
 			//startDate = DateTime.Parse("12/31/2013");

@@ -58,7 +58,6 @@ namespace StockSimulator.Core
 		/// </summary>
 		public Simulator(IProgress<string> progress, CancellationToken cancelToken)
 		{
-			DataStore = new TickerDataStore();
 			NumberOfBars = 0;
 			DataOutput = new DataOutputter();
 			_activeOrders = new List<MainStrategyOrder>();
@@ -70,9 +69,10 @@ namespace StockSimulator.Core
 		/// Initializes the sim from the config object.
 		/// </summary>
 		/// <param name="config">Object with all the parameters that can be used to config how this sim runs</param>
-		public void CreateFromConfig(SimulatorConfig config)
+		public void CreateFromConfig(SimulatorConfig config, TickerDataStore dataStore)
 		{
 			Config = config;
+			DataStore = dataStore;
 			_accountValue = Config.InitialAccountBalance;
 			_totalGain = 0;
 

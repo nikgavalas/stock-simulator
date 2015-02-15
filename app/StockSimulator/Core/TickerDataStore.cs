@@ -19,12 +19,16 @@ namespace StockSimulator.Core
 	{
 		SortedDictionary<int, TickerData> _symbolsInMemory;
 
+		private readonly string _cacheFolder = @"DataCache\";
+
 		/// <summary>
 		/// Constructor
 		/// </summary>
 		public TickerDataStore()
 		{
 			_symbolsInMemory = new SortedDictionary<int, TickerData>();
+
+			Directory.CreateDirectory(_cacheFolder);
 		}
 
 		/// <summary>
@@ -42,15 +46,24 @@ namespace StockSimulator.Core
 			int key = ticker.GetHashCode();
 			if (_symbolsInMemory.ContainsKey(key))
 			{
-				data = _symbolsInMemory[key];
+				TickerData inMemoryData = _symbolsInMemory[key];
 
 				// Make sure the symbol has data for the dates that we want
 				// If it doesn't then we have to get some more data.
-				if (data.Start > start || data.End < end)
+				if (start < inMemoryData.Start || end > inMemoryData.End)
 				{
 					data = GetDataFromDiskOrServer(ticker, start, end);
 				}
-
+				// Not requesting everything that is in the memory.
+				else if (start > inMemoryData.Start || end < inMemoryData.End)
+				{
+					data = inMemoryData.SubSet(start, end);
+				}
+				// Otherwise the data is the same and we just return it.
+				else
+				{
+					data = inMemoryData;
+				}
 			}
 			// Symbol isn't in memory so we need to load from the disk or the server.
 			else
@@ -74,15 +87,25 @@ namespace StockSimulator.Core
 
 			// Check if the data from the disk is in the range. If it's
 			// not then we need to get data from the server so we have it.
-			if (data == null || data.Start > start || data.End < end)
+			if (data == null || start < data.Start || end > data.End)
 			{
 				try
 				{
-					data = GetDataFromGoogleServerAlt(ticker, start, end);
-					AppendNewData(ticker, data);
+					TickerData serverData = GetDataFromGoogleServerAlt(ticker, start, end);
+					AppendNewData(ticker, serverData);
 
-					// TODO: Save this new data to the disk so we don't have to query
-					// the internet as much.
+					// Save the data so we can resuse it again without hitting the server.
+					if (data != null)
+					{
+						data.AppendData(serverData);
+					}
+					else
+					{
+						data = serverData;
+					}
+
+					SaveTickerData(ticker, data);
+					data = serverData;
 				}
 				catch (Exception e)
 				{
@@ -92,9 +115,40 @@ namespace StockSimulator.Core
 			else
 			{
 				AppendNewData(ticker, data);
+				data = data.SubSet(start, end);
 			}
 
 			return data;
+		}
+
+		/// <summary>
+		/// Saves all the ticker data to a file so it can be resused without us downloading from the server.
+		/// </summary>
+		/// <param name="ticker">Ticker exchange name</param>
+		/// <param name="newData">Ticker data to save</param>
+		private void SaveTickerData(TickerExchangePair ticker, TickerData newData)
+		{
+			string fileAndPath = GetTickerFilename(ticker);
+			string contents = "Date,Open,High,Low,Close,Volume," + Environment.NewLine;
+			contents += newData.ToString();
+			try
+			{
+				File.WriteAllText(fileAndPath, contents);
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e.Message);
+			}
+		}
+		
+		/// <summary>
+		/// Builds a cache file name for a ticker.
+		/// </summary>
+		/// <param name="ticker">Ticker exhange name</param>
+		/// <returns>Filename to for the ticker</returns>
+		private string GetTickerFilename(TickerExchangePair ticker)
+		{
+			return _cacheFolder + ticker.ToString() + ".csv";
 		}
 
 		/// <summary>
@@ -145,16 +199,31 @@ namespace StockSimulator.Core
 		/// <returns>Data (price, volume, etc) for the ticker</returns>
 		private TickerData GetDataFromDisk(TickerExchangePair ticker, DateTime start, DateTime end)
 		{
+			string fileAndPath = GetTickerFilename(ticker);
+
 			// If the file doesn't exist then we for sure have to pull it from the internet.
+			if (File.Exists(fileAndPath))
+			{
+				try
+				{
+					StreamReader file = new StreamReader(fileAndPath);
+					string line;
+					StringBuilder sb = new StringBuilder();
+					while ((line = file.ReadLine()) != null)
+					{
+						sb.AppendLine(line);
+					}
+
+					return CreateTickerDataFromString(sb.ToString(), ticker, new DateTime(1970, 1, 1), new DateTime(1970, 1, 1));
+				}
+				catch (Exception e)
+				{
+					Console.WriteLine(e.Message);
+				}
+			}
+		
 			// If file != exist
 			return null;
-
-			// If file exists
-			// Load it into memory
-			// Make sure that we have all the dates we need
-			// If not all dates
-
-
 		}
 
 		/// <summary>
@@ -307,7 +376,10 @@ namespace StockSimulator.Core
 					reader.ReadLine();
 				}
 
-				TickerData tickerData = new TickerData(ticker, start, end);
+				TickerData tickerData = new TickerData(ticker);
+
+				// Value for an invalid date.
+				DateTime invalidDate = new DateTime(1970, 1, 1);
 
 				// Read each line of the string and convert it into numerical data and dates.
 				do
@@ -321,11 +393,11 @@ namespace StockSimulator.Core
 						// Because of the way google returns data, we don't always get our exact dates.
 						// What we get is an interval of dates containing the ones we asked for, so 
 						// we'll filter that data down to just the dates we want.
-						if (lineDate < start)
+						if (start != invalidDate && lineDate < start)
 						{
 							continue;
 						}
-						if (lineDate > end)
+						if (end != invalidDate && lineDate > end)
 						{
 							break;
 						}
@@ -348,17 +420,25 @@ namespace StockSimulator.Core
 						tickerData.Typical.Add((high + low + close) / 3);
 						tickerData.Median.Add((high + low) / 2);
 
-						// Some error checking.
+						// Google has a weird bug where sometimes the open price will turn out to be
+						// zero for some random bars. If this happens we'll just hack it now so that 
+						// the open price = the close from the previous day.
 						if (tickerData.Open[tickerData.Open.Count - 1] <= 0)
 						{
-							throw new Exception("Open price 0 for this bar!");
+							
+							tickerData.Open[tickerData.Open.Count - 1] = (tickerData.Close.Count > 1) ? tickerData.Close[tickerData.Close.Count - 2] :
+								tickerData.Close[tickerData.Close.Count - 1];
+							Console.WriteLine(ticker.ToString() + ": Open price 0 for bar: " + (tickerData.Open.Count - 1));
 						}
 						if (tickerData.Close[tickerData.Close.Count - 1] <= 0)
 						{
-							throw new Exception("Close price 0 for this bar!");
+							throw new Exception(ticker.ToString() + ": Open price 0 for bar: " + (tickerData.Open.Count - 1));
 						}
 					}
 				} while (line != null);
+
+				tickerData.Start = tickerData.Dates[0];
+				tickerData.End = tickerData.Dates[tickerData.Dates.Count - 1];
 
 				return tickerData;
 			}

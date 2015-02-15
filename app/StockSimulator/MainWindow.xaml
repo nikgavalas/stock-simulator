@@ -2,18 +2,24 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 				xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-        Title="MainWindow" Height="800" Width="800"
+        Title="MainWindow" Height="800" Width="1000"
 				Icon="favicon.ico">
 	
 	<Grid>
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition/>
+			<ColumnDefinition Width="500"/>
 		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="*"></RowDefinition>
+		</Grid.RowDefinitions>
+		
 		<xctk:PropertyGrid x:Name="_propertyGrid" Width="Auto" Margin="10,10,10,100"
                                     AutoGenerateProperties="True">
 		</xctk:PropertyGrid>
 		<Button x:Name="_runButton" Content="Run Simulation" Margin="10,0,10,10" VerticalAlignment="Bottom" Height="30" Click="_runButton_Click"/>
-		<Label x:Name="_statusLabel" Content="Idle" HorizontalAlignment="Left" Margin="10,0,0,50" VerticalAlignment="Bottom" FontSize="20"/>
+	
+		<TextBox x:Name="_statusText" Grid.Column="1" Margin="10,10,10,10" TextWrapping="Wrap" Text="" AcceptsReturn="True"/>
 
 	</Grid>
 

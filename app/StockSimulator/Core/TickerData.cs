@@ -33,28 +33,16 @@ namespace StockSimulator.Core
 		[JsonProperty("volume")]
 		public List<List<object>> VolumeData { get; set; }
 
-		// TODO: add things like the median and such and such.
-
-		/// <summary>
-		/// Creates an empty object.
-		/// </summary>
-		public TickerData(TickerExchangePair tickerAndExchange)
-		{
-			TickerAndExchange = tickerAndExchange;
-			Start = DateTime.Now;
-			End = DateTime.Now;
-		}
-
 		/// <summary>
 		/// Creates a new object to hold all the data.
 		/// </summary>
 		/// <param name="start">Starting date of the data</param>
 		/// <param name="end">Ending date of the data</param>
-		public TickerData(TickerExchangePair tickerAndExchange, DateTime start, DateTime end)
+		public TickerData(TickerExchangePair tickerAndExchange)
 		{
 			TickerAndExchange = tickerAndExchange;
-			Start = start;
-			End = end;
+			Start = DateTime.Now;
+			End = DateTime.Now;
 
 			Dates = new List<DateTime>();
 			Open = new List<double>();
@@ -121,7 +109,54 @@ namespace StockSimulator.Core
 				Volume.AddRange(otherData.Volume.GetRange(copyStartIndex, otherData.Volume.Count - copyStartIndex));
 			}
 
+			Start = Dates[0];
+			End = Dates[Dates.Count - 1];
 			NumBars = Dates.Count;
+		}
+
+		/// <summary>
+		/// Gets a copy of this data from a date, to a date.
+		/// </summary>
+		/// <param name="start">Date to start from</param>
+		/// <param name="end">Date to end at</param>
+		/// <returns>New object with the data from the requested dates</returns>
+		public TickerData SubSet(DateTime start, DateTime end)
+		{
+			TickerData copyData = new TickerData(TickerAndExchange);
+
+			int copyStartIndex = 0;
+			int copyEndIndex = 0;
+			for (int i = 0; i < Dates.Count; i++)
+			{
+				if (copyStartIndex == 0 && Dates[i] >= start)
+				{
+					copyStartIndex = i;
+				}
+				if (copyEndIndex == 0 && Dates[i] >= end)
+				{
+					copyEndIndex = i;
+				}
+
+				if (copyStartIndex > 0 && copyEndIndex > 0)
+				{
+					break;
+				}
+			}
+
+			int amountToCopy = (copyEndIndex - copyStartIndex) + 1;
+			copyData.Dates.AddRange(Dates.GetRange(copyStartIndex, amountToCopy));
+			copyData.Open.AddRange(Open.GetRange(copyStartIndex, amountToCopy));
+			copyData.Close.AddRange(Close.GetRange(copyStartIndex, amountToCopy));
+			copyData.High.AddRange(High.GetRange(copyStartIndex, amountToCopy));
+			copyData.Low.AddRange(Low.GetRange(copyStartIndex, amountToCopy));
+			copyData.Typical.AddRange(Typical.GetRange(copyStartIndex, amountToCopy));
+			copyData.Median.AddRange(Median.GetRange(copyStartIndex, amountToCopy));
+			copyData.Volume.AddRange(Volume.GetRange(copyStartIndex, amountToCopy));
+
+			copyData.Start = copyData.Dates[0];
+			copyData.End = copyData.Dates[copyData.Dates.Count - 1];
+			copyData.NumBars = copyData.Dates.Count;
+			return copyData;
 		}
 
 		/// <summary>
@@ -137,8 +172,6 @@ namespace StockSimulator.Core
 				output += Open[i].ToString() + ',';
 				output += High[i].ToString() + ',';
 				output += Low[i].ToString() + ',';
-				output += Typical[i].ToString() + ',';
-				output += Median[i].ToString() + ',';
 				output += Close[i].ToString() + ',';
 				output += Volume[i].ToString();
 				output += Environment.NewLine;

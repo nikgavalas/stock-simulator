@@ -24,7 +24,19 @@ namespace StockSimulator
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		public SimulatorConfig Config { get; set; }
+		/// <summary>
+		/// Holds all the raw price data for the sim.
+		/// </summary>
+		private TickerDataStore DataStore { get; set; }
+
+		/// <summary>
+		/// Config data that comes from the property grid.
+		/// </summary>
+		private SimulatorConfig Config { get; set; }
+
+		/// <summary>
+		/// Our main sim. Gets created each run.
+		/// </summary>
 		public Simulator Sim { get; set; }
 
 		private CancellationTokenSource _cancelToken;
@@ -35,6 +47,7 @@ namespace StockSimulator
 
 			_cancelToken = new CancellationTokenSource();
 			Config = new SimulatorConfig();
+			DataStore = new TickerDataStore();
 			_propertyGrid.SelectedObject = Config;
 		}
 
@@ -61,7 +74,7 @@ namespace StockSimulator
 			Sim = new Simulator(progress, cancelToken);
 
 			// Create the simulator.
-			Sim.CreateFromConfig(Config);
+			Sim.CreateFromConfig(Config, DataStore);
 
 			// Initializes all the instruments.
 			Sim.Initialize();
@@ -75,7 +88,7 @@ namespace StockSimulator
 
 		private void UpdateStatus(string message)
 		{
-			_statusLabel.Content = message;
+			_statusText.Text += DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss.fff-") + message + Environment.NewLine;
 		}
 	}
 }
