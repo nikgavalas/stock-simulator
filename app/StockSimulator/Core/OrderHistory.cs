@@ -68,10 +68,15 @@ namespace StockSimulator.Core
 			if (StrategyDictionary.ContainsKey(strategyHash))
 			{
 				List<Order> strategyOrders = StrategyDictionary[strategyHash];
-				for (int i = 0; i < strategyOrders.Count; i++)
+				//for (int i = 0; i < strategyOrders.Count; i++)
+				for (int i = strategyOrders.Count - 1; i >= 0; i--)
 				{
 					Order order = strategyOrders[i];
-					if (order.BuyBar >= cutoffBar && order.IsFinished() && order.Ticker.TickerAndExchange == tickerAndExchange)
+					// For the date
+					//if (order.BuyBar >= cutoffBar && order.IsFinished() && order.Ticker.TickerAndExchange == tickerAndExchange)
+
+					// For the number of orders as the cutoff
+					if (numberOfOrders < Simulator.Config.MaxLookBackOrders && order.IsFinished() && order.Ticker.TickerAndExchange == tickerAndExchange)
 					{
 						++numberOfOrders;
 						totalGain += order.Gain;

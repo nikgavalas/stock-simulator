@@ -35,6 +35,11 @@ namespace StockSimulator.Core
 		public int MaxLookBackBars { get; set; }
 
 		[Category("Orders")]
+		[DisplayName("Max Lookback Orders")]
+		[Description("Maximum number of orders to look back when calculating the statistics for the strategy")]
+		public int MaxLookBackOrders { get; set; }
+
+		[Category("Orders")]
 		[DisplayName("Max Concurrent Orders")]
 		[Description("Maximum number of orders that can be for a particular strategy at one time")]
 		public int MaxConcurrentOrders { get; set; }
@@ -95,6 +100,7 @@ namespace StockSimulator.Core
 			//endDate = DateTime.Parse("12/31/2014");
 			MinOrders = 3;
 			MaxLookBackBars = 400;
+			MaxLookBackOrders = 20;
 			MaxConcurrentOrders = 1;
 			ProfitTarget = 0.05;
 			StopTarget = 0.04;

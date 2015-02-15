@@ -56,6 +56,7 @@ namespace StockSimulator.Core
 			// Calculate the percentages.
 			WinPercent = 0;
 			LossPercent = 0;
+			NumberOfOrders = numOrders;
 			if (numOrders > 0)
 			{
 				WinPercent = Math.Round(((double)wins / numOrders) * 100.0);
