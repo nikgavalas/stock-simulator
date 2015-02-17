@@ -1,5 +1,7 @@
 <div>
-	<pagination total-items="orders.length" ng-model="currentPage" items-per-page="numberOrdersPerPage" max-size="15" rotate="true" boundary-links="true" class="pagination-sm"></pagination>
+	<div class="text-center">
+		<pagination total-items="orders.length" ng-model="currentPage" items-per-page="numberOrdersPerPage" max-size="10" rotate="true" boundary-links="true" class="pagination-sm"></pagination>
+	</div>
 	<table class="table table-hover">
 		<thead>
 			<th>Ticker</th>
