@@ -4,6 +4,7 @@ angular.module('mainApp').controller('OrderDetailsCtrl', [
 	'$scope',
 	'$routeParams',
 	'$location',
+	'$window',
 	'ConfigFactory',
 	'OrderListFactory',
 	'StrategyListFactory',
@@ -11,6 +12,7 @@ angular.module('mainApp').controller('OrderDetailsCtrl', [
 		$scope,
 		$routeParams,
 		$location,
+		$window,
 		ConfigFactory,
 		OrderListFactory,
 		StrategyListFactory
@@ -78,8 +80,15 @@ angular.module('mainApp').controller('OrderDetailsCtrl', [
 		 * Called when the user clicks on a row in the strategy table
 		 * @param  {Object} strategy The strategy row that was clicked
 		 */
-		$scope.strategyClick = function(strategy) {
-			$location.url(ConfigFactory.getOutputName() + '/strategy/' + strategy.name + '/' + orderData.ticker);
+		$scope.strategyClick = function(strategy, $event) {
+			var url = ConfigFactory.getOutputName() + '/strategy/' + strategy.name + '/' + orderData.ticker;
+
+			if ($event && ($event.ctrlKey || $event.shiftKey)) {
+				$window.open('#/' + url);
+			}
+			else {
+				$location.url(url);
+			}
 		};
 
 	} // end controller

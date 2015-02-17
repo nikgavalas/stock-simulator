@@ -5,6 +5,7 @@ angular.module('mainApp').controller('MainCtrl', [
 	'$scope',
 	'$routeParams',
 	'$location',
+	'$window',
 	'ConfigFactory',
 	'OrderListFactory',
 	'StrategyListFactory',
@@ -12,6 +13,7 @@ angular.module('mainApp').controller('MainCtrl', [
 		$scope,
 		$routeParams,
 		$location,
+		$window,
 		ConfigFactory,
 		OrderListFactory,
 		StrategyListFactory
@@ -35,21 +37,34 @@ angular.module('mainApp').controller('MainCtrl', [
 		 * @param  {[type]} order [description]
 		 * @return {[type]}       [description]
 		 */
-		$scope.orderClick = function(order) {
+		$scope.orderClick = function(order, $event) {
 			// TODO: Maybe show the order here on the charts instead. So when clicked
 			// Change chart to ticker
 			// Change to strategy that was used to buy this order and display stats
 			// Change indicators to match the strategy
 			// Show buy and sell locations on the chart
-			$location.url(ConfigFactory.getOutputName() + '/order/' + order.ticker + '/' + order.id);
+			var url = ConfigFactory.getOutputName() + '/order/' + order.ticker + '/' + order.id;
+			if ($event && ($event.ctrlKey || $event.shiftKey)) {
+				$window.open('#/' + url);
+			}
+			else {
+				$location.url(url);
+			}
 		};
 
 		/**
 		 * Called when the user clicks on a row in the strategy table
 		 * @param  {Object} strategy The strategy row that was clicked
 		 */
-		$scope.strategyClick = function(strategy) {
-			$location.url(ConfigFactory.getOutputName() + '/performance/' + strategy.name);
+		$scope.strategyClick = function(strategy, $event) {
+			var url = ConfigFactory.getOutputName() + '/performance/' + strategy.name;
+
+			if ($event && ($event.ctrlKey || $event.shiftKey)) {
+				$window.open('#/' + url);
+			}
+			else {
+				$location.url(url);
+			}
 		};
 
 	} // end controller

@@ -6,7 +6,7 @@
 		<th>Gain</th>
 	</thead>
 	<tbody>
-		<tr ng-repeat="strategy in strategies" ng-click="rowClicked(strategy)" ng-class="{'info': $index == selected}" class="hover-pointer">
+		<tr ng-repeat="strategy in strategies" ng-click="rowClicked(strategy, $event)" ng-class="{'info': $index == selected}" class="hover-pointer">
 			<td>{{strategy.name}}</td>
 			<td>{{strategy.numberOfOrders}}</td>
 			<td>

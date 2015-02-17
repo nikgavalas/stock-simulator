@@ -4,12 +4,14 @@ angular.module('mainApp').controller('PerformanceCtrl', [
 	'$scope',
 	'$routeParams',
 	'$location',
+	'$window',
 	'ConfigFactory',
 	'StrategyListFactory',
 	function(
 		$scope,
 		$routeParams,
 		$location,
+		$window,
 		ConfigFactory,
 		StrategyListFactory
 	) {
@@ -28,8 +30,15 @@ angular.module('mainApp').controller('PerformanceCtrl', [
 		 * Called when the user clicks on a row in the strategy table
 		 * @param  {Object} strategy The strategy row that was clicked
 		 */
-		$scope.strategyClick = function(strategy) {
-			$location.url(ConfigFactory.getOutputName() + '/strategy/' + $scope.strategy + '/' + strategy.name);
+		$scope.strategyClick = function(strategy, $event) {
+			var url = ConfigFactory.getOutputName() + '/strategy/' + $scope.strategy + '/' + strategy.name;
+
+			if ($event && ($event.ctrlKey || $event.shiftKey)) {
+				$window.open('#/' + url);
+			}
+			else {
+				$location.url(url);
+			}
 		};
 
 	} // end controller

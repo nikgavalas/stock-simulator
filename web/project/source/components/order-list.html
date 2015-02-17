@@ -1,28 +1,31 @@
-<table class="table table-hover">
-	<thead>
-		<th>Ticker</th>
-		<th>Buy Date</th>
-		<th>Buy</th>
-		<th>Sell Date</th>
-		<th>Sell</th>
-		<th>Shares</th>
-		<th>Gain</th>
-		<th ng-show="showValue">Balance</th>
-		<th ng-show="showValue">Total Gain</th>
-	</thead>
-	<tbody>
-		<tr ng-repeat="order in orders" ng-click="orderClick(order)" class="hover-pointer" ng-class="{'info': activeOrder === order}">
-			<td>{{order.ticker}}</td>
-			<td>{{order.buyDate}}</td>
-			<td>${{order.buyPrice}}</td>
-			<td>{{order.sellDate}}</td>
-			<td>${{order.sellPrice}}</td>
-			<td>{{order.numShares}}</td>
-			<td>
-				<span ng-class="{'text-danger': order.gain < 0, 'text-success': order.gain >= 0}"><span class="glyphicon" ng-class="{'glyphicon-circle-arrow-up': order.gain >= 0, 'glyphicon-circle-arrow-down': order.gain < 0}"></span>&nbsp;${{abs(order.gain)}}</span>
-			</td>
-			<td ng-show="showValue">${{order.accountValue}}</td>
-			<td ng-show="showValue">${{order.totalGain}}</td>
-		</tr>
-	</tbody>
-</table>
+<div>
+	<pagination total-items="orders.length" ng-model="currentPage" items-per-page="numberOrdersPerPage" max-size="15" rotate="true" boundary-links="true" class="pagination-sm"></pagination>
+	<table class="table table-hover">
+		<thead>
+			<th>Ticker</th>
+			<th>Buy Date</th>
+			<th>Buy</th>
+			<th>Sell Date</th>
+			<th>Sell</th>
+			<th>Shares</th>
+			<th>Gain</th>
+			<th ng-show="showValue">Balance</th>
+			<th ng-show="showValue">Total Gain</th>
+		</thead>
+		<tbody>
+			<tr ng-repeat="order in getPageOrders()" ng-click="orderClick(order, $event)" class="hover-pointer" ng-class="{'info': activeOrder === order}">
+				<td>{{order.ticker}}</td>
+				<td>{{order.buyDate}}</td>
+				<td>${{order.buyPrice}}</td>
+				<td>{{order.sellDate}}</td>
+				<td>${{order.sellPrice}}</td>
+				<td>{{order.numShares}}</td>
+				<td>
+					<span ng-class="{'text-danger': order.gain < 0, 'text-success': order.gain >= 0}"><span class="glyphicon" ng-class="{'glyphicon-circle-arrow-up': order.gain >= 0, 'glyphicon-circle-arrow-down': order.gain < 0}"></span>&nbsp;${{abs(order.gain)}}</span>
+				</td>
+				<td ng-show="showValue">${{order.accountValue}}</td>
+				<td ng-show="showValue">${{order.totalGain}}</td>
+			</tr>
+		</tbody>
+	</table>
+</div>

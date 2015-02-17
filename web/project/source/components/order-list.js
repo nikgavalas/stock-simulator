@@ -36,6 +36,18 @@ mainApp.directive('orderList', [
 			],
 			link: function($scope, $element, $attrs) {
 				$scope.showValue = angular.isDefined($attrs.showValue);
+				$scope.numberOrdersPerPage = 20;
+				$scope.currentPage = 1;
+
+				$scope.getPageOrders = function() {
+					var startIndex = ($scope.currentPage - 1) * $scope.numberOrdersPerPage;
+					var endIndex = $scope.currentPage * $scope.numberOrdersPerPage;
+					if (endIndex >= $scope.orders.length) {
+						endIndex = $scope.orders.length - 1;
+					}
+
+					return $scope.orders.slice(startIndex, endIndex);
+				};
 			}
 		};
 	}
