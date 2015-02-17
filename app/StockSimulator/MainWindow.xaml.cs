@@ -56,6 +56,8 @@ namespace StockSimulator
 			// Disable the button while running.
 			_runButton.IsEnabled = false;
 
+			_statusText.Text = "";
+
 			Progress<string> progress = new Progress<string>(data => UpdateStatus(data));
 			try
 			{
@@ -88,7 +90,15 @@ namespace StockSimulator
 
 		private void UpdateStatus(string message)
 		{
+			_statusText.Focus();
 			_statusText.Text += DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss.fff-") + message + Environment.NewLine;
+			_statusText.CaretIndex = _statusText.Text.Length;
+			_statusText.ScrollToEnd();
+		}
+
+		private void _clearCache_Click(object sender, RoutedEventArgs e)
+		{
+			DataStore.ClearCache();
 		}
 	}
 }

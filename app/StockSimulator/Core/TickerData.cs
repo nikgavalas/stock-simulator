@@ -124,20 +124,20 @@ namespace StockSimulator.Core
 		{
 			TickerData copyData = new TickerData(TickerAndExchange);
 
-			int copyStartIndex = 0;
-			int copyEndIndex = 0;
+			int copyStartIndex = -1;
+			int copyEndIndex = -1;
 			for (int i = 0; i < Dates.Count; i++)
 			{
-				if (copyStartIndex == 0 && Dates[i] >= start)
+				if (copyStartIndex == -1 && Dates[i] >= start)
 				{
 					copyStartIndex = i;
 				}
-				if (copyEndIndex == 0 && Dates[i] >= end)
+				if (copyEndIndex == -1 && Dates[i] >= end)
 				{
 					copyEndIndex = i;
 				}
 
-				if (copyStartIndex > 0 && copyEndIndex > 0)
+				if (copyStartIndex > -1 && copyEndIndex > -1)
 				{
 					break;
 				}
@@ -157,6 +157,23 @@ namespace StockSimulator.Core
 			copyData.End = copyData.Dates[copyData.Dates.Count - 1];
 			copyData.NumBars = copyData.Dates.Count;
 			return copyData;
+		}
+
+		/// <summary>
+		/// Sets all the prices to 0 leaving the dates intact.
+		/// </summary>
+		public void ZeroPrices()
+		{
+			for (int i = 0; i < Dates.Count; i++)
+			{
+				Open[i] = 0;
+				Close[i] = 0;
+				High[i] = 0;
+				Low[i] = 0;
+				Typical[i] = 0;
+				Median[i] = 0;
+				Volume[i] = 0;
+			}
 		}
 
 		/// <summary>

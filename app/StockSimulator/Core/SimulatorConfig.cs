@@ -111,7 +111,7 @@ namespace StockSimulator.Core
 			MinRequiredOrders = 3;
 			InitialAccountBalance = 100000;
 			PercentForBuy = 70;
-			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\nasdaq3.csv";
+			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\nasdaq4.csv";
 		}
 	}
 }

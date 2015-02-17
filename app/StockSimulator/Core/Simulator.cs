@@ -50,8 +50,8 @@ namespace StockSimulator.Core
 
 		private double _accountValue;
 		private double _totalGain;
-		private IProgress<string> _progress;
 		private CancellationToken _cancelToken;
+		private static IProgress<string> _progress = null;
 
 		/// <summary>
 		/// Constructor
@@ -94,7 +94,7 @@ namespace StockSimulator.Core
 				Console.WriteLine("Error loading instrument file!\n" + e.Message);
 			}
 
-			_progress.Report("Downloading ticker data from internet");
+			WriteMessage("Downloading ticker data from internet");
 
 			// Add all the symbols as dependent strategies using the bestofsubstrategies
 			Instruments = new Dictionary<int, BestOfSubStrategies>();
@@ -137,7 +137,7 @@ namespace StockSimulator.Core
 		/// </summary>
 		public void Initialize()
 		{
-			_progress.Report("Initializing all the strategies");
+			WriteMessage("Initializing all the strategies");
 
 			// Reinit all the orders
 			Orders = new OrderHistory();
@@ -153,7 +153,7 @@ namespace StockSimulator.Core
 		/// </summary>
 		public void Run()
 		{
-			_progress.Report("Running historical analysis");
+			WriteMessage("Running historical analysis");
 
 			// Run all to start with so we have the data to simulate with.
 			foreach (KeyValuePair<int, BestOfSubStrategies> task in Instruments)
@@ -161,7 +161,7 @@ namespace StockSimulator.Core
 				task.Value.Run();
 			}
 
-			_progress.Report("Running main strategy based on historical analysis");
+			WriteMessage("Running main strategy based on historical analysis");
 
 			// Loop each bar and find the best one of each bar.
 			for (int i = 0; i < NumberOfBars; i++)
@@ -175,12 +175,24 @@ namespace StockSimulator.Core
 		/// </summary>
 		public void Shutdown()
 		{
-			_progress.Report("Outputting data for web");
+			WriteMessage("Outputting data for web");
 			string outputName = DataOutput.OutputData();
 
-			_progress.Report("Idle");
+			WriteMessage("Idle");
 
 			System.Diagnostics.Process.Start("http://localhost:9000/#/" + outputName + "/");
+		}
+
+		/// <summary>
+		/// Updates the progres with a message which will be outputted to the log.
+		/// </summary>
+		/// <param name="message">Mesage to output</param>
+		public static void WriteMessage(string message)
+		{
+			if (_progress != null)
+			{
+				_progress.Report(message);
+			}
 		}
 
 		/// <summary>

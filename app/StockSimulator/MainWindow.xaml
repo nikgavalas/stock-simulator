@@ -18,8 +18,9 @@
                                     AutoGenerateProperties="True">
 		</xctk:PropertyGrid>
 		<Button x:Name="_runButton" Content="Run Simulation" Margin="10,0,10,10" VerticalAlignment="Bottom" Height="30" Click="_runButton_Click"/>
-	
-		<TextBox x:Name="_statusText" Grid.Column="1" Margin="10,10,10,10" TextWrapping="Wrap" Text="" AcceptsReturn="True"/>
+		<Button x:Name="_clearCacheButton" Content="Clear Ticker Cache" Margin="10,0,10,50" VerticalAlignment="Bottom" Height="30" Click="_clearCache_Click"/>
+
+		<TextBox x:Name="_statusText" Grid.Column="1" Margin="10,10,10,10" TextWrapping="Wrap" Text="" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"/>
 
 	</Grid>
 
