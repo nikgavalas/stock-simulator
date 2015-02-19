@@ -39,30 +39,10 @@ namespace StockSimulator.Core
 		[JsonIgnore]
 		public List<Order> Orders { get; set; }
 
-		/// <summary>
-		/// Create the class and compute the values.
-		/// </summary>
-		/// <param name="strategyName">Name of the strategy</param>
-		/// <param name="numOrders">Number of orders this strategy produced</param>
-		/// <param name="wins">Number of winning trades</param>
-		/// <param name="losses">Number of loosing trades</param>
-		/// <param name="gain">Amount gained or lost</param>
-		public StrategyStatistics(string strategyName, int numOrders, int wins, int losses, double gain)
-		{
-			StrategyName = strategyName;
-			Gain = gain;
-			AccountValue = 0;
-
-			// Calculate the percentages.
-			WinPercent = 0;
-			LossPercent = 0;
-			NumberOfOrders = numOrders;
-			if (numOrders > 0)
-			{
-				WinPercent = Math.Round(((double)wins / numOrders) * 100.0);
-				LossPercent = Math.Round(((double)losses / numOrders) * 100.0);
-			}
-		}
+		private int _numberOfWins = 0;
+		private int _numberOfLosses = 0;
+		private double _totalGain = 0;
+		private DateTime _dateLastOrderSold = new DateTime(1970, 1, 1);
 
 		/// <summary>
 		/// Constructor that doesn't calculate the stats to be used with add order.
@@ -83,6 +63,24 @@ namespace StockSimulator.Core
 			if (order.IsFinished())
 			{
 				Orders.Add(order);
+
+				++NumberOfOrders;
+				if (order.Gain > 0)
+				{
+					++_numberOfWins;
+				}
+				else
+				{
+					++_numberOfLosses;
+				}
+
+				_totalGain += order.Gain;
+
+				if (order.SellDate > _dateLastOrderSold)
+				{
+					_dateLastOrderSold = order.SellDate;
+					AccountValue = order.AccountValue;
+				}
 			}
 		}
 
@@ -91,45 +89,13 @@ namespace StockSimulator.Core
 		/// </summary>
 		public void CalculateStatistics()
 		{
-			int numberOfOrders = 0;
-			int numberOfWins = 0;
-			int numberOfLosses = 0;
-			double totalGain = 0;
-			DateTime dateLastOrderSold = new DateTime(1970, 1, 1);
-
-			for (int i = 0; i < Orders.Count; i++)
-			{
-				Order o = Orders[i];
-				if (o.IsFinished())
-				{
-					++numberOfOrders;
-					if (o.Gain > 0)
-					{
-						++numberOfWins;
-					}
-					else
-					{
-						++numberOfLosses;
-					}
-
-					totalGain += o.Gain;
-
-					if (o.SellDate > dateLastOrderSold)
-					{
-						dateLastOrderSold = o.SellDate;
-						AccountValue = o.AccountValue;
-					}
-				}
-			}
-
-			Gain = totalGain;
+			Gain = _totalGain;
 			WinPercent = 0;
 			LossPercent = 0;
-			NumberOfOrders = numberOfOrders;
-			if (numberOfOrders > 0)
+			if (NumberOfOrders > 0)
 			{
-				WinPercent = Math.Round(((double)numberOfWins / numberOfOrders) * 100.0);
-				LossPercent = Math.Round(((double)numberOfLosses / numberOfOrders) * 100.0);
+				WinPercent = Math.Round(((double)_numberOfWins / NumberOfOrders) * 100.0);
+				LossPercent = Math.Round(((double)_numberOfLosses / NumberOfOrders) * 100.0);
 			}
 		}
 	}

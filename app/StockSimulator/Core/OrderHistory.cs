@@ -59,15 +59,14 @@ namespace StockSimulator.Core
 				cutoffBar = 0;
 			}
 
-			int numberOfWins = 0;
-			int numberOfLosses = 0;
-			int numberOfOrders = 0;
-			double totalGain = 0;
+			StrategyStatistics stats = new StrategyStatistics(strategyName);
 
 			int strategyHash = strategyName.GetHashCode();
 			if (StrategyDictionary.ContainsKey(strategyHash))
 			{
+
 				List<Order> strategyOrders = StrategyDictionary[strategyHash];
+
 				//for (int i = 0; i < strategyOrders.Count; i++)
 				for (int i = strategyOrders.Count - 1; i >= 0; i--)
 				{
@@ -76,18 +75,9 @@ namespace StockSimulator.Core
 					//if (order.BuyBar >= cutoffBar && order.IsFinished() && order.Ticker.TickerAndExchange == tickerAndExchange)
 
 					// For the number of orders as the cutoff
-					if (numberOfOrders < Simulator.Config.MaxLookBackOrders && order.IsFinished() && order.Ticker.TickerAndExchange == tickerAndExchange)
+					if (stats.NumberOfOrders < Simulator.Config.MaxLookBackOrders && order.IsFinished() && order.Ticker.TickerAndExchange == tickerAndExchange)
 					{
-						++numberOfOrders;
-						totalGain += order.Gain;
-						if (order.Gain >= 0)
-						{
-							++numberOfWins;
-						}
-						else
-						{
-							++numberOfLosses;
-						}
+						stats.AddOrder(order);
 					}
 				}
 			}
@@ -95,15 +85,13 @@ namespace StockSimulator.Core
 			// Only count the statistics if we have a bit more data to deal with.
 			// We want to avoid having a strategy say it's 100% correct when it 
 			// only has 1 winning trade.
-			StrategyStatistics stats = new StrategyStatistics(strategyName);
-			if (numberOfOrders > Simulator.Config.MinRequiredOrders)
+			if (stats.NumberOfOrders > Simulator.Config.MinRequiredOrders)
 			{
-				stats = new StrategyStatistics(
-					strategyName,
-					numberOfOrders,
-					numberOfWins,
-					numberOfLosses,
-					totalGain);
+				stats.CalculateStatistics();
+			}
+			else
+			{
+				stats = new StrategyStatistics(strategyName);
 			}
 
 			return stats;
