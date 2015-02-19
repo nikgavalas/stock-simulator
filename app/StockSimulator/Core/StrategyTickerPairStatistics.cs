@@ -27,6 +27,18 @@ namespace StockSimulator.Core
 		[JsonConverter(typeof(RoundedDoubleConverter))]
 		public double LossPercent { get; set; }
 
+		[JsonProperty("profitTargetPercent")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
+		public double ProfitTargetPercent { get; set; }
+
+		[JsonProperty("stopLossPercent")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
+		public double StopLossPercent { get; set; }
+
+		[JsonProperty("lengthExceededPercent")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
+		public double LengthExceededPercent { get; set; }
+
 		[JsonProperty("gain")]
 		[JsonConverter(typeof(RoundedDoubleConverter))]
 		public double Gain { get; set; }
@@ -46,16 +58,12 @@ namespace StockSimulator.Core
 		[JsonIgnore]
 		public string TickerName { get; set; }
 
-		//[JsonIgnore]
 		private int _numberOfOrders;
-
-		//[JsonIgnore]
 		private int _numberOfWins;
-
-		//[JsonIgnore]
 		private int _numberOfLosses;
-
-		//[JsonIgnore]
+		private int _numberOfProfitTargets = 0;
+		private int _numberOfStopLosses = 0;
+		private int _numberOfLengthExceeded = 0;
 		private double _totalGain;
 
 		/// <summary>
@@ -92,6 +100,19 @@ namespace StockSimulator.Core
 					++_numberOfLosses;
 				}
 
+				if (order.Status == Order.OrderStatus.ProfitTarget)
+				{
+					++_numberOfProfitTargets;
+				}
+				else if (order.Status == Order.OrderStatus.StopTarget)
+				{
+					++_numberOfStopLosses;
+				}
+				else if (order.Status == Order.OrderStatus.LengthExceeded)
+				{
+					++_numberOfLengthExceeded;
+				}
+
 				++_numberOfOrders;
 				_totalGain += order.Gain;
 				Orders.Add(order);
@@ -106,11 +127,17 @@ namespace StockSimulator.Core
 			Gain = _totalGain;
 			WinPercent = 0;
 			LossPercent = 0;
+			ProfitTargetPercent = 0;
+			StopLossPercent = 0;
+			LengthExceededPercent = 0;
 			NumberOfOrders = _numberOfOrders;
 			if (_numberOfOrders > 0)
 			{
 				WinPercent = Math.Round(((double)_numberOfWins / _numberOfOrders) * 100.0);
 				LossPercent = Math.Round(((double)_numberOfLosses / _numberOfOrders) * 100.0);
+				ProfitTargetPercent = Math.Round(((double)_numberOfProfitTargets / NumberOfOrders) * 100.0);
+				StopLossPercent = Math.Round(((double)_numberOfStopLosses / NumberOfOrders) * 100.0);
+				LengthExceededPercent = Math.Round(((double)_numberOfLengthExceeded / NumberOfOrders) * 100.0);
 			}
 		}
 	}
