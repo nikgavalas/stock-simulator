@@ -128,9 +128,9 @@ namespace StockSimulator.Strategies
 			double highestWinPercent = 0;
 			for (int i = 0; i < stats.Count; i++)
 			{
-				if (stats[i].WinPercent > highestWinPercent)
+				if (stats[i].ProfitTargetPercent > highestWinPercent)
 				{
-					highestWinPercent = stats[i].WinPercent;
+					highestWinPercent = stats[i].ProfitTargetPercent;
 				}
 			}
 
