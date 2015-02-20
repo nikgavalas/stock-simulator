@@ -94,7 +94,7 @@ namespace StockSimulator.Core
 				Console.WriteLine("Error loading instrument file!\n" + e.Message);
 			}
 
-			WriteMessage("Downloading ticker data from internet");
+			WriteMessage("Initializing ticker data");
 
 			// Add all the symbols as dependent strategies using the bestofsubstrategies
 			Instruments = new Dictionary<int, BestOfSubStrategies>();
@@ -229,7 +229,8 @@ namespace StockSimulator.Core
 				// If the highest percent is enough for a buy, then do it.
 				// If not then since the list is sorted, no other ones will
 				// be high enough and we can early out of the loop.
-				if (buyList[i].Bars[currentBar].HighestPercent > Config.PercentForBuy)
+				BestOfSubStrategies.BarStatistics barStats = buyList[i].Bars[currentBar];
+				if (barStats.HighestPercent > Config.PercentForBuy && barStats.ComboSizeOfHighestStrategy >= Simulator.Config.MinComboSizeToBuy)
 				{
 					// Don't want to order to late in the strategy where the order can't run it's course.
 					// Also, need to have enough money to buy stocks.

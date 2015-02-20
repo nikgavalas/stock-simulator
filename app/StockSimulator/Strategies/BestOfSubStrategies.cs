@@ -21,17 +21,20 @@ namespace StockSimulator.Strategies
 		public class BarStatistics
 		{
 			public double HighestPercent { get; set; }
+			public int ComboSizeOfHighestStrategy { get; set; }
 			public List<StrategyStatistics> Statistics { get; set; }
 
 			public BarStatistics()
 			{
 				HighestPercent = 0.0;
+				ComboSizeOfHighestStrategy = 0;
 				Statistics = new List<StrategyStatistics>();
 			}
 
-			public BarStatistics(double percent, List<StrategyStatistics> statistics)
+			public BarStatistics(double percent, int comboSize, List<StrategyStatistics> statistics)
 			{
 				HighestPercent = percent;
+				ComboSizeOfHighestStrategy = comboSize;
 				Statistics = statistics;
 			}
 		}
@@ -126,15 +129,17 @@ namespace StockSimulator.Strategies
 			// For each combo we want to find out the winning % and the gain
 			// for it and save those values for the bar.
 			double highestWinPercent = 0;
+			int comboSize = 0;
 			for (int i = 0; i < stats.Count; i++)
 			{
 				if (stats[i].ProfitTargetPercent > highestWinPercent)
 				{
 					highestWinPercent = stats[i].ProfitTargetPercent;
+					comboSize = stats[i].StrategyName.Split('-').Length;
 				}
 			}
 
-			Bars[currentBar] = new BarStatistics(highestWinPercent, stats);
+			Bars[currentBar] = new BarStatistics(highestWinPercent, comboSize, stats);
 		}
 
 		/// <summary>
@@ -151,13 +156,24 @@ namespace StockSimulator.Strategies
 				if (Dependents[i] is Strategy)
 				{
 					Strategy dependentStrategy = (Strategy)Dependents[i];
-					// TODO: We could implement logic here that searches the current bar
-					// and back a few days to make the finding not so exact. That could add
+
+					// The logic here that searches the current bar
+					// and back a few days to make the finding not so exact. It adds
 					// for some more leeway when finding combos as finding multiple
-					// strategies on exact bars may only happen a few times.
-					if (dependentStrategy.WasFound[currentBar])
+					// strategies on exact bars doesn't happen as frequently.
+					for (int j = 0; j < Simulator.Config.ComboLeewayBars + 1; j++)
 					{
-						foundStrategies.Add(dependentStrategy);
+						int comboBar = currentBar - j;
+						if (comboBar < 0)
+						{
+							comboBar = 0;
+						}
+
+						if (dependentStrategy.WasFound[comboBar])
+						{
+							foundStrategies.Add(dependentStrategy);
+							break;
+						}
 					}
 				}
 			}

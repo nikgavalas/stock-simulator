@@ -65,7 +65,12 @@ namespace StockSimulator.Core
 		public double SizeOfOrder { get; set; }
 
 		///////////////////////////// MAIN STRATEGY ///////////////////////////////
-	
+
+		[Category("Main Strategy")]
+		[DisplayName("Combo Leeway")]
+		[Description("Number of bars back in time allowed to find a combo from the current bar")]
+		public int ComboLeewayBars { get; set; }
+
 		[Category("Main Strategy")]
 		[DisplayName("Max Buys Per Bar")]
 		[Description("Maximum number of buys that can be made on a single bar")]
@@ -75,6 +80,11 @@ namespace StockSimulator.Core
 		[DisplayName("Min Required Orders")]
 		[Description("Number of orders needed before we start counting the statistics as valid")]
 		public int MinRequiredOrders { get; set; }
+
+		[Category("Main Strategy")]
+		[DisplayName("Min Combo Size")]
+		[Description("Minimum number of strategies that must have been present to buy")]
+		public int MinComboSizeToBuy { get; set; }
 
 		[Category("Main Strategy")]
 		[DisplayName("Initial Account Balance")]
@@ -102,16 +112,18 @@ namespace StockSimulator.Core
 			MaxLookBackBars = 400;
 			MaxLookBackOrders = 20;
 			MaxConcurrentOrders = 1;
-			ProfitTarget = 0.05;
-			StopTarget = 0.04;
-			MaxBarsOrderOpen = 15;
-			SizeOfOrder = 10000;
+			ProfitTarget = 0.10;
+			StopTarget = 0.05;
+			MaxBarsOrderOpen = 30;
+			SizeOfOrder = 25000;
 
-			MaxBuysPerBar = 3;
-			MinRequiredOrders = 3;
+			ComboLeewayBars = 2;
+			MinComboSizeToBuy = 2;
+			MaxBuysPerBar = 5;
+			MinRequiredOrders = 5;
 			InitialAccountBalance = 100000;
-			PercentForBuy = 70;
-			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\nasdaq4.csv";
+			PercentForBuy = 80;
+			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\nasdaq100.csv";
 		}
 	}
 }

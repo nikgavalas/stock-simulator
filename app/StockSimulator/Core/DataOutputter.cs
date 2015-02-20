@@ -136,6 +136,9 @@ namespace StockSimulator.Core
 						StrategyStatistics tickerStats = new StrategyStatistics(item.Value.TickerName);
 						tickerStats.WinPercent = item.Value.WinPercent;
 						tickerStats.LossPercent = item.Value.LossPercent;
+						tickerStats.ProfitTargetPercent = item.Value.ProfitTargetPercent;
+						tickerStats.StopLossPercent = item.Value.StopLossPercent; 
+						tickerStats.LengthExceededPercent = item.Value.LengthExceededPercent;
 						tickerStats.Gain = item.Value.Gain;
 						tickerStats.NumberOfOrders = item.Value.NumberOfOrders;
 						overallList.Add(tickerStats);
