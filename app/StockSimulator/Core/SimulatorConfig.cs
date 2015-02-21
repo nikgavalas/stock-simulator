@@ -30,6 +30,11 @@ namespace StockSimulator.Core
 		public int MinOrders { get; set; }
 
 		[Category("Orders")]
+		[DisplayName("Use Bars for Lookback")]
+		[Description("If true, use the look back bars for calculating strategy statistics")]
+		public bool UseLookbackBars { get; set; }
+
+		[Category("Orders")]
 		[DisplayName("Max Lookback")]
 		[Description("Maximum number of bars to look back when calculating the statistics for the strategy")]
 		public int MaxLookBackBars { get; set; }
@@ -109,6 +114,7 @@ namespace StockSimulator.Core
 			//startDate = DateTime.Parse("12/31/2013");
 			//endDate = DateTime.Parse("12/31/2014");
 			MinOrders = 3;
+			UseLookbackBars = true;
 			MaxLookBackBars = 400;
 			MaxLookBackOrders = 20;
 			MaxConcurrentOrders = 1;
@@ -123,7 +129,10 @@ namespace StockSimulator.Core
 			MinRequiredOrders = 5;
 			InitialAccountBalance = 100000;
 			PercentForBuy = 80;
-			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\nasdaq100.csv";
+			// Desktop
+			//InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\nasdaq100.csv";
+			// Laptop
+			InstrumentListFile = @"C:\Users\Nik\Documents\github\stock-simulator\input\nasdaq100.csv";
 		}
 	}
 }

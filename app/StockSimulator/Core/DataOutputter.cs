@@ -20,9 +20,9 @@ namespace StockSimulator.Core
 		private Dictionary<int, Indicator> _indicators;
 
 		// Desktop
-		private string _outputFolder = "C:\\Users\\Nik\\Documents\\Code\\github\\stock-simulator\\output\\output";
+		//private string _outputFolder = "C:\\Users\\Nik\\Documents\\Code\\github\\stock-simulator\\output\\output";
 		// Laptop
-		//private string _outputFolder = "C:\\Users\\Nik\\Documents\\github\\stock-simulator\\output\\output";
+		private string _outputFolder = "C:\\Users\\Nik\\Documents\\github\\stock-simulator\\output\\output";
 
 		/// <summary>
 		/// Constructor
