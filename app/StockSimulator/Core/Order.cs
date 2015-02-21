@@ -29,7 +29,8 @@ namespace StockSimulator.Core
 			Filled,
 			ProfitTarget,
 			StopTarget,
-			LengthExceeded
+			LengthExceeded,
+			Cancelled
 		}
 
 		[JsonProperty("buyPrice")]
@@ -82,6 +83,9 @@ namespace StockSimulator.Core
 		public StrategyStatistics EndStatistics { get; set; }
 		public List<string> DependentIndicatorNames { get; set; }
 
+		private double LimitBuyPrice { get; set; }
+		private int LimitOpenedBar { get; set; }
+
 		/// <summary>
 		/// Contructor for the order.
 		/// </summary>
@@ -95,6 +99,8 @@ namespace StockSimulator.Core
 			DependentIndicatorNames = dependentIndicatorNames;
 			AccountValue = 0;
 			TotalGain = 0;
+			LimitBuyPrice = tickerData.Close[currentBar];
+			LimitOpenedBar = currentBar;
 
 			// Get things like win/loss percent up to the point this order was finished.
 			StartStatistics = Simulator.Orders.GetStrategyStatistics(StrategyName,
@@ -109,38 +115,50 @@ namespace StockSimulator.Core
 		/// <param name="curBar">Current bar of the simulation</param>
 		public void Update(int curBar)
 		{
-			// TODO: get from config.
-			bool UseATR = false;
-
 			// If the order is open and not filled we need to fill it.
 			if (Status == OrderStatus.Open)
 			{
-				BuyBar = curBar;
-				BuyDate = Ticker.Dates[curBar];
-				BuyPrice = Ticker.Open[curBar];
-				Status = OrderStatus.Filled;
-
-				NumberOfShares = BuyPrice > 0.0 ? Convert.ToInt32(Math.Floor(Simulator.Config.SizeOfOrder / BuyPrice)) : 0;
-				Value = NumberOfShares * BuyPrice;
-
-				int direction = Type == OrderType.Long ? 1 : -1;
-
-				// Set prices to exit.
-				if (!UseATR)
+				// If we are using limit orders make sure the price is higher than that 
+				// limit before buying.
+				if (Simulator.Config.UseLimitOrders)
 				{
-					ProfitTargetPrice = BuyPrice + ((BuyPrice * Simulator.Config.ProfitTarget) * direction);
-					StopPrice = BuyPrice - ((BuyPrice * Simulator.Config.StopTarget) * direction);
+					if (curBar - LimitOpenedBar >= Simulator.Config.MaxBarsLimitOrderFill)
+					{
+						Status = OrderStatus.Cancelled;
+					}
+					else if (Ticker.Open[curBar] >= LimitBuyPrice)
+					{
+						BuyPrice = Ticker.Open[curBar];
+					}
+					else if (Ticker.Close[curBar] > LimitBuyPrice || Ticker.High[curBar] > LimitBuyPrice)
+					{
+						BuyPrice = LimitBuyPrice;
+					}
 				}
 				else
 				{
-					// TODO: this won't work yet.
-					//ATR atr = mInd.ATR(14);
-					//ProfitTargetPrice = BuyPrice + ((atr[curBar] * ProfitTarget) * direction);
-					//StopPrice = BuyPrice - ((atr[curBar] * StopTarget) * direction);
+					BuyPrice = Ticker.Open[curBar];
+				}
+
+				if (BuyPrice > 0)
+				{
+					BuyBar = curBar;
+					BuyDate = Ticker.Dates[curBar];
+					Status = OrderStatus.Filled;
+
+					NumberOfShares = BuyPrice > 0.0 ? Convert.ToInt32(Math.Floor(Simulator.Config.SizeOfOrder / BuyPrice)) : 0;
+					Value = NumberOfShares * BuyPrice;
+
+					int direction = Type == OrderType.Long ? 1 : -1;
+
+					// Set prices to exit.
+					ProfitTargetPrice = BuyPrice + ((BuyPrice * Simulator.Config.ProfitTarget) * direction);
+					StopPrice = BuyPrice - ((BuyPrice * Simulator.Config.StopTarget) * direction);
 				}
 			}
+
 			// Close any orders that need to be closed
-			else if (Status == OrderStatus.Filled)
+			if (Status == OrderStatus.Filled)
 			{
 				Value = NumberOfShares * Ticker.Close[curBar];
 

@@ -69,6 +69,16 @@ namespace StockSimulator.Core
 		[Description("Amount of money to invest in each stock order")]
 		public double SizeOfOrder { get; set; }
 
+		[Category("Orders")]
+		[DisplayName("Use Limit Orders For Buy")]
+		[Description("Use a limit order when buying which is equal to the closing price of the previous day")]
+		public bool UseLimitOrders { get; set; }
+
+		[Category("Orders")]
+		[DisplayName("Max Bars for Limit Order To Fill")]
+		[Description("Maximum number of bars to wait for a limit order to fill")]
+		public int MaxBarsLimitOrderFill { get; set; }
+
 		///////////////////////////// MAIN STRATEGY ///////////////////////////////
 
 		[Category("Main Strategy")]
@@ -114,7 +124,7 @@ namespace StockSimulator.Core
 			//startDate = DateTime.Parse("12/31/2013");
 			//endDate = DateTime.Parse("12/31/2014");
 			MinOrders = 3;
-			UseLookbackBars = true;
+			UseLookbackBars = false;
 			MaxLookBackBars = 400;
 			MaxLookBackOrders = 20;
 			MaxConcurrentOrders = 1;
@@ -122,6 +132,8 @@ namespace StockSimulator.Core
 			StopTarget = 0.05;
 			MaxBarsOrderOpen = 30;
 			SizeOfOrder = 25000;
+			UseLimitOrders = false;
+			MaxBarsLimitOrderFill = 3;
 
 			ComboLeewayBars = 2;
 			MinComboSizeToBuy = 2;

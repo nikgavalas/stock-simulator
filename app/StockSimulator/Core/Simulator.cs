@@ -289,7 +289,7 @@ namespace StockSimulator.Core
 
 			// Remove the orders that are finished. This will just remove them from
 			// this array but they order will still be saved in the order history.
-			_activeOrders.RemoveAll(order => order.IsFinished());
+			_activeOrders.RemoveAll(order => order.IsFinished() || order.Status == Order.OrderStatus.Cancelled);
 		}
 
 		/// <summary>
