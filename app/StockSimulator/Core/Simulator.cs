@@ -142,6 +142,9 @@ namespace StockSimulator.Core
 			// Reinit all the orders
 			Orders = new OrderHistory();
 
+			// Get the buy list ready.
+			DataOutput.InitializeBuyList();
+
 			foreach (KeyValuePair<int, BestOfSubStrategies> task in Instruments)
 			{
 				task.Value.Initialize();
@@ -217,7 +220,7 @@ namespace StockSimulator.Core
 			buyList.Sort((x, y) => -1 * x.Bars[currentBar].HighestPercent.CompareTo(y.Bars[currentBar].HighestPercent));
 
 			// Output the buy list for each day.
-			DataOutput.OutputBuyList(currentBar);
+			DataOutput.SaveBuyList(buyList, currentBar);
 
 			// Update all the active orders before placing new ones.
 			UpdateOrders(currentBar);

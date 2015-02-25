@@ -33,6 +33,10 @@ var mainApp = angular.module('mainApp', [
 			templateUrl: 'views/strategy-details.html',
 			controller: 'StrategyDetailsCtrl'
 		})
+		.when('/:runName/buylist', {
+			templateUrl: 'views/buylist.html',
+			controller: 'BuyListCtrl'
+		})
 		.otherwise({
 			redirectTo: '/'
 		});

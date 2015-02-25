@@ -1,0 +1,51 @@
+<div class="container-fluid container-padding">
+	<navbar></navbar>
+	
+	<!-- The row for the grid -->
+	<div class="row firstrow-container">
+
+		<div class="col-lg-3">
+			<label>Show List for Date:</label>
+			<div>
+				<datepicker ng-model="calendarDate" show-weeks="true" class="well well-sm"></datepicker>
+			</div>
+			<br>
+
+			<form class="form-inline" ng-submit="setDate()">
+				<div class="form-group">
+					<div class="input-group">
+						<div class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></div>
+						<input ng-model="buyListDate" type="text" class="form-control" id="inputDate" placeholder="Date">
+						<div ng-click="setDate()" class="input-group-addon hover-pointer">Go</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	
+	</div>
+
+	<br>
+
+	<div class="row">
+
+		<alert ng-show="buyList === null || buyList.length === 0" type="success">Nothing to buy today!</alert>
+
+		<table ng-show="buyList !== null && buyList.length > 0" class="table table-hover">
+			<thead>
+				<th class="col-xs-1">Rank #</th>
+				<th class="col-sm-4">Ticker</th>
+				<th>Strategy Name</th>
+				<th>Buy value</th>
+			</thead>
+			<tbody>
+				<tr ng-repeat="item in buyList" class="hover-pointer">
+					<td>{{$index + 1}}</td>
+					<td>{{item.ticker}}</td>
+					<td>{{item.strategyName}}</td>
+					<td>{{item.percent}}</td>
+				</tr>
+			</tbody>
+		</table>
+
+	</div>
+</div>

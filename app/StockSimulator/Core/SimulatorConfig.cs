@@ -120,9 +120,6 @@ namespace StockSimulator.Core
 		{
 			startDate = DateTime.Parse("1/4/2010");
 			endDate = DateTime.Parse("12/31/2014");
-			// Test dates for indicator correctness.
-			//startDate = DateTime.Parse("12/31/2013");
-			//endDate = DateTime.Parse("12/31/2014");
 			MinOrders = 3;
 			UseLookbackBars = false;
 			MaxLookBackBars = 400;
@@ -144,7 +141,14 @@ namespace StockSimulator.Core
 			// Desktop
 			//InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\nasdaq100.csv";
 			// Laptop
-			InstrumentListFile = @"C:\Users\Nik\Documents\github\stock-simulator\input\nasdaq100.csv";
+			InstrumentListFile = @"C:\Users\Nik\Documents\github\stock-simulator\input\test.csv";
+
+			// Testing parameters for indicator correctness.
+			//startDate = DateTime.Parse("12/31/2013");
+			//endDate = DateTime.Parse("12/31/2014");
+			//PercentForBuy = 25;
+			//MinComboSizeToBuy = 1;
+
 		}
 	}
 }

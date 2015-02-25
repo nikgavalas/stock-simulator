@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using Newtonsoft.Json;
+using StockSimulator.Strategies;
 
 namespace StockSimulator.Core
 {
@@ -15,9 +16,30 @@ namespace StockSimulator.Core
 	/// </summary>
 	public class DataOutputter
 	{
+		private class JsonBuyList
+		{
+			[JsonProperty("ticker")]
+			public string Ticker { get; set; }
+
+			[JsonProperty("strategyName")]
+			public string StrategyName { get; set; }
+
+			[JsonProperty("percent")]
+			public double Percent { get; set; }
+
+			public JsonBuyList(string ticker, string strategyName, double percent)
+			{
+				Ticker = ticker;
+				StrategyName = strategyName;
+				Percent = percent;
+			}
+		}
+
 		private Dictionary<int, TickerData> _tickerData;
 
 		private Dictionary<int, Indicator> _indicators;
+
+		private List<List<JsonBuyList>> _buyLists;
 
 		// Desktop
 		//private string _outputFolder = "C:\\Users\\Nik\\Documents\\Code\\github\\stock-simulator\\output\\output";
@@ -31,6 +53,7 @@ namespace StockSimulator.Core
 		{
 			_tickerData = new Dictionary<int, TickerData>();
 			_indicators = new Dictionary<int, Indicator>();
+			_buyLists = new List<List<JsonBuyList>>();
 		}
 
 		/// <summary>
@@ -60,12 +83,30 @@ namespace StockSimulator.Core
 		}
 
 		/// <summary>
+		/// Gets the buy list ready to be saved for each bar of the simulation.
+		/// </summary>
+		public void InitializeBuyList()
+		{
+			_buyLists = Enumerable.Repeat(new List<JsonBuyList>(), Simulator.NumberOfBars).ToList();
+		}
+
+		/// <summary>
 		/// Outputs the buy list for the current bar.
 		/// </summary>
+		/// <param name="buyList">List of stocks that are displaying a reason to buy</param>
 		/// <param name="currentBar">The bar to use as the output index</param>
-		public void OutputBuyList(int currentBar)
+		public void SaveBuyList(List<BestOfSubStrategies> buyList, int currentBar)
 		{
-
+			// Convert the buy list into better serializable data.
+			_buyLists[currentBar] = new List<JsonBuyList>();
+			List<JsonBuyList> outputList = _buyLists[currentBar];
+			for (int i = 0; i < buyList.Count; i++)
+			{
+				outputList.Add(new JsonBuyList(buyList[i].Data.TickerAndExchange.ToString(),
+					buyList[i].Bars[currentBar].HighestStrategyName,
+					buyList[i].Bars[currentBar].HighestPercent
+				));
+			}
 		}
 
 		/// <summary>
@@ -81,6 +122,17 @@ namespace StockSimulator.Core
 			string timeString = DateTime.Now.ToString("MM-dd-yyyyTHH-mm-ss-ffff");
 			string saveFolderName = GetOutputFolder(timeString);
 			Directory.CreateDirectory(saveFolderName.TrimEnd('\\'));
+
+			// Create the buy list directory and output all of them for each bar.
+			folderName = GetOutputFolder(timeString) + "buylist\\";
+			Directory.CreateDirectory(folderName);
+			List<DateTime> simulationDates = _indicators.First().Value.Data.Dates;
+			for (int i = 0; i < _buyLists.Count; i++)
+			{
+				jsonOutput = JsonConvert.SerializeObject(_buyLists[i], Formatting.Indented);
+				filename = folderName + simulationDates[i].ToString("yyyy-MM-dd") + ".json";
+				File.WriteAllText(filename, jsonOutput);
+			}
 
 			List<StrategyStatistics> allStrategyStatistics = new List<StrategyStatistics>();
 

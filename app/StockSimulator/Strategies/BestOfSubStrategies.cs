@@ -21,19 +21,22 @@ namespace StockSimulator.Strategies
 		public class BarStatistics
 		{
 			public double HighestPercent { get; set; }
+			public string HighestStrategyName { get; set; }
 			public int ComboSizeOfHighestStrategy { get; set; }
 			public List<StrategyStatistics> Statistics { get; set; }
 
 			public BarStatistics()
 			{
 				HighestPercent = 0.0;
+				HighestStrategyName = "None";
 				ComboSizeOfHighestStrategy = 0;
 				Statistics = new List<StrategyStatistics>();
 			}
 
-			public BarStatistics(double percent, int comboSize, List<StrategyStatistics> statistics)
+			public BarStatistics(double percent, string name, int comboSize, List<StrategyStatistics> statistics)
 			{
 				HighestPercent = percent;
+				HighestStrategyName = name;
 				ComboSizeOfHighestStrategy = comboSize;
 				Statistics = statistics;
 			}
@@ -129,17 +132,19 @@ namespace StockSimulator.Strategies
 			// For each combo we want to find out the winning % and the gain
 			// for it and save those values for the bar.
 			double highestWinPercent = 0;
+			string highestName = "None";
 			int comboSize = 0;
 			for (int i = 0; i < stats.Count; i++)
 			{
 				if (stats[i].ProfitTargetPercent > highestWinPercent)
 				{
 					highestWinPercent = stats[i].ProfitTargetPercent;
+					highestName = stats[i].StrategyName;
 					comboSize = stats[i].StrategyName.Split('-').Length;
 				}
 			}
 
-			Bars[currentBar] = new BarStatistics(highestWinPercent, comboSize, stats);
+			Bars[currentBar] = new BarStatistics(highestWinPercent, highestName, comboSize, stats);
 		}
 
 		/// <summary>

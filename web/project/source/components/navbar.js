@@ -1,7 +1,10 @@
 'use strict';
 
 mainApp.directive('navbar', [
-	function() {
+	'ConfigFactory',
+	function(
+		ConfigFactory
+	) {
 		return {
 			restrict: 'E',
 			replace: true,
@@ -9,17 +12,9 @@ mainApp.directive('navbar', [
 			scope: {
 				strategyName: '@'
 			},
-			controller: [
-				'$scope',
-				'ConfigFactory',
-				function(
-					$scope,
-					ConfigFactory
-				) {
-	
-
-				}
-			]
+			link: function($scope) {
+				$scope.buyListLink = '#/' + ConfigFactory.getOutputName() + '/buylist';
+			}
 		};
 	}
 ]);
