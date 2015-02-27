@@ -89,6 +89,7 @@
     <Compile Include="Core\MainStrategyOrder.cs" />
     <Compile Include="Core\Order.cs" />
     <Compile Include="Core\SimulatorConfig.cs" />
+    <Compile Include="Core\StatisticsCalculator.cs" />
     <Compile Include="Core\StrategyStatistics.cs" />
     <Compile Include="Core\StrategyTickerPairStatistics.cs" />
     <Compile Include="Indicators\Candlesticks\BaseCandlestick.cs" />
