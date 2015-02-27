@@ -224,5 +224,17 @@ namespace StockSimulator.Core
 				});
 			}
 		}
+
+		/// <summary>
+		/// Returns if this is a valid bar of data.
+		/// Some bars just have zeros which is what we want for the simulation
+		/// but not what we want for calculating indicators and strategies.
+		/// </summary>
+		/// <param name="bar">Bar to check</param>
+		/// <returns>True if the open and close price are more than zero</returns>
+		public bool IsValidBar(int bar)
+		{
+			return Close[bar] > 0 && Open[bar] > 0;
+		}
 	}
 }

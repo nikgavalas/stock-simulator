@@ -75,7 +75,10 @@ namespace StockSimulator.Core
 			// size lists.
 			for (int i = 0; i < Data.Close.Count; i++)
 			{
-				OnBarUpdate(i);
+				if (Data.IsValidBar(i) == true)
+				{
+					OnBarUpdate(i);
+				}
 			}
 
 			_isFinishedRunning = true;
