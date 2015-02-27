@@ -66,11 +66,15 @@ namespace StockSimulator.Strategies
 			get
 			{
 				string[] deps = {
+					"BullBeltHoldFound",
 					"CciCrossover",
+					"DojiFound",
 					"MacdCrossover",
 					"MomentumCrossover",
 					"RsiCrossover30",
-					"SmaCrossover"
+					"SmaCrossover",
+					"SwingStart",
+					"TrendStart"
 				};
 
 				return deps;

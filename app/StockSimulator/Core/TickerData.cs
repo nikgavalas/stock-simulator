@@ -25,6 +25,7 @@ namespace StockSimulator.Core
 		public List<long> Volume { get; set; }
 		public int NumBars { get; set; }
 		public TickerExchangePair TickerAndExchange { get; set; }
+		public double TickSize { get { return 0.01; } }
 
 		// For serialization
 		[JsonProperty("price")]

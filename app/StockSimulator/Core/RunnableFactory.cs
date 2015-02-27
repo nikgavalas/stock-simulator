@@ -47,8 +47,16 @@ namespace StockSimulator.Core
 				switch (runnableName)
 				{
 					// Indicators.
+					case "BullBeltHold":
+						requestedItem = new BullBeltHold(_tickerData, this);
+						break;
+
 					case "Cci14":
 						requestedItem = new Cci(_tickerData, this, 14);
+						break;
+
+					case "Doji":
+						requestedItem = new Doji(_tickerData, this);
 						break;
 
 					case "Macd":
@@ -67,13 +75,29 @@ namespace StockSimulator.Core
 						requestedItem = new Sma(_tickerData, this);
 						break;
 
+					case "Swing":
+						requestedItem = new Swing(_tickerData, this);
+						break;
+
+					case "Trend":
+						requestedItem = new Trend(_tickerData, this);
+						break;
+
 					// Strategies.
 					case "BestOfSubStrategies":
 						requestedItem = new BestOfSubStrategies(_tickerData, this);
 						break;
 
+					case "BullBeltHoldFound":
+						requestedItem = new BullBeltHoldFound(_tickerData, this);
+						break;
+
 					case "CciCrossover":
 						requestedItem = new CciCrossover(_tickerData, this);
+						break;
+
+					case "DojiFound":
+						requestedItem = new DojiFound(_tickerData, this);
 						break;
 
 					case "MacdCrossover":
@@ -92,6 +116,14 @@ namespace StockSimulator.Core
 						requestedItem = new SmaCrossover(_tickerData, this);
 						break;
 
+					case "SwingStart":
+						requestedItem = new SwingStart(_tickerData, this);
+						break;
+
+					case "TrendStart":
+						requestedItem = new TrendStart(_tickerData, this);
+						break;
+					
 					default:
 						throw new Exception("Trying to create a runnable that doesn't exist");
 				}

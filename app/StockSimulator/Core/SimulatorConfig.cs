@@ -22,6 +22,13 @@ namespace StockSimulator.Core
 		[Description("Date to stop the simulation")]
 		public DateTime endDate { get; set; }
 
+		//////////////////////////// CANDLESTICKS//////////////////////////////////
+
+		[Category("Candlesticks")]
+		[DisplayName("Trend Strength")]
+		[Description("The number of bars for a trend")]
+		public int TrendStrength { get; set; }
+
 		//////////////////////////// ALL ORDERS ///////////////////////////////////
 
 		[Category("Orders")]
@@ -120,6 +127,9 @@ namespace StockSimulator.Core
 		{
 			startDate = DateTime.Parse("1/4/2010");
 			endDate = DateTime.Parse("12/31/2014");
+
+			TrendStrength = 4;
+
 			MinOrders = 3;
 			UseLookbackBars = false;
 			MaxLookBackBars = 400;
@@ -148,6 +158,7 @@ namespace StockSimulator.Core
 			//endDate = DateTime.Parse("12/31/2014");
 			//PercentForBuy = 25;
 			//MinComboSizeToBuy = 1;
+			//InstrumentListFile = @"C:\Users\Nik\Documents\github\stock-simulator\input\indtest.csv";
 
 		}
 	}

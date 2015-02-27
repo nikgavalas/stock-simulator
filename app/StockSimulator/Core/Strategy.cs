@@ -47,6 +47,15 @@ namespace StockSimulator.Core
 				if (Dependents[i] is Indicator)
 				{
 					ret.Add(Dependents[i].ToString());
+
+					// Add any dependent indicators of this indicator, only 1 level for now.
+					for (int j = 0; j < Dependents[i].Dependents.Count; j++)
+					{
+						if (Dependents[i].Dependents[j] is Indicator)
+						{
+							ret.Add(Dependents[i].Dependents[j].ToString());
+						}
+					}
 				}
 			}
 
