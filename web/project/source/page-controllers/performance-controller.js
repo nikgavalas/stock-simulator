@@ -24,6 +24,10 @@ angular.module('mainApp').controller('PerformanceCtrl', [
 		$scope.strategies = [];
 		StrategyListFactory.getOverallForStrategy($scope.strategy).then(function(data) {
 			$scope.strategies = data;
+			// Sort so the strategy with the highest is at the top and that is the one that is shown first.
+			$scope.strategies.sort(function(a, b) {
+				return b.profitTargetPercent - a.profitTargetPercent;
+			});
 		});
 
 		/**
