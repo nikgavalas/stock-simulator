@@ -5,23 +5,34 @@
         Title="MainWindow" Height="800" Width="1000"
 				Icon="favicon.ico">
 	
-	<Grid>
-		<Grid.ColumnDefinitions>
-			<ColumnDefinition/>
-			<ColumnDefinition Width="500"/>
-		</Grid.ColumnDefinitions>
-		<Grid.RowDefinitions>
-			<RowDefinition Height="*"></RowDefinition>
-		</Grid.RowDefinitions>
-		
-		<xctk:PropertyGrid x:Name="_propertyGrid" Width="Auto" Margin="10,10,10,100"
+	<DockPanel>
+		<Menu DockPanel.Dock="Top" IsMainMenu="True">
+			<MenuItem Header="_File">
+				<MenuItem Header="E_xit"></MenuItem>
+			</MenuItem>
+			<MenuItem x:Name="_dataMenu"  Header="_Data">
+				<MenuItem Header="Clear _Ticker Data" Click="_clearCache_Click"></MenuItem>
+				<MenuItem Header="Clear _Output Folder" Click="_clearOutput_Click"></MenuItem>
+			</MenuItem>
+		</Menu>
+
+		<Grid>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition/>
+				<ColumnDefinition Width="500"/>
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="*"></RowDefinition>
+			</Grid.RowDefinitions>
+
+			<xctk:PropertyGrid x:Name="_propertyGrid" Width="Auto" Margin="10,10,10,50"
                                     AutoGenerateProperties="True">
-		</xctk:PropertyGrid>
-		<Button x:Name="_runButton" Content="Run Simulation" Margin="10,0,10,10" VerticalAlignment="Bottom" Height="30" Click="_runButton_Click"/>
-		<Button x:Name="_clearCacheButton" Content="Clear Ticker Cache" Margin="10,0,10,50" VerticalAlignment="Bottom" Height="30" Click="_clearCache_Click"/>
+			</xctk:PropertyGrid>
+			<Button x:Name="_runButton" Content="Run Simulation" Margin="10,0,10,10" VerticalAlignment="Bottom" Height="30" Click="_runButton_Click"/>
 
-		<TextBox x:Name="_statusText" Grid.Column="1" Margin="10,10,10,10" TextWrapping="Wrap" Text="" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"/>
+			<TextBox x:Name="_statusText" Grid.Column="1" Margin="10,10,10,10" TextWrapping="Wrap" Text="" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"/>
 
-	</Grid>
+		</Grid>
+	</DockPanel>
 
 </Window>

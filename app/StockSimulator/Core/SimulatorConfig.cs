@@ -123,6 +123,11 @@ namespace StockSimulator.Core
 		[Description("File with a list of stocks to run the sim on")]
 		public string InstrumentListFile { get; set; }
 
+		[Category("Main Strategy")]
+		[DisplayName("Output Folder")]
+		[Description("Folder to output the results to")]
+		public string OutputFolder { get; set; }
+
 		public SimulatorConfig()
 		{
 			startDate = DateTime.Parse("1/4/2010");
@@ -149,9 +154,13 @@ namespace StockSimulator.Core
 			InitialAccountBalance = 100000;
 			PercentForBuy = 80;
 			// Desktop
-			//InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\nasdaq100.csv";
+			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\test.csv";
 			// Laptop
-			InstrumentListFile = @"C:\Users\Nik\Documents\github\stock-simulator\input\test.csv";
+			//InstrumentListFile = @"C:\Users\Nik\Documents\github\stock-simulator\input\test.csv";
+			// Desktop
+			OutputFolder = @"C:\Users\Nik\Documents\Code\github\stock-simulator\output\output";
+			// Laptop
+			//OutputFolder = @"C:\Users\Nik\Documents\github\stock-simulator\output\output";
 
 			// Testing parameters for indicator correctness.
 			//startDate = DateTime.Parse("12/31/2013");

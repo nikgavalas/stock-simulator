@@ -16,6 +16,7 @@ using Xceed.Wpf.Toolkit;
 
 using StockSimulator.Core;
 using System.Threading;
+using System.IO;
 
 namespace StockSimulator
 {
@@ -98,7 +99,43 @@ namespace StockSimulator
 
 		private void _clearCache_Click(object sender, RoutedEventArgs e)
 		{
-			DataStore.ClearCache();
+			_runButton.IsEnabled = false;
+			_dataMenu.IsEnabled = false;
+			UpdateStatus("Start cleaning ticker cache");
+
+			Task t = Task.Run(() =>
+			{
+				DataStore.ClearCache();
+			});
+
+			t.Wait();
+			_runButton.IsEnabled = true;
+			_dataMenu.IsEnabled = true;
+			UpdateStatus("Finished cleaning ticker cache");
+		}
+
+		private void _clearOutput_Click(object sender, RoutedEventArgs e)
+		{
+			_runButton.IsEnabled = false;
+			_dataMenu.IsEnabled = false;
+			UpdateStatus("Start cleaning output folder");
+
+			Task t = Task.Run(() =>
+			{
+				DirectoryInfo cacheInfo = new DirectoryInfo(Config.OutputFolder);
+				foreach (DirectoryInfo item in cacheInfo.GetDirectories())
+				{
+					if (item.Name != "test")
+					{
+						item.Delete(true);
+					}
+				}
+			});
+
+			t.Wait();
+			_runButton.IsEnabled = true;
+			_dataMenu.IsEnabled = true;
+			UpdateStatus("Finished cleaning output folder");
 		}
 	}
 }

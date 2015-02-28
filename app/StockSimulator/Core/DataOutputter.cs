@@ -41,10 +41,6 @@ namespace StockSimulator.Core
 
 		private List<List<JsonBuyList>> _buyLists;
 
-		// Desktop
-		//private string _outputFolder = "C:\\Users\\Nik\\Documents\\Code\\github\\stock-simulator\\output\\output";
-		// Laptop
-		private string _outputFolder = "C:\\Users\\Nik\\Documents\\github\\stock-simulator\\output\\output";
 
 		/// <summary>
 		/// Constructor
@@ -314,7 +310,7 @@ namespace StockSimulator.Core
 		/// <returns>Root folder for the output with the date as the subfolder</returns>
 		private string GetOutputFolder(string timeString)
 		{
-			return _outputFolder + "\\" + timeString + "\\";
+			return Simulator.Config.OutputFolder + "\\" + timeString + "\\";
 		}
 
 	}
