@@ -134,6 +134,46 @@ namespace StockSimulator.Core
 				File.WriteAllText(filename, jsonOutput);
 			}
 
+			//////////////////// Info about how each ticker has performed ////////////////
+
+			List<StrategyStatistics> allTickerStatistics = new List<StrategyStatistics>();
+
+			foreach (KeyValuePair<int, List<Order>> tickerOrder in Simulator.Orders.TickerDictionary)
+			{
+				List<Order> orders = tickerOrder.Value;
+				if (orders.Count > 0)
+				{
+					string tickerName = orders[0].Ticker.TickerAndExchange.ToString();
+					StrategyStatistics tickerStats = new StrategyStatistics(tickerName);
+
+					// Catagorize and total all the orders by ticker.
+					for (int i = 0; i < orders.Count; i++)
+					{
+						// Get the strategy name but skip the main strategy as it gets process differently.
+						string strategyName = orders[i].StrategyName;
+						if (strategyName == "MainStrategy")
+						{
+							continue;
+						}
+
+						tickerStats.AddOrder(orders[i]);
+					}
+
+					tickerStats.CalculateStatistics();
+					allTickerStatistics.Add(tickerStats);
+
+					//jsonOutput = JsonConvert.SerializeObject(tickerStats, Formatting.Indented);
+					//folderName = GetOutputFolder(timeString) + "ticker-statistics\\" + tickerName;
+					//filename = folderName + "\\overall.json";
+					//Directory.CreateDirectory(folderName);
+					//File.WriteAllText(filename, jsonOutput);
+
+
+				}
+			}
+
+			////////////////////// Strategy stats paired with tickers ////////////////////
+
 			List<StrategyStatistics> allStrategyStatistics = new List<StrategyStatistics>();
 
 			foreach (KeyValuePair<int, List<Order>> strategy in Simulator.Orders.StrategyDictionary)
@@ -238,6 +278,9 @@ namespace StockSimulator.Core
 			filename = GetOutputFolder(timeString) + "overall-strategies.json";
 			File.WriteAllText(filename, jsonOutput);
 
+			jsonOutput = JsonConvert.SerializeObject(allTickerStatistics, Formatting.Indented);
+			filename = GetOutputFolder(timeString) + "overall-tickers.json";
+			File.WriteAllText(filename, jsonOutput);
 
 			///////////////////// Process main strategy /////////////////////////////////
 			

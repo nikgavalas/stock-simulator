@@ -21,7 +21,24 @@
 					<h3 class="panel-title">Strategy performance</h3>
 				</div>
 				<div class="panel-body">
-					<strategy-list strategies="strategies" row-clicked="strategyClick"></strategy-list>
+					<!-- For toggling between tickers or strategies -->
+					<div class="text-center">
+						<div class="btn-group">
+							<button ng-class="{'active': showAllTickers === true}" ng-click="showAllTickers = true" class="btn btn-default">By Ticker</button>
+							<button ng-class="{'active': showAllTickers === false}" ng-click="showAllTickers = false" class="btn btn-default">By Strategy</button>
+						</div>
+					</div>
+					<br>
+
+					<!-- Even though it's a strategy list, it can show everything with the tickers just the
+					same because the data is the same. So just link it to the tickers. -->
+					<div ng-show="showAllTickers === true">
+						<strategy-list strategies="tickers" show-tickers></strategy-list>
+					</div>
+
+					<div ng-show="showAllTickers === false">
+						<strategy-list strategies="strategies" row-clicked="strategyClick"></strategy-list>
+					</div>
 				</div>
 			</div>
 

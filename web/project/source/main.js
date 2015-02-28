@@ -9,6 +9,7 @@ angular.module('mainApp').controller('MainCtrl', [
 	'ConfigFactory',
 	'OrderListFactory',
 	'StrategyListFactory',
+	'TickerListFactory',
 	function(
 		$scope,
 		$routeParams,
@@ -16,10 +17,14 @@ angular.module('mainApp').controller('MainCtrl', [
 		$window,
 		ConfigFactory,
 		OrderListFactory,
-		StrategyListFactory
+		StrategyListFactory,
+		TickerListFactory
 	) {
 		// Save since it will be used in the rest of the app.
 		ConfigFactory.setOutputFolder($routeParams.runName);
+
+		// TODO: have this toggled with a button group.
+		$scope.showAllTickers = true;
 
 		$scope.orders = [];
 		OrderListFactory.getOverallOrders().then(function(data) {
@@ -34,7 +39,16 @@ angular.module('mainApp').controller('MainCtrl', [
 			$scope.strategies.sort(function(a, b) {
 				return b.profitTargetPercent - a.profitTargetPercent;
 			});
+		});
 
+		// Load all the overall tickers.
+		$scope.tickers = [];
+		TickerListFactory.getOverallTickers().then(function(data) {
+			$scope.tickers = data;
+			// Sort so the strategy with the highest is at the top and that is the one that is shown first.
+			$scope.tickers.sort(function(a, b) {
+				return b.profitTargetPercent - a.profitTargetPercent;
+			});
 		});
 
 		/**
