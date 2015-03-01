@@ -28,6 +28,18 @@ mainApp.directive('strategyList', [
 			],
 			link: function($scope, $element, $attrs) {
 				$scope.showTickers = angular.isDefined($attrs.showTickers);
+				$scope.numberItemsPerPage = 20;
+				$scope.currentPage = 1;
+
+				$scope.getPageItems = function() {
+					var startIndex = ($scope.currentPage - 1) * $scope.numberItemsPerPage;
+					var endIndex = $scope.currentPage * $scope.numberItemsPerPage;
+					if (endIndex > $scope.strategies.length) {
+						endIndex = $scope.strategies.length;
+					}
+
+					return $scope.strategies.slice(startIndex, endIndex);
+				};
 			}
 		};
 	}

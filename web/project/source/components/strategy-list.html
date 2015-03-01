@@ -1,29 +1,34 @@
-<table class="table table-hover strategy-list">
-	<thead>
-		<th class="col-sm-4">{{showTickers ? 'Ticker' : 'Name'}}</th>
-		<th>Profit %</th>
-		<th>Loss %</th>
-		<th>Length %</th>
-		<th>Num Orders</th>
-		<th>Win/Loss %</th>
-		<th>Gain</th>
-	</thead>
-	<tbody>
-		<tr ng-repeat="strategy in strategies" ng-click="rowClicked(strategy, $event)" ng-class="{'info': $index == selected}" class="hover-pointer">
-			<td>{{strategy.name}}</td>
-			<td>{{strategy.profitTargetPercent}} %</td>
-			<td>{{strategy.stopLossPercent}} %</td>
-			<td>{{strategy.lengthExceededPercent}} %</td>
-			<td>{{strategy.numberOfOrders}}</td>
-			<td>
-				<progress>
-					<bar type="success" value="strategy.winPercent"><span>{{strategy.winPercent}}%</span></bar>
-					<bar type="danger" value="strategy.lossPercent"><span>{{strategy.lossPercent}}%</span></bar>
-				</progress>
-			</td>
-			<td>
-				<span ng-class="{'text-danger': strategy.gain < 0, 'text-success': strategy.gain >= 0}"><span class="glyphicon" ng-class="{'glyphicon-circle-arrow-up': strategy.gain >= 0, 'glyphicon-circle-arrow-down': strategy.gain < 0}"></span>&nbsp;${{abs(strategy.gain)}}</span>
-			</td>
-		</tr>
-	</tbody>
-</table>
+<div>
+	<div class="text-center">
+		<pagination total-items="strategies.length" ng-model="currentPage" items-per-page="numberItemsPerPage" max-size="10" rotate="true" boundary-links="true" class="pagination-sm"></pagination>
+	</div>
+	<table class="table table-hover strategy-list">
+		<thead>
+			<th class="col-sm-4">{{showTickers ? 'Ticker' : 'Name'}}</th>
+			<th>Profit %</th>
+			<th>Loss %</th>
+			<th>Length %</th>
+			<th>Num Orders</th>
+			<th>Win/Loss %</th>
+			<th>Gain</th>
+		</thead>
+		<tbody>
+			<tr ng-repeat="strategy in getPageItems()" ng-click="rowClicked(strategy, $event)" ng-class="{'info': $index == selected}" class="hover-pointer">
+				<td>{{strategy.name}}</td>
+				<td>{{strategy.profitTargetPercent}} %</td>
+				<td>{{strategy.stopLossPercent}} %</td>
+				<td>{{strategy.lengthExceededPercent}} %</td>
+				<td>{{strategy.numberOfOrders}}</td>
+				<td>
+					<progress>
+						<bar type="success" value="strategy.winPercent"><span>{{strategy.winPercent}}%</span></bar>
+						<bar type="danger" value="strategy.lossPercent"><span>{{strategy.lossPercent}}%</span></bar>
+					</progress>
+				</td>
+				<td>
+					<span ng-class="{'text-danger': strategy.gain < 0, 'text-success': strategy.gain >= 0}"><span class="glyphicon" ng-class="{'glyphicon-circle-arrow-up': strategy.gain >= 0, 'glyphicon-circle-arrow-down': strategy.gain < 0}"></span>&nbsp;${{abs(strategy.gain)}}</span>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
