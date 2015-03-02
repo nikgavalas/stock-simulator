@@ -81,7 +81,7 @@ namespace StockSimulator.Indicators
 
 			for (int i = 0; i < Data.Dates.Count; i++)
 			{
-				long dateTicks = ExtensionMethods.UnixTicks(Data.Dates[i]);
+				long dateTicks = UtilityMethods.UnixTicks(Data.Dates[i]);
 				if (SwingHighPlot[i] > 0)
 				{
 					plotHigh.PlotData.Add(new List<object>()

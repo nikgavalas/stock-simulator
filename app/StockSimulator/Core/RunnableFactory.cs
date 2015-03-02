@@ -47,6 +47,10 @@ namespace StockSimulator.Core
 				switch (runnableName)
 				{
 					// Indicators.
+					case "Bollinger":
+						requestedItem = new Bollinger(_tickerData, this);
+						break;
+
 					case "BullBeltHold":
 						requestedItem = new BullBeltHold(_tickerData, this);
 						break;
@@ -86,6 +90,10 @@ namespace StockSimulator.Core
 					// Strategies.
 					case "BestOfSubStrategies":
 						requestedItem = new BestOfSubStrategies(_tickerData, this);
+						break;
+
+					case "BollingerExtended":
+						requestedItem = new BollingerExtended(_tickerData, this);
 						break;
 
 					case "BullBeltHoldFound":

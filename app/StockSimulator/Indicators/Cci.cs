@@ -47,7 +47,7 @@ namespace StockSimulator.Indicators
 			{
 				plot.PlotData.Add(new List<object>()
 				{
-					ExtensionMethods.UnixTicks(Data.Dates[i]),
+					UtilityMethods.UnixTicks(Data.Dates[i]),
 					Math.Round(Value[i], 2)
 				});
 			}
@@ -64,8 +64,7 @@ namespace StockSimulator.Indicators
 			if (currentBar > 0)
 			{
 				double mean = 0;
-				int avgStartIndex = currentBar - Math.Min(currentBar, _period - 1);
-				double avg = Data.Typical.GetRange(avgStartIndex, Math.Min(currentBar, _period)).Average();
+				double avg = UtilityMethods.Sma(Data.Typical, currentBar, _period);
 				for (int idx = Math.Min(currentBar, _period - 1); idx >= 0; idx--)
 				{
 					mean += Math.Abs(Data.Typical[currentBar - idx] - avg);

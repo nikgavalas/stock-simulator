@@ -56,7 +56,7 @@ namespace StockSimulator.Indicators
 			{
 				plot.PlotData.Add(new List<object>()
 				{
-					ExtensionMethods.UnixTicks(Data.Dates[i]),
+					UtilityMethods.UnixTicks(Data.Dates[i]),
 					Math.Round(Value[i], 2)
 				});
 			}

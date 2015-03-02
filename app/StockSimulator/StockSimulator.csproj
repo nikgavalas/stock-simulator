@@ -92,6 +92,7 @@
     <Compile Include="Core\StatisticsCalculator.cs" />
     <Compile Include="Core\StrategyStatistics.cs" />
     <Compile Include="Core\StrategyTickerPairStatistics.cs" />
+    <Compile Include="Indicators\Bollinger.cs" />
     <Compile Include="Indicators\Candlesticks\BaseCandlestick.cs" />
     <Compile Include="Indicators\Candlesticks\BullBeltHold.cs" />
     <Compile Include="Indicators\Candlesticks\Doji.cs" />
@@ -100,6 +101,7 @@
     <Compile Include="Indicators\Swing.cs" />
     <Compile Include="Indicators\Trend.cs" />
     <Compile Include="Strategies\BestOfSubStrategies.cs" />
+    <Compile Include="Strategies\BollingerExtended.cs" />
     <Compile Include="Strategies\Candlesticks\BullBeltHoldFound.cs" />
     <Compile Include="Strategies\Candlesticks\DojiFound.cs" />
     <Compile Include="Strategies\CciCrossover.cs" />

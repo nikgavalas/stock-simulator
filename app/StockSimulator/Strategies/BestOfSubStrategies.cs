@@ -66,6 +66,7 @@ namespace StockSimulator.Strategies
 			get
 			{
 				string[] deps = {
+					"BollingerExtended",
 					"BullBeltHoldFound",
 					"CciCrossover",
 					"DojiFound",

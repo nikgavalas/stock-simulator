@@ -13,11 +13,14 @@ namespace StockSimulator.Indicators
 	/// Sma indicator
 	/// </summary>
 	[JsonObject(MemberSerialization.OptIn)]
-	class Sma : Indicator
+	class Bollinger : Indicator
 	{
 		private int _period = 14;
+		private int _numStdDev = 2;
 
-		public List<double> Avg { get; set; }
+		public List<double> Upper { get; set; }
+		public List<double> Middle { get; set; }
+		public List<double> Lower { get; set; }
 
 		/// <summary>
 		/// This indicator is plotted on the price bars.
@@ -33,10 +36,12 @@ namespace StockSimulator.Indicators
 		/// </summary>
 		/// <param name="tickerData">Ticker data for the indicator</param>
 		/// <param name="factory">Factory to create the dependent runnables</param>
-		public Sma(TickerData tickerData, RunnableFactory factory) 
+		public Bollinger(TickerData tickerData, RunnableFactory factory)
 			: base(tickerData, factory)
 		{
-			Avg = Enumerable.Repeat(0d, Data.NumBars).ToList();
+			Upper = Enumerable.Repeat(0d, Data.NumBars).ToList();
+			Middle = Enumerable.Repeat(0d, Data.NumBars).ToList();
+			Lower = Enumerable.Repeat(0d, Data.NumBars).ToList();
 		}
 
 		/// <summary>
@@ -45,7 +50,7 @@ namespace StockSimulator.Indicators
 		/// <returns>The name of this indicator</returns>
 		public override string ToString()
 		{
-			return "Sma";
+			return "Bollinger";
 		}
 
 		/// <summary>
@@ -55,15 +60,31 @@ namespace StockSimulator.Indicators
 		{
 			base.PrepareForSerialization();
 
-			// Add the sma avg to the the data for plotting.
-			PlotSeries smaPlot = new PlotSeries("line");
-			ChartPlots["Sma"] = smaPlot; 
+			// Add the data plots.
+			PlotSeries plotUpper = new PlotSeries("line");
+			PlotSeries plotMiddle = new PlotSeries("line");
+			PlotSeries plotLower = new PlotSeries("line");
+			ChartPlots[ToString() + "Upper"] = plotUpper;
+			ChartPlots[ToString() + "Middle"] = plotMiddle;
+			ChartPlots[ToString() + "Lower"] = plotLower;
 			for (int i = 0; i < Data.Dates.Count; i++)
 			{
-				smaPlot.PlotData.Add(new List<object>()
+				long ticks = UtilityMethods.UnixTicks(Data.Dates[i]);
+				
+				plotUpper.PlotData.Add(new List<object>()
 				{
-					UtilityMethods.UnixTicks(Data.Dates[i]),
-					Math.Round(Avg[i], 2)
+					ticks,
+					Math.Round(Upper[i], 2)
+				});
+				plotMiddle.PlotData.Add(new List<object>()
+				{
+					ticks,
+					Math.Round(Middle[i], 2)
+				});
+				plotLower.PlotData.Add(new List<object>()
+				{
+					ticks,
+					Math.Round(Lower[i], 2)
 				});
 			}
 		}
@@ -76,23 +97,11 @@ namespace StockSimulator.Indicators
 		{
 			base.OnBarUpdate(currentBar);
 
-			if (currentBar == 0)
-			{
-				Avg[currentBar] = Data.Close[currentBar];
-			}
-			else
-			{
-				double last = Avg[currentBar - 1] * Math.Min(currentBar, _period);
-
-				if (currentBar >= _period)
-				{
-					Avg[currentBar] = (last + Data.Close[currentBar] - Data.Close[currentBar - _period]) / Math.Min(currentBar, _period);
-				}
-				else
-				{
-					Avg[currentBar] = (last + Data.Close[currentBar]) / (Math.Min(currentBar, _period) + 1);
-				}
-			}
+			double smaValue = UtilityMethods.Sma(Data.Close, currentBar, _period);
+			double stdDevValue = UtilityMethods.StdDev(Data.Close, currentBar, _period);
+			Upper[currentBar] = smaValue + _numStdDev * stdDevValue;
+			Middle[currentBar] = smaValue;
+			Lower[currentBar] = smaValue - _numStdDev * stdDevValue;
 		}
 	}
 }

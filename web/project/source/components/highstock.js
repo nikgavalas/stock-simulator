@@ -65,7 +65,7 @@ mainApp.directive('highstock', [
 									for (seriesName in data.series) {
 										seriesData = data.series[seriesName];
 										newSeries = chart.addSeries({
-											name: args.name,
+											name: seriesName,
 											data: seriesData.data,
 											type: seriesData.type
 										}, false);

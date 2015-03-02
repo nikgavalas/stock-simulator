@@ -138,7 +138,7 @@ namespace StockSimulator.Core
 			MinOrders = 3;
 			UseLookbackBars = false;
 			MaxLookBackBars = 400;
-			MaxLookBackOrders = 20;
+			MaxLookBackOrders = 10;
 			MaxConcurrentOrders = 1;
 			ProfitTarget = 0.10;
 			StopTarget = 0.05;
@@ -147,14 +147,14 @@ namespace StockSimulator.Core
 			UseLimitOrders = false;
 			MaxBarsLimitOrderFill = 3;
 
-			ComboLeewayBars = 2;
+			ComboLeewayBars = 1;
 			MinComboSizeToBuy = 2;
 			MaxBuysPerBar = 5;
 			MinRequiredOrders = 5;
 			InitialAccountBalance = 100000;
 			PercentForBuy = 80;
 			// Desktop
-			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\test.csv";
+			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\exp-small.csv";
 			// Laptop
 			//InstrumentListFile = @"C:\Users\Nik\Documents\github\stock-simulator\input\test.csv";
 			// Desktop
@@ -167,7 +167,7 @@ namespace StockSimulator.Core
 			//endDate = DateTime.Parse("12/31/2014");
 			//PercentForBuy = 25;
 			//MinComboSizeToBuy = 1;
-			//InstrumentListFile = @"C:\Users\Nik\Documents\github\stock-simulator\input\indtest.csv";
+			//InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\indtest.csv";
 
 		}
 	}

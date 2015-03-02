@@ -210,7 +210,7 @@ namespace StockSimulator.Core
 			{
 				PriceData.Add(new List<object>()
 				{
-					ExtensionMethods.UnixTicks(Dates[i]),
+					UtilityMethods.UnixTicks(Dates[i]),
 					Math.Round(Open[i], 2),
 					Math.Round(High[i], 2),
 					Math.Round(Low[i], 2),
@@ -219,7 +219,7 @@ namespace StockSimulator.Core
 
 				VolumeData.Add(new List<object>()
 				{
-					ExtensionMethods.UnixTicks(Dates[i]),
+					UtilityMethods.UnixTicks(Dates[i]),
 					Volume[i]
 				});
 			}

@@ -59,7 +59,7 @@ namespace StockSimulator.Indicators
 			ChartPlots["Diff"] = plotDiff;
 			for (int i = 0; i < Data.Dates.Count; i++)
 			{
-				long dateTicks = ExtensionMethods.UnixTicks(Data.Dates[i]);
+				long dateTicks = UtilityMethods.UnixTicks(Data.Dates[i]);
 				plotMacd.PlotData.Add(new List<object>()
 				{
 					dateTicks,

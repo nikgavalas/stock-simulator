@@ -61,7 +61,7 @@ namespace StockSimulator.Indicators
 			ChartPlots[ToString() + "Down"] = plotDown;
 			for (int i = 0; i < Data.Dates.Count; i++)
 			{
-				long ticks = ExtensionMethods.UnixTicks(Data.Dates[i]);
+				long ticks = UtilityMethods.UnixTicks(Data.Dates[i]);
 				plotUp.PlotData.Add(new List<object>()
 				{
 					ticks,

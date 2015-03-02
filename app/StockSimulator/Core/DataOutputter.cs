@@ -175,7 +175,7 @@ namespace StockSimulator.Core
 			foreach (KeyValuePair<int, List<Order>> strategy in Simulator.Orders.StrategyDictionary)
 			{
 				List<Order> orders = strategy.Value;
-				if (orders.Count > 0)
+				if (orders.Count > Simulator.Config.MinRequiredOrders)
 				{
 					// Get the strategy name but skip the main strategy as it gets process differently.
 					string strategyName = orders[0].StrategyName;
