@@ -140,18 +140,18 @@ namespace StockSimulator.Core
 			MaxLookBackBars = 400;
 			MaxLookBackOrders = 10;
 			MaxConcurrentOrders = 1;
-			ProfitTarget = 0.10;
+			ProfitTarget = 0.05;
 			StopTarget = 0.05;
-			MaxBarsOrderOpen = 30;
-			SizeOfOrder = 25000;
+			MaxBarsOrderOpen = 10;
+			SizeOfOrder = 6000;
 			UseLimitOrders = false;
 			MaxBarsLimitOrderFill = 3;
 
-			ComboLeewayBars = 1;
-			MinComboSizeToBuy = 2;
+			ComboLeewayBars = 0;
+			MinComboSizeToBuy = 1;
 			MaxBuysPerBar = 5;
-			MinRequiredOrders = 5;
-			InitialAccountBalance = 100000;
+			MinRequiredOrders = 3;
+			InitialAccountBalance = 20000;
 			PercentForBuy = 80;
 			// Desktop
 			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\exp-small.csv";
