@@ -82,7 +82,7 @@
     </ApplicationDefinition>
     <Compile Include="Core\ComboSet.cs" />
     <Compile Include="Core\DataOutputter.cs" />
-    <Compile Include="Core\ExtentionMethods.cs" />
+    <Compile Include="Core\UtilityMethods.cs" />
     <Compile Include="Core\JsonConverters\RoundedDoubleConverter.cs" />
     <Compile Include="Core\JsonConverters\ShortDateTimeConverter.cs" />
     <Compile Include="Core\JsonConverters\TickerDataStringConverter.cs" />
@@ -98,8 +98,10 @@
     <Compile Include="Indicators\Candlesticks\Doji.cs" />
     <Compile Include="Indicators\Cci.cs" />
     <Compile Include="Indicators\Momentum.cs" />
+    <Compile Include="Indicators\StochasticsFast.cs" />
     <Compile Include="Indicators\Swing.cs" />
     <Compile Include="Indicators\Trend.cs" />
+    <Compile Include="Indicators\WilliamsR.cs" />
     <Compile Include="Strategies\BestOfSubStrategies.cs" />
     <Compile Include="Strategies\BollingerExtended.cs" />
     <Compile Include="Strategies\Candlesticks\BullBeltHoldFound.cs" />
@@ -111,8 +113,10 @@
     <Compile Include="Strategies\SmaCrossover.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Strategies\StochasticsFastCrossover.cs" />
     <Compile Include="Strategies\SwingStart.cs" />
     <Compile Include="Strategies\TrendStart.cs" />
+    <Compile Include="Strategies\WilliamsRCrossover.cs" />
     <Compile Include="YahooFinanceDownloader\YahooFinanceDownloader.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

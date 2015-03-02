@@ -42,6 +42,13 @@ namespace StockSimulator.Core
 			return series.GetRange(avgStartIndex, Math.Min(currentBar, period)).Average();
 		}
 
+		/// <summary>
+		/// Returns the standard deviation of a series.
+		/// </summary>
+		/// <param name="currentBar">Curent bar of the simulation</param>
+		/// <param name="series">The series to get the min from</param>
+		/// <param name="period">How many bars to use for the min</param>
+		/// <returns>Standard deviation for the bars</returns>
 		public static double StdDev(List<double> series, int currentBar, int period)
 		{
 			if (currentBar < 1)
@@ -59,19 +66,42 @@ namespace StockSimulator.Core
 
 				return Math.Sqrt(sum / Math.Min(currentBar + 1, period));
 			}
+		}
 
-			//double M = 0.0;
-			//double S = 0.0;
-			//int k = 1;
-			//for (int i = currentBar - period; i <= currentBar; i++)
-			//{
-			//	double value = series[i];
-			//	double tmpM = M;
-			//	M += (value - tmpM) / k;
-			//	S += (value - tmpM) * (value - M);
-			//	k++;
-			//}
-			//return Math.Sqrt(S / (k - 2));
+		/// <summary>
+		/// Returns the minimum value of a series from the current back back to the period value.
+		/// </summary>
+		/// <param name="currentBar">Curent bar of the simulation</param>
+		/// <param name="series">The series to get the min from</param>
+		/// <param name="period">How many bars to use for the min</param>
+		/// <returns>Minimum value for the bars</returns>
+		public static double Min(List<double> series, int currentBar, int period)
+		{
+			if (currentBar == 0)
+			{
+				return series[0];
+			}
+
+			int startIndex = currentBar - Math.Min(currentBar, period - 1);
+			return series.GetRange(startIndex, Math.Min(currentBar, period)).Min();
+		}
+
+		/// <summary>
+		/// Returns the maximum value of a series from the current back back to the period value.
+		/// </summary>
+		/// <param name="currentBar">Curent bar of the simulation</param>
+		/// <param name="series">The series to get the max from</param>
+		/// <param name="period">How many bars to use for the max</param>
+		/// <returns>Maximum value for the bars</returns>
+		public static double Max(List<double> series, int currentBar, int period)
+		{
+			if (currentBar == 0)
+			{
+				return series[0];
+			}
+
+			int startIndex = currentBar - Math.Min(currentBar, period - 1);
+			return series.GetRange(startIndex, Math.Min(currentBar, period)).Max();
 		}
 	}
 }

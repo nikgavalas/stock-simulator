@@ -74,8 +74,10 @@ namespace StockSimulator.Strategies
 					"MomentumCrossover",
 					"RsiCrossover30",
 					"SmaCrossover",
+					"StochasticsFastCrossover",
 					"SwingStart",
-					"TrendStart"
+					"TrendStart",
+					"WilliamsRCrossover"
 				};
 
 				return deps;

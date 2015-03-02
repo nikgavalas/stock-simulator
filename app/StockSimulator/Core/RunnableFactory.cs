@@ -79,12 +79,20 @@ namespace StockSimulator.Core
 						requestedItem = new Sma(_tickerData, this);
 						break;
 
+					case "StochasticsFast":
+						requestedItem = new StochasticsFast(_tickerData, this);
+						break;
+
 					case "Swing":
 						requestedItem = new Swing(_tickerData, this);
 						break;
 
 					case "Trend":
 						requestedItem = new Trend(_tickerData, this);
+						break;
+
+					case "WilliamsR":
+						requestedItem = new WilliamsR(_tickerData, this);
 						break;
 
 					// Strategies.
@@ -124,6 +132,10 @@ namespace StockSimulator.Core
 						requestedItem = new SmaCrossover(_tickerData, this);
 						break;
 
+					case "StochasticsFastCrossover":
+						requestedItem = new StochasticsFastCrossover(_tickerData, this);
+						break;
+
 					case "SwingStart":
 						requestedItem = new SwingStart(_tickerData, this);
 						break;
@@ -131,7 +143,11 @@ namespace StockSimulator.Core
 					case "TrendStart":
 						requestedItem = new TrendStart(_tickerData, this);
 						break;
-					
+
+					case "WilliamsRCrossover":
+						requestedItem = new WilliamsRCrossover(_tickerData, this);
+						break;
+
 					default:
 						throw new Exception("Trying to create a runnable that doesn't exist");
 				}
