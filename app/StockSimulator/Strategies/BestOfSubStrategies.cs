@@ -70,6 +70,7 @@ namespace StockSimulator.Strategies
 					"BullBeltHoldFound",
 					"CciCrossover",
 					"DojiFound",
+					"KeltnerCloseAbove",
 					"MacdCrossover",
 					"MomentumCrossover",
 					"RsiCrossover30",
@@ -77,6 +78,8 @@ namespace StockSimulator.Strategies
 					"StochasticsFastCrossover",
 					"SwingStart",
 					"TrendStart",
+					"TrixSignalCrossover",
+					"TrixZeroCrossover",
 					"WilliamsRCrossover"
 				};
 

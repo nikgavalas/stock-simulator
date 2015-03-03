@@ -43,6 +43,19 @@ namespace StockSimulator.Core
 		}
 
 		/// <summary>
+		/// Calculates a exponential moving average of a series.
+		/// </summary>
+		/// <param name="series">The series to get the average from</param>
+		/// <param name="emaSeries">The current ema series</param>
+		/// <param name="currentBar">Curent bar of the simulation</param>
+		/// <param name="period">How many bars to use for the average</param>
+		/// <returns>The exponential moving average of the series</returns>
+		public static double Ema(List<double> series, List<double> emaSeries, int currentBar, int period)
+		{
+			return (currentBar == 0 ? series[0] : series[currentBar] * (2.0 / (1 + period)) + (1 - (2.0 / (1 + period))) * emaSeries[currentBar - 1]);
+		}
+
+		/// <summary>
 		/// Returns the standard deviation of a series.
 		/// </summary>
 		/// <param name="currentBar">Curent bar of the simulation</param>

@@ -167,6 +167,7 @@ namespace StockSimulator.Core
 			//endDate = DateTime.Parse("12/31/2014");
 			//PercentForBuy = 25;
 			//MinComboSizeToBuy = 1;
+			//MinRequiredOrders = 1;
 			//InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\indtest.csv";
 
 		}

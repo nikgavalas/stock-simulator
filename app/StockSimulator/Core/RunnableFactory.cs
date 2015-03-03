@@ -63,6 +63,10 @@ namespace StockSimulator.Core
 						requestedItem = new Doji(_tickerData, this);
 						break;
 
+					case "KeltnerChannel":
+						requestedItem = new KeltnerChannel(_tickerData, this);
+						break;
+
 					case "Macd":
 						requestedItem = new Macd(_tickerData, this);
 						break;
@@ -91,6 +95,10 @@ namespace StockSimulator.Core
 						requestedItem = new Trend(_tickerData, this);
 						break;
 
+					case "Trix":
+						requestedItem = new Trix(_tickerData, this);
+						break;
+
 					case "WilliamsR":
 						requestedItem = new WilliamsR(_tickerData, this);
 						break;
@@ -114,6 +122,10 @@ namespace StockSimulator.Core
 
 					case "DojiFound":
 						requestedItem = new DojiFound(_tickerData, this);
+						break;
+
+					case "KeltnerCloseAbove":
+						requestedItem = new KeltnerCloseAbove(_tickerData, this);
 						break;
 
 					case "MacdCrossover":
@@ -142,6 +154,14 @@ namespace StockSimulator.Core
 
 					case "TrendStart":
 						requestedItem = new TrendStart(_tickerData, this);
+						break;
+
+					case "TrixSignalCrossover":
+						requestedItem = new TrixSignalCrossover(_tickerData, this);
+						break;
+
+					case "TrixZeroCrossover":
+						requestedItem = new TrixZeroCrossover(_tickerData, this);
 						break;
 
 					case "WilliamsRCrossover":
