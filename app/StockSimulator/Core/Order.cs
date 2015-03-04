@@ -166,7 +166,7 @@ namespace StockSimulator.Core
 				{
 					FinishOrder(Ticker.Open[curBar], curBar, OrderStatus.ProfitTarget);
 				}
-				else if (IsMore(Ticker.Close[curBar], ProfitTargetPrice, Type))
+				else if (IsMore(Math.Max(Ticker.Close[curBar], Ticker.High[curBar]), ProfitTargetPrice, Type))
 				{
 					FinishOrder(ProfitTargetPrice, curBar, OrderStatus.ProfitTarget);
 				}
@@ -174,7 +174,7 @@ namespace StockSimulator.Core
 				{
 					FinishOrder(Ticker.Open[curBar], curBar, OrderStatus.StopTarget);
 				}
-				else if (IsLess(Ticker.Close[curBar], StopPrice, Type))
+				else if (IsLess(Math.Min(Ticker.Close[curBar], Ticker.Low[curBar]), StopPrice, Type))
 				{
 					FinishOrder(StopPrice, curBar, OrderStatus.StopTarget);
 				}
