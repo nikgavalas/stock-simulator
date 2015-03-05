@@ -17,8 +17,9 @@ namespace StockSimulator.Core
 	/// </summary>
 	public class TickerDataStore
 	{
+		public TickerData TradeableDateTicker { get; set; }
+
 		private SortedDictionary<int, TickerData> _symbolsInMemory;
-		private TickerData _tradeableDateTicker;
 
 		private readonly string _cacheFolder = @"DataCache\";
 		private readonly DateTime _earliestStartAllowed = new DateTime(2000, 1, 4); // Max allowed is the first trading day of the year.
@@ -35,7 +36,7 @@ namespace StockSimulator.Core
 			// doesn't have data from too long, but we still want to include it in the simulation
 			// when it does have data. We just fill the facebook data with zeros using the dates
 			// from this ticker. That way all the tickers have the same number of bars.
-			_tradeableDateTicker = new TickerData(new TickerExchangePair("NASDAQ", "INTC"));
+			TradeableDateTicker = new TickerData(new TickerExchangePair("NASDAQ", "INTC"));
 
 			Directory.CreateDirectory(_cacheFolder);
 		}
@@ -64,11 +65,11 @@ namespace StockSimulator.Core
 			// First thing is make sure we have a valid list of trading dates. Easiest way to do this is 
 			// just download ticker data from the internet and use those dates. Calculating what days the
 			// market actually traded isn't a super simple task.
-			if (ticker.Ticker != _tradeableDateTicker.TickerAndExchange.Ticker &&
-				(_tradeableDateTicker.Start > _earliestStartAllowed || _tradeableDateTicker.End < end))
+			if (ticker.Ticker != TradeableDateTicker.TickerAndExchange.Ticker &&
+				(TradeableDateTicker.Start > _earliestStartAllowed || TradeableDateTicker.End < end))
 			{
-				_tradeableDateTicker = GetDataFromDiskOrServer(_tradeableDateTicker.TickerAndExchange, _earliestStartAllowed, end);
-				_tradeableDateTicker.ZeroPrices();
+				TradeableDateTicker = GetDataFromDiskOrServer(TradeableDateTicker.TickerAndExchange, _earliestStartAllowed, end);
+				TradeableDateTicker.ZeroPrices();
 			}
 
 			TickerData data = new TickerData(ticker);
@@ -153,11 +154,11 @@ namespace StockSimulator.Core
 					// pad the rest of the dates with 0's.
 					if (data.Start > start)
 					{
-						data.AppendData(_tradeableDateTicker.SubSet(start, data.Start));
+						data.AppendData(TradeableDateTicker.SubSet(start, data.Start));
 					}
 					if (data.End < end)
 					{
-						data.AppendData(_tradeableDateTicker.SubSet(data.End, end));
+						data.AppendData(TradeableDateTicker.SubSet(data.End, end));
 					}
 
 					// Save the data so we can resuse it again without hitting the server.

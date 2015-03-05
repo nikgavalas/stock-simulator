@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using StockSimulator.Core.JsonConverters;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace StockSimulator.Core
 {
@@ -59,10 +60,6 @@ namespace StockSimulator.Core
 		[JsonConverter(typeof(RoundedDoubleConverter))]
 		public double Gain { get; set; }
 
-		[JsonProperty("totalGain")]
-		[JsonConverter(typeof(RoundedDoubleConverter))]
-		public double TotalGain { get; set; }
-
 		[JsonProperty("accountValue")]
 		[JsonConverter(typeof(RoundedDoubleConverter))]
 		public double AccountValue { get; set; }
@@ -71,7 +68,9 @@ namespace StockSimulator.Core
 		[JsonConverter(typeof(TickerDataStringConverter))]
 		public TickerData Ticker { get; set; }
 
+		[JsonProperty("orderStatus")]
 		public OrderStatus Status { get; set; }
+
 		public int BuyBar { get; set; }
 		public int SellBar { get; set; }
 		public OrderType Type { get; set; }
@@ -98,7 +97,6 @@ namespace StockSimulator.Core
 			Ticker = tickerData;
 			DependentIndicatorNames = dependentIndicatorNames;
 			AccountValue = 0;
-			TotalGain = 0;
 			LimitBuyPrice = tickerData.Close[currentBar];
 			LimitOpenedBar = currentBar;
 

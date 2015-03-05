@@ -11,8 +11,7 @@
 			<th>Sell</th>
 			<th>Shares</th>
 			<th>Gain</th>
-			<th ng-show="showValue">Balance</th>
-			<th ng-show="showValue">Total Gain</th>
+			<th>Reason</th>
 		</thead>
 		<tbody>
 			<tr ng-repeat="order in getPageOrders()" ng-click="orderClick(order, $event)" class="hover-pointer" ng-class="{'info': activeOrder === order}">
@@ -25,8 +24,9 @@
 				<td>
 					<span ng-class="{'text-danger': order.gain < 0, 'text-success': order.gain >= 0}"><span class="glyphicon" ng-class="{'glyphicon-circle-arrow-up': order.gain >= 0, 'glyphicon-circle-arrow-down': order.gain < 0}"></span>&nbsp;${{abs(order.gain)}}</span>
 				</td>
-				<td ng-show="showValue">${{order.accountValue}}</td>
-				<td ng-show="showValue">${{order.totalGain}}</td>
+				<td>
+					<span ng-class="{'text-info': order.orderStatus === 4, 'text-danger': order.orderStatus === 3, 'text-success': order.orderStatus === 2}">{{statusName(order.orderStatus)}}</span>
+				</td>
 			</tr>
 		</tbody>
 	</table>

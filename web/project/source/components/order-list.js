@@ -23,6 +23,12 @@ mainApp.directive('orderList', [
 					OrderListFactory
 				) {
 
+					var statusNames = {
+						'4': 'Length Exceeded',
+						'3': 'Stop Loss',
+						'2': 'Profit Target'
+					};
+
 					/**
 					 * Expose the absolute function to the scope html
 					 * @param  {Number} value Value to return the absolute value for
@@ -32,10 +38,17 @@ mainApp.directive('orderList', [
 						return Math.abs(value);
 					};
 
+					/**
+					 * Return the name for the order status value.
+					 * @param  {Number} value Order status enum value
+					 * @return {String}       String of the order status value
+					 */
+					$scope.statusName = function(value) {
+						return statusNames[value];
+					};
 				}
 			],
 			link: function($scope, $element, $attrs) {
-				$scope.showValue = angular.isDefined($attrs.showValue);
 				$scope.numberOrdersPerPage = 20;
 				$scope.currentPage = 1;
 

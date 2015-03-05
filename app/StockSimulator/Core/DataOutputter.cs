@@ -298,6 +298,10 @@ namespace StockSimulator.Core
 				jsonOutput = JsonConvert.SerializeObject(mainStrategyOrders, Formatting.Indented);
 				filename = GetOutputFolder(timeString) + "overall-orders.json";
 				File.WriteAllText(filename, jsonOutput);
+
+				jsonOutput = JsonConvert.SerializeObject(Simulator.Broker, Formatting.Indented);
+				filename = GetOutputFolder(timeString) + "overall-account.json";
+				File.WriteAllText(filename, jsonOutput);
 			}
 
 			return timeString;

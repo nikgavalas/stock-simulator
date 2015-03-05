@@ -41,10 +41,6 @@ namespace StockSimulator.Core
 		[JsonConverter(typeof(RoundedDoubleConverter))]
 		public double Gain { get; set; }
 
-		[JsonProperty("accountValue")]
-		[JsonConverter(typeof(RoundedDoubleConverter))]
-		public double AccountValue { get; set; }
-
 		// Not serialized!
 		public virtual List<Order> Orders { get; set; }
 
@@ -54,8 +50,7 @@ namespace StockSimulator.Core
 		private int _numberOfStopLosses = 0;
 		private int _numberOfLengthExceeded = 0;
 		private double _totalGain = 0;
-		private DateTime _dateLastOrderSold = new DateTime(1970, 1, 1);
-
+	
 		/// <summary>
 		/// Constructor that doesn't calculate the stats to be used with add order.
 		/// </summary>
@@ -98,12 +93,6 @@ namespace StockSimulator.Core
 				}
 
 				_totalGain += order.Gain;
-
-				if (order.SellDate > _dateLastOrderSold)
-				{
-					_dateLastOrderSold = order.SellDate;
-					AccountValue = order.AccountValue;
-				}
 			}
 		}
 

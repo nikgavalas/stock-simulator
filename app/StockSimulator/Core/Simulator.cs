@@ -44,12 +44,15 @@ namespace StockSimulator.Core
 		public static DataOutputter DataOutput { get; set; }
 
 		/// <summary>
+		/// Holds things like account value and cash value.
+		/// </summary>
+		public static Broker Broker { get; set; }
+
+		/// <summary>
 		/// List of all the orders that are not closed.
 		/// </summary>
 		private List<MainStrategyOrder> _activeOrders { get; set; }
 
-		private double _accountValue;
-		private double _totalGain;
 		private CancellationToken _cancelToken;
 		private static IProgress<string> _progress = null;
 
@@ -73,8 +76,6 @@ namespace StockSimulator.Core
 		{
 			Config = config;
 			DataStore = dataStore;
-			_accountValue = Config.InitialAccountBalance;
-			_totalGain = 0;
 
 			// Load the config file with the instument list for all the symbols that we 
 			// want to test.
@@ -108,6 +109,7 @@ namespace StockSimulator.Core
 					if (NumberOfBars == 0)
 					{
 						NumberOfBars = tickerData.Dates.Count;
+						Broker = new Broker(Config.InitialAccountBalance, NumberOfBars);
 					}
 
 					// Make sure everything we're working with has the same number of bars.
@@ -238,7 +240,7 @@ namespace StockSimulator.Core
 					// Don't want to order to late in the strategy where the order can't run it's course.
 					// Also, need to have enough money to buy stocks.
 					if (currentBar < NumberOfBars - Config.MaxBarsOrderOpen &&
-						_accountValue > Config.SizeOfOrder * 2)
+						Broker.AccountCash > Config.SizeOfOrder * 2)
 					{
 						EnterOrder(buyList[i].Bars[currentBar].Statistics, buyList[i].Data, currentBar);
 						++currentCount;
@@ -277,22 +279,29 @@ namespace StockSimulator.Core
 				// If the order has just been filled, then subtract that amount from the account.
 				if (previousStatus == Order.OrderStatus.Open && order.Status == Order.OrderStatus.Filled)
 				{
-					_accountValue -= order.Value;
+					Broker.AccountCash -= order.Value;
 				}
 				// If the order just finished then add the value back.
 				else if (previousStatus == Order.OrderStatus.Filled && order.IsFinished())
 				{
-					_accountValue += order.Value;
-					order.AccountValue = _accountValue;
-					
-					_totalGain += order.Gain;
-					order.TotalGain = _totalGain;
+					Broker.AccountCash += order.Value;
 				}
 			}
 
 			// Remove the orders that are finished. This will just remove them from
 			// this array but they order will still be saved in the order history.
 			_activeOrders.RemoveAll(order => order.IsFinished() || order.Status == Order.OrderStatus.Cancelled);
+
+			double accountValue = 0;
+			for (int i = 0; i < _activeOrders.Count; i++)
+			{
+				Order order = _activeOrders[i];
+				accountValue += order.Value;
+			}
+
+			// Save the current value at the end of the frame.
+			accountValue += Broker.AccountCash;
+			Broker.AddValueToList(DataStore.TradeableDateTicker.Dates[currentBar], accountValue);
 		}
 
 		/// <summary>
