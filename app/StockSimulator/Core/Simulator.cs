@@ -239,8 +239,11 @@ namespace StockSimulator.Core
 				{
 					// Don't want to order to late in the strategy where the order can't run it's course.
 					// Also, need to have enough money to buy stocks.
+					double accountValue = (double)Broker.AccountValue[currentBar > 0 ? currentBar - 1 : currentBar][1];
+					double sizeOfOrder = accountValue / Config.MaxBuysPerBar;
+
 					if (currentBar < NumberOfBars - Config.MaxBarsOrderOpen &&
-						Broker.AccountCash > Config.SizeOfOrder * 2)
+						Broker.AccountCash > sizeOfOrder * 1.2)
 					{
 						EnterOrder(buyList[i].Bars[currentBar].Statistics, buyList[i].Data, currentBar);
 						++currentCount;

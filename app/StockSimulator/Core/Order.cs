@@ -144,7 +144,14 @@ namespace StockSimulator.Core
 					BuyDate = Ticker.Dates[curBar];
 					Status = OrderStatus.Filled;
 
-					NumberOfShares = BuyPrice > 0.0 ? Convert.ToInt32(Math.Floor(Simulator.Config.SizeOfOrder / BuyPrice)) : 0;
+					double sizeOfOrder = Simulator.Config.SizeOfOrder;
+					if (GetType() == typeof(MainStrategyOrder))
+					{
+						double accountValue = (double)Simulator.Broker.AccountValue[curBar > 0 ? curBar - 1 : curBar][1];
+						sizeOfOrder = accountValue / Simulator.Config.MaxBuysPerBar;
+					}
+
+					NumberOfShares = BuyPrice > 0.0 ? Convert.ToInt32(Math.Floor(sizeOfOrder / BuyPrice)) : 0;
 					Value = NumberOfShares * BuyPrice;
 
 					int direction = Type == OrderType.Long ? 1 : -1;
