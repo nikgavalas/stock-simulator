@@ -119,6 +119,11 @@ namespace StockSimulator.Core
 		public double PercentForBuy { get; set; }
 
 		[Category("Main Strategy")]
+		[DisplayName("Num Bars to Delay Start")]
+		[Description("Number of bars to delay purchasing from the buy list")]
+		public int NumBarsToDelayStart { get; set; }
+
+		[Category("Main Strategy")]
 		[DisplayName("Stock List File")]
 		[Description("File with a list of stocks to run the sim on")]
 		public string InstrumentListFile { get; set; }
@@ -153,14 +158,16 @@ namespace StockSimulator.Core
 			MinRequiredOrders = 3;
 			InitialAccountBalance = 20000;
 			PercentForBuy = 80;
+			NumBarsToDelayStart = 250;
+
 			// Desktop
-			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\exp-small.csv";
+			//InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\exp-small.csv";
 			// Laptop
-			//InstrumentListFile = @"C:\Users\Nik\Documents\github\stock-simulator\input\test.csv";
+			InstrumentListFile = @"C:\Users\Nik\Documents\github\stock-simulator\input\test.csv";
 			// Desktop
-			OutputFolder = @"C:\Users\Nik\Documents\Code\github\stock-simulator\output\output";
+			//OutputFolder = @"C:\Users\Nik\Documents\Code\github\stock-simulator\output\output";
 			// Laptop
-			//OutputFolder = @"C:\Users\Nik\Documents\github\stock-simulator\output\output";
+			OutputFolder = @"C:\Users\Nik\Documents\github\stock-simulator\output\output";
 
 			// Testing parameters for indicator correctness.
 			//startDate = DateTime.Parse("12/31/2013");
