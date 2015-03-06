@@ -228,38 +228,41 @@ namespace StockSimulator.Core
 			UpdateOrders(currentBar);
 
 			// Buy stocks if we it's a good time.
-			int currentCount = 0;
-			for (int i = 0; i < buyList.Count; i++)
+			if (currentBar >= Config.NumBarsToDelayStart)
 			{
-				// If the highest percent is enough for a buy, then do it.
-				// If not then since the list is sorted, no other ones will
-				// be high enough and we can early out of the loop.
-				BestOfSubStrategies.BarStatistics barStats = buyList[i].Bars[currentBar];
-				if (barStats.HighestPercent > Config.PercentForBuy && barStats.ComboSizeOfHighestStrategy >= Simulator.Config.MinComboSizeToBuy)
+				int currentCount = 0;
+				for (int i = 0; i < buyList.Count; i++)
 				{
-					// Don't want to order to late in the strategy where the order can't run it's course.
-					// Also, need to have enough money to buy stocks.
-					double accountValue = (double)Broker.AccountValue[currentBar > 0 ? currentBar - 1 : currentBar][1];
-					double sizeOfOrder = accountValue / Config.MaxBuysPerBar;
-
-					if (currentBar < NumberOfBars - Config.MaxBarsOrderOpen &&
-						Broker.AccountCash > sizeOfOrder * 1.2)
+					// If the highest percent is enough for a buy, then do it.
+					// If not then since the list is sorted, no other ones will
+					// be high enough and we can early out of the loop.
+					BestOfSubStrategies.BarStatistics barStats = buyList[i].Bars[currentBar];
+					if (barStats.HighestPercent > Config.PercentForBuy && barStats.ComboSizeOfHighestStrategy >= Simulator.Config.MinComboSizeToBuy)
 					{
-						EnterOrder(buyList[i].Bars[currentBar].Statistics, buyList[i].Data, currentBar);
-						++currentCount;
-					}
-				}
-				else
-				{
-					break;
-				}
+						// Don't want to order to late in the strategy where the order can't run it's course.
+						// Also, need to have enough money to buy stocks.
+						double accountValue = (double)Broker.AccountValue[currentBar > 0 ? currentBar - 1 : currentBar][1];
+						double sizeOfOrder = accountValue / Config.MaxBuysPerBar;
 
-				// We only allow a set number of buys per frame. This is so we don't just buy
-				// everything all on one frame so that we can try and get different
-				// stocks when we need to.
-				if (currentCount >= Config.MaxBuysPerBar)
-				{
-					break;
+						if (currentBar < NumberOfBars - Config.MaxBarsOrderOpen &&
+							Broker.AccountCash > sizeOfOrder * 1.2)
+						{
+							EnterOrder(buyList[i].Bars[currentBar].Statistics, buyList[i].Data, currentBar);
+							++currentCount;
+						}
+					}
+					else
+					{
+						break;
+					}
+
+					// We only allow a set number of buys per frame. This is so we don't just buy
+					// everything all on one frame so that we can try and get different
+					// stocks when we need to.
+					if (currentCount >= Config.MaxBuysPerBar)
+					{
+						break;
+					}
 				}
 			}
 		}
