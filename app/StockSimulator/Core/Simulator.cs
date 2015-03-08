@@ -244,11 +244,29 @@ namespace StockSimulator.Core
 						double accountValue = (double)Broker.AccountValue[currentBar > 0 ? currentBar - 1 : currentBar][1];
 						double sizeOfOrder = accountValue / Config.MaxBuysPerBar;
 
+						// Make sure we have enough money and also that we have enough time
+						// before the end of the sim to complete the order we place.
 						if (currentBar < NumberOfBars - Config.MaxBarsOrderOpen &&
 							Broker.AccountCash > sizeOfOrder * 1.2)
 						{
-							EnterOrder(buyList[i].Bars[currentBar].Statistics, buyList[i].Data, currentBar);
-							++currentCount;
+							bool shouldReallyOrder = true;
+
+							// As a last optional check, see how this ticker has been performing
+							// across all strategies. If it's been doing bad then lets not buy it.
+							if (Config.ShouldFilterBad)
+							{
+								StrategyStatistics tickerStats = Orders.GetTickerStatistics(buyList[i].Data.TickerAndExchange, currentBar, Simulator.Config.NumBarsBadFilter);
+								if (tickerStats.Gain < 0 || tickerStats.ProfitTargetPercent < Config.BadFilterProfitTarget * 100)
+								{
+									shouldReallyOrder = false;
+								}
+							}
+
+							if (shouldReallyOrder == true)
+							{
+								EnterOrder(buyList[i].Bars[currentBar].Statistics, buyList[i].Data, currentBar);
+								++currentCount;
+							}
 						}
 					}
 					else

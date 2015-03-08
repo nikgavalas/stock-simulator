@@ -22,7 +22,24 @@ namespace StockSimulator.Core
 		[Description("Date to stop the simulation")]
 		public DateTime endDate { get; set; }
 
-		//////////////////////////// CANDLESTICKS//////////////////////////////////
+		//////////////////////////// FILTER BAD ///////////////////////////////////
+
+		[Category("Bad Filter")]
+		[DisplayName("Should Filter Bad")]
+		[Description("Should we filter bad performing stocks in the main strategy")]
+		public bool ShouldFilterBad { get; set; }
+
+		[Category("Bad Filter")]
+		[DisplayName("Look Back Bars")]
+		[Description("How many bars to look back to filter bad stocks")]
+		public int NumBarsBadFilter { get; set; }
+
+		[Category("Bad Filter")]
+		[DisplayName("Min Profit Target")]
+		[Description("The profit target that all orders for a ticker must be above to be considered in the main strategy")]
+		public double BadFilterProfitTarget { get; set; }
+
+		//////////////////////////// CANDLESTICKS /////////////////////////////////
 
 		[Category("Candlesticks")]
 		[DisplayName("Trend Strength")]
@@ -159,6 +176,10 @@ namespace StockSimulator.Core
 			InitialAccountBalance = 20000;
 			PercentForBuy = 80;
 			NumBarsToDelayStart = 250;
+
+			ShouldFilterBad = true;
+			NumBarsBadFilter = 300;
+			BadFilterProfitTarget = 0.15;
 
 			// Desktop
 			//InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\exp-small.csv";

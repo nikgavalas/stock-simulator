@@ -107,6 +107,56 @@ namespace StockSimulator.Core
 		}
 
 		/// <summary>
+		/// Calculates things like win/loss percent, gain, etc. for the ticker.
+		/// </summary>
+		/// <param name="tickerAndExchange">Ticker to calculate for</param>
+		/// <param name="currentBar">Current bar of the simulation</param>
+		/// <param name="maxBarsAgo">Maximum number of bars in the past to consider for calculating</param>
+		/// <returns>Class holding the statistics calculated</returns>
+		public StrategyStatistics GetTickerStatistics(TickerExchangePair tickerAndExchange, int currentBar, int maxBarsAgo)
+		{
+			// Orders that started less than this bar will not be considered.
+			int cutoffBar = currentBar - maxBarsAgo;
+			if (cutoffBar < 0)
+			{
+				cutoffBar = 0;
+			}
+
+			StrategyStatistics stats = new StrategyStatistics(tickerAndExchange.ToString());
+
+			int tickerHash = tickerAndExchange.GetHashCode();
+			if (TickerDictionary.ContainsKey(tickerHash))
+			{
+
+				List<Order> tickerOrders = TickerDictionary[tickerHash];
+
+				//for (int i = 0; i < strategyOrders.Count; i++)
+				for (int i = tickerOrders.Count - 1; i >= 0; i--)
+				{
+					Order order = tickerOrders[i];
+					if (order.BuyBar >= cutoffBar && order.IsFinished())
+					{
+						stats.AddOrder(order);
+					}
+				}
+			}
+
+			// Only count the statistics if we have a bit more data to deal with.
+			// We want to avoid having a strategy say it's 100% correct when it 
+			// only has 1 winning trade.
+			if (stats.NumberOfOrders > Simulator.Config.MinRequiredOrders)
+			{
+				stats.CalculateStatistics();
+			}
+			else
+			{
+				stats = new StrategyStatistics(tickerAndExchange.ToString());
+			}
+
+			return stats;
+		}
+
+		/// <summary>
 		/// Adds an order to a dictionary that has a list of orders indexed by a string hash.
 		/// </summary>
 		/// <param name="table">Table to add to</param>
