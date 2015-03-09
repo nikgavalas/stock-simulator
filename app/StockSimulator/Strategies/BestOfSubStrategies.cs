@@ -68,18 +68,28 @@ namespace StockSimulator.Strategies
 				string[] deps = {
 					"BollingerExtended",
 					"BullBeltHoldFound",
+					"BullEngulfingFound",
+					"BullHaramiFound",
+					"BullHaramiCrossFound",
 					"CciCrossover",
 					"DojiFound",
+					"HammerFound",
 					"KeltnerCloseAbove",
 					"MacdCrossover",
 					"MomentumCrossover",
+					"MorningStarFound",
+					"PiercingLineFound",
+					"RisingThreeMethodsFound",
 					"RsiCrossover30",
 					"SmaCrossover",
+					"StickSandwitchFound",
 					"StochasticsFastCrossover",
 					"SwingStart",
+					"ThreeWhiteSoldiersFound",
 					"TrendStart",
 					"TrixSignalCrossover",
 					"TrixZeroCrossover",
+					"UpsideTasukiGapFound",
 					"WilliamsRCrossover"
 				};
 
