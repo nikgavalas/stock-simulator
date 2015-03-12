@@ -17,6 +17,7 @@ using Xceed.Wpf.Toolkit;
 using StockSimulator.Core;
 using System.Threading;
 using System.IO;
+using Newtonsoft.Json;
 
 namespace StockSimulator
 {
@@ -50,12 +51,14 @@ namespace StockSimulator
 			Config = new SimulatorConfig();
 			DataStore = new TickerDataStore();
 			_propertyGrid.SelectedObject = Config;
+
+			InitFromCommandLine();
 		}
 
 		private async void _runButton_Click(object sender, RoutedEventArgs e)
 		{
 			// Disable the button while running.
-			_runButton.IsEnabled = false;
+			EnableOptions(false);
 
 			_statusText.Text = "";
 
@@ -69,7 +72,7 @@ namespace StockSimulator
 				// TODO: Update the gui to indicator the method was canceled.
 			}
 
-			_runButton.IsEnabled = true;
+			EnableOptions(true);
 		}
 
 		private void RunSim(IProgress<string> progress, CancellationToken cancelToken)
@@ -89,6 +92,31 @@ namespace StockSimulator
 			Sim.Shutdown();
 		}
 
+		private void InitFromCommandLine()
+		{
+			string configOption = "-config:";
+
+			string[] args = Environment.GetCommandLineArgs();
+			if (args.Length > 0)
+			{
+				for (int i = 0; i < args.Length; i++)
+				{
+					if (args[i].StartsWith(configOption))
+					{
+						_configFilePath.Text = args[i].Substring(configOption.Length, args[i].Length - configOption.Length);
+						try
+						{
+							InitConfigFromFile();
+						}
+						catch (Exception e)
+						{
+							UpdateStatus("Could not init config from path on the command line: " + e.Message);
+						}
+					}
+				}
+			}
+		}
+
 		private void UpdateStatus(string message)
 		{
 			_statusText.Focus();
@@ -97,10 +125,23 @@ namespace StockSimulator
 			_statusText.ScrollToEnd();
 		}
 
+		private void EnableOptions(bool shouldEnable)
+		{
+			_runButton.IsEnabled = shouldEnable;
+			_dataMenu.IsEnabled = shouldEnable;
+		}
+
+		private void InitConfigFromFile()
+		{
+			string json = File.ReadAllText(_configFilePath.Text);
+			Config = JsonConvert.DeserializeObject<SimulatorConfig>(json);
+			_propertyGrid.SelectedObject = Config;
+			UpdateStatus("Config file loaded from " + _configFilePath.Text);			
+		}
+
 		private void _clearCache_Click(object sender, RoutedEventArgs e)
 		{
-			_runButton.IsEnabled = false;
-			_dataMenu.IsEnabled = false;
+			EnableOptions(false);
 			UpdateStatus("Start cleaning ticker cache");
 
 			Task t = Task.Run(() =>
@@ -109,15 +150,13 @@ namespace StockSimulator
 			});
 
 			t.Wait();
-			_runButton.IsEnabled = true;
-			_dataMenu.IsEnabled = true;
+			EnableOptions(true);
 			UpdateStatus("Finished cleaning ticker cache");
 		}
 
 		private void _clearOutput_Click(object sender, RoutedEventArgs e)
 		{
-			_runButton.IsEnabled = false;
-			_dataMenu.IsEnabled = false;
+			EnableOptions(false);
 			UpdateStatus("Start cleaning output folder");
 
 			Task t = Task.Run(() =>
@@ -133,9 +172,48 @@ namespace StockSimulator
 			});
 
 			t.Wait();
-			_runButton.IsEnabled = true;
-			_dataMenu.IsEnabled = true;
+			EnableOptions(true);
 			UpdateStatus("Finished cleaning output folder");
+		}
+
+		private void _loadButton_Click(object sender, RoutedEventArgs e)
+		{
+			// Configure open file dialog box
+			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+			dlg.DefaultExt = ".json"; // Default file extension
+			dlg.Filter = "Config File (.json)|*.json"; // Filter files by extension 
+
+			// Show open file dialog box
+			Nullable<bool> result = dlg.ShowDialog();
+
+			// Process open file dialog box results 
+			if (result == true)
+			{
+				// Open document 
+				_configFilePath.Text = dlg.FileName;
+				InitConfigFromFile();
+			}
+		}
+
+		private void _saveButton_Click(object sender, RoutedEventArgs e)
+		{
+			// Configure save file dialog box
+			Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+			dlg.FileName = "Config"; // Default file name
+			dlg.DefaultExt = ".json"; // Default file extension
+			dlg.Filter = "Config File (.json)|*.json"; // Filter files by extension 
+
+			// Show save file dialog box
+			Nullable<bool> result = dlg.ShowDialog();
+
+			// Process save file dialog box results 
+			if (result == true)
+			{
+				// Save document 
+				string filename = dlg.FileName;
+				string json = JsonConvert.SerializeObject(Config, Formatting.Indented);
+				File.WriteAllText(filename, json);
+			}
 		}
 	}
 }

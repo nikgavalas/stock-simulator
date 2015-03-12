@@ -9,7 +9,6 @@ using Xceed.Wpf.Toolkit;
 
 namespace StockSimulator.Core
 {
-	[Serializable]
 	public class SimulatorConfig
 	{
 		[Category("Dates")]
