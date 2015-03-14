@@ -115,6 +115,11 @@ namespace StockSimulator.Core
 		public int MaxBuysPerBar { get; set; }
 
 		[Category("Main Strategy")]
+		[DisplayName("Max Order Size")]
+		[Description("Maximum amount of money used for a single order")]
+		public double MaxOrderSize { get; set; }
+
+		[Category("Main Strategy")]
 		[DisplayName("Min Required Orders")]
 		[Description("Number of orders needed before we start counting the statistics as valid")]
 		public int MinRequiredOrders { get; set; }
@@ -175,19 +180,20 @@ namespace StockSimulator.Core
 			InitialAccountBalance = 20000;
 			PercentForBuy = 80;
 			NumBarsToDelayStart = 250;
+			MaxOrderSize = 50000;
 
 			ShouldFilterBad = true;
 			NumBarsBadFilter = 300;
 			BadFilterProfitTarget = 0.15;
 
 			// Desktop
-			//InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\exp-small.csv";
+			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\exp-small.csv";
 			// Laptop
-			InstrumentListFile = @"C:\Users\Nik\Documents\github\stock-simulator\input\test.csv";
+			//InstrumentListFile = @"C:\Users\Nik\Documents\github\stock-simulator\input\test.csv";
 			// Desktop
-			//OutputFolder = @"C:\Users\Nik\Documents\Code\github\stock-simulator\output\output";
+			OutputFolder = @"C:\Users\Nik\Documents\Code\github\stock-simulator\output\output";
 			// Laptop
-			OutputFolder = @"C:\Users\Nik\Documents\github\stock-simulator\output\output";
+			//OutputFolder = @"C:\Users\Nik\Documents\github\stock-simulator\output\output";
 
 			// Testing parameters for indicator correctness.
 			//startDate = DateTime.Parse("12/31/2013");

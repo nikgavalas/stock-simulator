@@ -149,6 +149,12 @@ namespace StockSimulator.Core
 					{
 						double accountValue = (double)Simulator.Broker.AccountValue[curBar > 0 ? curBar - 1 : curBar][1];
 						sizeOfOrder = accountValue / Simulator.Config.MaxBuysPerBar;
+
+						// Make sure we don't have an order of an unrealistic amount.
+						if (sizeOfOrder > Simulator.Config.MaxOrderSize)
+						{
+							sizeOfOrder = Simulator.Config.MaxOrderSize;
+						}
 					}
 
 					NumberOfShares = BuyPrice > 0.0 ? Convert.ToInt32(Math.Floor(sizeOfOrder / BuyPrice)) : 0;
@@ -250,7 +256,10 @@ namespace StockSimulator.Core
 		/// <param name="currentBar">Current bar of the simulation</param>
 		private void FinishOrder(double sellPrice, int currentBar, OrderStatus sellStatus)
 		{
-			SellPrice = sellPrice;
+			// If the sell price is 0 then it's a bug that no more data for this stock exists 
+			// and we had an order open. This is not really realistic so we'll just have the order
+			// gain $0.
+			SellPrice = sellPrice > 0.0 ? sellPrice : BuyPrice;
 			SellBar = currentBar;
 			SellDate = Ticker.Dates[currentBar];
 			Status = sellStatus;
