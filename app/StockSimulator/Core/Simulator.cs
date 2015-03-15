@@ -72,14 +72,14 @@ namespace StockSimulator.Core
 		/// Initializes the sim from the config object.
 		/// </summary>
 		/// <param name="config">Object with all the parameters that can be used to config how this sim runs</param>
-		public void CreateFromConfig(SimulatorConfig config, TickerDataStore dataStore)
+		public bool CreateFromConfig(SimulatorConfig config, TickerDataStore dataStore)
 		{
 			Config = config;
 			DataStore = dataStore;
 
 			// Load the config file with the instument list for all the symbols that we 
 			// want to test.
-			List<TickerExchangePair> instruments = new List<TickerExchangePair>();
+			Dictionary<int, TickerExchangePair> fileInstruments = new Dictionary<int, TickerExchangePair>();
 			string line;
 			try
 			{
@@ -87,22 +87,31 @@ namespace StockSimulator.Core
 				while ((line = file.ReadLine()) != null)
 				{
 					string[] pair = line.Split(',');
-					instruments.Add(new TickerExchangePair(pair[1], pair[0]));
+					TickerExchangePair newTicker = new TickerExchangePair(pair[1], pair[0]);
+					if (fileInstruments.ContainsKey(newTicker.GetHashCode()) == false)
+					{
+						fileInstruments[newTicker.GetHashCode()] = newTicker;
+					}
+					else
+					{
+						WriteMessage("Duplicate ticker in file: " + newTicker.ToString());
+					}
 				}
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine("Error loading instrument file!\n" + e.Message);
+				WriteMessage("Error loading instrument file!\n" + e.Message);
+				return false;
 			}
 
 			WriteMessage("Initializing ticker data");
 
 			// Add all the symbols as dependent strategies using the bestofsubstrategies
 			Instruments = new Dictionary<int, BestOfSubStrategies>();
-			for (int i = 0; i < instruments.Count; i++)
+			foreach (KeyValuePair<int, TickerExchangePair> item in fileInstruments)
 			{
 				// Get the data for the symbol and save it for later so we can output it.
-				TickerData tickerData = DataStore.GetTickerData(instruments[i], config.startDate, config.endDate);
+				TickerData tickerData = DataStore.GetTickerData(item.Value, config.startDate, config.endDate);
 				if (tickerData != null)
 				{
 					DataOutput.SaveTickerData(tickerData);
@@ -120,18 +129,20 @@ namespace StockSimulator.Core
 						RunnableFactory factory = new RunnableFactory(tickerData);
 
 						// This strategy will find the best strategy for this instrument everyday and save the value.
-						Instruments[instruments[i].GetHashCode()] = new BestOfSubStrategies(tickerData, factory);
+						Instruments[item.Value.GetHashCode()] = new BestOfSubStrategies(tickerData, factory);
 					}
 					else
 					{
-						Console.WriteLine("Bars not equal for ticker " + tickerData.TickerAndExchange.ToString());
+						WriteMessage("Bars not equal for ticker " + tickerData.TickerAndExchange.ToString());
 					}
 				}
 				else
 				{
-					Console.WriteLine("No ticker data for " + instruments[i].ToString());
+					WriteMessage("No ticker data for " + item.Value.ToString());
 				}
 			}
+
+			return true;
 		}
 
 		/// <summary>

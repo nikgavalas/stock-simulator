@@ -3,4 +3,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <StartArguments>-config:C:\Users\Nik\Desktop\testconfig.json</StartArguments>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <StartArguments>-config:C:\Users\Nik\Desktop\testconfig.json</StartArguments>
+  </PropertyGroup>
 </Project>

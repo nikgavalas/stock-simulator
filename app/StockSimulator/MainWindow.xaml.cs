@@ -80,16 +80,20 @@ namespace StockSimulator
 			Sim = new Simulator(progress, cancelToken);
 
 			// Create the simulator.
-			Sim.CreateFromConfig(Config, DataStore);
+			if (Sim.CreateFromConfig(Config, DataStore))
+			{
+				// Initializes all the instruments.
+				Sim.Initialize();
 
-			// Initializes all the instruments.
-			Sim.Initialize();
+				// Runs the simulation.
+				Sim.Run();
 
-			// Runs the simulation.
-			Sim.Run();
+				// Output all the data.
+				Sim.Shutdown();
+			}
 
-			// Output all the data.
-			Sim.Shutdown();
+			// Free the memory.
+			Sim = null;
 		}
 
 		private void InitFromCommandLine()
