@@ -117,7 +117,7 @@ namespace StockSimulator.Core
 					DataOutput.SaveTickerData(tickerData);
 					if (NumberOfBars == 0)
 					{
-						NumberOfBars = tickerData.Dates.Count;
+						NumberOfBars = DataStore.SimTickerDates.Dates.Count;
 						Broker = new Broker(Config.InitialAccountBalance, NumberOfBars);
 					}
 
@@ -221,6 +221,9 @@ namespace StockSimulator.Core
 			List<BestOfSubStrategies> buyList = new List<BestOfSubStrategies>();
 
 			// Add all the tickers that are at least showing some sort of activity.
+			// NOTE: There seems to be extra trading dates on NYSE that don't exist on NASDAQ.
+			// For example, NYSE has 4/1/2010 while NASDAQ's first date in April is 4/5/2010.
+
 			foreach (KeyValuePair<int, BestOfSubStrategies> instrument in Instruments)
 			{
 				if (instrument.Value.Bars[currentBar].HighestPercent > 0)
@@ -336,7 +339,7 @@ namespace StockSimulator.Core
 
 			// Save the current value at the end of the frame.
 			accountValue += Broker.AccountCash;
-			Broker.AddValueToList(DataStore.TradeableDateTicker.Dates[currentBar], accountValue);
+			Broker.AddValueToList(DataStore.SimTickerDates.Dates[currentBar], accountValue);
 		}
 
 		/// <summary>

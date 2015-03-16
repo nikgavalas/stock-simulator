@@ -143,27 +143,26 @@ namespace StockSimulator
 			UpdateStatus("Config file loaded from " + _configFilePath.Text);			
 		}
 
-		private void _clearCache_Click(object sender, RoutedEventArgs e)
+		private async void _clearCache_Click(object sender, RoutedEventArgs e)
 		{
 			EnableOptions(false);
 			UpdateStatus("Start cleaning ticker cache");
 
-			Task t = Task.Run(() =>
+			await Task.Run(() =>
 			{
 				DataStore.ClearCache();
 			});
 
-			t.Wait();
 			EnableOptions(true);
 			UpdateStatus("Finished cleaning ticker cache");
 		}
 
-		private void _clearOutput_Click(object sender, RoutedEventArgs e)
+		private async void _clearOutput_Click(object sender, RoutedEventArgs e)
 		{
 			EnableOptions(false);
 			UpdateStatus("Start cleaning output folder");
 
-			Task t = Task.Run(() =>
+			await Task.Run(() =>
 			{
 				DirectoryInfo cacheInfo = new DirectoryInfo(Config.OutputFolder);
 				foreach (DirectoryInfo item in cacheInfo.GetDirectories())
@@ -175,7 +174,6 @@ namespace StockSimulator
 				}
 			});
 
-			t.Wait();
 			EnableOptions(true);
 			UpdateStatus("Finished cleaning output folder");
 		}

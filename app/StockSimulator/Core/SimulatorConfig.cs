@@ -187,7 +187,7 @@ namespace StockSimulator.Core
 			BadFilterProfitTarget = 0.15;
 
 			// Desktop
-			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\exp-small.csv";
+			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\test.csv";
 			// Laptop
 			//InstrumentListFile = @"C:\Users\Nik\Documents\github\stock-simulator\input\test.csv";
 			// Desktop

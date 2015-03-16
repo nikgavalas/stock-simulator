@@ -17,7 +17,9 @@ namespace StockSimulator.Core
 	/// </summary>
 	public class TickerDataStore
 	{
-		public TickerData TradeableDateTicker { get; set; }
+		public TickerData SimTickerDates { get; set; }
+
+		private TickerData _allTickerDates { get; set; }
 
 		private SortedDictionary<int, TickerData> _symbolsInMemory;
 
@@ -36,7 +38,8 @@ namespace StockSimulator.Core
 			// doesn't have data from too long, but we still want to include it in the simulation
 			// when it does have data. We just fill the facebook data with zeros using the dates
 			// from this ticker. That way all the tickers have the same number of bars.
-			TradeableDateTicker = new TickerData(new TickerExchangePair("NASDAQ", "INTC"));
+			_allTickerDates = new TickerData(new TickerExchangePair("NASDAQ", "INTC"));
+			SimTickerDates = new TickerData(new TickerExchangePair("NASDAQ", "INTC"));
 
 			Directory.CreateDirectory(_cacheFolder);
 		}
@@ -65,11 +68,17 @@ namespace StockSimulator.Core
 			// First thing is make sure we have a valid list of trading dates. Easiest way to do this is 
 			// just download ticker data from the internet and use those dates. Calculating what days the
 			// market actually traded isn't a super simple task.
-			if (ticker.Ticker != TradeableDateTicker.TickerAndExchange.Ticker &&
-				(TradeableDateTicker.Start > _earliestStartAllowed || TradeableDateTicker.End < end))
+			if (ticker.Ticker != _allTickerDates.TickerAndExchange.Ticker &&
+				(_allTickerDates.Start > _earliestStartAllowed || _allTickerDates.End < end))
 			{
-				TradeableDateTicker = GetDataFromDiskOrServer(TradeableDateTicker.TickerAndExchange, _earliestStartAllowed, end);
-				TradeableDateTicker.ZeroPrices();
+				_allTickerDates = GetDataFromDiskOrServer(_allTickerDates.TickerAndExchange, _earliestStartAllowed, end);
+				_allTickerDates.ZeroPrices();
+			}
+
+			// Save this so we have an accurate amount of tradeable bars along with the dates.
+			if (SimTickerDates.Start != start || SimTickerDates.End != end)
+			{
+				SimTickerDates = _allTickerDates.SubSet(start, end);
 			}
 
 			TickerData data = new TickerData(ticker);
@@ -154,11 +163,11 @@ namespace StockSimulator.Core
 					// pad the rest of the dates with 0's.
 					if (data.Start > start)
 					{
-						data.AppendData(TradeableDateTicker.SubSet(start, data.Start));
+						data.AppendData(_allTickerDates.SubSet(start, data.Start));
 					}
 					if (data.End < end)
 					{
-						data.AppendData(TradeableDateTicker.SubSet(data.End, end));
+						data.AppendData(_allTickerDates.SubSet(data.End, end));
 					}
 
 					// Save the data so we can resuse it again without hitting the server.
@@ -344,7 +353,7 @@ namespace StockSimulator.Core
 						double low = 0;
 						double close = 0;
 						long volume = 0;
-
+					
 						if (IsDataFieldValid(splitData, 1) && IsDataFieldValid(splitData, 2) && IsDataFieldValid(splitData, 3) && IsDataFieldValid(splitData, 4) && IsDataFieldValid(splitData, 5))
 						{
 							open = Convert.ToDouble(splitData[1]);
