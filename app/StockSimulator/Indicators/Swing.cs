@@ -120,9 +120,9 @@ namespace StockSimulator.Indicators
 			{
 				throw new Exception(GetType().Name + ".SwingLowBar: barsAgo must be greater/equal 0 but was " + barsAgo);
 			}
-			else if (barsAgo >= Simulator.NumberOfBars)
+			else if (barsAgo >= Data.NumBars)
 			{
-				throw new Exception(GetType().Name + ".SwingLowBar: barsAgo out of valid range 0 through " + (Simulator.NumberOfBars - 1) + ", was " + barsAgo + ".");
+				throw new Exception(GetType().Name + ".SwingLowBar: barsAgo out of valid range 0 through " + (Data.NumBars - 1) + ", was " + barsAgo + ".");
 			}
 
 			for (int idx = currentBar - barsAgo - strength; idx >= currentBar - barsAgo - strength - lookBackPeriod; idx--)
@@ -164,11 +164,17 @@ namespace StockSimulator.Indicators
 		public int SwingHighBar(int currentBar, int barsAgo, int instance, int lookBackPeriod)
 		{
 			if (instance < 1)
+			{
 				throw new Exception(GetType().Name + ".SwingHighBar: instance must be greater/equal 1 but was " + instance);
+			}
 			else if (barsAgo < 0)
+			{
 				throw new Exception(GetType().Name + ".SwingHighBar: barsAgo must be greater/equal 0 but was " + barsAgo);
-			else if (barsAgo >= Simulator.NumberOfBars)
-				throw new Exception(GetType().Name + ".SwingHighBar: barsAgo out of valid range 0 through " + (Simulator.NumberOfBars - 1) + ", was " + barsAgo + ".");
+			}
+			else if (barsAgo >= Data.NumBars)
+			{
+				throw new Exception(GetType().Name + ".SwingHighBar: barsAgo out of valid range 0 through " + (Data.NumBars - 1) + ", was " + barsAgo + ".");
+			}
 
 			for (int idx = currentBar - barsAgo - strength; idx >= currentBar - barsAgo - strength - lookBackPeriod; idx--)
 			{
