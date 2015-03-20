@@ -39,7 +39,7 @@ namespace StockSimulator.Core
 
 		private Dictionary<int, Indicator> _indicators;
 
-		private List<List<JsonBuyList>> _buyLists;
+		private Dictionary<DateTime, List<JsonBuyList>> _buyLists;
 
 
 		/// <summary>
@@ -49,7 +49,7 @@ namespace StockSimulator.Core
 		{
 			_tickerData = new Dictionary<int, TickerData>();
 			_indicators = new Dictionary<int, Indicator>();
-			_buyLists = new List<List<JsonBuyList>>();
+			_buyLists = new Dictionary<DateTime, List<JsonBuyList>>();
 		}
 
 		/// <summary>
@@ -79,28 +79,20 @@ namespace StockSimulator.Core
 		}
 
 		/// <summary>
-		/// Gets the buy list ready to be saved for each bar of the simulation.
-		/// </summary>
-		public void InitializeBuyList()
-		{
-			_buyLists = Enumerable.Repeat(new List<JsonBuyList>(), Simulator.NumberOfBars).ToList();
-		}
-
-		/// <summary>
 		/// Outputs the buy list for the current bar.
 		/// </summary>
 		/// <param name="buyList">List of stocks that are displaying a reason to buy</param>
-		/// <param name="currentBar">The bar to use as the output index</param>
-		public void SaveBuyList(List<BestOfSubStrategies> buyList, int currentBar)
+		/// <param name="currentDate">The date to use as the output index</param>
+		public void SaveBuyList(List<BestOfSubStrategies> buyList, DateTime currentDate)
 		{
 			// Convert the buy list into better serializable data.
-			_buyLists[currentBar] = new List<JsonBuyList>();
-			List<JsonBuyList> outputList = _buyLists[currentBar];
+			_buyLists[currentDate] = new List<JsonBuyList>();
+			List<JsonBuyList> outputList = _buyLists[currentDate];
 			for (int i = 0; i < buyList.Count; i++)
 			{
 				outputList.Add(new JsonBuyList(buyList[i].Data.TickerAndExchange.ToString(),
-					buyList[i].Bars[currentBar].HighestStrategyName,
-					buyList[i].Bars[currentBar].HighestPercent
+					buyList[i].Bars[buyList[i].Data.GetBar(currentDate)].HighestStrategyName,
+					buyList[i].Bars[buyList[i].Data.GetBar(currentDate)].HighestPercent
 				));
 			}
 		}
@@ -123,10 +115,10 @@ namespace StockSimulator.Core
 			folderName = GetOutputFolder(timeString) + "buylist\\";
 			Directory.CreateDirectory(folderName);
 			List<DateTime> simulationDates = _indicators.First().Value.Data.Dates;
-			for (int i = 0; i < _buyLists.Count; i++)
+			foreach (KeyValuePair<DateTime, List<JsonBuyList>> buyList in _buyLists)
 			{
-				jsonOutput = JsonConvert.SerializeObject(_buyLists[i], Formatting.Indented);
-				filename = folderName + simulationDates[i].ToString("yyyy-MM-dd") + ".json";
+				jsonOutput = JsonConvert.SerializeObject(buyList.Value, Formatting.Indented);
+				filename = folderName + buyList.Key.ToString("yyyy-MM-dd") + ".json";
 				File.WriteAllText(filename, jsonOutput);
 			}
 

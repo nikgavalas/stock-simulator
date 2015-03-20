@@ -115,32 +115,18 @@ namespace StockSimulator.Core
 				if (tickerData != null)
 				{
 					DataOutput.SaveTickerData(tickerData);
-					if (NumberOfBars == 0)
-					{
-						NumberOfBars = DataStore.SimTickerDates.Dates.Count;
-						Broker = new Broker(Config.InitialAccountBalance, NumberOfBars);
-					}
-
-					// Make sure everything we're working with has the same number of bars.
-					if (tickerData.Dates.Count == NumberOfBars)
-					{
-						// The factory is responsible for creating each runnable. There should only be 1 per ticker
-						// so that we don't recreate the same runnable per ticker. 
-						RunnableFactory factory = new RunnableFactory(tickerData);
-
-						// This strategy will find the best strategy for this instrument everyday and save the value.
-						Instruments[item.Value.GetHashCode()] = new BestOfSubStrategies(tickerData, factory);
-					}
-					else
-					{
-						WriteMessage("Bars not equal for ticker " + tickerData.TickerAndExchange.ToString());
-					}
+					RunnableFactory factory = new RunnableFactory(tickerData);
+					// This strategy will find the best strategy for this instrument everyday and save the value.
+					Instruments[item.Value.GetHashCode()] = new BestOfSubStrategies(tickerData, factory);
 				}
 				else
 				{
 					WriteMessage("No ticker data for " + item.Value.ToString());
 				}
 			}
+
+			NumberOfBars = DataStore.SimTickerDates.Count;
+			Broker = new Broker(Config.InitialAccountBalance, NumberOfBars);
 
 			return true;
 		}
@@ -155,9 +141,6 @@ namespace StockSimulator.Core
 			// Reinit all the orders
 			Orders = new OrderHistory();
 
-			// Get the buy list ready.
-			DataOutput.InitializeBuyList();
-
 			foreach (KeyValuePair<int, BestOfSubStrategies> task in Instruments)
 			{
 				task.Value.Initialize();
@@ -169,20 +152,28 @@ namespace StockSimulator.Core
 		/// </summary>
 		public void Run()
 		{
-			WriteMessage("Running historical analysis");
+			WriteMessage("Running historical analysis for");
 
 			// Run all to start with so we have the data to simulate with.
 			foreach (KeyValuePair<int, BestOfSubStrategies> task in Instruments)
 			{
+				WriteMessage("Running " + task.Value.Data.TickerAndExchange.ToString());
 				task.Value.Run();
 			}
 
-			WriteMessage("Running main strategy based on historical analysis");
+			DateTime startDate = DataStore.SimTickerDates.First().Key;
+			DateTime endDate = DataStore.SimTickerDates.Last().Key;
 
-			// Loop each bar and find the best one of each bar.
-			for (int i = 0; i < NumberOfBars; i++)
+			WriteMessage("Running main strategy for dates " + startDate.ToShortDateString() + " to " + endDate.ToShortDateString());
+
+			// Loop through each date. We use dates because different tickers have different
+			// amounts of trading days. And some are trading on certain days while others aren't.
+			// This way to just see if the ticker traded that day, and if it did, then we use it.
+			// Otherwise we just ignore it for the day it doesn't have.
+			int i = 0;
+			foreach (KeyValuePair<DateTime, bool> date in DataStore.SimTickerDates)
 			{
-				OnBarUpdate(i);
+				OnBarUpdate(date.Key, i++);
 			}
 		}
 
@@ -215,85 +206,94 @@ namespace StockSimulator.Core
 		/// Called for every bar update. Find instrument (ticker) with the highest
 		/// win percent and buy that stock if we have enough money.
 		/// </summary>
-		/// <param name="currentBar"></param>
-		private void OnBarUpdate(int currentBar)
+		/// <param name="currentDate">The date that the sim is on.</param>
+		/// <param name="barNumber">The bar number of the sim loop. Not to be used for indexing since each ticker has a different number of bars</param>
+		private void OnBarUpdate(DateTime currentDate, int barNumber)
 		{
+			bool isTradingBar = false;
 			List<BestOfSubStrategies> buyList = new List<BestOfSubStrategies>();
 
 			// Add all the tickers that are at least showing some sort of activity.
-			// NOTE: There seems to be extra trading dates on NYSE that don't exist on NASDAQ.
-			// For example, NYSE has 4/1/2010 while NASDAQ's first date in April is 4/5/2010.
-
 			foreach (KeyValuePair<int, BestOfSubStrategies> instrument in Instruments)
 			{
-				if (instrument.Value.Bars[currentBar].HighestPercent > 0)
+				BestOfSubStrategies strat = instrument.Value;
+				int currentBar = strat.Data.GetBar(currentDate);
+				if (currentBar != -1)
 				{
-					buyList.Add(instrument.Value);
+					isTradingBar = true;
+					if (strat.Bars[currentBar].HighestPercent > 0)
+					{
+						buyList.Add(strat);
+					}
 				}
 			}
 
-			// Sort the list so the instruments that have the highest buy value are first in the list.
-			buyList.Sort((x, y) => -1 * x.Bars[currentBar].HighestPercent.CompareTo(y.Bars[currentBar].HighestPercent));
-
-			// Output the buy list for each day.
-			DataOutput.SaveBuyList(buyList, currentBar);
-
-			// Update all the active orders before placing new ones.
-			UpdateOrders(currentBar);
-
-			// Buy stocks if we it's a good time.
-			if (currentBar >= Config.NumBarsToDelayStart)
+			if (isTradingBar == true)
 			{
-				int currentCount = 0;
-				for (int i = 0; i < buyList.Count; i++)
+				// Sort the list so the instruments that have the highest buy value are first in the list.
+				buyList.Sort((x, y) => -1 * x.Bars[x.Data.GetBar(currentDate)].HighestPercent.CompareTo(y.Bars[y.Data.GetBar(currentDate)].HighestPercent));
+
+				// Output the buy list for each day.
+				DataOutput.SaveBuyList(buyList, currentDate);
+
+				// Update all the active orders before placing new ones.
+				UpdateOrders(currentDate);
+
+				// Buy stocks if we it's a good time.
+				if (barNumber >= Config.NumBarsToDelayStart)
 				{
-					// If the highest percent is enough for a buy, then do it.
-					// If not then since the list is sorted, no other ones will
-					// be high enough and we can early out of the loop.
-					BestOfSubStrategies.BarStatistics barStats = buyList[i].Bars[currentBar];
-					if (barStats.HighestPercent > Config.PercentForBuy && barStats.ComboSizeOfHighestStrategy >= Simulator.Config.MinComboSizeToBuy)
+					int currentCount = 0;
+					for (int i = 0; i < buyList.Count; i++)
 					{
-						// Don't want to order to late in the strategy where the order can't run it's course.
-						// Also, need to have enough money to buy stocks.
-						double accountValue = (double)Broker.AccountValue[currentBar > 0 ? currentBar - 1 : currentBar][1];
-						double sizeOfOrder = accountValue / Config.MaxBuysPerBar;
-
-						// Make sure we have enough money and also that we have enough time
-						// before the end of the sim to complete the order we place.
-						if (currentBar < NumberOfBars - Config.MaxBarsOrderOpen &&
-							Broker.AccountCash > sizeOfOrder * 1.2)
+						// If the highest percent is enough for a buy, then do it.
+						// If not then since the list is sorted, no other ones will
+						// be high enough and we can early out of the loop.
+						int strategyBarIndex = buyList[i].Data.GetBar(currentDate);
+						BestOfSubStrategies.BarStatistics barStats = buyList[i].Bars[strategyBarIndex];
+						if (barStats.HighestPercent > Config.PercentForBuy && barStats.ComboSizeOfHighestStrategy >= Simulator.Config.MinComboSizeToBuy)
 						{
-							bool shouldReallyOrder = true;
+							// Don't want to order to late in the strategy where the order can't run it's course.
+							// Also, need to have enough money to buy stocks.
+							double accountValue = (double)Broker.AccountValue[barNumber > 0 ? barNumber - 1 : barNumber][1];
+							double sizeOfOrder = accountValue / Config.MaxBuysPerBar;
 
-							// As a last optional check, see how this ticker has been performing
-							// across all strategies. If it's been doing bad then lets not buy it.
-							if (Config.ShouldFilterBad)
+							// Make sure we have enough money and also that we have enough time
+							// before the end of the sim to complete the order we place.
+							if (barNumber < NumberOfBars - Config.MaxBarsOrderOpen &&
+								Broker.AccountCash > sizeOfOrder * 1.2)
 							{
-								StrategyStatistics tickerStats = Orders.GetTickerStatistics(buyList[i].Data.TickerAndExchange, currentBar, Simulator.Config.NumBarsBadFilter);
-								if (tickerStats.Gain < 0 || tickerStats.ProfitTargetPercent < Config.BadFilterProfitTarget * 100)
+								bool shouldReallyOrder = true;
+
+								// As a last optional check, see how this ticker has been performing
+								// across all strategies. If it's been doing bad then lets not buy it.
+								if (Config.ShouldFilterBad)
 								{
-									shouldReallyOrder = false;
+									StrategyStatistics tickerStats = Orders.GetTickerStatistics(buyList[i].Data.TickerAndExchange, barNumber, Simulator.Config.NumBarsBadFilter);
+									if (tickerStats.Gain < 0 || tickerStats.ProfitTargetPercent < Config.BadFilterProfitTarget * 100)
+									{
+										shouldReallyOrder = false;
+									}
+								}
+
+								if (shouldReallyOrder == true)
+								{
+									EnterOrder(buyList[i].Bars[strategyBarIndex].Statistics, buyList[i].Data, strategyBarIndex);
+									++currentCount;
 								}
 							}
-
-							if (shouldReallyOrder == true)
-							{
-								EnterOrder(buyList[i].Bars[currentBar].Statistics, buyList[i].Data, currentBar);
-								++currentCount;
-							}
 						}
-					}
-					else
-					{
-						break;
-					}
+						else
+						{
+							break;
+						}
 
-					// We only allow a set number of buys per frame. This is so we don't just buy
-					// everything all on one frame so that we can try and get different
-					// stocks when we need to.
-					if (currentCount >= Config.MaxBuysPerBar)
-					{
-						break;
+						// We only allow a set number of buys per frame. This is so we don't just buy
+						// everything all on one frame so that we can try and get different
+						// stocks when we need to.
+						if (currentCount >= Config.MaxBuysPerBar)
+						{
+							break;
+						}
 					}
 				}
 			}
@@ -302,8 +302,8 @@ namespace StockSimulator.Core
 		/// <summary>
 		/// Updates all the orders. Adds and subtracts money spent buying and selling.
 		/// </summary>
-		/// <param name="currentBar">Current bar of the simulation</param>
-		private void UpdateOrders(int currentBar)
+		/// <param name="currentDate">Current date of the simulation</param>
+		private void UpdateOrders(DateTime currentDate)
 		{
 			// Update all the open orders.
 			for (int i = 0; i < _activeOrders.Count; i++)
@@ -312,7 +312,7 @@ namespace StockSimulator.Core
 
 				// Save the previous status befure the update so we can see if it got filled this update.
 				Order.OrderStatus previousStatus = order.Status;
-				order.Update(currentBar);
+				order.Update(order.Ticker.GetBar(currentDate));
 
 				// If the order has just been filled, then subtract that amount from the account.
 				if (previousStatus == Order.OrderStatus.Open && order.Status == Order.OrderStatus.Filled)
@@ -339,7 +339,7 @@ namespace StockSimulator.Core
 
 			// Save the current value at the end of the frame.
 			accountValue += Broker.AccountCash;
-			Broker.AddValueToList(DataStore.SimTickerDates.Dates[currentBar], accountValue);
+			Broker.AddValueToList(currentDate, accountValue);
 		}
 
 		/// <summary>

@@ -35,6 +35,14 @@ namespace StockSimulator.Core
 		public List<List<object>> VolumeData { get; set; }
 
 		/// <summary>
+		/// A map of a date to a current bar. We need this because there seems to be extra 
+		/// trading dates on NYSE that don't exist on NASDAQ.
+		/// For example, NYSE has 4/1/2010 while NASDAQ's first date in April is 4/5/2010.
+		/// So we use this to get the current bar from a date.
+		/// </summary>
+		private Dictionary<DateTime, int> _dateToBar;
+		
+		/// <summary>
 		/// Creates a new object to hold all the data.
 		/// </summary>
 		/// <param name="start">Starting date of the data</param>
@@ -113,6 +121,7 @@ namespace StockSimulator.Core
 			Start = Dates[0];
 			End = Dates[Dates.Count - 1];
 			NumBars = Dates.Count;
+			SaveDates();
 		}
 
 		/// <summary>
@@ -157,6 +166,7 @@ namespace StockSimulator.Core
 			copyData.Start = copyData.Dates[0];
 			copyData.End = copyData.Dates[copyData.Dates.Count - 1];
 			copyData.NumBars = copyData.Dates.Count;
+			copyData.SaveDates();
 			return copyData;
 		}
 
@@ -235,6 +245,29 @@ namespace StockSimulator.Core
 		public bool IsValidBar(int bar)
 		{
 			return Close[bar] > 0 && Open[bar] > 0;
+		}
+
+		/// <summary>
+		/// Used to get the bar for the simulation from a date.
+		/// </summary>
+		/// <param name="date">Date of the bar requested</param>
+		/// <returns>The bar if the date exists, otherwise -1</returns>
+		public int GetBar(DateTime date)
+		{
+			return _dateToBar.ContainsKey(date) ? _dateToBar[date] : -1;
+		}
+
+		/// <summary>
+		/// Saves all the dates to bar mappings.
+		/// </summary>
+		public void SaveDates()
+		{
+			// Save all the dates as keys so we can find out what bar they match to.
+			_dateToBar = new Dictionary<DateTime, int>();
+			for (int i = 0; i < Dates.Count; i++)
+			{
+				_dateToBar[Dates[i]] = i;
+			}
 		}
 	}
 }

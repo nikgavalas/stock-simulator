@@ -17,9 +17,7 @@ namespace StockSimulator.Core
 	/// </summary>
 	public class TickerDataStore
 	{
-		public TickerData SimTickerDates { get; set; }
-
-		private TickerData _allTickerDates { get; set; }
+		public SortedDictionary<DateTime, bool> SimTickerDates { get; set; }
 
 		private SortedDictionary<int, TickerData> _symbolsInMemory;
 
@@ -32,14 +30,7 @@ namespace StockSimulator.Core
 		public TickerDataStore()
 		{
 			_symbolsInMemory = new SortedDictionary<int, TickerData>();
-
-			// This holds all the valid trading days from our earliest allowed start date up to 
-			// the latest requested date. This is so that if we get a symbol (ex Facebook) which 
-			// doesn't have data from too long, but we still want to include it in the simulation
-			// when it does have data. We just fill the facebook data with zeros using the dates
-			// from this ticker. That way all the tickers have the same number of bars.
-			_allTickerDates = new TickerData(new TickerExchangePair("NASDAQ", "INTC"));
-			SimTickerDates = new TickerData(new TickerExchangePair("NASDAQ", "INTC"));
+			SimTickerDates = new SortedDictionary<DateTime, bool>();
 
 			Directory.CreateDirectory(_cacheFolder);
 		}
@@ -65,22 +56,6 @@ namespace StockSimulator.Core
 		/// <returns>Data (price, volume, etc) for the ticker</returns>
 		public TickerData GetTickerData(TickerExchangePair ticker, DateTime start, DateTime end)
 		{
-			// First thing is make sure we have a valid list of trading dates. Easiest way to do this is 
-			// just download ticker data from the internet and use those dates. Calculating what days the
-			// market actually traded isn't a super simple task.
-			if (ticker.Ticker != _allTickerDates.TickerAndExchange.Ticker &&
-				(_allTickerDates.Start > _earliestStartAllowed || _allTickerDates.End < end))
-			{
-				_allTickerDates = GetDataFromDiskOrServer(_allTickerDates.TickerAndExchange, _earliestStartAllowed, end);
-				_allTickerDates.ZeroPrices();
-			}
-
-			// Save this so we have an accurate amount of tradeable bars along with the dates.
-			if (SimTickerDates.Start != start || SimTickerDates.End != end)
-			{
-				SimTickerDates = _allTickerDates.SubSet(start, end);
-			}
-
 			TickerData data = new TickerData(ticker);
 
 			// The symbol exists in memory already.
@@ -89,14 +64,8 @@ namespace StockSimulator.Core
 			{
 				TickerData inMemoryData = _symbolsInMemory[key];
 
-				// Anything in memory should have data from our earliest date. If the stock wasn't around 
-				// prior to that date then it will have 0's for the data instead.
-				if (inMemoryData.Start > _earliestStartAllowed)
-				{
-					throw new Exception("The data stored in memory isn't filled to the earliest start date. Please restart the program!");
-				}
 				// We don't have all the data in memory past the end, so we need to get that data and append it.
-				else if (end > inMemoryData.End)
+				if (end > inMemoryData.End)
 				{
 					data = GetDataFromDiskOrServer(ticker, _earliestStartAllowed, end);
 					
@@ -134,6 +103,18 @@ namespace StockSimulator.Core
 				}
 			}
 
+			// Save all the dates that this ticker has so that we have a list of dates that we can 
+			// iterate through for trading periods. This is because each ticker can potentially have
+			// different trading dates but for the main sim we want to go through all dates and if
+			// the ticker has data for that time, we'll use it.
+			for (int i = 0; i < data.Dates.Count; i++)
+			{
+				if (SimTickerDates.ContainsKey(data.Dates[i]) == false)
+				{
+					SimTickerDates[data.Dates[i]] = true;
+				}
+			}
+
 			return data;
 		}
 
@@ -147,8 +128,10 @@ namespace StockSimulator.Core
 		/// <returns>Data (price, volume, etc) for the ticker</returns>
 		private TickerData GetDataFromDiskOrServer(TickerExchangePair ticker, DateTime start, DateTime end)
 		{
-			TickerData data = GetDataFromDisk(ticker);
-			bool diskDataNeedsUpdate = data == null || data.Start > start || data.End < end;
+			DateTime fileStartDate;
+			DateTime fileEndDate;
+			TickerData data = GetDataFromDisk(ticker, out fileStartDate, out fileEndDate);
+			bool diskDataNeedsUpdate = data == null || fileStartDate > start || fileEndDate < end;
 
 			// If the data is not on disk at all or there was a problem reading it, then 
 			// we definitely get it from the server.
@@ -157,21 +140,28 @@ namespace StockSimulator.Core
 				try
 				{
 					Simulator.WriteMessage("[" + ticker.ToString() + "] Downloading data");
-					data = GetDataFromGoogleServerAlt(ticker, start, end);
+					TickerData serverData = GetDataFromGoogleServerAlt(ticker, start, end);
 
-					// If there is not enough data from the server to fill our dates, then 
-					// pad the rest of the dates with 0's.
-					if (data.Start > start)
+					// TODO: This is where we can probably have some logic that only downloads
+					// the dates that we don't have saved on disk. Like if we have all data except
+					// todays data, we can just download todays data and then append it to the data
+					// returned from disk. 
+					// We may NOT want to do this incase we have very obselete data and the new data
+					// from the server is actually better...It could also be that the data gets worse,
+					// who knows!
+
+					// Append the server data to the disk data so that we have it for another time.
+					if (data != null)
 					{
-						data.AppendData(_allTickerDates.SubSet(start, data.Start));
+						data.AppendData(serverData);
 					}
-					if (data.End < end)
+					else
 					{
-						data.AppendData(_allTickerDates.SubSet(data.End, end));
+						data = serverData;
 					}
 
 					// Save the data so we can resuse it again without hitting the server.
-					SaveTickerData(ticker, data);
+					SaveTickerData(ticker, data, start, end);
 				}
 				catch (Exception e)
 				{
@@ -187,10 +177,13 @@ namespace StockSimulator.Core
 		/// </summary>
 		/// <param name="ticker">Ticker exchange name</param>
 		/// <param name="newData">Ticker data to save</param>
-		private void SaveTickerData(TickerExchangePair ticker, TickerData newData)
+		/// <param name="start">Start date requested</param>
+		/// <param name="end">End date requested</param>
+		private void SaveTickerData(TickerExchangePair ticker, TickerData newData, DateTime start, DateTime end)
 		{
 			string fileAndPath = GetTickerFilename(ticker);
-			string contents = "Date,Open,High,Low,Close,Volume," + Environment.NewLine;
+			string contents = start.ToShortDateString() + "," + end.ToShortDateString() + "," + Environment.NewLine;
+			contents += "Date,Open,High,Low,Close,Volume," + Environment.NewLine;
 			contents += newData.ToString();
 			try
 			{
@@ -219,8 +212,10 @@ namespace StockSimulator.Core
 		/// for later use.
 		/// </summary>
 		/// <param name="ticker">Ticker to get data for</param>
+		/// <param name="fileStartDate">The date that was the start of the requested date range. This can differ from the actual date that the server returns as the first date</param>
+		/// <param name="fileEndDate">The date that was the end of the requested date range</param>
 		/// <returns>Data (price, volume, etc) for the ticker</returns>
-		private TickerData GetDataFromDisk(TickerExchangePair ticker)
+		private TickerData GetDataFromDisk(TickerExchangePair ticker, out DateTime fileStartDate, out DateTime fileEndDate)
 		{
 			string fileAndPath = GetTickerFilename(ticker);
 
@@ -234,6 +229,14 @@ namespace StockSimulator.Core
 					StreamReader file = new StreamReader(fileAndPath);
 					string line;
 					StringBuilder sb = new StringBuilder();
+
+					// The first line should be the saved start and end dates. Don't include that in the string builder
+					// since it's only important for the callee of this function.
+					line = file.ReadLine();
+					string[] dates = line.Split(',');
+					fileStartDate = DateTime.Parse(dates[0]);
+					fileEndDate = DateTime.Parse(dates[1]);
+
 					while ((line = file.ReadLine()) != null)
 					{
 						sb.AppendLine(line);
@@ -248,6 +251,8 @@ namespace StockSimulator.Core
 			}
 		
 			// If file != exist
+			fileStartDate = DateTime.Now;
+			fileEndDate = DateTime.Now;
 			return null;
 		}
 
@@ -393,6 +398,7 @@ namespace StockSimulator.Core
 
 				tickerData.Start = tickerData.Dates[0];
 				tickerData.End = tickerData.Dates[tickerData.Dates.Count - 1];
+				tickerData.SaveDates();
 
 				return tickerData;
 			}
