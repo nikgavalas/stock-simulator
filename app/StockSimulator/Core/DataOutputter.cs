@@ -214,7 +214,7 @@ namespace StockSimulator.Core
 						item.Value.CalculateStatistics();
 
 						// Save the info for this strategy by the ticker.
-						jsonOutput = JsonConvert.SerializeObject(item.Value, Formatting.Indented);
+						jsonOutput = JsonConvert.SerializeObject(item.Value);
 						folderName = GetOutputFolder(timeString) + "strategies\\" + strategyName;
 						filename = folderName + "\\" + item.Value.TickerName + ".json";
 						Directory.CreateDirectory(folderName);
@@ -233,7 +233,7 @@ namespace StockSimulator.Core
 					}
 
 					// Output the overall stats for this strategy.
-					jsonOutput = JsonConvert.SerializeObject(overallList, Formatting.Indented);
+					jsonOutput = JsonConvert.SerializeObject(overallList);
 					folderName = GetOutputFolder(timeString) + "strategies\\" + strategyName;
 					filename = folderName + "\\overall.json";
 					Directory.CreateDirectory(folderName);
@@ -249,7 +249,7 @@ namespace StockSimulator.Core
 			foreach (KeyValuePair<int, TickerData> item in _tickerData)
 			{
 				item.Value.PrepareForSerialization();
-				jsonOutput = JsonConvert.SerializeObject(item.Value, Formatting.Indented);
+				jsonOutput = JsonConvert.SerializeObject(item.Value);
 				filename = folderName + "\\" + item.Value.TickerAndExchange.ToString() + ".json";
 				File.WriteAllText(filename, jsonOutput);
 			}
@@ -261,7 +261,7 @@ namespace StockSimulator.Core
 			foreach (KeyValuePair<int, Indicator> item in _indicators)
 			{
 				item.Value.PrepareForSerialization();
-				jsonOutput = JsonConvert.SerializeObject(item.Value, Formatting.Indented);
+				jsonOutput = JsonConvert.SerializeObject(item.Value);
 				folderName = GetOutputFolder(timeString) + "indicators\\" + item.Value.ToString();
 				filename = folderName + "\\" + item.Value.Data.TickerAndExchange.ToString() + ".json";
 				Directory.CreateDirectory(folderName);
@@ -270,11 +270,11 @@ namespace StockSimulator.Core
 
 			////////////////////// Main info about all strategies ///////////////////////
 			
-			jsonOutput = JsonConvert.SerializeObject(allStrategyStatistics, Formatting.Indented);
+			jsonOutput = JsonConvert.SerializeObject(allStrategyStatistics);
 			filename = GetOutputFolder(timeString) + "overall-strategies.json";
 			File.WriteAllText(filename, jsonOutput);
 
-			jsonOutput = JsonConvert.SerializeObject(allTickerStatistics, Formatting.Indented);
+			jsonOutput = JsonConvert.SerializeObject(allTickerStatistics);
 			filename = GetOutputFolder(timeString) + "overall-tickers.json";
 			File.WriteAllText(filename, jsonOutput);
 
@@ -291,15 +291,15 @@ namespace StockSimulator.Core
 				}
 
 				mainStratStats.CalculateStatistics();
-				jsonOutput = JsonConvert.SerializeObject(mainStratStats, Formatting.Indented);
+				jsonOutput = JsonConvert.SerializeObject(mainStratStats);
 				filename = GetOutputFolder(timeString) + "overall.json";
 				File.WriteAllText(filename, jsonOutput);
 
-				jsonOutput = JsonConvert.SerializeObject(mainStrategyOrders, Formatting.Indented);
+				jsonOutput = JsonConvert.SerializeObject(mainStrategyOrders);
 				filename = GetOutputFolder(timeString) + "overall-orders.json";
 				File.WriteAllText(filename, jsonOutput);
 
-				jsonOutput = JsonConvert.SerializeObject(Simulator.Broker, Formatting.Indented);
+				jsonOutput = JsonConvert.SerializeObject(Simulator.Broker);
 				filename = GetOutputFolder(timeString) + "overall-account.json";
 				File.WriteAllText(filename, jsonOutput);
 			}
