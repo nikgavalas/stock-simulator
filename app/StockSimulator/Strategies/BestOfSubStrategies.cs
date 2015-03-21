@@ -124,6 +124,13 @@ namespace StockSimulator.Strategies
 			for (int i = 0; i < combos.Count; i++)
 			{
 				List<Strategy> comboList = combos[i];
+
+				// Ignore combos greater than a max amount.
+				if (comboList.Count > Simulator.Config.MaxComboSize)
+				{
+					continue;
+				}
+
 				List<string> dependentIndicators = new List<string>();
 				string comboName = "";
 				for (int j = 0; j < comboList.Count; j++)

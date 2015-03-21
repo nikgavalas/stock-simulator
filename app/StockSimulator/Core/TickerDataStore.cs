@@ -107,11 +107,14 @@ namespace StockSimulator.Core
 			// iterate through for trading periods. This is because each ticker can potentially have
 			// different trading dates but for the main sim we want to go through all dates and if
 			// the ticker has data for that time, we'll use it.
-			for (int i = 0; i < data.Dates.Count; i++)
+			if (data != null)
 			{
-				if (SimTickerDates.ContainsKey(data.Dates[i]) == false)
+				for (int i = 0; i < data.Dates.Count; i++)
 				{
-					SimTickerDates[data.Dates[i]] = true;
+					if (SimTickerDates.ContainsKey(data.Dates[i]) == false)
+					{
+						SimTickerDates[data.Dates[i]] = true;
+					}
 				}
 			}
 

@@ -153,6 +153,11 @@ namespace StockSimulator.Core
 				}
 			}
 
+			if (copyEndIndex == -1 && end > Dates.Last())
+			{
+				copyEndIndex = Dates.Count - 1;
+			}
+
 			int amountToCopy = (copyEndIndex - copyStartIndex) + 1;
 			copyData.Dates.AddRange(Dates.GetRange(copyStartIndex, amountToCopy));
 			copyData.Open.AddRange(Open.GetRange(copyStartIndex, amountToCopy));

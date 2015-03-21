@@ -102,6 +102,11 @@ namespace StockSimulator.Core
 		[Description("Maximum number of bars to wait for a limit order to fill")]
 		public int MaxBarsLimitOrderFill { get; set; }
 
+		[Category("Orders")]
+		[DisplayName("Maximum Combo Size")]
+		[Description("Maximum size of a combo that can be used")]
+		public int MaxComboSize { get; set; }
+
 		///////////////////////////// MAIN STRATEGY ///////////////////////////////
 
 		[Category("Main Strategy")]
@@ -161,6 +166,7 @@ namespace StockSimulator.Core
 
 			TrendStrength = 4;
 
+			MaxComboSize = 6;
 			MinOrders = 3;
 			UseLookbackBars = false;
 			MaxLookBackBars = 400;
@@ -187,7 +193,7 @@ namespace StockSimulator.Core
 			BadFilterProfitTarget = 0.15;
 
 			// Desktop
-			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\test.csv";
+			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\exp-small.csv";
 			// Laptop
 			//InstrumentListFile = @"C:\Users\Nik\Documents\github\stock-simulator\input\test.csv";
 			// Desktop

@@ -312,7 +312,11 @@ namespace StockSimulator.Core
 
 				// Save the previous status befure the update so we can see if it got filled this update.
 				Order.OrderStatus previousStatus = order.Status;
-				order.Update(order.Ticker.GetBar(currentDate));
+				int barNum = order.Ticker.GetBar(currentDate);
+				if (barNum != -1)
+				{
+					order.Update(barNum);
+				}
 
 				// If the order has just been filled, then subtract that amount from the account.
 				if (previousStatus == Order.OrderStatus.Open && order.Status == Order.OrderStatus.Filled)
