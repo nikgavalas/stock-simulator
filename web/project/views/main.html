@@ -15,6 +15,22 @@
 				</div>
 			</div>
 
+			<accordion>
+				<accordion-group is-open="status.open">
+					<accordion-heading>
+						Input Parameters <span class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></span>
+					</accordion-heading>
+					<table class="table">
+						<tbody>
+							<tr ng-repeat="(key, value) in inputParameters">
+								<td><strong>{{key}}</strong></td>
+								<td>{{value}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</accordion-group>
+			</accordion>
+
 			<!-- The column for the aggregated strategies by the strategy name -->		
 			<div class="panel panel-default">
 				<div class="panel-heading">

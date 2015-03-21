@@ -10,6 +10,7 @@ angular.module('mainApp').controller('MainCtrl', [
 	'OrderListFactory',
 	'StrategyListFactory',
 	'TickerListFactory',
+	'InputOptionsFactory',
 	function(
 		$scope,
 		$routeParams,
@@ -18,7 +19,8 @@ angular.module('mainApp').controller('MainCtrl', [
 		ConfigFactory,
 		OrderListFactory,
 		StrategyListFactory,
-		TickerListFactory
+		TickerListFactory,
+		InputOptionsFactory
 	) {
 		// Save since it will be used in the rest of the app.
 		ConfigFactory.setOutputFolder($routeParams.runName);
@@ -49,6 +51,12 @@ angular.module('mainApp').controller('MainCtrl', [
 			$scope.tickers.sort(function(a, b) {
 				return b.profitTargetPercent - a.profitTargetPercent;
 			});
+		});
+
+		// Load the input parameters used for this run.
+		$scope.inputParameters = {};
+		InputOptionsFactory.get().then(function(data) {
+			$scope.inputParameters = data;
 		});
 
 		/**

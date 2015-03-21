@@ -111,6 +111,14 @@ namespace StockSimulator.Core
 			string saveFolderName = GetOutputFolder(timeString);
 			Directory.CreateDirectory(saveFolderName.TrimEnd('\\'));
 
+			///////////////////////// Config used to run this sim ////////////////////////
+
+			jsonOutput = JsonConvert.SerializeObject(Simulator.Config, Formatting.Indented);
+			filename = GetOutputFolder(timeString) + "input.json";
+			File.WriteAllText(filename, jsonOutput);
+			
+			/////////////////////////////// Buy list output //////////////////////////////
+
 			// Create the buy list directory and output all of them for each bar.
 			folderName = GetOutputFolder(timeString) + "buylist\\";
 			Directory.CreateDirectory(folderName);
