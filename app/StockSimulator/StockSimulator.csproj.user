@@ -4,6 +4,7 @@
     <StartArguments>-config:C:\Users\Nik\Desktop\testconfig.json</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <StartArguments>-config:C:\Users\Nik\Desktop\testconfig.json</StartArguments>
+    <StartArguments>
+    </StartArguments>
   </PropertyGroup>
 </Project>

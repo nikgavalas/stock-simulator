@@ -42,20 +42,28 @@ namespace StockSimulator
 		public Simulator Sim { get; set; }
 
 		private CancellationTokenSource _cancelToken;
+		private bool _shouldAutoRun;
 
 		public MainWindow()
 		{
 			InitializeComponent();
 
+			_shouldAutoRun = false;
 			_cancelToken = new CancellationTokenSource();
 			Config = new SimulatorConfig();
 			DataStore = new TickerDataStore();
 			_propertyGrid.SelectedObject = Config;
 
 			InitFromCommandLine();
+
+			// If the command line option was to autorun, trigger the click for running.
+			if (_shouldAutoRun == true)
+			{
+				StartSimRun();
+			}
 		}
 
-		private async void _runButton_Click(object sender, RoutedEventArgs e)
+		private async void StartSimRun()
 		{
 			// Disable the button while running.
 			EnableOptions(false);
@@ -73,6 +81,11 @@ namespace StockSimulator
 			}
 
 			EnableOptions(true);
+		}
+
+		private void _runButton_Click(object sender, RoutedEventArgs e)
+		{
+			StartSimRun();
 		}
 
 		private void RunSim(IProgress<string> progress, CancellationToken cancelToken)
@@ -99,13 +112,18 @@ namespace StockSimulator
 		private void InitFromCommandLine()
 		{
 			string configOption = "-config:";
+			string autoRunOption = "-run";
 
 			string[] args = Environment.GetCommandLineArgs();
 			if (args.Length > 0)
 			{
 				for (int i = 0; i < args.Length; i++)
 				{
-					if (args[i].StartsWith(configOption))
+					if (args[i].StartsWith(autoRunOption))
+					{
+						_shouldAutoRun = true;
+					}
+					else if (args[i].StartsWith(configOption))
 					{
 						_configFilePath.Text = args[i].Substring(configOption.Length, args[i].Length - configOption.Length);
 						try
