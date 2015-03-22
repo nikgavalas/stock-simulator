@@ -50,6 +50,13 @@ namespace StockSimulator.Core
 		[Description("The number of bars for a trend")]
 		public int TrendStrength { get; set; }
 
+		/////////////////////////////// OUTPUT ////////////////////////////////////
+
+		[Category("Output")]
+		[DisplayName("Use Abbreviated Output")]
+		[Description("Only outputs the buy list and the overal orders and stats. Significantly improves speed of outputing data.")]
+		public int UseAbbreviatedOutput { get; set; }
+
 		//////////////////////////// ALL ORDERS ///////////////////////////////////
 
 		[Category("Orders")]

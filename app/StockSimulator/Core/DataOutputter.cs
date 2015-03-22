@@ -113,60 +113,11 @@ namespace StockSimulator.Core
 
 			///////////////////////// Config used to run this sim ////////////////////////
 
-			jsonOutput = JsonConvert.SerializeObject(Simulator.Config, Formatting.Indented);
-			filename = GetOutputFolder(timeString) + "input.json";
-			File.WriteAllText(filename, jsonOutput);
+			OutputConfigFile(timeString);
 			
 			/////////////////////////////// Buy list output //////////////////////////////
 
-			// Create the buy list directory and output all of them for each bar.
-			folderName = GetOutputFolder(timeString) + "buylist\\";
-			Directory.CreateDirectory(folderName);
-			List<DateTime> simulationDates = _indicators.First().Value.Data.Dates;
-			foreach (KeyValuePair<DateTime, List<JsonBuyList>> buyList in _buyLists)
-			{
-				jsonOutput = JsonConvert.SerializeObject(buyList.Value, Formatting.Indented);
-				filename = folderName + buyList.Key.ToString("yyyy-MM-dd") + ".json";
-				File.WriteAllText(filename, jsonOutput);
-			}
-
-			//////////////////// Info about how each ticker has performed ////////////////
-
-			List<StrategyStatistics> allTickerStatistics = new List<StrategyStatistics>();
-
-			foreach (KeyValuePair<int, List<Order>> tickerOrder in Simulator.Orders.TickerDictionary)
-			{
-				List<Order> orders = tickerOrder.Value;
-				if (orders.Count > 0)
-				{
-					string tickerName = orders[0].Ticker.TickerAndExchange.ToString();
-					StrategyStatistics tickerStats = new StrategyStatistics(tickerName);
-
-					// Catagorize and total all the orders by ticker.
-					for (int i = 0; i < orders.Count; i++)
-					{
-						// Get the strategy name but skip the main strategy as it gets process differently.
-						string strategyName = orders[i].StrategyName;
-						if (strategyName == "MainStrategy")
-						{
-							continue;
-						}
-
-						tickerStats.AddOrder(orders[i]);
-					}
-
-					tickerStats.CalculateStatistics();
-					allTickerStatistics.Add(tickerStats);
-
-					//jsonOutput = JsonConvert.SerializeObject(tickerStats, Formatting.Indented);
-					//folderName = GetOutputFolder(timeString) + "ticker-statistics\\" + tickerName;
-					//filename = folderName + "\\overall.json";
-					//Directory.CreateDirectory(folderName);
-					//File.WriteAllText(filename, jsonOutput);
-
-
-				}
-			}
+			OutputBuyList(timeString);
 
 			////////////////////// Strategy stats paired with tickers ////////////////////
 
@@ -269,14 +220,13 @@ namespace StockSimulator.Core
 			}
 
 			////////////////////// Main info about all strategies ///////////////////////
-			
+
+			OutputTickerStats(timeString);
+
 			jsonOutput = JsonConvert.SerializeObject(allStrategyStatistics);
 			filename = GetOutputFolder(timeString) + "overall-strategies.json";
 			File.WriteAllText(filename, jsonOutput);
 
-			jsonOutput = JsonConvert.SerializeObject(allTickerStatistics);
-			filename = GetOutputFolder(timeString) + "overall-tickers.json";
-			File.WriteAllText(filename, jsonOutput);
 
 			///////////////////// Process main strategy /////////////////////////////////
 			
@@ -317,5 +267,83 @@ namespace StockSimulator.Core
 			return Simulator.Config.OutputFolder + "\\" + timeString + "\\";
 		}
 
+		/// <summary>
+		/// Outputs info about how each ticker has performed.
+		/// </summary>
+		/// <param name="timeString">Time string used for the folder output</param>
+		private void OutputTickerStats(string timeString)
+		{
+			List<StrategyStatistics> allTickerStatistics = new List<StrategyStatistics>();
+
+			foreach (KeyValuePair<int, List<Order>> tickerOrder in Simulator.Orders.TickerDictionary)
+			{
+				List<Order> orders = tickerOrder.Value;
+				if (orders.Count > 0)
+				{
+					string tickerName = orders[0].Ticker.TickerAndExchange.ToString();
+					StrategyStatistics tickerStats = new StrategyStatistics(tickerName);
+
+					// Catagorize and total all the orders by ticker.
+					for (int i = 0; i < orders.Count; i++)
+					{
+						// Get the strategy name but skip the main strategy as it gets process differently.
+						string strategyName = orders[i].StrategyName;
+						if (strategyName == "MainStrategy")
+						{
+							continue;
+						}
+
+						tickerStats.AddOrder(orders[i]);
+					}
+
+					tickerStats.CalculateStatistics();
+					allTickerStatistics.Add(tickerStats);
+
+					//jsonOutput = JsonConvert.SerializeObject(tickerStats, Formatting.Indented);
+					//folderName = GetOutputFolder(timeString) + "ticker-statistics\\" + tickerName;
+					//filename = folderName + "\\overall.json";
+					//Directory.CreateDirectory(folderName);
+					//File.WriteAllText(filename, jsonOutput);
+
+
+				}
+			}
+
+			string jsonOutput = JsonConvert.SerializeObject(allTickerStatistics);
+			string filename = GetOutputFolder(timeString) + "overall-tickers.json";
+			File.WriteAllText(filename, jsonOutput);
+		}
+
+		/// <summary>
+		/// Outputs a buy list for each day.
+		/// </summary>
+		/// <param name="timeString">Time string used for the folder output</param>
+		void OutputBuyList(string timeString)
+		{
+			string jsonOutput;
+			string filename;
+
+			// Create the buy list directory and output all of them for each bar.
+			string folderName = GetOutputFolder(timeString) + "buylist\\";
+			Directory.CreateDirectory(folderName);
+			List<DateTime> simulationDates = _indicators.First().Value.Data.Dates;
+			foreach (KeyValuePair<DateTime, List<JsonBuyList>> buyList in _buyLists)
+			{
+				jsonOutput = JsonConvert.SerializeObject(buyList.Value, Formatting.Indented);
+				filename = folderName + buyList.Key.ToString("yyyy-MM-dd") + ".json";
+				File.WriteAllText(filename, jsonOutput);
+			}
+		}
+
+		/// <summary>
+		/// Outputs the config options used for this sim run.
+		/// </summary>
+		/// <param name="timeString">Time string used for the folder output</param>
+		void OutputConfigFile(string timeString)
+		{
+			string jsonOutput = JsonConvert.SerializeObject(Simulator.Config, Formatting.Indented);
+			string filename = GetOutputFolder(timeString) + "input.json";
+			File.WriteAllText(filename, jsonOutput);
+		}
 	}
 }
