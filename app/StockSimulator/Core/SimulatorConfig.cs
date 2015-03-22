@@ -21,6 +21,11 @@ namespace StockSimulator.Core
 		[Description("Date to stop the simulation")]
 		public DateTime EndDate { get; set; }
 
+		[Category("Dates")]
+		[DisplayName("Use Today For End")]
+		[Description("Use today's date for the end date")]
+		public bool UseTodaysDate { get; set; }
+
 		//////////////////////////// FILTER BAD ///////////////////////////////////
 
 		[Category("Bad Filter")]

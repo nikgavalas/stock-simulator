@@ -77,6 +77,11 @@ namespace StockSimulator.Core
 			Config = config;
 			DataStore = dataStore;
 
+			if (Config.UseTodaysDate)
+			{
+				Config.EndDate = DateTime.Now;
+			}
+
 			// Load the config file with the instument list for all the symbols that we 
 			// want to test.
 			Dictionary<int, TickerExchangePair> fileInstruments = new Dictionary<int, TickerExchangePair>();
