@@ -245,6 +245,8 @@ namespace StockSimulator.Core
 						sb.AppendLine(line);
 					}
 
+					file.Close();
+
 					return CreateTickerDataFromString(sb.ToString(), ticker, new DateTime(1970, 1, 1), new DateTime(1970, 1, 1));
 				}
 				catch (Exception e)

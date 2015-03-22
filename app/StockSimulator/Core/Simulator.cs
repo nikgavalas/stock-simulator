@@ -79,7 +79,7 @@ namespace StockSimulator.Core
 
 			if (Config.UseTodaysDate)
 			{
-				Config.EndDate = DateTime.Now;
+				Config.EndDate = DateTime.Now.Date;
 			}
 
 			// Load the config file with the instument list for all the symbols that we 
