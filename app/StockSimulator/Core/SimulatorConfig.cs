@@ -14,12 +14,12 @@ namespace StockSimulator.Core
 		[Category("Dates")]
 		[DisplayName("Start Date")]
 		[Description("Date to start the simulation from")]
-		public DateTime startDate { get; set; }
+		public DateTime StartDate { get; set; }
 
 		[Category("Dates")]
 		[DisplayName("End Date")]
 		[Description("Date to stop the simulation")]
-		public DateTime endDate { get; set; }
+		public DateTime EndDate { get; set; }
 
 		//////////////////////////// FILTER BAD ///////////////////////////////////
 
@@ -161,8 +161,8 @@ namespace StockSimulator.Core
 
 		public SimulatorConfig()
 		{
-			startDate = DateTime.Parse("1/4/2010");
-			endDate = DateTime.Parse("12/31/2014");
+			StartDate = DateTime.Parse("1/4/2010");
+			EndDate = DateTime.Parse("12/31/2014");
 
 			TrendStrength = 4;
 

@@ -111,7 +111,7 @@ namespace StockSimulator.Core
 			foreach (KeyValuePair<int, TickerExchangePair> item in fileInstruments)
 			{
 				// Get the data for the symbol and save it for later so we can output it.
-				TickerData tickerData = DataStore.GetTickerData(item.Value, config.startDate, config.endDate);
+				TickerData tickerData = DataStore.GetTickerData(item.Value, config.StartDate, config.EndDate);
 				if (tickerData != null)
 				{
 					DataOutput.SaveTickerData(tickerData);
