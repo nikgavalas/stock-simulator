@@ -57,6 +57,11 @@ namespace StockSimulator.Core
 		[Description("Only outputs the buy list and the overal orders and stats. Significantly improves speed of outputing data.")]
 		public bool UseAbbreviatedOutput { get; set; }
 
+		[Category("Output")]
+		[DisplayName("Output Last Buy List")]
+		[Description("Only outputs the last buy list the occurs on the end date. Useful for finding out what tickers to buy today.")]
+		public bool OnlyOutputLastBuyList { get; set; }
+
 		//////////////////////////// ALL ORDERS ///////////////////////////////////
 
 		[Category("Orders")]
@@ -203,6 +208,9 @@ namespace StockSimulator.Core
 			ShouldFilterBad = true;
 			NumBarsBadFilter = 300;
 			BadFilterProfitTarget = 0.15;
+
+			UseAbbreviatedOutput = false;
+			OnlyOutputLastBuyList = false;
 
 			// Desktop
 			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\exp-small.csv";

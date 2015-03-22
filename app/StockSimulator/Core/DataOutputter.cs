@@ -181,7 +181,7 @@ namespace StockSimulator.Core
 		}
 
 		/// <summary>
-		/// Outputs a buy list for each day.
+		/// Outputs a buy list for each day or just the last day with the option set in the config.
 		/// </summary>
 		/// <param name="timeString">Time string used for the folder output</param>
 		void OutputBuyList(string timeString)
@@ -189,15 +189,27 @@ namespace StockSimulator.Core
 			string jsonOutput;
 			string filename;
 
-			// Create the buy list directory and output all of them for each bar.
+			// Create the buy list directory to hold all the buy list files.
 			string folderName = GetOutputFolder(timeString) + "buylist\\";
 			Directory.CreateDirectory(folderName);
-			List<DateTime> simulationDates = _indicators.First().Value.Data.Dates;
-			foreach (KeyValuePair<DateTime, List<JsonBuyList>> buyList in _buyLists)
+
+			// Only output the list for the last day simulated.
+			if (Simulator.Config.OnlyOutputLastBuyList == true)
 			{
+				KeyValuePair<DateTime, List<JsonBuyList>> buyList = _buyLists.Last();
 				jsonOutput = JsonConvert.SerializeObject(buyList.Value, Formatting.Indented);
 				filename = folderName + buyList.Key.ToString("yyyy-MM-dd") + ".json";
-				File.WriteAllText(filename, jsonOutput);
+				File.WriteAllText(filename, jsonOutput);				
+			}
+			// Output the lists for every day.
+			else
+			{
+				foreach (KeyValuePair<DateTime, List<JsonBuyList>> buyList in _buyLists)
+				{
+					jsonOutput = JsonConvert.SerializeObject(buyList.Value, Formatting.Indented);
+					filename = folderName + buyList.Key.ToString("yyyy-MM-dd") + ".json";
+					File.WriteAllText(filename, jsonOutput);
+				}
 			}
 		}
 
