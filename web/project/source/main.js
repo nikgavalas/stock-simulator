@@ -6,6 +6,7 @@ angular.module('mainApp').controller('MainCtrl', [
 	'$routeParams',
 	'$location',
 	'$window',
+	'filterFilter',
 	'ConfigFactory',
 	'OrderListFactory',
 	'StrategyListFactory',
@@ -16,12 +17,25 @@ angular.module('mainApp').controller('MainCtrl', [
 		$routeParams,
 		$location,
 		$window,
+		filterFilter,
 		ConfigFactory,
 		OrderListFactory,
 		StrategyListFactory,
 		TickerListFactory,
 		InputOptionsFactory
 	) {
+
+		function updateFiltered(term) {
+			var originalArray = $scope.showAllTickers ? $scope.tickers : $scope.strategies;
+			var filteredArray = filterFilter(originalArray, term);
+			if ($scope.showAllTickers) {
+				$scope.tickersFiltered = filteredArray;
+			}
+			else {
+				$scope.strategiesFiltered = filteredArray;
+			}			
+		}
+
 		// Save since it will be used in the rest of the app.
 		ConfigFactory.setOutputFolder($routeParams.runName);
 
@@ -35,22 +49,28 @@ angular.module('mainApp').controller('MainCtrl', [
 
 		// Load all the overall strategies.
 		$scope.strategies = [];
+		$scope.strategiesFiltered = [];
 		StrategyListFactory.getOverallStrategies().then(function(data) {
 			$scope.strategies = data;
 			// Sort so the strategy with the highest is at the top and that is the one that is shown first.
 			$scope.strategies.sort(function(a, b) {
 				return b.profitTargetPercent - a.profitTargetPercent;
 			});
+
+			updateFiltered($scope.filterTerm);
 		});
 
 		// Load all the overall tickers.
 		$scope.tickers = [];
+		$scope.tickersFiltered = [];
 		TickerListFactory.getOverallTickers().then(function(data) {
 			$scope.tickers = data;
 			// Sort so the strategy with the highest is at the top and that is the one that is shown first.
 			$scope.tickers.sort(function(a, b) {
 				return b.profitTargetPercent - a.profitTargetPercent;
 			});
+
+			updateFiltered($scope.filterTerm);
 		});
 
 		// Load the input parameters used for this run.
@@ -58,6 +78,20 @@ angular.module('mainApp').controller('MainCtrl', [
 		InputOptionsFactory.get().then(function(data) {
 			$scope.inputParameters = data;
 		});
+
+		$scope.$watch('filterTerm', function(term) {
+			updateFiltered(term);
+		});
+
+
+		/**
+		 * Updates the ticker or strategy list visibility and items
+		 * @param  {Boolean} show Show the ticker list or not
+		 */
+		$scope.updateLists = function(show) {
+			$scope.showAllTickers = show;
+			updateFiltered($scope.filterTerm);
+		};
 
 		/**
 		 * Goto a location. TODO: rewrite

@@ -38,22 +38,30 @@
 				</div>
 				<div class="panel-body">
 					<!-- For toggling between tickers or strategies -->
-					<div class="text-center">
-						<div class="btn-group">
-							<button ng-class="{'active': showAllTickers === true}" ng-click="showAllTickers = true" class="btn btn-default">By Ticker</button>
-							<button ng-class="{'active': showAllTickers === false}" ng-click="showAllTickers = false" class="btn btn-default">By Strategy</button>
+					<div class="btn-group btn-group-justified" role="group">
+						<div class="btn-group" role="group">
+							<button ng-class="{'active': showAllTickers === true}" ng-click="updateLists(true)" class="btn btn-default">By Ticker</button>
 						</div>
+						<div class="btn-group" role="group">
+							<button ng-class="{'active': showAllTickers === false}" ng-click="updateLists(false)" class="btn btn-default">By Strategy</button>
+						</div>
+					</div>
+					<br>
+
+					<div class="input-group">
+						<span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
+						<input ng-model="filterTerm" type="text" class="form-control" placeholder="Filter by..." />
 					</div>
 					<br>
 
 					<!-- Even though it's a strategy list, it can show everything with the tickers just the
 					same because the data is the same. So just link it to the tickers. -->
 					<div ng-show="showAllTickers === true">
-						<strategy-list strategies="tickers" show-tickers></strategy-list>
+						<strategy-list strategies="tickersFiltered" show-tickers></strategy-list>
 					</div>
 
 					<div ng-show="showAllTickers === false">
-						<strategy-list strategies="strategies" row-clicked="strategyClick"></strategy-list>
+						<strategy-list strategies="strategiesFiltered" row-clicked="strategyClick"></strategy-list>
 					</div>
 				</div>
 			</div>

@@ -30,16 +30,25 @@ mainApp.directive('strategyList', [
 				$scope.showTickers = angular.isDefined($attrs.showTickers);
 				$scope.numberItemsPerPage = 20;
 				$scope.currentPage = 1;
+				$scope.pageItems = [];
 
-				$scope.getPageItems = function() {
+				function updatePageItems() {
 					var startIndex = ($scope.currentPage - 1) * $scope.numberItemsPerPage;
 					var endIndex = $scope.currentPage * $scope.numberItemsPerPage;
 					if (endIndex > $scope.strategies.length) {
 						endIndex = $scope.strategies.length;
 					}
 
-					return $scope.strategies.slice(startIndex, endIndex);
-				};
+					$scope.pageItems = $scope.strategies.slice(startIndex, endIndex);
+				}
+
+				$scope.$watch('currentPage', function() {
+					updatePageItems();
+				});
+
+				$scope.$watch('strategies', function() {
+					updatePageItems();
+				});
 			}
 		};
 	}

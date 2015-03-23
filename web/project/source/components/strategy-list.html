@@ -13,7 +13,7 @@
 			<th>Gain</th>
 		</thead>
 		<tbody>
-			<tr ng-repeat="strategy in getPageItems()" ng-click="rowClicked(strategy, $event)" ng-class="{'info': $index == selected}" class="hover-pointer">
+			<tr ng-repeat="strategy in pageItems" ng-click="rowClicked(strategy, $event)" ng-class="{'info': $index == selected}" class="hover-pointer">
 				<td>{{strategy.name}}</td>
 				<td>{{strategy.profitTargetPercent}} %</td>
 				<td>{{strategy.stopLossPercent}} %</td>
