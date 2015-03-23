@@ -148,7 +148,9 @@ namespace StockSimulator.Core
 					if (GetType() == typeof(MainStrategyOrder))
 					{
 						double accountValue = (double)Simulator.Broker.AccountValue[curBar > 0 ? curBar - 1 : curBar][1];
-						sizeOfOrder = accountValue / Simulator.Config.MaxBuysPerBar;
+						
+						// We only ever want to gain (or lose) a percent of our account value.
+						sizeOfOrder = (accountValue * Simulator.Config.PercentGainPerTrade) / Simulator.Config.ProfitTarget;
 
 						// Make sure we don't have an order of an unrealistic amount.
 						if (sizeOfOrder > Simulator.Config.MaxOrderSize)

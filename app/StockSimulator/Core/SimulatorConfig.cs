@@ -127,6 +127,11 @@ namespace StockSimulator.Core
 		///////////////////////////// MAIN STRATEGY ///////////////////////////////
 
 		[Category("Main Strategy")]
+		[DisplayName("Percent Gain Per Trade")]
+		[Description("Percentage of account value to gain (or lose) on each trade")]
+		public double PercentGainPerTrade { get; set; }
+
+		[Category("Main Strategy")]
 		[DisplayName("Combo Leeway")]
 		[Description("Number of bars back in time allowed to find a combo from the current bar")]
 		public int ComboLeewayBars { get; set; }
@@ -196,6 +201,7 @@ namespace StockSimulator.Core
 			UseLimitOrders = false;
 			MaxBarsLimitOrderFill = 3;
 
+			PercentGainPerTrade = 0.02;
 			ComboLeewayBars = 0;
 			MinComboSizeToBuy = 1;
 			MaxBuysPerBar = 5;
@@ -203,7 +209,7 @@ namespace StockSimulator.Core
 			InitialAccountBalance = 20000;
 			PercentForBuy = 80;
 			NumBarsToDelayStart = 250;
-			MaxOrderSize = 50000;
+			MaxOrderSize = 100000;
 
 			ShouldFilterBad = true;
 			NumBarsBadFilter = 300;
