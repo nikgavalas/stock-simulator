@@ -60,7 +60,7 @@ mainApp.factory('AccountSummaryFactory', [
 				if (dateOfValue > currentMonth.startDate) {
 					currentMonth.endDate = dateOfValue;
 					currentMonth.endValue = value;
-					currentMonth.gain = currentMonth.endValue - currentMonth.startValue;
+					currentMonth.gain = (currentMonth.endValue - currentMonth.startValue).toFixed(2);
 					currentMonth.percentGain = ((currentMonth.gain / currentMonth.startValue) * 100.0).toFixed(2);
 				}
 			},
@@ -86,7 +86,7 @@ mainApp.factory('AccountSummaryFactory', [
 			 * @return {Number} The gain for the year
 			 */
 			getGain: function() {
-				return this.getEndValue() - this.getStartValue();
+				return (this.getEndValue() - this.getStartValue()).toFixed(2);
 			},
 
 			/**
