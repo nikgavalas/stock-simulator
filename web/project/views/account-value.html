@@ -8,5 +8,39 @@
 			<highstock-single chart-data="chartData"></highstock-single>
 		</div>
 
+		<div class="col-xs-12">
+			<div ng-repeat="yearSummary in yearSummaries" class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">{{yearSummary.year}} Summary</h3>
+				</div>
+
+				<table class="table">
+					<thead>
+						<th>Month</th>
+						<th>Start Value</th>
+						<th>End Value</th>
+						<th>Gain</th>
+						<th>Percent Gain</th>
+					</thead>
+					<tbody>
+						<tr ng-repeat="monthSummary in yearSummary.months">
+							<td>{{monthSummary.name}}</td>
+							<td>{{monthSummary.startValue}}</td>
+							<td>{{monthSummary.endValue}}</td>
+							<td>{{monthSummary.gain}}</td>
+							<td>{{monthSummary.percentGain}}</td>
+						</tr>
+						<tr>
+							<td>Total</td>
+							<td>{{yearSummary.getStartValue()}}</td>
+							<td>{{yearSummary.getEndValue()}}</td>
+							<td>{{yearSummary.getGain()}}</td>
+							<td>{{yearSummary.getPercentGain()}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>			
+		</div>
+
 	</div>
 </div>
