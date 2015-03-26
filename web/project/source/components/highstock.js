@@ -85,7 +85,7 @@ mainApp.directive('highstock', [
 											x: -3
 										},
 										title: {
-												text: args.name
+											text: args.name
 										},
 										top: '15%',
 										height: '15%',
@@ -156,11 +156,11 @@ mainApp.directive('highstock', [
 
 					$element.highcharts('StockChart', {
 						rangeSelector: {
-								selected: 1
+							selected: 1
 						},
 
 						title: {
-								text: $scope.ticker
+							text: $scope.ticker
 						},
 
 						tooltip: {
