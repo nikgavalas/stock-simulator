@@ -244,7 +244,7 @@ module.exports = function (grunt) {
 					base: '<%= yeoman.root %>/source',
 					module: 'templates-mainApp',
 					rename: function(moduleName) {
-						return 'templates/' + moduleName;
+						return 'source/' + moduleName;
 					}
 				},
 				files: [{
