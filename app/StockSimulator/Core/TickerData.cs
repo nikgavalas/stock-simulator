@@ -241,6 +241,15 @@ namespace StockSimulator.Core
 		}
 
 		/// <summary>
+		/// Releases the resources allocated when prepping for serialization.
+		/// </summary>
+		public void FreeResourcesAfterSerialization()
+		{
+			PriceData = null;
+			VolumeData = null;
+		}
+
+		/// <summary>
 		/// Returns if this is a valid bar of data.
 		/// Some bars just have zeros which is what we want for the simulation
 		/// but not what we want for calculating indicators and strategies.

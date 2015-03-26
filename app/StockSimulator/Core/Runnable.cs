@@ -67,9 +67,7 @@ namespace StockSimulator.Core
 			{
 				runnable.Run();
 			}
-
-			Debug.WriteLine("Running: " + ToString());
-
+ 
 			// Then run this one. Just use the closing data as the number of bars to run.
 			// The dependents will have all the other ticker data but they are all the same
 			// size lists.

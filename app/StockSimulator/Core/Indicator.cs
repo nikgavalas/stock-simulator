@@ -75,5 +75,13 @@ namespace StockSimulator.Core
 		{
 
 		}
+
+		/// <summary>
+		/// Releases the resources allocated when prepping for serialization.
+		/// </summary>
+		public void FreeResourcesAfterSerialization()
+		{
+			ChartPlots = null;
+		}
 	}
 }

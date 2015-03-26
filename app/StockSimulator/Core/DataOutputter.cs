@@ -338,6 +338,7 @@ namespace StockSimulator.Core
 				jsonOutput = JsonConvert.SerializeObject(item.Value);
 				filename = folderName + "\\" + item.Value.TickerAndExchange.ToString() + ".json";
 				File.WriteAllText(filename, jsonOutput);
+				item.Value.FreeResourcesAfterSerialization();
 			}
 		}
 
@@ -365,6 +366,7 @@ namespace StockSimulator.Core
 				filename = folderName + "\\" + item.Value.Data.TickerAndExchange.ToString() + ".json";
 				Directory.CreateDirectory(folderName);
 				File.WriteAllText(filename, jsonOutput);
+				item.Value.FreeResourcesAfterSerialization();
 			}
 		}
 
