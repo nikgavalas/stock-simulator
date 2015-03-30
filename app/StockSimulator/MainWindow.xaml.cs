@@ -169,6 +169,7 @@ namespace StockSimulator
 			await Task.Run(() =>
 			{
 				DataStore.ClearCache();
+				DataStore = new TickerDataStore();
 			});
 
 			EnableOptions(true);

@@ -2,8 +2,10 @@
 
 mainApp.directive('highstock', [
 	'ChartDataFactory',
+	'ConfigFactory',
 	function(
-		ChartDataFactory
+		ChartDataFactory,
+		ConfigFactory
 	) {
 		
 		// The chart so that we can manipulate it in the directive.
@@ -149,13 +151,55 @@ mainApp.directive('highstock', [
 					var ohlc = data.price;
 					var volume = data.volume;
 
+					var rangeButtons = [{
+						type: 'month',
+						count: 1,
+						text: '1m'
+					}, {
+						type: 'month',
+						count: 3,
+						text: '3m'
+					}, {
+						type: 'month',
+						count: 6,
+						text: '6m'
+					}, {
+						type: 'ytd',
+						text: 'YTD'
+					}, {
+						type: 'year',
+						count: 1,
+						text: '1y'
+					}, {
+						type: 'all',
+						text: 'All'
+					}];
+
+					// For mintute data change the range options.
+					if (ConfigFactory.getHighStockDataType() !== 'day') {
+						rangeButtons = [{
+							type: 'minute',
+							count: 60,
+							text: '1hr'
+						}, {
+							type: 'minute',
+							count: 120,
+							text: '2hr'
+						}, {
+							type: 'day',
+							count: 1,
+							text: '1day'
+						}];						
+					}
+
 					var groupingUnits = [[
-						'day',
-						[1]
+						ConfigFactory.getHighStockDataType(),
+						[ConfigFactory.getNumberOfPointsPerBar()]
 					]];
 
 					$element.highcharts('StockChart', {
 						rangeSelector: {
+							buttons: rangeButtons,
 							selected: 1
 						},
 

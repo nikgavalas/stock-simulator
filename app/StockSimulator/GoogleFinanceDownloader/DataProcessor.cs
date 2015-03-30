@@ -46,6 +46,105 @@ namespace StockSimulator.GoogleFinanceDownloader {
 		private const string TIME_ZONE_OFFSET_ROW_BEGINNING = "TIMEZONE_OFFSET=";
 
 		#region Public methods
+
+		/// <summary>
+		/// Processes a stream of intraday data and converts it to OHLCV along with the date as
+		/// a DateTime object based on the number seconds since epoch.
+		/// </summary>
+		/// <param name="stream">Stream of data</param>
+		/// <param name="errorMessage">Output argument. Describes the error.</param>
+		/// <returns></returns>
+		public String processIntradayStream(Stream stream, out string errorMessage)
+		{
+			errorMessage = String.Empty;
+
+			StringBuilder stringResult = new StringBuilder();
+
+			stringResult.AppendLine("Date,Open,High,Low,Close,Volume");
+
+			StreamReader sr = new StreamReader(stream);
+
+			string line;
+			DateTime lastInterpretedDate = DateTime.MaxValue;
+			DateTime previousDate = DateTime.MaxValue;
+			bool processingData = false;
+
+			//Process the retrieved file.
+			int numberOfLines = 0;
+			bool atLeastOneLineProcessed = false;
+			while ((line = sr.ReadLine()) != null)
+			{
+				numberOfLines++;
+
+				if (!processingData)
+				{
+					if (line.StartsWith(BEGINNING_OF_DATE))
+					{
+						processingData = true;
+					}
+					else
+					{
+						continue;
+					}
+				}
+
+				if (line.StartsWith(TIME_ZONE_OFFSET_ROW_BEGINNING))
+				{ //From time to time, information about the time zone offset is inserted. It's ignored.
+					continue;
+				}
+
+				string[] elements = null;
+				if (!getElements(line, numberOfLines, ref elements, out errorMessage))
+				{
+					return null;
+				}
+
+				DateTime dt;
+				if (elements[(int)Columns.date].StartsWith(BEGINNING_OF_DATE))
+				{
+					dt = lastInterpretedDate = ConvertFromUnixTimestamp(double.Parse(elements[0].Substring(1)));
+				}
+				else
+				{
+					int days2Add;
+					if (!int.TryParse(elements[0], out days2Add))
+					{
+						errorMessage = "Invalid line " + numberOfLines + ": '" + line + "'.";
+						return null;
+					}
+					dt = lastInterpretedDate.AddMinutes(int.Parse(elements[0]));
+				}
+
+				if (dt == previousDate)
+				{ //There are lines with repeated dates when a day is a holiday.
+					continue;
+				}
+
+				string convertedLine = formatDataEpoch(dt, elements[(int)Columns.open], elements[(int)Columns.high], elements[(int)Columns.low],
+					elements[(int)Columns.close], elements[(int)Columns.volume]);
+
+				stringResult.AppendLine(convertedLine);
+				previousDate = dt;
+
+				if (!atLeastOneLineProcessed)
+				{
+					atLeastOneLineProcessed = true;
+				}
+			}
+
+			//Returns the stream (null if no data has been processed).
+			if (!atLeastOneLineProcessed)
+			{
+				errorMessage = "No data recovered.";
+				return string.Empty;
+			}
+			else
+			{
+				return stringResult.ToString();
+			}
+
+		}
+
 		/// <summary>
 		/// Recovers the current (sometimes real-time) quote from the input stream.
 		/// To be used in conjunction with DownloadUriBuilder.getGetPricesUrlForLastQuote().
@@ -310,6 +409,19 @@ namespace StockSimulator.GoogleFinanceDownloader {
 			DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
 			return origin.AddSeconds(timestamp);
 		}
+
+		/// <summary>
+		/// Converts a DateTime to a unix timestamp.
+		/// </summary>
+		/// <param name="dt">Datetime to convert</param>
+		/// <returns>Number of seconds since epoch</returns>
+		private long ConvertToUnixTimestamp(DateTime dt)
+		{
+			DateTime d1 = new DateTime(1970, 1, 1);
+			DateTime d2 = dt.ToUniversalTime();
+			TimeSpan ts = new TimeSpan(d2.Ticks - d1.Ticks);
+			return Convert.ToInt64(ts.TotalMilliseconds);
+		}
 		
 		/// <summary>
 		/// Throws an exception if a line's columns doesn't match
@@ -357,6 +469,15 @@ namespace StockSimulator.GoogleFinanceDownloader {
 					open, high, low, close, volume);
 		}
 
+		/// <summary>
+		/// Just like the formatData function, except the date is formatted as the number
+		/// of seconds since the epoch.
+		/// </summary>
+		private string formatDataEpoch<T>(DateTime date, T open, T high, T low, T close, T volume)
+		{
+			return String.Format("{0},{1},{2},{3},{4},{5}", ConvertToUnixTimestamp(date),
+					open, high, low, close, volume);
+		}
 
 		/// <summary>
 		/// Gets the columns from a line of data. Check that they are valid. 

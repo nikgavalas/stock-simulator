@@ -17,6 +17,7 @@ angular.module('mainApp').controller('PerformanceCtrl', [
 	) {
 		// Save since it will be used in the rest of the app.
 		ConfigFactory.setOutputFolder($routeParams.runName);
+		ConfigFactory.setDataType($routeParams.type);
 
 		$scope.strategy = $routeParams.strategy;
 
@@ -35,7 +36,7 @@ angular.module('mainApp').controller('PerformanceCtrl', [
 		 * @param  {Object} strategy The strategy row that was clicked
 		 */
 		$scope.strategyClick = function(strategy, $event) {
-			var url = ConfigFactory.getOutputName() + '/strategy/' + $scope.strategy + '/' + strategy.name;
+			var url = ConfigFactory.getOutputName() + '/strategy/' + $scope.strategy + '/' + strategy.name + '/' + ConfigFactory.getSimDataType();
 
 			if ($event && ($event.ctrlKey || $event.shiftKey)) {
 				$window.open('#/' + url);

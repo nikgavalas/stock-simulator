@@ -25,6 +25,17 @@ namespace StockSimulator.Core
 		}
 
 		/// <summary>
+		/// Creates a DateTime object from a UNIX time stamp.
+		/// </summary>
+		/// <param name="timestamp">String of the unix timestamp</param>
+		public static DateTime ConvertFromUnixTimestamp(string timestamp)
+		{
+			DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+			long ms = Convert.ToInt64(timestamp);
+			return origin.AddMilliseconds(ms);
+		}
+
+		/// <summary>
 		/// Calculates a simple moving average of a series.
 		/// </summary>
 		/// <param name="currentBar">Curent bar of the simulation</param>

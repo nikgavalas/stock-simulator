@@ -77,6 +77,7 @@ angular.module('mainApp').controller('MainCtrl', [
 		$scope.inputParameters = {};
 		InputOptionsFactory.get().then(function(data) {
 			$scope.inputParameters = data;
+			ConfigFactory.setDataType(data.DataType);
 		});
 
 		$scope.$watch('filterTerm', function(term) {
@@ -104,7 +105,7 @@ angular.module('mainApp').controller('MainCtrl', [
 			// Change to strategy that was used to buy this order and display stats
 			// Change indicators to match the strategy
 			// Show buy and sell locations on the chart
-			var url = ConfigFactory.getOutputName() + '/order/' + order.ticker + '/' + order.id;
+			var url = ConfigFactory.getOutputName() + '/order/' + order.ticker + '/' + order.id + '/' + ConfigFactory.getSimDataType();
 			if ($event && ($event.ctrlKey || $event.shiftKey)) {
 				$window.open('#/' + url);
 			}
@@ -118,7 +119,7 @@ angular.module('mainApp').controller('MainCtrl', [
 		 * @param  {Object} strategy The strategy row that was clicked
 		 */
 		$scope.strategyClick = function(strategy, $event) {
-			var url = ConfigFactory.getOutputName() + '/performance/' + strategy.name;
+			var url = ConfigFactory.getOutputName() + '/performance/' + strategy.name + '/' + ConfigFactory.getSimDataType();
 
 			if ($event && ($event.ctrlKey || $event.shiftKey)) {
 				$window.open('#/' + url);

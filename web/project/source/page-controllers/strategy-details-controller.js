@@ -17,6 +17,7 @@ angular.module('mainApp').controller('StrategyDetailsCtrl', [
 	) {
 		// Save since it will be used in the rest of the app.
 		ConfigFactory.setOutputFolder($routeParams.runName);
+		ConfigFactory.setDataType($routeParams.type);
 
 		$scope.strategy = $routeParams.strategy;
 		$scope.ticker = $routeParams.ticker;
@@ -45,13 +46,14 @@ angular.module('mainApp').controller('StrategyDetailsCtrl', [
 			
 			// Set the chart to position to these dates.
 			var buyDate = new Date(order.buyDate);
-			var range = 30; // Days
+			var range = 30; // Bars
+			var rangeMs = range * ConfigFactory.getRangeInMilliseconds();
 			$scope.extremes = {
 				min: new Date(),
 				max: new Date()
 			};
-			$scope.extremes.min.setTime(buyDate.getTime() - (range * 24 * 60 * 60 * 1000));
-			$scope.extremes.max.setTime(buyDate.getTime() + (range * 24 * 60 * 60 * 1000));
+			$scope.extremes.min.setTime(buyDate.getTime() - (rangeMs));
+			$scope.extremes.max.setTime(buyDate.getTime() + (rangeMs));
 		};
 
 		/**

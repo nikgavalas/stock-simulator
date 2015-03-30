@@ -4,18 +4,63 @@ mainApp.factory('ConfigFactory', [
 	function() {
 		var factory = {};
 		
-		factory.runName = '';
+		var runName = '';
+		var simDataType = 'daily';
+		var highStockDataType = 'day';
+		var numberOfPointsPerBar = 1;
 
-		factory.setOutputFolder = function(runName) {
-			factory.runName = runName;
+		factory.setOutputFolder = function(name) {
+			runName = name;
 		};
 
 		factory.getOutputFolder = function() {
-			return '/output/' + factory.runName + '/';
+			return '/output/' + runName + '/';
 		};
 
 		factory.getOutputName = function() {
-			return factory.runName;
+			return runName;
+		};
+
+		factory.setDataType = function(type) {
+			var typeToHighstocks = {
+				minute: {
+					type: 'minute',
+					numberOfPoints: 1
+				},
+				fiveminute: {
+					type: 'minute',
+					numberOfPoints: 5
+				},
+				daily: {
+					type: 'day',
+					numberOfPoints: 1
+				}
+			};
+
+			simDataType = type;
+			highStockDataType = typeToHighstocks[type].type;
+			numberOfPointsPerBar = typeToHighstocks[type].numberOfPoints;
+		};
+
+		factory.getSimDataType = function() {
+			return simDataType;
+		};
+		
+		factory.getHighStockDataType = function() {
+			return highStockDataType;
+		};
+
+		factory.getNumberOfPointsPerBar = function() {
+			return numberOfPointsPerBar;
+		};
+
+		factory.getRangeInMilliseconds = function() {
+			var typeToMs = {
+				minute: 1 * 60 * 1000,
+				fiveminute: 5 * 60 * 1000,
+				daily: 24 * 60 * 60 * 1000
+			};
+			return typeToMs[simDataType];
 		};
 
 		return factory;

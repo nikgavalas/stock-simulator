@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using System.Globalization;
 
 namespace StockSimulator.Core.JsonConverters
 {
@@ -23,7 +24,7 @@ namespace StockSimulator.Core.JsonConverters
 			string shortDate = "";
 			if (value is DateTime)
 			{
-				shortDate = ((DateTime)value).ToShortDateString();
+				shortDate = ((DateTime)value).ToString("g", CultureInfo.CreateSpecificCulture("en-us"));
 			}
 			else
 			{

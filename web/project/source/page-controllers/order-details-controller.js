@@ -21,6 +21,7 @@ angular.module('mainApp').controller('OrderDetailsCtrl', [
 
 		// Save since it will be used in the rest of the app.
 		ConfigFactory.setOutputFolder($routeParams.runName);
+		ConfigFactory.setDataType($routeParams.type);
 
 		$scope.ticker = $routeParams.ticker;
 		$scope.orderId = $routeParams.orderId;
@@ -59,13 +60,14 @@ angular.module('mainApp').controller('OrderDetailsCtrl', [
 					
 					// Set the chart to position to these dates.
 					var buyDate = new Date($scope.orderDate);
-					var range = 30; // Days
+					var range = 30; // Bars
+					var rangeMs = range * ConfigFactory.getRangeInMilliseconds();
 					$scope.extremes = {
 						min: new Date(),
 						max: new Date()
 					};
-					$scope.extremes.min.setTime(buyDate.getTime() - (range * 24 * 60 * 60 * 1000));
-					$scope.extremes.max.setTime(buyDate.getTime() + (range * 24 * 60 * 60 * 1000));
+					$scope.extremes.min.setTime(buyDate.getTime() - (rangeMs));
+					$scope.extremes.max.setTime(buyDate.getTime() + (rangeMs));
 					
 					// Add all the indicators to the chart.
 					for (var i = 0; i < data.indicators.length; i++) {
@@ -81,7 +83,7 @@ angular.module('mainApp').controller('OrderDetailsCtrl', [
 		 * @param  {Object} strategy The strategy row that was clicked
 		 */
 		$scope.strategyClick = function(strategy, $event) {
-			var url = ConfigFactory.getOutputName() + '/strategy/' + strategy.name + '/' + orderData.ticker;
+			var url = ConfigFactory.getOutputName() + '/strategy/' + strategy.name + '/' + orderData.ticker + '/' + ConfigFactory.getSimDataType();
 
 			if ($event && ($event.ctrlKey || $event.shiftKey)) {
 				$window.open('#/' + url);

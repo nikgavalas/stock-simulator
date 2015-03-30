@@ -133,7 +133,7 @@ namespace StockSimulator.Core
 			NumberOfBars = DataStore.SimTickerDates.Count;
 			Broker = new Broker(Config.InitialAccountBalance, NumberOfBars);
 
-			return true;
+			return DataStore.SimTickerDates.Count > 0;
 		}
 
 		/// <summary>

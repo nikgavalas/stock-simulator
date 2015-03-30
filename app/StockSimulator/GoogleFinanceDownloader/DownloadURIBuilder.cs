@@ -74,6 +74,16 @@ namespace StockSimulator.GoogleFinanceDownloader {
 		public string getGetPricesUrlForLastQuote() {
 			return getGetPricesUri(60, "1d");
 		}
+
+		/// <summary>
+		/// Returns url for intraday data between the dates specified.
+		/// </summary>
+		/// <param name="startDate">Date for start</param>
+		/// <param name="endDate">Date for end</param>
+		/// <returns>Url for intraday data between the dates specified</returns>
+		public string getGetPricesUrlForIntraday(DateTime startDate, DateTime endDate) {
+			return getGetPricesUri(60, getPeriod(startDate, endDate));
+		}
 		
 		/// <summary>
 		/// Returns a URI to invoke the getPrices method.

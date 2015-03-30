@@ -201,7 +201,7 @@ namespace StockSimulator.Core
 			string output = "";
 			for (int i = 0; i < Dates.Count; i++)
 			{
-				output += Dates[i].ToShortDateString() + ',';
+				output += UtilityMethods.UnixTicks(Dates[i]).ToString() + ',';
 				output += Open[i].ToString() + ',';
 				output += High[i].ToString() + ',';
 				output += Low[i].ToString() + ',';

@@ -32,7 +32,15 @@ namespace StockSimulator.Core
 			_symbolsInMemory = new SortedDictionary<int, TickerData>();
 			SimTickerDates = new SortedDictionary<DateTime, bool>();
 
+			// Create the root datacache folders and all the sub folders for the different type
+			// of data we support running with (daily, minute, 5 minute).
 			Directory.CreateDirectory(_cacheFolder);
+			SimulatorConfig.DataItemsSource dataTypes = new SimulatorConfig.DataItemsSource();
+			Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection dataTypesValues = dataTypes.GetValues();
+			for (int i = 0; i < dataTypesValues.Count; i++)
+			{
+				Directory.CreateDirectory(_cacheFolder + @"\" + dataTypesValues[i].Value);
+			}
 		}
 
 		/// <summary>
@@ -41,9 +49,9 @@ namespace StockSimulator.Core
 		public void ClearCache()
 		{
 			DirectoryInfo cacheInfo = new DirectoryInfo(_cacheFolder);
-			foreach (FileInfo item in cacheInfo.GetFiles())
+			foreach (DirectoryInfo item in cacheInfo.GetDirectories())
 			{
-				item.Delete();
+				item.Delete(true);
 			}
 		}
 
@@ -67,7 +75,7 @@ namespace StockSimulator.Core
 				// We don't have all the data in memory past the end, so we need to get that data and append it.
 				if (end > inMemoryData.End)
 				{
-					data = GetDataFromDiskOrServer(ticker, _earliestStartAllowed, end);
+					data = GetDataFromDiskOrServer(ticker, start, end);
 					
 					// Update the data in memory so it has it next time it runs.
 					_symbolsInMemory[key] = data;
@@ -92,7 +100,7 @@ namespace StockSimulator.Core
 				// Always start by loading everything we have our earliest date so that
 				// anytime we eventually will have all the data saved allowing us to
 				// test lots of different date ranges without having to hit the disk or internet.
-				data = GetDataFromDiskOrServer(ticker, _earliestStartAllowed, end);
+				data = GetDataFromDiskOrServer(ticker, start, end);
 
 				if (data != null)
 				{
@@ -143,7 +151,15 @@ namespace StockSimulator.Core
 				try
 				{
 					Simulator.WriteMessage("[" + ticker.ToString() + "] Downloading data");
-					TickerData serverData = GetDataFromGoogleServerAlt(ticker, start, end);
+					TickerData serverData;
+					if (Simulator.Config.DataType == "daily")
+					{
+						serverData = GetDataFromGoogleServerAlt(ticker, start, end);
+					}
+					else
+					{
+						serverData = GetIntraDayDataFromGoogleServer(ticker, start, end);
+					}
 
 					// TODO: This is where we can probably have some logic that only downloads
 					// the dates that we don't have saved on disk. Like if we have all data except
@@ -185,7 +201,7 @@ namespace StockSimulator.Core
 		private void SaveTickerData(TickerExchangePair ticker, TickerData newData, DateTime start, DateTime end)
 		{
 			string fileAndPath = GetTickerFilename(ticker);
-			string contents = start.ToShortDateString() + "," + end.ToShortDateString() + "," + Environment.NewLine;
+			string contents = UtilityMethods.UnixTicks(start) + "," + UtilityMethods.UnixTicks(end) + "," + Environment.NewLine;
 			contents += "Date,Open,High,Low,Close,Volume," + Environment.NewLine;
 			contents += newData.ToString();
 			try
@@ -205,7 +221,7 @@ namespace StockSimulator.Core
 		/// <returns>Filename to for the ticker</returns>
 		private string GetTickerFilename(TickerExchangePair ticker)
 		{
-			return _cacheFolder + ticker.ToString() + ".csv";
+			return _cacheFolder + @"\" + Simulator.Config.DataType + @"\" + ticker.ToString() + ".csv";
 		}
 
 
@@ -237,8 +253,8 @@ namespace StockSimulator.Core
 					// since it's only important for the callee of this function.
 					line = file.ReadLine();
 					string[] dates = line.Split(',');
-					fileStartDate = DateTime.Parse(dates[0]);
-					fileEndDate = DateTime.Parse(dates[1]);
+					fileStartDate = UtilityMethods.ConvertFromUnixTimestamp(dates[0]);
+					fileEndDate = UtilityMethods.ConvertFromUnixTimestamp(dates[1]);
 
 					while ((line = file.ReadLine()) != null)
 					{
@@ -308,6 +324,46 @@ namespace StockSimulator.Core
 		}
 
 		/// <summary>
+		/// Gets the data from the webserver and saves it onto disk for later usage.
+		/// </summary>
+		/// <param name="ticker">ticker to get data for</param>
+		/// <param name="start">Start date for the data</param>
+		/// <param name="end">End date for the data</param>
+		/// <returns>Data (price, volume, etc) for the ticker</returns>
+		private TickerData GetIntraDayDataFromGoogleServer(TickerExchangePair ticker, DateTime start, DateTime end)
+		{
+			string downloadedData;
+
+			DownloadURIBuilder uriBuilder = new DownloadURIBuilder(ticker.Exchange, ticker.Ticker);
+
+			// Need to always get up till today from the server since google only supports a start date.
+			string uri = uriBuilder.getGetPricesUrlForIntraday(start, end);
+
+			using (WebClient wClient = new WebClient())
+			{
+				downloadedData = wClient.DownloadString(uri);
+			}
+
+			using (MemoryStream ms = new MemoryStream(System.Text.Encoding.Default.GetBytes(downloadedData)))
+			{
+				DataProcessor dp = new DataProcessor();
+				string errorMessage;
+				string resultValue;
+
+				resultValue = dp.processIntradayStream(ms, out errorMessage);
+
+				if (!string.IsNullOrEmpty(errorMessage))
+				{
+					throw new Exception(errorMessage);
+				}
+				else
+				{
+					return CreateTickerDataFromString(resultValue, ticker, start, end);
+				}
+			}
+		}
+
+		/// <summary>
 		/// Creates an object of ticker data from the stream passed in.
 		/// </summary>
 		/// <param name="data">String of ticker data</param>
@@ -343,7 +399,16 @@ namespace StockSimulator.Core
 					if (line != null)
 					{
 						string[] splitData = line.Split(new char[] { ',' });
-						DateTime lineDate = DateTime.Parse(splitData[0]);
+						DateTime lineDate = DateTime.MaxValue;
+						long lineDateDigit = 0;
+						if (long.TryParse(splitData[0], out lineDateDigit))
+						{
+							lineDate = UtilityMethods.ConvertFromUnixTimestamp(splitData[0]);
+						}
+						else
+						{
+							lineDate = DateTime.Parse(splitData[0]);
+						}
 						
 						// Because of the way google returns data, we don't always get our exact dates.
 						// What we get is an interval of dates containing the ones we asked for, so 

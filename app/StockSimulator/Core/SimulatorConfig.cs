@@ -5,12 +5,26 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
 using Xceed.Wpf.Toolkit;
+using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 
 namespace StockSimulator.Core
 {
 	public class SimulatorConfig
 	{
+		/////////////////////////////// DATES /////////////////////////////////////
+
+		public class DataItemsSource : IItemsSource {
+			public ItemCollection GetValues()
+			{
+				ItemCollection dataTypes = new ItemCollection();
+				dataTypes.Add("daily", "Daily");
+				dataTypes.Add("minute", "1 Minute");
+				dataTypes.Add("fiveminute", "5 Minute");
+				return dataTypes;
+			}
+		}
+
 		[Category("Dates")]
 		[DisplayName("Start Date")]
 		[Description("Date to start the simulation from")]
@@ -25,6 +39,12 @@ namespace StockSimulator.Core
 		[DisplayName("Use Today For End")]
 		[Description("Use today's date for the end date")]
 		public bool UseTodaysDate { get; set; }
+
+		[Category("Dates")]
+		[DisplayName("Data Type")]
+		[Description("Daily, Minute, or 5 Minute data (which is just aggregated from minute data")]
+		[ItemsSource(typeof(DataItemsSource))]
+		public string DataType { get; set; }
 
 		//////////////////////////// FILTER BAD ///////////////////////////////////
 
@@ -183,8 +203,9 @@ namespace StockSimulator.Core
 
 		public SimulatorConfig()
 		{
-			StartDate = DateTime.Parse("1/4/2010");
-			EndDate = DateTime.Parse("12/31/2014");
+			StartDate = DateTime.Parse("3/8/2015");
+			EndDate = DateTime.Parse("3/28/2015");
+			DataType = "minute";
 
 			TrendStrength = 4;
 
@@ -194,8 +215,8 @@ namespace StockSimulator.Core
 			MaxLookBackBars = 400;
 			MaxLookBackOrders = 10;
 			MaxConcurrentOrders = 1;
-			ProfitTarget = 0.05;
-			StopTarget = 0.05;
+			ProfitTarget = 0.01;
+			StopTarget = 0.005;
 			MaxBarsOrderOpen = 10;
 			SizeOfOrder = 6000;
 			UseLimitOrders = false;
@@ -215,8 +236,8 @@ namespace StockSimulator.Core
 			NumBarsBadFilter = 300;
 			BadFilterProfitTarget = 0.15;
 
-			UseAbbreviatedOutput = false;
-			OnlyOutputLastBuyList = false;
+			UseAbbreviatedOutput = true;
+			OnlyOutputLastBuyList = true;
 
 			// Desktop
 			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\exp-small.csv";

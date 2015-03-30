@@ -21,15 +21,15 @@ var mainApp = angular.module('mainApp', [
 			templateUrl: 'views/main.html',
 			controller: 'MainCtrl'
 		})
-		.when('/:runName/order/:ticker/:orderId', {
+		.when('/:runName/order/:ticker/:orderId/:type', {
 			templateUrl: 'views/order-details.html',
 			controller: 'OrderDetailsCtrl'
 		})
-		.when('/:runName/performance/:strategy', {
+		.when('/:runName/performance/:strategy/:type', {
 			templateUrl: 'views/performance.html',
 			controller: 'PerformanceCtrl'
 		})
-		.when('/:runName/strategy/:strategy/:ticker', {
+		.when('/:runName/strategy/:strategy/:ticker/:type', {
 			templateUrl: 'views/strategy-details.html',
 			controller: 'StrategyDetailsCtrl'
 		})
