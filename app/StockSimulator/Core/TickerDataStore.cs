@@ -18,6 +18,7 @@ namespace StockSimulator.Core
 	public class TickerDataStore
 	{
 		public SortedDictionary<DateTime, bool> SimTickerDates { get; set; }
+		public string DataType { get; set; }
 
 		private SortedDictionary<int, TickerData> _symbolsInMemory;
 

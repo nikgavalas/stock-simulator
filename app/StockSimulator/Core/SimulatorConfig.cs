@@ -146,10 +146,11 @@ namespace StockSimulator.Core
 
 		///////////////////////////// MAIN STRATEGY ///////////////////////////////
 
-		[Category("Main Strategy")]
-		[DisplayName("Percent Gain Per Trade")]
-		[Description("Percentage of account value to gain (or lose) on each trade")]
-		public double PercentGainPerTrade { get; set; }
+		// Disabled-see the comment in Order.cs
+		//[Category("Main Strategy")]
+		//[DisplayName("Percent Gain Per Trade")]
+		//[Description("Percentage of account value to gain (or lose) on each trade")]
+		//public double PercentGainPerTrade { get; set; }
 
 		[Category("Main Strategy")]
 		[DisplayName("Combo Leeway")]
@@ -161,10 +162,10 @@ namespace StockSimulator.Core
 		[Description("Maximum number of buys that can be made on a single bar")]
 		public int MaxBuysPerBar { get; set; }
 
-		[Category("Main Strategy")]
-		[DisplayName("Max Order Size")]
-		[Description("Maximum amount of money used for a single order")]
-		public double MaxOrderSize { get; set; }
+		//[Category("Main Strategy")]
+		//[DisplayName("Max Order Size")]
+		//[Description("Maximum amount of money used for a single order")]
+		//public double MaxOrderSize { get; set; }
 
 		[Category("Main Strategy")]
 		[DisplayName("Min Required Orders")]
@@ -203,9 +204,9 @@ namespace StockSimulator.Core
 
 		public SimulatorConfig()
 		{
-			StartDate = DateTime.Parse("3/8/2015");
-			EndDate = DateTime.Parse("3/28/2015");
-			DataType = "minute";
+			StartDate = DateTime.Parse("1/4/2010");
+			EndDate = DateTime.Parse("3/31/2015");
+			DataType = "daily";
 
 			TrendStrength = 4;
 
@@ -215,14 +216,14 @@ namespace StockSimulator.Core
 			MaxLookBackBars = 400;
 			MaxLookBackOrders = 10;
 			MaxConcurrentOrders = 1;
-			ProfitTarget = 0.01;
-			StopTarget = 0.005;
+			ProfitTarget = 0.10;
+			StopTarget = 0.10;
 			MaxBarsOrderOpen = 10;
 			SizeOfOrder = 6000;
 			UseLimitOrders = false;
 			MaxBarsLimitOrderFill = 3;
 
-			PercentGainPerTrade = 0.02;
+			//PercentGainPerTrade = 0.02;
 			ComboLeewayBars = 0;
 			MinComboSizeToBuy = 1;
 			MaxBuysPerBar = 5;
@@ -230,7 +231,7 @@ namespace StockSimulator.Core
 			InitialAccountBalance = 20000;
 			PercentForBuy = 80;
 			NumBarsToDelayStart = 250;
-			MaxOrderSize = 100000;
+			//MaxOrderSize = 100000;
 
 			ShouldFilterBad = true;
 			NumBarsBadFilter = 300;
@@ -240,7 +241,7 @@ namespace StockSimulator.Core
 			OnlyOutputLastBuyList = true;
 
 			// Desktop
-			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\exp-small.csv";
+			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\avg-volume-min-10mil.csv";
 			// Laptop
 			//InstrumentListFile = @"C:\Users\Nik\Documents\github\stock-simulator\input\test.csv";
 			// Desktop

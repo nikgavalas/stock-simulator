@@ -56,6 +56,8 @@ namespace StockSimulator
 
 			InitFromCommandLine();
 
+			DataStore.DataType = Config.DataType;
+
 			// If the command line option was to autorun, trigger the click for running.
 			if (_shouldAutoRun == true)
 			{
@@ -90,6 +92,15 @@ namespace StockSimulator
 
 		private void RunSim(IProgress<string> progress, CancellationToken cancelToken)
 		{
+			// If the data type changes (ie from minutes to daily) we need to reset the 
+			// ticker store so the data for the ticker is of the correct type. We don't
+			// want to store all types in memory because it will take up too much memory.
+			if (Config.DataType != DataStore.DataType)
+			{
+				DataStore = new TickerDataStore();
+				DataStore.DataType = Config.DataType;
+			}
+
 			Sim = new Simulator(progress, cancelToken);
 
 			// Create the simulator.

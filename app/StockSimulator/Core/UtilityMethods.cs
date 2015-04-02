@@ -18,9 +18,8 @@ namespace StockSimulator.Core
 		/// <returns>Returns the number of milliseconds since Jan 1, 1970</returns>
 		public static long UnixTicks(this DateTime dt)
 		{
-			DateTime d1 = new DateTime(1970, 1, 1);
-			DateTime d2 = dt.ToUniversalTime();
-			TimeSpan ts = new TimeSpan(d2.Ticks - d1.Ticks);
+			DateTime d1 = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+			TimeSpan ts = new TimeSpan(dt.Ticks - d1.Ticks);
 			return Convert.ToInt64(ts.TotalMilliseconds);
 		}
 
@@ -30,7 +29,7 @@ namespace StockSimulator.Core
 		/// <param name="timestamp">String of the unix timestamp</param>
 		public static DateTime ConvertFromUnixTimestamp(string timestamp)
 		{
-			DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+			DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 			long ms = Convert.ToInt64(timestamp);
 			return origin.AddMilliseconds(ms);
 		}
