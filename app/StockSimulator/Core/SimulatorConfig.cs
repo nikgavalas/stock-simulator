@@ -20,6 +20,8 @@ namespace StockSimulator.Core
 				ItemCollection dataTypes = new ItemCollection();
 				dataTypes.Add("daily", "Daily");
 				dataTypes.Add("minute", "1 Minute");
+				dataTypes.Add("twominute", "2 Minute");
+				dataTypes.Add("threeminute", "3 Minute");
 				dataTypes.Add("fiveminute", "5 Minute");
 				return dataTypes;
 			}

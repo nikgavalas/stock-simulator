@@ -80,9 +80,10 @@ namespace StockSimulator.GoogleFinanceDownloader {
 		/// </summary>
 		/// <param name="startDate">Date for start</param>
 		/// <param name="endDate">Date for end</param>
+		/// <param name="interval">Interval in seconds of the data to retreive</param>
 		/// <returns>Url for intraday data between the dates specified</returns>
-		public string getGetPricesUrlForIntraday(DateTime startDate, DateTime endDate) {
-			return getGetPricesUri(60, getPeriod(startDate, endDate));
+		public string getGetPricesUrlForIntraday(DateTime startDate, DateTime endDate, int interval) {
+			return getGetPricesUri(interval, getPeriod(startDate, endDate));
 		}
 		
 		/// <summary>

@@ -27,6 +27,14 @@ mainApp.factory('ConfigFactory', [
 					type: 'minute',
 					numberOfPoints: 1
 				},
+				twominute: {
+					type: 'minute',
+					numberOfPoints: 2
+				},
+				threeminute: {
+					type: 'minute',
+					numberOfPoints: 3
+				},
 				fiveminute: {
 					type: 'minute',
 					numberOfPoints: 5
@@ -57,6 +65,8 @@ mainApp.factory('ConfigFactory', [
 		factory.getRangeInMilliseconds = function() {
 			var typeToMs = {
 				minute: 1 * 60 * 1000,
+				twominute: 2 * 60 * 1000,
+				threeminute: 3 * 60 * 1000,
 				fiveminute: 5 * 60 * 1000,
 				daily: 24 * 60 * 60 * 1000
 			};

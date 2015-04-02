@@ -159,7 +159,21 @@ namespace StockSimulator.Core
 					}
 					else
 					{
-						serverData = GetIntraDayDataFromGoogleServer(ticker, start, end);
+						int interval = 60;
+						if (Simulator.Config.DataType == "fiveminute")
+						{
+							interval = 300;
+						}
+						else if (Simulator.Config.DataType == "threeminute")
+						{
+							interval = 180;
+						}
+						else if (Simulator.Config.DataType == "twominute")
+						{
+							interval = 120;
+						}
+
+						serverData = GetIntraDayDataFromGoogleServer(ticker, start, end, interval);
 					}
 
 					// TODO: This is where we can probably have some logic that only downloads
@@ -330,15 +344,16 @@ namespace StockSimulator.Core
 		/// <param name="ticker">ticker to get data for</param>
 		/// <param name="start">Start date for the data</param>
 		/// <param name="end">End date for the data</param>
+		/// <param name="interval">Interval in seconds of the data to retreive</param>
 		/// <returns>Data (price, volume, etc) for the ticker</returns>
-		private TickerData GetIntraDayDataFromGoogleServer(TickerExchangePair ticker, DateTime start, DateTime end)
+		private TickerData GetIntraDayDataFromGoogleServer(TickerExchangePair ticker, DateTime start, DateTime end, int interval)
 		{
 			string downloadedData;
 
 			DownloadURIBuilder uriBuilder = new DownloadURIBuilder(ticker.Exchange, ticker.Ticker);
 
 			// Need to always get up till today from the server since google only supports a start date.
-			string uri = uriBuilder.getGetPricesUrlForIntraday(start, end);
+			string uri = uriBuilder.getGetPricesUrlForIntraday(start, end, interval);
 
 			using (WebClient wClient = new WebClient())
 			{
