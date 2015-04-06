@@ -56,7 +56,8 @@ mainApp.factory('AccountSummaryFactory', [
 				}
 
 				// Calculate the gain if this is the new end of the month.
-				var currentMonth = this.months[month];
+				var monthIndex = this.monthNameToIndex[monthName];
+				var currentMonth = this.months[monthIndex];
 				if (dateOfValue > currentMonth.startDate) {
 					currentMonth.endDate = dateOfValue;
 					currentMonth.endValue = value;
