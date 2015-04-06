@@ -22,7 +22,7 @@
   "MaxBarsLimitOrderFill": 3,
   "MaxComboSize": 6,
   "ComboLeewayBars": 0,
-  "MaxBuysPerBar": 10,
+  "MaxBuysPerBar": 4,
   "MinRequiredOrders": 3,
   "MinComboSizeToBuy": 1,
   "InitialAccountBalance": 100000,
