@@ -74,7 +74,7 @@ namespace StockSimulator.Core
 				TickerData inMemoryData = _symbolsInMemory[key];
 
 				// We don't have all the data in memory past the end, so we need to get that data and append it.
-				if (end > inMemoryData.End)
+				if (end > inMemoryData.End || start < inMemoryData.Start)
 				{
 					data = GetDataFromDiskOrServer(ticker, start, end);
 					
