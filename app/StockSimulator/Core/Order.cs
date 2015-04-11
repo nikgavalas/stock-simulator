@@ -284,9 +284,16 @@ namespace StockSimulator.Core
 		/// Returns a unique order id to make sure we can lookup orders easily.
 		/// </summary>
 		private static long _uniqueId = 0;
-		private long GetUniqueId()
+		private static Object _threadLock = new Object();
+		private static long GetUniqueId()
 		{
-			return ++_uniqueId;
+			long id = 0;
+			lock (_threadLock)
+			{
+				id = ++_uniqueId;
+			}
+
+			return id;
 		}
 	}
 }

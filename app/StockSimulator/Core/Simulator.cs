@@ -159,12 +159,18 @@ namespace StockSimulator.Core
 		{
 			WriteMessage("Running historical analysis for");
 
-			// Run all to start with so we have the data to simulate with.
-			foreach (KeyValuePair<int, BestOfSubStrategies> task in Instruments)
+			Parallel.ForEach(Instruments, task =>
 			{
 				WriteMessage("Running " + task.Value.Data.TickerAndExchange.ToString());
 				task.Value.Run();
-			}
+			});
+
+			// Run all to start with so we have the data to simulate with.
+			//foreach (KeyValuePair<int, BestOfSubStrategies> task in Instruments)
+			//{
+			//	WriteMessage("Running " + task.Value.Data.TickerAndExchange.ToString());
+			//	task.Value.Run();
+			//}
 
 			DateTime startDate = DataStore.SimTickerDates.First().Key;
 			DateTime endDate = DataStore.SimTickerDates.Last().Key;

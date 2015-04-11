@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections.Concurrent;
 
 namespace StockSimulator.Core
 {
@@ -12,18 +13,18 @@ namespace StockSimulator.Core
 	/// </summary>
 	public class OrderHistory
 	{
-		public Dictionary<long, Order> IdDictionary { get; set; }
-		public Dictionary<int, List<Order>> TickerDictionary { get; set; }
-		public Dictionary<int, List<Order>> StrategyDictionary { get; set; }
+		public ConcurrentDictionary<long, Order> IdDictionary { get; set; }
+		public ConcurrentDictionary<int, List<Order>> TickerDictionary { get; set; }
+		public ConcurrentDictionary<int, ConcurrentBag<Order>> StrategyDictionary { get; set; }
 
 		/// <summary>
 		/// Initialize the object.
 		/// </summary>
 		public OrderHistory()
 		{
-			IdDictionary = new Dictionary<long, Order>();
-			TickerDictionary = new Dictionary<int, List<Order>>();
-			StrategyDictionary = new Dictionary<int, List<Order>>();
+			IdDictionary = new ConcurrentDictionary<long, Order>();
+			TickerDictionary = new ConcurrentDictionary<int, List<Order>>();
+			StrategyDictionary = new ConcurrentDictionary<int, ConcurrentBag<Order>>();
 		}
 
 		/// <summary>
@@ -39,7 +40,7 @@ namespace StockSimulator.Core
 			
 			IdDictionary[order.OrderId] = order;
 			AddToListTable(TickerDictionary, order, order.Ticker.TickerAndExchange.GetHashCode());
-			AddToListTable(StrategyDictionary, order, order.StrategyName.GetHashCode());
+			AddToListTableConcurrent(StrategyDictionary, order, order.StrategyName.GetHashCode());
 		}
 
 		/// <summary>
@@ -61,27 +62,25 @@ namespace StockSimulator.Core
 
 			StrategyStatistics stats = new StrategyStatistics(strategyName);
 
-			int strategyHash = strategyName.GetHashCode();
-			if (StrategyDictionary.ContainsKey(strategyHash))
+			int tickerHash = tickerAndExchange.GetHashCode();
+			if (TickerDictionary.ContainsKey(tickerHash))
 			{
+				List<Order> tickerOrders = TickerDictionary[tickerHash];
 
-				List<Order> strategyOrders = StrategyDictionary[strategyHash];
-
-				//for (int i = 0; i < strategyOrders.Count; i++)
-				for (int i = strategyOrders.Count - 1; i >= 0; i--)
+				for (int i = tickerOrders.Count - 1; i >= 0; i--)
 				{
-					Order order = strategyOrders[i];
+					Order order = tickerOrders[i];
 					bool shouldAddOrder = false;
 
 					// For the date
 					if (Simulator.Config.UseLookbackBars)
 					{
-						shouldAddOrder = order.BuyBar >= cutoffBar && order.IsFinished() && order.Ticker.TickerAndExchange == tickerAndExchange;
+						shouldAddOrder = order.BuyBar >= cutoffBar && order.IsFinished() && order.StrategyName == strategyName;
 					}
 					// For the number of orders as the cutoff
 					else
 					{
-						shouldAddOrder = stats.NumberOfOrders < Simulator.Config.MaxLookBackOrders && order.IsFinished() && order.Ticker.TickerAndExchange == tickerAndExchange;
+						shouldAddOrder = stats.NumberOfOrders < Simulator.Config.MaxLookBackOrders && order.IsFinished() && order.StrategyName == strategyName;
 					}
 
 					if (shouldAddOrder == true)
@@ -127,10 +126,8 @@ namespace StockSimulator.Core
 			int tickerHash = tickerAndExchange.GetHashCode();
 			if (TickerDictionary.ContainsKey(tickerHash))
 			{
-
 				List<Order> tickerOrders = TickerDictionary[tickerHash];
 
-				//for (int i = 0; i < strategyOrders.Count; i++)
 				for (int i = tickerOrders.Count - 1; i >= 0; i--)
 				{
 					Order order = tickerOrders[i];
@@ -162,11 +159,26 @@ namespace StockSimulator.Core
 		/// <param name="table">Table to add to</param>
 		/// <param name="order">Order to add</param>
 		/// <param name="hash">Hash index for the order list</param>
-		private void AddToListTable(Dictionary<int, List<Order>> table, Order order, int hash)
+		private void AddToListTable(ConcurrentDictionary<int, List<Order>> table, Order order, int hash)
 		{
 			if (table.ContainsKey(hash) == false)
 			{
 				table[hash] = new List<Order>();
+			}
+			table[hash].Add(order);
+		}
+
+		/// <summary>
+		/// Adds an order to a dictionary that has a list of orders indexed by a string hash.
+		/// </summary>
+		/// <param name="table">Table to add to</param>
+		/// <param name="order">Order to add</param>
+		/// <param name="hash">Hash index for the order list</param>
+		private void AddToListTableConcurrent(ConcurrentDictionary<int, ConcurrentBag<Order>> table, Order order, int hash)
+		{
+			if (table.ContainsKey(hash) == false)
+			{
+				table[hash] = new ConcurrentBag<Order>();
 			}
 			table[hash].Add(order);
 		}

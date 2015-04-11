@@ -6,6 +6,7 @@ using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
+using System.Collections.Concurrent;
 using Newtonsoft.Json;
 using StockSimulator.Strategies;
 
@@ -241,13 +242,13 @@ namespace StockSimulator.Core
 
 			List<StrategyStatistics> allStrategyStatistics = new List<StrategyStatistics>();
 
-			foreach (KeyValuePair<int, List<Order>> strategy in Simulator.Orders.StrategyDictionary)
+			foreach (KeyValuePair<int, ConcurrentBag<Order>> strategy in Simulator.Orders.StrategyDictionary)
 			{
-				List<Order> orders = strategy.Value;
+				ConcurrentBag<Order> orders = strategy.Value;
 				if (orders.Count > Simulator.Config.MinRequiredOrders)
 				{
 					// Get the strategy name but skip the main strategy as it gets process differently.
-					string strategyName = orders[0].StrategyName;
+					string strategyName = orders.First().StrategyName;
 					if (strategyName == "MainStrategy")
 					{
 						continue;
@@ -257,19 +258,19 @@ namespace StockSimulator.Core
 					StrategyStatistics stratStats = new StrategyStatistics(strategyName);
 
 					// Catagorize and total all the orders for this strategy by the ticker they are associated with.
-					for (int i = 0; i < orders.Count; i++)
+					foreach (Order order in orders)
 					{
-						int tickerHash = orders[i].Ticker.TickerAndExchange.GetHashCode();
-						string tickerName = orders[i].Ticker.TickerAndExchange.ToString();
+						int tickerHash = order.Ticker.TickerAndExchange.GetHashCode();
+						string tickerName = order.Ticker.TickerAndExchange.ToString();
 
 						// If we haven't created the output for this ticker then creat it.
 						if (!tickersForThisStrategy.ContainsKey(tickerHash))
 						{
-							tickersForThisStrategy[tickerHash] = new StrategyTickerPairStatistics(strategyName, tickerName, orders[i].DependentIndicatorNames);
+							tickersForThisStrategy[tickerHash] = new StrategyTickerPairStatistics(strategyName, tickerName, order.DependentIndicatorNames);
 						}
 
-						tickersForThisStrategy[tickerHash].AddOrder(orders[i]);
-						stratStats.AddOrder(orders[i]);
+						tickersForThisStrategy[tickerHash].AddOrder(order);
+						stratStats.AddOrder(order);
 					}
 
 					stratStats.CalculateStatistics();
@@ -381,11 +382,10 @@ namespace StockSimulator.Core
 				string jsonOutput;
 				string filename;
 
-				List<Order> mainStrategyOrders = Simulator.Orders.StrategyDictionary["MainStrategy".GetHashCode()];
+				ConcurrentBag<Order> mainStrategyOrders = Simulator.Orders.StrategyDictionary["MainStrategy".GetHashCode()];
 				StrategyStatistics mainStratStats = new StrategyStatistics("MainStrategy");
-				for (int i = 0; i < mainStrategyOrders.Count; i++)
+				foreach (Order order in mainStrategyOrders)
 				{
-					Order order = mainStrategyOrders[i];
 					mainStratStats.AddOrder(order);
 				}
 
