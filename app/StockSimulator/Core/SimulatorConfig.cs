@@ -218,9 +218,9 @@ namespace StockSimulator.Core
 			MaxLookBackBars = 400;
 			MaxLookBackOrders = 10;
 			MaxConcurrentOrders = 1;
-			ProfitTarget = 0.10;
-			StopTarget = 0.10;
-			MaxBarsOrderOpen = 10;
+			ProfitTarget = 0.07;
+			StopTarget = 0.04;
+			MaxBarsOrderOpen = 15;
 			SizeOfOrder = 6000;
 			UseLimitOrders = false;
 			MaxBarsLimitOrderFill = 3;
@@ -228,7 +228,7 @@ namespace StockSimulator.Core
 			//PercentGainPerTrade = 0.02;
 			ComboLeewayBars = 0;
 			MinComboSizeToBuy = 1;
-			MaxBuysPerBar = 5;
+			MaxBuysPerBar = 3;
 			MinRequiredOrders = 3;
 			InitialAccountBalance = 20000;
 			PercentForBuy = 80;
@@ -236,14 +236,14 @@ namespace StockSimulator.Core
 			//MaxOrderSize = 100000;
 
 			ShouldFilterBad = true;
-			NumBarsBadFilter = 300;
+			NumBarsBadFilter = 400;
 			BadFilterProfitTarget = 0.15;
 
 			UseAbbreviatedOutput = true;
 			OnlyOutputLastBuyList = true;
 
 			// Desktop
-			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\avg-volume-min-10mil.csv";
+			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\test-large.csv";
 			// Laptop
 			//InstrumentListFile = @"C:\Users\Nik\Documents\github\stock-simulator\input\test.csv";
 			// Desktop
