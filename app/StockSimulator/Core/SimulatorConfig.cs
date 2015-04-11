@@ -84,6 +84,11 @@ namespace StockSimulator.Core
 		[Description("Only outputs the last buy list the occurs on the end date. Useful for finding out what tickers to buy today.")]
 		public bool OnlyOutputLastBuyList { get; set; }
 
+		[Category("Output")]
+		[DisplayName("Should Open Web Page")]
+		[Description("Should auto open the web page after the sim finishes running.")]
+		public bool ShouldOpenWebPage { get; set; }
+
 		//////////////////////////// ALL ORDERS ///////////////////////////////////
 
 		[Category("Orders")]
@@ -241,6 +246,7 @@ namespace StockSimulator.Core
 
 			UseAbbreviatedOutput = true;
 			OnlyOutputLastBuyList = true;
+			ShouldOpenWebPage = true;
 
 			// Desktop
 			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\test-large.csv";

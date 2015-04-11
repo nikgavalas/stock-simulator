@@ -198,7 +198,10 @@ namespace StockSimulator.Core
 
 			WriteMessage("Idle");
 
-			System.Diagnostics.Process.Start("http://localhost:9000/#/" + outputName + "/");
+			if (Config.ShouldOpenWebPage == true)
+			{
+				System.Diagnostics.Process.Start("http://localhost:9000/#/" + outputName + "/");
+			}
 		}
 
 		/// <summary>
