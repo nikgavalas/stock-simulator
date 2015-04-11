@@ -227,7 +227,7 @@ namespace StockSimulator.Core
 			bool isTradingBar = false;
 			List<BestOfSubStrategies> buyList = new List<BestOfSubStrategies>();
 
-			// Add all the tickers that are at least showing some sort of activity.
+			// Add all the tickers that are above our set percent to buy.
 			foreach (KeyValuePair<int, BestOfSubStrategies> instrument in Instruments)
 			{
 				BestOfSubStrategies strat = instrument.Value;
@@ -235,7 +235,7 @@ namespace StockSimulator.Core
 				if (currentBar != -1)
 				{
 					isTradingBar = true;
-					if (strat.Bars[currentBar].HighestPercent > 0)
+					if (strat.Bars[currentBar].HighestPercent >= Config.PercentForBuy)
 					{
 						buyList.Add(strat);
 					}
@@ -264,7 +264,7 @@ namespace StockSimulator.Core
 						// be high enough and we can early out of the loop.
 						int strategyBarIndex = buyList[i].Data.GetBar(currentDate);
 						BestOfSubStrategies.BarStatistics barStats = buyList[i].Bars[strategyBarIndex];
-						if (barStats.HighestPercent > Config.PercentForBuy && barStats.ComboSizeOfHighestStrategy >= Simulator.Config.MinComboSizeToBuy)
+						if (barStats.HighestPercent >= Config.PercentForBuy && barStats.ComboSizeOfHighestStrategy >= Simulator.Config.MinComboSizeToBuy)
 						{
 							// Don't want to order to late in the strategy where the order can't run it's course.
 							// Also, need to have enough money to buy stocks.
@@ -273,8 +273,7 @@ namespace StockSimulator.Core
 
 							// Make sure we have enough money and also that we have enough time
 							// before the end of the sim to complete the order we place.
-							if (barNumber < NumberOfBars - Config.MaxBarsOrderOpen &&
-								Broker.AccountCash > sizeOfOrder * 1.2)
+							if (barNumber < NumberOfBars - Config.MaxBarsOrderOpen && Broker.AccountCash > sizeOfOrder * 1.2)
 							{
 								bool shouldReallyOrder = true;
 
