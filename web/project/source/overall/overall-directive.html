@@ -23,8 +23,16 @@
 						<td><span ng-class="{'text-danger': fileData.gain < 0, 'text-success': fileData.gain >= 0}"><span class="glyphicon" ng-class="{'glyphicon-circle-arrow-up': fileData.gain >= 0, 'glyphicon-circle-arrow-down': fileData.gain < 0}"></span>&nbsp;${{abs(fileData.gain)}}</span></td>
 					</tr>
 					<tr>
-						<td><strong>Ending Balance</strong></td>
-						<td>${{fileData.accountValue}}</td>
+						<td><strong>Avg Order Length</strong></td>
+						<td>{{fileData.averageOrderLength}} Bars</td>
+					</tr>
+					<tr>
+						<td><strong>Avg Order Length (Profit Orders)</strong></td>
+						<td>{{fileData.averageProfitOrderLength}} Bars</td>
+					</tr>
+					<tr>
+						<td><strong>Avg Order Length (Stop Orders)</strong></td>
+						<td>{{fileData.averageStopOrderLength}} Bars</td>
 					</tr>
 				</tbody>
 			</table>

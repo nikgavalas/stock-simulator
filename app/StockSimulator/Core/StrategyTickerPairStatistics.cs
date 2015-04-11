@@ -14,7 +14,7 @@ namespace StockSimulator.Core
 	/// Very similar to StrategyStatistics except it serializes the orders. 
 	/// TODO: There is probably a way to combine the two.
 	/// </summary>
-	class StrategyTickerPairStatistics : StatisticsCalculator
+	public class StrategyTickerPairStatistics : StatisticsCalculator
 	{
 		[JsonProperty("name")]
 		public string StrategyName { get; set; }

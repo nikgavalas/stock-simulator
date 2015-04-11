@@ -292,13 +292,7 @@ namespace StockSimulator.Core
 
 						// Save for the overall stats to be outputted later.
 						StrategyStatistics tickerStats = new StrategyStatistics(item.Value.TickerName);
-						tickerStats.WinPercent = item.Value.WinPercent;
-						tickerStats.LossPercent = item.Value.LossPercent;
-						tickerStats.ProfitTargetPercent = item.Value.ProfitTargetPercent;
-						tickerStats.StopLossPercent = item.Value.StopLossPercent;
-						tickerStats.LengthExceededPercent = item.Value.LengthExceededPercent;
-						tickerStats.Gain = item.Value.Gain;
-						tickerStats.NumberOfOrders = item.Value.NumberOfOrders;
+						tickerStats.InitFromStrategyTickerPairStatistics(item.Value);
 						overallList.Add(tickerStats);
 					}
 
