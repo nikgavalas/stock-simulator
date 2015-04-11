@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using StockSimulator.Core.JsonConverters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using System.Threading;
 
 namespace StockSimulator.Core
 {
@@ -284,16 +285,9 @@ namespace StockSimulator.Core
 		/// Returns a unique order id to make sure we can lookup orders easily.
 		/// </summary>
 		private static long _uniqueId = 0;
-		private static Object _threadLock = new Object();
 		private static long GetUniqueId()
 		{
-			long id = 0;
-			lock (_threadLock)
-			{
-				id = ++_uniqueId;
-			}
-
-			return id;
+			return Interlocked.Increment(ref _uniqueId);
 		}
 	}
 }
