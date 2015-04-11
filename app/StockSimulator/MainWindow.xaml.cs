@@ -43,12 +43,14 @@ namespace StockSimulator
 
 		private CancellationTokenSource _cancelToken;
 		private bool _shouldAutoRun;
+		private bool _shouldCloseAfterRun;
 
 		public MainWindow()
 		{
 			InitializeComponent();
 
 			_shouldAutoRun = false;
+			_shouldCloseAfterRun = false;
 			_cancelToken = new CancellationTokenSource();
 			Config = new SimulatorConfig();
 			DataStore = new TickerDataStore();
@@ -76,6 +78,12 @@ namespace StockSimulator
 			try
 			{
 				await Task.Run(() => RunSim(progress, _cancelToken.Token));
+
+				// Exit automatically if we auto started and the option is set.
+				if (_shouldAutoRun && _shouldCloseAfterRun == true)
+				{
+					Application.Current.Shutdown();
+				}
 			}
 			catch (OperationCanceledException)
 			{
@@ -124,6 +132,7 @@ namespace StockSimulator
 		{
 			string configOption = "-config:";
 			string autoRunOption = "-run";
+			string closeWhenFinishedOption = "-closeAfterSim";
 
 			string[] args = Environment.GetCommandLineArgs();
 			if (args.Length > 0)
@@ -133,6 +142,10 @@ namespace StockSimulator
 					if (args[i].StartsWith(autoRunOption))
 					{
 						_shouldAutoRun = true;
+					}
+					else if (args[i].StartsWith(closeWhenFinishedOption))
+					{
+						_shouldCloseAfterRun = true;
 					}
 					else if (args[i].StartsWith(configOption))
 					{
