@@ -388,7 +388,7 @@ namespace StockSimulator.Core
 				filename = GetOutputFolder(timeString) + "overall.json";
 				File.WriteAllText(filename, jsonOutput);
 
-				jsonOutput = JsonConvert.SerializeObject(mainStrategyOrders);
+				jsonOutput = JsonConvert.SerializeObject(mainStrategyOrders.ToArray());
 				filename = GetOutputFolder(timeString) + "overall-orders.json";
 				File.WriteAllText(filename, jsonOutput);
 
