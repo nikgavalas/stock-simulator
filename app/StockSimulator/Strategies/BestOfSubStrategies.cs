@@ -23,6 +23,7 @@ namespace StockSimulator.Strategies
 			public double HighestPercent { get; set; }
 			public string HighestStrategyName { get; set; }
 			public int ComboSizeOfHighestStrategy { get; set; }
+			public Order.OrderType StrategyOrderType { get; set; }
 			public List<StrategyStatistics> Statistics { get; set; }
 
 			public BarStatistics()
@@ -30,14 +31,16 @@ namespace StockSimulator.Strategies
 				HighestPercent = 0.0;
 				HighestStrategyName = "None";
 				ComboSizeOfHighestStrategy = 0;
+				StrategyOrderType = Order.OrderType.Long;
 				Statistics = new List<StrategyStatistics>();
 			}
 
-			public BarStatistics(double percent, string name, int comboSize, List<StrategyStatistics> statistics)
+			public BarStatistics(double percent, string name, int comboSize, Order.OrderType orderType, List<StrategyStatistics> statistics)
 			{
 				HighestPercent = percent;
 				HighestStrategyName = name;
 				ComboSizeOfHighestStrategy = comboSize;
+				StrategyOrderType = orderType;
 				Statistics = statistics;
 			}
 		}
@@ -66,31 +69,33 @@ namespace StockSimulator.Strategies
 			get
 			{
 				string[] deps = {
-					"BollingerExtended",
-					"BullBeltHoldFound",
-					"BullEngulfingFound",
-					"BullHaramiFound",
-					"BullHaramiCrossFound",
-					"CciCrossover",
-					"DojiFound",
-					"HammerFound",
-					"KeltnerCloseAbove",
-					"MacdCrossover",
-					"MomentumCrossover",
-					"MorningStarFound",
-					"PiercingLineFound",
-					"RisingThreeMethodsFound",
-					"RsiCrossover30",
-					"SmaCrossover",
-					"StickSandwitchFound",
-					"StochasticsFastCrossover",
-					"SwingStart",
-					"ThreeWhiteSoldiersFound",
-					"TrendStart",
-					"TrixSignalCrossover",
-					"TrixZeroCrossover",
-					"UpsideTasukiGapFound",
-					"WilliamsRCrossover"
+					// Bull strategies
+					//"BullBollingerExtended",
+					//"BullBeltHoldFound",
+					//"BullEngulfingFound",
+					//"BullHaramiFound",
+					//"BullHaramiCrossFound",
+					//"DojiFound",
+					//"HammerFound",
+					//"BullKeltnerCloseAbove",
+					//"BullMomentumCrossover",
+					//"MorningStarFound",
+					//"PiercingLineFound",
+					//"RisingThreeMethodsFound",
+					//"BullRsiCrossover30",
+					//"BullSmaCrossover",
+					//"StickSandwitchFound",
+					//"BullStochasticsFastCrossover",
+					//"BullSwingStart",
+					//"ThreeWhiteSoldiersFound",
+					//"BullTrendStart",
+					//"BullTrixSignalCrossover",
+					//"BullTrixZeroCrossover",
+					//"UpsideTasukiGapFound",
+					//"BullWilliamsRCrossover",
+
+					// Bear strategies
+					"BearMacdCrossover"
 				};
 
 				return deps;
@@ -117,7 +122,11 @@ namespace StockSimulator.Strategies
 		{
 			base.OnBarUpdate(currentBar);
 
-			List<List<Strategy>> combos = GetComboList(currentBar);
+			// Bull and bear strategies can't combo with each other but we still want
+			// to compare them side by side to find our what combo is the best.
+			// So append all the bear combos to the combo list so they can be evaluated too.
+			List<List<Strategy>> combos = GetComboList(currentBar, Order.OrderType.Long);
+			combos.AddRange(GetComboList(currentBar, Order.OrderType.Short));
 
 			// Place orders for all the combos.
 			List<StrategyStatistics> stats = new List<StrategyStatistics>();
@@ -149,7 +158,7 @@ namespace StockSimulator.Strategies
 				}
 
 				// Now that the name of the strategy is found, enter the order.
-				Order placedOrder = EnterOrder(comboName, currentBar, dependentIndicators);
+				Order placedOrder = EnterOrder(comboName, currentBar, comboList[0].OrderType, dependentIndicators);
 				if (placedOrder != null)
 				{
 					stats.Add(placedOrder.StartStatistics);
@@ -161,6 +170,7 @@ namespace StockSimulator.Strategies
 			double highestWinPercent = 0;
 			string highestName = "None";
 			int comboSize = 0;
+			Order.OrderType orderType = Order.OrderType.Long;
 			for (int i = 0; i < stats.Count; i++)
 			{
 				if (stats[i].ProfitTargetPercent > highestWinPercent)
@@ -168,18 +178,20 @@ namespace StockSimulator.Strategies
 					highestWinPercent = stats[i].ProfitTargetPercent;
 					highestName = stats[i].StrategyName;
 					comboSize = stats[i].StrategyName.Split('-').Length;
+					orderType = stats[i].StrategyOrderType;
 				}
 			}
 
-			Bars[currentBar] = new BarStatistics(highestWinPercent, highestName, comboSize, stats);
+			Bars[currentBar] = new BarStatistics(highestWinPercent, highestName, comboSize, orderType, stats);
 		}
 
 		/// <summary>
 		/// Builds a list of all the possible combos found on this bar.
 		/// </summary>
-		/// <param name="currentBar">Current bar to search for combos.=</param>
+		/// <param name="currentBar">Current bar to search for combos</param>
+		/// <param name="orderType">Type of strategies to combo together</param>
 		/// <returns>List of all the combo lists for this bar</returns>
-		private List<List<Strategy>> GetComboList(int currentBar)
+		private List<List<Strategy>> GetComboList(int currentBar, Order.OrderType orderType)
 		{
 			// Get all the strategies that were found on today.
 			List<Strategy> foundStrategies = new List<Strategy>();
@@ -188,6 +200,17 @@ namespace StockSimulator.Strategies
 				if (Dependents[i] is Strategy)
 				{
 					Strategy dependentStrategy = (Strategy)Dependents[i];
+
+					// Ensure each dependent has the same order type.
+					if (orderType != dependentStrategy.OrderType)
+					{
+						continue;
+					}
+
+
+					// TODO: check here that the strategy order type matches
+					// with the higher timeframe trend. Continue if it doesn't.
+
 
 					// The logic here that searches the current bar
 					// and back a few days to make the finding not so exact. It adds

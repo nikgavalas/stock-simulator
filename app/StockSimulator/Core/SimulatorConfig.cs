@@ -244,8 +244,8 @@ namespace StockSimulator.Core
 			NumBarsBadFilter = 400;
 			BadFilterProfitTarget = 0.15;
 
-			UseAbbreviatedOutput = true;
-			OnlyOutputLastBuyList = true;
+			UseAbbreviatedOutput = false;
+			OnlyOutputLastBuyList = false;
 			ShouldOpenWebPage = true;
 
 			// Desktop

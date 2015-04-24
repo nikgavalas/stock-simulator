@@ -9,9 +9,9 @@ using StockSimulator.Indicators;
 
 namespace StockSimulator.Strategies
 {
-	class MacdCrossover : Strategy
+	class BullWilliamsRCrossover : Strategy
 	{
-		public MacdCrossover(TickerData tickerData, RunnableFactory factory)
+		public BullWilliamsRCrossover(TickerData tickerData, RunnableFactory factory)
 			: base(tickerData, factory)
 		{
 
@@ -25,7 +25,7 @@ namespace StockSimulator.Strategies
 			get
 			{
 				string[] deps = {
-					"Macd"
+					"WilliamsR"
 				};
 
 				return deps;
@@ -38,7 +38,7 @@ namespace StockSimulator.Strategies
 		/// <returns>The name of this strategy</returns>
 		public override string ToString()
 		{
-			return "MacdCrossover";
+			return "BullWilliamsRCrossover";
 		}
 
 		/// <summary>
@@ -49,12 +49,11 @@ namespace StockSimulator.Strategies
 		{
 			base.OnBarUpdate(currentBar);
 
-			Macd macd = (Macd)Dependents[0];
-			if (DataSeries.CrossAbove(macd.Value, macd.Avg, currentBar, 0) != -1)
+			WilliamsR ind = (WilliamsR)Dependents[0];
+			if (DataSeries.CrossAbove(ind.Value, -80, currentBar, 0) != -1)
 			{
 				WasFound[currentBar] = true;
 			}
 		}
 	}
-
 }

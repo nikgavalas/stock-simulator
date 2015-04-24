@@ -148,7 +148,7 @@ namespace StockSimulator.Core
 				if (orders.Count > 0)
 				{
 					string tickerName = orders[0].Ticker.TickerAndExchange.ToString();
-					StrategyStatistics tickerStats = new StrategyStatistics(tickerName);
+					StrategyStatistics tickerStats = new StrategyStatistics(tickerName, Order.OrderType.Long);
 
 					// Catagorize and total all the orders by ticker.
 					for (int i = 0; i < orders.Count; i++)
@@ -255,7 +255,7 @@ namespace StockSimulator.Core
 					}
 
 					Dictionary<int, StrategyTickerPairStatistics> tickersForThisStrategy = new Dictionary<int, StrategyTickerPairStatistics>();
-					StrategyStatistics stratStats = new StrategyStatistics(strategyName);
+					StrategyStatistics stratStats = new StrategyStatistics(strategyName, orders.First().Type);
 
 					// Catagorize and total all the orders for this strategy by the ticker they are associated with.
 					foreach (Order order in orders)
@@ -291,7 +291,8 @@ namespace StockSimulator.Core
 						File.WriteAllText(filename, jsonOutput);
 
 						// Save for the overall stats to be outputted later.
-						StrategyStatistics tickerStats = new StrategyStatistics(item.Value.TickerName);
+						// Order type doesn't matter for tickers and will get ignored in the web display.
+						StrategyStatistics tickerStats = new StrategyStatistics(item.Value.TickerName, Order.OrderType.Long);
 						tickerStats.InitFromStrategyTickerPairStatistics(item.Value);
 						overallList.Add(tickerStats);
 					}
@@ -377,7 +378,7 @@ namespace StockSimulator.Core
 				string filename;
 
 				ConcurrentBag<Order> mainStrategyOrders = Simulator.Orders.StrategyDictionary["MainStrategy".GetHashCode()];
-				StrategyStatistics mainStratStats = new StrategyStatistics("MainStrategy");
+				StrategyStatistics mainStratStats = new StrategyStatistics("MainStrategy", Order.OrderType.Long);
 				foreach (Order order in mainStrategyOrders)
 				{
 					mainStratStats.AddOrder(order);

@@ -9,9 +9,9 @@ using StockSimulator.Indicators;
 
 namespace StockSimulator.Strategies
 {
-	class BollingerExtended : Strategy
+	class BullCciCrossover : Strategy
 	{
-		public BollingerExtended(TickerData tickerData, RunnableFactory factory)
+		public BullCciCrossover(TickerData tickerData, RunnableFactory factory)
 			: base(tickerData, factory)
 		{
 
@@ -25,7 +25,7 @@ namespace StockSimulator.Strategies
 			get
 			{
 				string[] deps = {
-					"Bollinger"
+					"Cci14"
 				};
 
 				return deps;
@@ -38,7 +38,7 @@ namespace StockSimulator.Strategies
 		/// <returns>The name of this strategy</returns>
 		public override string ToString()
 		{
-			return "BollingerExtended";
+			return "BullCciCrossover";
 		}
 
 		/// <summary>
@@ -49,8 +49,8 @@ namespace StockSimulator.Strategies
 		{
 			base.OnBarUpdate(currentBar);
 
-			Bollinger ind = (Bollinger)Dependents[0];
-			if (DataSeries.CrossBelow(Data.Close, ind.Lower, currentBar, 0) != -1)
+			Cci ind = (Cci)Dependents[0];
+			if (DataSeries.CrossAbove(ind.Value, 100, currentBar, 0) != -1)
 			{
 				WasFound[currentBar] = true;
 			}

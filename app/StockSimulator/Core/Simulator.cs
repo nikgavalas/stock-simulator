@@ -159,18 +159,18 @@ namespace StockSimulator.Core
 		{
 			WriteMessage("Running historical analysis for");
 
-			Parallel.ForEach(Instruments, task =>
-			{
-				WriteMessage("Running " + task.Value.Data.TickerAndExchange.ToString());
-				task.Value.Run();
-			});
-
-			// Run all to start with so we have the data to simulate with.
-			//foreach (KeyValuePair<int, BestOfSubStrategies> task in Instruments)
+			//Parallel.ForEach(Instruments, task =>
 			//{
 			//	WriteMessage("Running " + task.Value.Data.TickerAndExchange.ToString());
 			//	task.Value.Run();
-			//}
+			//});
+
+			// Run all to start with so we have the data to simulate with.
+			foreach (KeyValuePair<int, BestOfSubStrategies> task in Instruments)
+			{
+				WriteMessage("Running " + task.Value.Data.TickerAndExchange.ToString());
+				task.Value.Run();
+			}
 
 			DateTime startDate = DataStore.SimTickerDates.First().Key;
 			DateTime endDate = DataStore.SimTickerDates.Last().Key;
@@ -290,7 +290,7 @@ namespace StockSimulator.Core
 
 								if (shouldReallyOrder == true)
 								{
-									EnterOrder(buyList[i].Bars[strategyBarIndex].Statistics, buyList[i].Data, strategyBarIndex);
+									EnterOrder(buyList[i].Bars[strategyBarIndex].Statistics, barStats.StrategyOrderType, buyList[i].Data, strategyBarIndex);
 									++currentCount;
 								}
 							}
@@ -362,9 +362,13 @@ namespace StockSimulator.Core
 		/// <summary>
 		/// Place an order for the main strategy.
 		/// </summary>
-		private void EnterOrder(List<StrategyStatistics> stats, TickerData ticker, int currentBar)
+		/// <param name="stats">Stats for each strategy combo that occured on this bar</param>
+		/// <param name="orderType">Type of order to place for the found strategy (long or short)</param>
+		/// <param name="ticker">Ticker we're placing the order on</param>
+		/// <param name="currentBar">Current bar of the simulation</param>
+		private void EnterOrder(List<StrategyStatistics> stats, Order.OrderType orderType, TickerData ticker, int currentBar)
 		{
-			MainStrategyOrder order = new MainStrategyOrder(stats, Order.OrderType.Long, ticker, "MainStrategy", currentBar);
+			MainStrategyOrder order = new MainStrategyOrder(stats, orderType, ticker, "MainStrategy", currentBar);
 			Simulator.Orders.AddOrder(order);
 			_activeOrders.Add(order);
 		}

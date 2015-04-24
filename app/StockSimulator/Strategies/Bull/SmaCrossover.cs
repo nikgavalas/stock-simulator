@@ -10,9 +10,9 @@ using StockSimulator.Indicators;
 
 namespace StockSimulator.Strategies
 {
-	class TrendStart : Strategy
+	class BullSmaCrossover : Strategy
 	{
-		public TrendStart(TickerData tickerData, RunnableFactory factory) 
+		public BullSmaCrossover(TickerData tickerData, RunnableFactory factory) 
 			: base(tickerData, factory)
 		{
 
@@ -26,7 +26,7 @@ namespace StockSimulator.Strategies
 			get
 			{
 				string[] deps = {
-					"Trend"
+					"Sma"
 				};
 
 				return deps;
@@ -39,7 +39,7 @@ namespace StockSimulator.Strategies
 		/// <returns>The name of this strategy</returns>
 		public override string ToString()
 		{
-			return "TrendStart";
+			return "BullSmaCrossover";
 		}
 
 		/// <summary>
@@ -50,13 +50,8 @@ namespace StockSimulator.Strategies
 		{
 			base.OnBarUpdate(currentBar);
 
-			if (currentBar < 1)
-			{
-				return;
-			}
-
-			Trend trend = (Trend)Dependents[0];
-			if (trend.DownTrend[currentBar] == true && trend.DownTrend[currentBar - 1] == true)
+			Sma sma = (Sma)Dependents[0];
+			if (DataSeries.CrossAbove(Data.Close, sma.Avg, currentBar, 0) != -1)
 			{
 				WasFound[currentBar] = true;
 			}

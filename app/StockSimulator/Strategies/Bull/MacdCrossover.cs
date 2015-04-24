@@ -4,15 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
-
 using StockSimulator.Core;
 using StockSimulator.Indicators;
 
 namespace StockSimulator.Strategies
 {
-	class SmaCrossover : Strategy
+	class BullMacdCrossover : Strategy
 	{
-		public SmaCrossover(TickerData tickerData, RunnableFactory factory) 
+		public BullMacdCrossover(TickerData tickerData, RunnableFactory factory)
 			: base(tickerData, factory)
 		{
 
@@ -26,7 +25,7 @@ namespace StockSimulator.Strategies
 			get
 			{
 				string[] deps = {
-					"Sma"
+					"Macd"
 				};
 
 				return deps;
@@ -39,7 +38,7 @@ namespace StockSimulator.Strategies
 		/// <returns>The name of this strategy</returns>
 		public override string ToString()
 		{
-			return "SmaCrossover";
+			return "BullMacdCrossover";
 		}
 
 		/// <summary>
@@ -50,11 +49,12 @@ namespace StockSimulator.Strategies
 		{
 			base.OnBarUpdate(currentBar);
 
-			Sma sma = (Sma)Dependents[0];
-			if (DataSeries.CrossAbove(Data.Close, sma.Avg, currentBar, 0) != -1)
+			Macd macd = (Macd)Dependents[0];
+			if (DataSeries.CrossAbove(macd.Value, macd.Avg, currentBar, 0) != -1)
 			{
 				WasFound[currentBar] = true;
 			}
 		}
 	}
+
 }

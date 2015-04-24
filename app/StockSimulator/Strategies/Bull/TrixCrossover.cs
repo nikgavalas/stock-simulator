@@ -4,15 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
-
 using StockSimulator.Core;
 using StockSimulator.Indicators;
 
 namespace StockSimulator.Strategies
 {
-	class SwingStart : Strategy
+	class BullTrixZeroCrossover : Strategy
 	{
-		public SwingStart(TickerData tickerData, RunnableFactory factory)
+		public BullTrixZeroCrossover(TickerData tickerData, RunnableFactory factory)
 			: base(tickerData, factory)
 		{
 
@@ -26,7 +25,7 @@ namespace StockSimulator.Strategies
 			get
 			{
 				string[] deps = {
-					"Swing"
+					"Trix"
 				};
 
 				return deps;
@@ -39,7 +38,7 @@ namespace StockSimulator.Strategies
 		/// <returns>The name of this strategy</returns>
 		public override string ToString()
 		{
-			return "SwingStart";
+			return "BullTrixZeroCrossover";
 		}
 
 		/// <summary>
@@ -50,8 +49,8 @@ namespace StockSimulator.Strategies
 		{
 			base.OnBarUpdate(currentBar);
 
-			Swing swing = (Swing)Dependents[0];
-			if (currentBar > 0 && swing.SwingLowPlot[currentBar - 1] == 0.0 && swing.SwingLowPlot[currentBar] > 0)
+			Trix ind = (Trix)Dependents[0];
+			if (DataSeries.CrossAbove(ind.Default, 0, currentBar, 0) != -1)
 			{
 				WasFound[currentBar] = true;
 			}

@@ -134,8 +134,9 @@
     <Compile Include="Indicators\Trend.cs" />
     <Compile Include="Indicators\Trix.cs" />
     <Compile Include="Indicators\WilliamsR.cs" />
+    <Compile Include="Strategies\Bear\BearMacdCrossover.cs" />
     <Compile Include="Strategies\BestOfSubStrategies.cs" />
-    <Compile Include="Strategies\BollingerExtended.cs" />
+    <Compile Include="Strategies\Bull\BollingerExtended.cs" />
     <Compile Include="Strategies\Candlesticks\BullBeltHoldFound.cs" />
     <Compile Include="Strategies\Candlesticks\BullEngulfingFound.cs" />
     <Compile Include="Strategies\Candlesticks\BullHaramiCrossFound.cs" />
@@ -148,20 +149,20 @@
     <Compile Include="Strategies\Candlesticks\StickSandwitchFound.cs" />
     <Compile Include="Strategies\Candlesticks\ThreeWhiteSoldiersFound.cs" />
     <Compile Include="Strategies\Candlesticks\UpsideTasukiGapFound.cs" />
-    <Compile Include="Strategies\CciCrossover.cs" />
-    <Compile Include="Strategies\KeltnerCloseAbove.cs" />
-    <Compile Include="Strategies\MacdCrossover.cs" />
-    <Compile Include="Strategies\MomentumCrossover.cs" />
-    <Compile Include="Strategies\RsiCrossover30.cs" />
-    <Compile Include="Strategies\SmaCrossover.cs">
+    <Compile Include="Strategies\Bull\CciCrossover.cs" />
+    <Compile Include="Strategies\Bull\KeltnerCloseAbove.cs" />
+    <Compile Include="Strategies\Bull\MacdCrossover.cs" />
+    <Compile Include="Strategies\Bull\MomentumCrossover.cs" />
+    <Compile Include="Strategies\Bull\RsiCrossover30.cs" />
+    <Compile Include="Strategies\Bull\SmaCrossover.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Strategies\StochasticsFastCrossover.cs" />
-    <Compile Include="Strategies\SwingStart.cs" />
-    <Compile Include="Strategies\TrendStart.cs" />
-    <Compile Include="Strategies\TrixCrossover.cs" />
-    <Compile Include="Strategies\TrixSignalCrossover.cs" />
-    <Compile Include="Strategies\WilliamsRCrossover.cs" />
+    <Compile Include="Strategies\Bull\StochasticsFastCrossover.cs" />
+    <Compile Include="Strategies\Bull\SwingStart.cs" />
+    <Compile Include="Strategies\Bull\TrendStart.cs" />
+    <Compile Include="Strategies\Bull\TrixCrossover.cs" />
+    <Compile Include="Strategies\Bull\TrixSignalCrossover.cs" />
+    <Compile Include="Strategies\Bull\WilliamsRCrossover.cs" />
     <Compile Include="YahooFinanceDownloader\YahooFinanceDownloader.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -224,6 +225,7 @@
   <ItemGroup>
     <Resource Include="favicon.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -14,6 +14,11 @@ namespace StockSimulator.Core
 		public List<bool> WasFound { get; set; }
 
 		/// <summary>
+		/// Expose the order type of this strategy.
+		/// </summary>
+		public Order.OrderType OrderType { get { return _orderType; } }
+
+		/// <summary>
 		/// The type of orders this strategy places.
 		/// </summary>
 		protected Order.OrderType _orderType;
@@ -87,9 +92,10 @@ namespace StockSimulator.Core
 		/// </summary>
 		/// <param name="strategyName">Name of the strategy that placed the order</param>
 		/// <param name="currentBar">Bar the order was placed on</param>
+		/// <param name="orderType">Type of order to place (long or short)</param>
 		/// <param name="dependentIndicatorNames">List of all the dependent indicator names</param>
 		/// <returns>The order that was placed or null if none was placed</returns>
-		protected Order EnterOrder(string strategyName, int currentBar, List<string> dependentIndicatorNames)
+		protected Order EnterOrder(string strategyName, int currentBar, Order.OrderType orderType, List<string> dependentIndicatorNames)
 		{
 			Order order = null;
 
@@ -106,7 +112,7 @@ namespace StockSimulator.Core
 			// Only place the order if it's less than the allowed amount of concurrent orders allowed.
 			if (openOrders < Simulator.Config.MaxConcurrentOrders)
 			{
-				order = new Order(_orderType, Data, strategyName, currentBar, dependentIndicatorNames);
+				order = new Order(orderType, Data, strategyName, currentBar, dependentIndicatorNames);
 				Simulator.Orders.AddOrder(order);
 				_activeOrders.Add(order);
 			}

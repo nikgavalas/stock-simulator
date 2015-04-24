@@ -9,12 +9,12 @@ using StockSimulator.Indicators;
 
 namespace StockSimulator.Strategies
 {
-	class TrixSignalCrossover : Strategy
+	class BearMacdCrossover : Strategy
 	{
-		public TrixSignalCrossover(TickerData tickerData, RunnableFactory factory)
+		public BearMacdCrossover(TickerData tickerData, RunnableFactory factory)
 			: base(tickerData, factory)
 		{
-
+			_orderType = Order.OrderType.Short;
 		}
 
 		/// <summary>
@@ -25,7 +25,7 @@ namespace StockSimulator.Strategies
 			get
 			{
 				string[] deps = {
-					"Trix"
+					"Macd"
 				};
 
 				return deps;
@@ -38,7 +38,7 @@ namespace StockSimulator.Strategies
 		/// <returns>The name of this strategy</returns>
 		public override string ToString()
 		{
-			return "TrixSignalCrossover";
+			return "BearMacdCrossover";
 		}
 
 		/// <summary>
@@ -49,11 +49,12 @@ namespace StockSimulator.Strategies
 		{
 			base.OnBarUpdate(currentBar);
 
-			Trix ind = (Trix)Dependents[0];
-			if (DataSeries.CrossAbove(ind.Default, ind.Signal, currentBar, 0) != -1)
+			Macd macd = (Macd)Dependents[0];
+			if (DataSeries.CrossBelow(macd.Value, macd.Avg, currentBar, 0) != -1)
 			{
 				WasFound[currentBar] = true;
 			}
 		}
 	}
+
 }

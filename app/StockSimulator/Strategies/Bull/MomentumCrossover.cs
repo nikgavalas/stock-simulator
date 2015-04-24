@@ -9,9 +9,9 @@ using StockSimulator.Indicators;
 
 namespace StockSimulator.Strategies
 {
-	class RsiCrossover30 : Strategy
+	class BullMomentumCrossover : Strategy
 	{
-		public RsiCrossover30(TickerData tickerData, RunnableFactory factory) 
+		public BullMomentumCrossover(TickerData tickerData, RunnableFactory factory)
 			: base(tickerData, factory)
 		{
 
@@ -25,7 +25,7 @@ namespace StockSimulator.Strategies
 			get
 			{
 				string[] deps = {
-					"Rsi14"
+					"Momentum14"
 				};
 
 				return deps;
@@ -38,7 +38,7 @@ namespace StockSimulator.Strategies
 		/// <returns>The name of this strategy</returns>
 		public override string ToString()
 		{
-			return "RsiCrossover30";
+			return "BullMomentumCrossover";
 		}
 
 		/// <summary>
@@ -49,8 +49,8 @@ namespace StockSimulator.Strategies
 		{
 			base.OnBarUpdate(currentBar);
 
-			Rsi rsi = (Rsi)Dependents[0];
-			if (DataSeries.CrossAbove(rsi.Value, 30, currentBar, 0) != -1)
+			Momentum ind = (Momentum)Dependents[0];
+			if (DataSeries.CrossAbove(ind.Value, 0, currentBar, 0) != -1)
 			{
 				WasFound[currentBar] = true;
 			}

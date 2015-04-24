@@ -4,14 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
+
 using StockSimulator.Core;
 using StockSimulator.Indicators;
 
 namespace StockSimulator.Strategies
 {
-	class StochasticsFastCrossover : Strategy
+	class BullTrendStart : Strategy
 	{
-		public StochasticsFastCrossover(TickerData tickerData, RunnableFactory factory)
+		public BullTrendStart(TickerData tickerData, RunnableFactory factory) 
 			: base(tickerData, factory)
 		{
 
@@ -25,7 +26,7 @@ namespace StockSimulator.Strategies
 			get
 			{
 				string[] deps = {
-					"StochasticsFast"
+					"Trend"
 				};
 
 				return deps;
@@ -38,7 +39,7 @@ namespace StockSimulator.Strategies
 		/// <returns>The name of this strategy</returns>
 		public override string ToString()
 		{
-			return "StochasticsFastCrossover";
+			return "BullTrendStart";
 		}
 
 		/// <summary>
@@ -49,13 +50,15 @@ namespace StockSimulator.Strategies
 		{
 			base.OnBarUpdate(currentBar);
 
-			StochasticsFast ind = (StochasticsFast)Dependents[0];
-			if (DataSeries.IsBelow(ind.D, 20, currentBar, 0) != -1)
+			if (currentBar < 1)
 			{
-				if (DataSeries.CrossAbove(ind.K, ind.D, currentBar, 0) != -1)
-				{
-					WasFound[currentBar] = true;
-				}
+				return;
+			}
+
+			Trend trend = (Trend)Dependents[0];
+			if (trend.DownTrend[currentBar] == true && trend.DownTrend[currentBar - 1] == true)
+			{
+				WasFound[currentBar] = true;
 			}
 		}
 	}

@@ -89,7 +89,11 @@ namespace StockSimulator.Core
 		/// <summary>
 		/// Contructor for the order.
 		/// </summary>
+		/// <param name="type">Type of order we're placing, long or short</param>
 		/// <param name="tickerData">Ticker data</param>
+		/// <param name="currentBar">Current bar of the simulation</param>
+		/// <param name="fromStrategyName">Name of the strategy this order is for. Can't use the actual strategy reference because it could come from a strategy combo (ie. MacdCrossover-SmaCrossover)</paramparam>
+		/// <param name="dependentIndicatorNames">Names of the dependent indicators so they can be shown on the web with the order</param>
 		public Order(OrderType type, TickerData tickerData, string fromStrategyName, int currentBar, List<string> dependentIndicatorNames)
 		{
 			StrategyName = fromStrategyName;
@@ -103,6 +107,7 @@ namespace StockSimulator.Core
 
 			// Get things like win/loss percent up to the point this order was finished.
 			StartStatistics = Simulator.Orders.GetStrategyStatistics(StrategyName,
+				type,
 				Ticker.TickerAndExchange,
 				currentBar,
 				Simulator.Config.MaxLookBackBars);
@@ -167,7 +172,7 @@ namespace StockSimulator.Core
 					NumberOfShares = BuyPrice > 0.0 ? Convert.ToInt32(Math.Floor(sizeOfOrder / BuyPrice)) : 0;
 					Value = NumberOfShares * BuyPrice;
 
-					int direction = Type == OrderType.Long ? 1 : -1;
+					double direction = Type == OrderType.Long ? 1.0 : -1.0;
 
 					// Set prices to exit.
 					ProfitTargetPrice = BuyPrice + ((BuyPrice * Simulator.Config.ProfitTarget) * direction);
@@ -180,21 +185,13 @@ namespace StockSimulator.Core
 			{
 				Value = NumberOfShares * Ticker.Close[curBar];
 
-				if (IsMore(Ticker.Open[curBar], ProfitTargetPrice, Type))
+				if (Type == OrderType.Long)
 				{
-					FinishOrder(Ticker.Open[curBar], curBar, OrderStatus.ProfitTarget);
+					FinishLongOrder(curBar);
 				}
-				else if (IsMore(Math.Max(Ticker.Close[curBar], Ticker.High[curBar]), ProfitTargetPrice, Type))
+				else
 				{
-					FinishOrder(ProfitTargetPrice, curBar, OrderStatus.ProfitTarget);
-				}
-				else if (IsLess(Ticker.Open[curBar], StopPrice, Type))
-				{
-					FinishOrder(Ticker.Open[curBar], curBar, OrderStatus.StopTarget);
-				}
-				else if (IsLess(Math.Min(Ticker.Close[curBar], Ticker.Low[curBar]), StopPrice, Type))
-				{
-					FinishOrder(StopPrice, curBar, OrderStatus.StopTarget);
+					FinishShortOrder(curBar);
 				}
 
 				// Limit the order since we won't want to be in the market forever.
@@ -217,42 +214,64 @@ namespace StockSimulator.Core
 		}
 
 		/// <summary>
-		/// Util function to return if a is more than b depending on if the order type is for a
-		/// positive or negative order.
+		/// Checks all the conditions that could close a long order and if any
+		/// are true then close the order.
 		/// </summary>
-		/// <param name="a">First value</param>
-		/// <param name="b">Second value</param>
-		/// <param name="type">Type of order</param>
-		/// <returns>Returns true if a is valued more than b based on the type of order (long or short)</returns>
-		private bool IsMore(double a, double b, OrderType type)
+		/// <param name="curBar">Current bar of the simulation</param>
+		private void FinishLongOrder(int curBar)
 		{
-			if (type == OrderType.Long)
+			// Gapped open above our profit target, then close at the open price.
+			if (Ticker.Open[curBar] >= ProfitTargetPrice)
 			{
-				return a >= b;
+				FinishOrder(Ticker.Open[curBar], curBar, OrderStatus.ProfitTarget);
 			}
-			else
+			// Either the high or close during this bar was above our profit target,
+			// then close at the profit target.
+			else if (Math.Max(Ticker.Close[curBar], Ticker.High[curBar]) >= ProfitTargetPrice)
 			{
-				return a <= b;
+				FinishOrder(ProfitTargetPrice, curBar, OrderStatus.ProfitTarget);
+			}
+			// Gapped open below our stop target, so close at the open price.
+			else if (Ticker.Open[curBar] <= StopPrice)
+			{
+				FinishOrder(Ticker.Open[curBar], curBar, OrderStatus.StopTarget);
+			}
+			// Either the low or close during this bar was below our stop target,
+			// then close at the stop target.
+			else if (Math.Min(Ticker.Close[curBar], Ticker.Low[curBar]) <= StopPrice)
+			{
+				FinishOrder(StopPrice, curBar, OrderStatus.StopTarget);
 			}
 		}
 
 		/// <summary>
-		/// Util function to return if a is less than b depending on if the order type is for a
-		/// positive or negative order.
+		/// Checks all the conditions that could close a short order and if any
+		/// are true then close the order.
 		/// </summary>
-		/// <param name="a">First value</param>
-		/// <param name="b">Second value</param>
-		/// <param name="type">Type of order</param>
-		/// <returns>Returns true if a is valued less than b based on the type of order (long or short)</returns>
-		private bool IsLess(double a, double b, OrderType type)
+		/// <param name="curBar">Current bar of the simulation</param>
+		private void FinishShortOrder(int curBar)
 		{
-			if (type == OrderType.Long)
+			// Gapped open below our profit target, then close at the open price.
+			if (Ticker.Open[curBar] <= ProfitTargetPrice)
 			{
-				return a <= b;
+				FinishOrder(Ticker.Open[curBar], curBar, OrderStatus.ProfitTarget);
 			}
-			else
+			// Either the low or close during this bar was below our profit target,
+			// then close at the profit target.
+			else if (Math.Max(Ticker.Close[curBar], Ticker.Low[curBar]) <= ProfitTargetPrice)
 			{
-				return a >= b;
+				FinishOrder(ProfitTargetPrice, curBar, OrderStatus.ProfitTarget);
+			}
+			// Gapped open above our stop target, so close at the open price.
+			else if (Ticker.Open[curBar] >= StopPrice)
+			{
+				FinishOrder(Ticker.Open[curBar], curBar, OrderStatus.StopTarget);
+			}
+			// Either the high or close during this bar was above our stop target,
+			// then close at the stop target.
+			else if (Math.Min(Ticker.Close[curBar], Ticker.High[curBar]) >= StopPrice)
+			{
+				FinishOrder(StopPrice, curBar, OrderStatus.StopTarget);
 			}
 		}
 
@@ -263,6 +282,8 @@ namespace StockSimulator.Core
 		/// <param name="currentBar">Current bar of the simulation</param>
 		private void FinishOrder(double sellPrice, int currentBar, OrderStatus sellStatus)
 		{
+			double direction = Type == OrderType.Long ? 1.0 : -1.0;
+
 			// If the sell price is 0 then it's a bug that no more data for this stock exists 
 			// and we had an order open. This is not really realistic so we'll just have the order
 			// gain $0.
@@ -271,7 +292,7 @@ namespace StockSimulator.Core
 			SellDate = Ticker.Dates[currentBar];
 			Status = sellStatus;
 			Value = NumberOfShares * SellPrice;
-			Gain = Value - (NumberOfShares * BuyPrice);
+			Gain = (Value - (NumberOfShares * BuyPrice)) * direction;
 
 			// Get things like win/loss percent up to the point this order was finished.
 			// TODO: not sure if this is needed.

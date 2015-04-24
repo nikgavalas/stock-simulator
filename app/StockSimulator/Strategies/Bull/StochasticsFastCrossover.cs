@@ -9,9 +9,9 @@ using StockSimulator.Indicators;
 
 namespace StockSimulator.Strategies
 {
-	class KeltnerCloseAbove : Strategy
+	class BullStochasticsFastCrossover : Strategy
 	{
-		public KeltnerCloseAbove(TickerData tickerData, RunnableFactory factory)
+		public BullStochasticsFastCrossover(TickerData tickerData, RunnableFactory factory)
 			: base(tickerData, factory)
 		{
 
@@ -25,7 +25,7 @@ namespace StockSimulator.Strategies
 			get
 			{
 				string[] deps = {
-					"KeltnerChannel"
+					"StochasticsFast"
 				};
 
 				return deps;
@@ -38,7 +38,7 @@ namespace StockSimulator.Strategies
 		/// <returns>The name of this strategy</returns>
 		public override string ToString()
 		{
-			return "KeltnerCloseAbove";
+			return "BullStochasticsFastCrossover";
 		}
 
 		/// <summary>
@@ -49,10 +49,13 @@ namespace StockSimulator.Strategies
 		{
 			base.OnBarUpdate(currentBar);
 
-			KeltnerChannel ind = (KeltnerChannel)Dependents[0];
-			if (DataSeries.CrossAbove(Data.Close, ind.Upper, currentBar, 0) != -1)
+			StochasticsFast ind = (StochasticsFast)Dependents[0];
+			if (DataSeries.IsBelow(ind.D, 20, currentBar, 0) != -1)
 			{
-				WasFound[currentBar] = true;
+				if (DataSeries.CrossAbove(ind.K, ind.D, currentBar, 0) != -1)
+				{
+					WasFound[currentBar] = true;
+				}
 			}
 		}
 	}

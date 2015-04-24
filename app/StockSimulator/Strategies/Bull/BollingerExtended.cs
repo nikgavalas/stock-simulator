@@ -9,9 +9,9 @@ using StockSimulator.Indicators;
 
 namespace StockSimulator.Strategies
 {
-	class TrixZeroCrossover : Strategy
+	class BullBollingerExtended : Strategy
 	{
-		public TrixZeroCrossover(TickerData tickerData, RunnableFactory factory)
+		public BullBollingerExtended(TickerData tickerData, RunnableFactory factory)
 			: base(tickerData, factory)
 		{
 
@@ -25,7 +25,7 @@ namespace StockSimulator.Strategies
 			get
 			{
 				string[] deps = {
-					"Trix"
+					"Bollinger"
 				};
 
 				return deps;
@@ -38,7 +38,7 @@ namespace StockSimulator.Strategies
 		/// <returns>The name of this strategy</returns>
 		public override string ToString()
 		{
-			return "TrixZeroCrossover";
+			return "BullBollingerExtended";
 		}
 
 		/// <summary>
@@ -49,8 +49,8 @@ namespace StockSimulator.Strategies
 		{
 			base.OnBarUpdate(currentBar);
 
-			Trix ind = (Trix)Dependents[0];
-			if (DataSeries.CrossAbove(ind.Default, 0, currentBar, 0) != -1)
+			Bollinger ind = (Bollinger)Dependents[0];
+			if (DataSeries.CrossBelow(Data.Close, ind.Lower, currentBar, 0) != -1)
 			{
 				WasFound[currentBar] = true;
 			}

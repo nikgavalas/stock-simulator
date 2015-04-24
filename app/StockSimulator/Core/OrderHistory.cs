@@ -47,11 +47,12 @@ namespace StockSimulator.Core
 		/// Calculates things like win/loss percent, gain, etc. for the strategy used on the ticker.
 		/// </summary>
 		/// <param name="strategyName">Name of the strategy the statistics are for</param>
+		/// <param name="orderType">Type of orders placed with this strategy (long or short)</param>
 		/// <param name="tickerAndExchange">Ticker the strategy used</param>
 		/// <param name="currentBar">Current bar of the simulation</param>
 		/// <param name="maxBarsAgo">Maximum number of bars in the past to consider for calculating</param>
 		/// <returns>Class holding the statistics calculated</returns>
-		public StrategyStatistics GetStrategyStatistics(string strategyName, TickerExchangePair tickerAndExchange, int currentBar, int maxBarsAgo)
+		public StrategyStatistics GetStrategyStatistics(string strategyName, Order.OrderType orderType, TickerExchangePair tickerAndExchange, int currentBar, int maxBarsAgo)
 		{
 			// Orders that started less than this bar will not be considered.
 			int cutoffBar = currentBar - maxBarsAgo;
@@ -60,7 +61,7 @@ namespace StockSimulator.Core
 				cutoffBar = 0;
 			}
 
-			StrategyStatistics stats = new StrategyStatistics(strategyName);
+			StrategyStatistics stats = new StrategyStatistics(strategyName, orderType);
 
 			int tickerHash = tickerAndExchange.GetHashCode();
 			if (TickerDictionary.ContainsKey(tickerHash))
@@ -99,7 +100,7 @@ namespace StockSimulator.Core
 			}
 			else
 			{
-				stats = new StrategyStatistics(strategyName);
+				stats = new StrategyStatistics(strategyName, orderType);
 			}
 
 			return stats;
@@ -121,7 +122,10 @@ namespace StockSimulator.Core
 				cutoffBar = 0;
 			}
 
-			StrategyStatistics stats = new StrategyStatistics(tickerAndExchange.ToString());
+			// Order type doesn't matter here since we are just using this class to 
+			// output overall ticker info which could be from any order type. It will
+			// get ignored on the web output display.
+			StrategyStatistics stats = new StrategyStatistics(tickerAndExchange.ToString(), Order.OrderType.Long);
 
 			int tickerHash = tickerAndExchange.GetHashCode();
 			if (TickerDictionary.ContainsKey(tickerHash))
@@ -147,7 +151,8 @@ namespace StockSimulator.Core
 			}
 			else
 			{
-				stats = new StrategyStatistics(tickerAndExchange.ToString());
+				// For the same reasons as earlier in this function, order type doesn't matter here.
+				stats = new StrategyStatistics(tickerAndExchange.ToString(), Order.OrderType.Long);
 			}
 
 			return stats;

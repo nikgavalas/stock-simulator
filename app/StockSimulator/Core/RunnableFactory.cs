@@ -143,13 +143,18 @@ namespace StockSimulator.Core
 						requestedItem = new WilliamsR(_tickerData, this);
 						break;
 
-					// Strategies.
+					///////////////////////////// Strategies ////////////////////////////
+
+					//
+					// Bull
+					//
+
 					case "BestOfSubStrategies":
 						requestedItem = new BestOfSubStrategies(_tickerData, this);
 						break;
 
-					case "BollingerExtended":
-						requestedItem = new BollingerExtended(_tickerData, this);
+					case "BullBollingerExtended":
+						requestedItem = new BullBollingerExtended(_tickerData, this);
 						break;
 
 					case "BullBeltHoldFound":
@@ -168,8 +173,8 @@ namespace StockSimulator.Core
 						requestedItem = new BullHaramiCrossFound(_tickerData, this);
 						break;
 
-					case "CciCrossover":
-						requestedItem = new CciCrossover(_tickerData, this);
+					case "BullCciCrossover":
+						requestedItem = new BullCciCrossover(_tickerData, this);
 						break;
 
 					case "DojiFound":
@@ -180,16 +185,16 @@ namespace StockSimulator.Core
 						requestedItem = new HammerFound(_tickerData, this);
 						break;
 
-					case "KeltnerCloseAbove":
-						requestedItem = new KeltnerCloseAbove(_tickerData, this);
+					case "BullKeltnerCloseAbove":
+						requestedItem = new BullKeltnerCloseAbove(_tickerData, this);
 						break;
 
-					case "MacdCrossover":
-						requestedItem = new MacdCrossover(_tickerData, this);
+					case "BullMacdCrossover":
+						requestedItem = new BullMacdCrossover(_tickerData, this);
 						break;
 
-					case "MomentumCrossover":
-						requestedItem = new MomentumCrossover(_tickerData, this);
+					case "BullMomentumCrossover":
+						requestedItem = new BullMomentumCrossover(_tickerData, this);
 						break;
 
 					case "MorningStarFound":
@@ -204,48 +209,56 @@ namespace StockSimulator.Core
 						requestedItem = new RisingThreeMethodsFound(_tickerData, this);
 						break;
 
-					case "RsiCrossover30":
-						requestedItem = new RsiCrossover30(_tickerData, this);
+					case "BullRsiCrossover30":
+						requestedItem = new BullRsiCrossover30(_tickerData, this);
 						break;
 
-					case "SmaCrossover":
-						requestedItem = new SmaCrossover(_tickerData, this);
+					case "BullSmaCrossover":
+						requestedItem = new BullSmaCrossover(_tickerData, this);
 						break;
 
 					case "StickSandwitchFound":
 						requestedItem = new StickSandwitchFound(_tickerData, this);
 						break;
 
-					case "StochasticsFastCrossover":
-						requestedItem = new StochasticsFastCrossover(_tickerData, this);
+					case "BullStochasticsFastCrossover":
+						requestedItem = new BullStochasticsFastCrossover(_tickerData, this);
 						break;
 
-					case "SwingStart":
-						requestedItem = new SwingStart(_tickerData, this);
+					case "BullSwingStart":
+						requestedItem = new BullSwingStart(_tickerData, this);
 						break;
 
 					case "ThreeWhiteSoldiersFound":
 						requestedItem = new ThreeWhiteSoldiersFound(_tickerData, this);
 						break;
 
-					case "TrendStart":
-						requestedItem = new TrendStart(_tickerData, this);
+					case "BullTrendStart":
+						requestedItem = new BullTrendStart(_tickerData, this);
 						break;
 
-					case "TrixSignalCrossover":
-						requestedItem = new TrixSignalCrossover(_tickerData, this);
+					case "BullTrixSignalCrossover":
+						requestedItem = new BullTrixSignalCrossover(_tickerData, this);
 						break;
 
-					case "TrixZeroCrossover":
-						requestedItem = new TrixZeroCrossover(_tickerData, this);
+					case "BullTrixZeroCrossover":
+						requestedItem = new BullTrixZeroCrossover(_tickerData, this);
 						break;
 
 					case "UpsideTasukiGapFound":
 						requestedItem = new UpsideTasukiGapFound(_tickerData, this);
 						break;
 
-					case "WilliamsRCrossover":
-						requestedItem = new WilliamsRCrossover(_tickerData, this);
+					case "BullWilliamsRCrossover":
+						requestedItem = new BullWilliamsRCrossover(_tickerData, this);
+						break;
+
+					//
+					// Bear
+					//
+
+					case "BearMacdCrossover":
+						requestedItem = new BearMacdCrossover(_tickerData, this);
 						break;
 
 					default:
