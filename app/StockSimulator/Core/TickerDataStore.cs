@@ -112,12 +112,12 @@ namespace StockSimulator.Core
 				}
 			}
 
-			// Save all the dates that this ticker has so that we have a list of dates that we can 
-			// iterate through for trading periods. This is because each ticker can potentially have
-			// different trading dates but for the main sim we want to go through all dates and if
-			// the ticker has data for that time, we'll use it.
 			if (data != null)
 			{
+				// Save all the dates that this ticker has so that we have a list of dates that we can 
+				// iterate through for trading periods. This is because each ticker can potentially have
+				// different trading dates but for the main sim we want to go through all dates and if
+				// the ticker has data for that time, we'll use it.
 				for (int i = 0; i < data.Dates.Count; i++)
 				{
 					if (SimTickerDates.ContainsKey(data.Dates[i]) == false)
@@ -125,6 +125,8 @@ namespace StockSimulator.Core
 						SimTickerDates[data.Dates[i]] = true;
 					}
 				}
+
+				data.CalcHigherTimeframe();
 			}
 
 			return data;

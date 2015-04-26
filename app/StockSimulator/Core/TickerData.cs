@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using StockSimulator.Indicators;
 
 namespace StockSimulator.Core
 {
@@ -13,6 +14,15 @@ namespace StockSimulator.Core
 	[JsonObject(MemberSerialization.OptIn)]
 	public class TickerData
 	{
+		public enum HigherMomentumState
+		{
+			Bull,
+			BullOverBought,
+			Bear,
+			BearOverSold
+		}
+
+
 		public DateTime Start { get; set; }
 		public DateTime End { get; set; }
 		public List<DateTime> Dates { get; set; }
@@ -23,6 +33,7 @@ namespace StockSimulator.Core
 		public List<double> Typical { get; set; }
 		public List<double> Median { get; set; }
 		public List<long> Volume { get; set; }
+		public List<HigherMomentumState> HigherTimeframeMomentum { get; set; }
 		public int NumBars { get; set; }
 		public TickerExchangePair TickerAndExchange { get; set; }
 		public double TickSize { get { return 0.01; } }
@@ -64,8 +75,7 @@ namespace StockSimulator.Core
 			Typical = new List<double>();
 			Median = new List<double>();
 			Volume = new List<long>();
-
-			HigherTimeFrame = new TickerData(tickerAndExchange);
+			HigherTimeframeMomentum = new List<HigherMomentumState>();
 		}
 
 		/// <summary>
@@ -201,22 +211,22 @@ namespace StockSimulator.Core
 		/// Returns a string with one data set per line.
 		/// </summary>
 		/// <returns>String of data</returns>
-		public override string ToString()
-		{
-			string output = "";
-			for (int i = 0; i < Dates.Count; i++)
-			{
-				output += UtilityMethods.UnixTicks(Dates[i]).ToString() + ',';
-				output += Open[i].ToString() + ',';
-				output += High[i].ToString() + ',';
-				output += Low[i].ToString() + ',';
-				output += Close[i].ToString() + ',';
-				output += Volume[i].ToString();
-				output += Environment.NewLine;
-			}
+		//public override string ToString()
+		//{
+		//	string output = "";
+		//	for (int i = 0; i < Dates.Count; i++)
+		//	{
+		//		output += UtilityMethods.UnixTicks(Dates[i]).ToString() + ',';
+		//		output += Open[i].ToString() + ',';
+		//		output += High[i].ToString() + ',';
+		//		output += Low[i].ToString() + ',';
+		//		output += Close[i].ToString() + ',';
+		//		output += Volume[i].ToString();
+		//		output += Environment.NewLine;
+		//	}
 
-			return output;
-		}
+		//	return output;
+		//}
 
 		/// <summary>
 		/// Inits the list so they can be outputted in a json/highcharts friendly way.
@@ -296,7 +306,11 @@ namespace StockSimulator.Core
 		/// <summary>
 		/// Uses the current ticker data and aggregates it for a higher time frame set of data.
 		/// Then will run a momentum indicator on that data and compute the 4 different types
-		/// of momentum states we can be in. 
+		/// of momentum states we can be in.
+		/// Bull, not OB = Long orders
+		/// Bull, OB = Short orders
+		/// Bear, not OS = Short orders
+		/// Bear, OS = Long orders
 		/// </summary>
 		public void CalcHigherTimeframe()
 		{
@@ -307,6 +321,11 @@ namespace StockSimulator.Core
 			long volume = 0;
 			int barCount = 0;
 
+			// Reset the states since we'll calculate them again.
+			HigherTimeFrame = new TickerData(TickerAndExchange);
+			HigherTimeframeMomentum = new List<HigherMomentumState>();
+
+			// Aggregate all the data into the higher timeframe.
 			for (int i = 0; i < Dates.Count; i++)
 			{
 				// The first bar open we'll treat as the open price and set the high and low.
@@ -358,6 +377,64 @@ namespace StockSimulator.Core
 				}
 			}
 
+			// Run the indicator and save it.
+			StochasticsFast momentumInd = new StochasticsFast(HigherTimeFrame, new RunnableFactory(HigherTimeFrame));
+			momentumInd.Run();
+
+			// Run through all the dates and see what state we're in.
+			int lowerTimeframeStartBar = 0;
+			for (int i = 0; i < HigherTimeFrame.Dates.Count; i++)
+			{
+				HigherMomentumState momentumState = GetHigherTimeframeMomentumState(momentumInd, i);
+
+				// Assign the lower timeframe the state of the higher timeframe at this time.
+				int lowerTimeframeEndBar = _dateToBar[HigherTimeFrame.Dates[i]];
+				for (int j = lowerTimeframeStartBar; j < lowerTimeframeEndBar; j++)
+				{
+					HigherTimeframeMomentum.Add(momentumState);
+				}
+
+				lowerTimeframeStartBar = lowerTimeframeEndBar;
+
+				if (i + 1 == HigherTimeFrame.Dates.Count)
+				{
+					HigherTimeframeMomentum.Add(momentumState);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Returns the state of the higher momentum bar. Any momentum indicator can be used here.
+		/// </summary>
+		/// <param name="indicator">Momentum indicator to use</param>
+		/// <param name="curBar">Current bar in the momentum simulation</param>
+		/// <returns>The state of the higher momentum indicator</returns>
+		private HigherMomentumState GetHigherTimeframeMomentumState(StochasticsFast indicator, int curBar)
+		{
+			if (DataSeries.IsAbove(indicator.K, indicator.D, curBar, 0) != -1 || indicator.K[curBar] == indicator.D[curBar])
+			{
+				if (indicator.K[curBar] > 75.0)
+				{
+					return HigherMomentumState.BullOverBought;
+				}
+				else
+				{
+					return HigherMomentumState.Bull;
+				}
+			}
+			else if (DataSeries.IsBelow(indicator.K, indicator.D, curBar, 0) != -1)
+			{
+				if (indicator.K[curBar] < 25.0)
+				{
+					return HigherMomentumState.BearOverSold;
+				}
+				else
+				{
+					return HigherMomentumState.Bear;
+				}
+			}
+
+			throw new Exception("Unknown higher momentum state");
 		}
 	}
 }
