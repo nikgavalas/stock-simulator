@@ -23,7 +23,13 @@
 						<!-- indicators will have to be added to the directive so it can stack them accordingly -->
 						<div class="row">
 							<div class="col-xs-12">
-								<highstock ticker="{{ticker}}" events="chartEvents" extremes="extremes"></highstock>
+								<highstock ticker="{{ticker}}" chart-name="lowerTimeframe" events="chartEvents" extremes="extremes"></highstock>
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="col-xs-12">
+								<highstock ticker="{{ticker}}" chart-name="higherTimeframe" higher-timeframe></highstock>
 							</div>
 						</div>
 

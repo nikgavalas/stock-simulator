@@ -49,98 +49,122 @@ namespace StockSimulator.Core
 					// Indicators.
 					case "Bollinger":
 						requestedItem = new Bollinger(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
 					case "BullBeltHold":
 						requestedItem = new BullBeltHold(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
 					case "BullEngulfing":
 						requestedItem = new BullEngulfing(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
 					case "BullHarami":
 						requestedItem = new BullHarami(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
 					case "BullHaramiCross":
 						requestedItem = new BullHaramiCross(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
 					case "Cci14":
 						requestedItem = new Cci(_tickerData, this, 14);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
 					case "Doji":
 						requestedItem = new Doji(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
 					case "Hammer":
 						requestedItem = new Hammer(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
 					case "KeltnerChannel":
 						requestedItem = new KeltnerChannel(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
 					case "Macd":
 						requestedItem = new Macd(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
 					case "Momentum14":
 						requestedItem = new Momentum(_tickerData, this, 14);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
 					case "MorningStar":
 						requestedItem = new MorningStar(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
 					case "PiercingLine":
 						requestedItem = new PiercingLine(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
 					case "RisingThreeMethods":
 						requestedItem = new RisingThreeMethods(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
 					case "Rsi14":
 						requestedItem = new Rsi(_tickerData, this, 14);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
 					case "Sma":
 						requestedItem = new Sma(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
 					case "StickSandwitch":
 						requestedItem = new StickSandwitch(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
 					case "StochasticsFast":
 						requestedItem = new StochasticsFast(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
 					case "Swing":
 						requestedItem = new Swing(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
 					case "Trend":
 						requestedItem = new Trend(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
 					case "ThreeWhiteSoldiers":
 						requestedItem = new ThreeWhiteSoldiers(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
 					case "Trix":
 						requestedItem = new Trix(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
 					case "UpsideTasukiGap":
 						requestedItem = new UpsideTasukiGap(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
 					case "WilliamsR":
 						requestedItem = new WilliamsR(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
 					///////////////////////////// Strategies ////////////////////////////

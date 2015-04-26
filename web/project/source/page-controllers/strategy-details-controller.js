@@ -32,7 +32,7 @@ angular.module('mainApp').controller('StrategyDetailsCtrl', [
 
 			// Add all the indicators to the chart.
 			for (var i = 0; i < data.indicators.length; i++) {
-				$scope.$broadcast('AddIndicator', { name: data.indicators[i] });
+				$scope.$broadcast('AddIndicator', { name: data.indicators[i], chartName: 'lowerTimeframe' });
 			}
 		});
 

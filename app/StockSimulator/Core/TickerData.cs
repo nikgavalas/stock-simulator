@@ -46,7 +46,10 @@ namespace StockSimulator.Core
 		public List<List<object>> VolumeData { get; set; }
 
 		[JsonProperty("higherTimeframe")]
-		public TickerData HigherTimeFrame { get; set; }
+		public TickerData HigherTimeframe { get; set; }
+
+		[JsonProperty("higherTimeframeIndicator")]
+		public StochasticsFast HigherTimeframeIndicator { get; set; }
 
 		/// <summary>
 		/// A map of a date to a current bar. We need this because there seems to be extra 
@@ -75,7 +78,10 @@ namespace StockSimulator.Core
 			Typical = new List<double>();
 			Median = new List<double>();
 			Volume = new List<long>();
-			HigherTimeframeMomentum = new List<HigherMomentumState>();
+
+			HigherTimeframeMomentum = null;
+			HigherTimeframe = null;
+			HigherTimeframeIndicator = null;
 		}
 
 		/// <summary>
@@ -207,6 +213,8 @@ namespace StockSimulator.Core
 			}
 		}
 
+		// Commented out because it really slows down debugging. But there may be a time 
+		// when this is useful to have.
 		/// <summary>
 		/// Returns a string with one data set per line.
 		/// </summary>
@@ -254,7 +262,11 @@ namespace StockSimulator.Core
 				});
 			}
 
-			// TODO: Call the same method for higher timeframe?
+			if (HigherTimeframe != null)
+			{
+				HigherTimeframe.PrepareForSerialization();
+				HigherTimeframeIndicator.PrepareForSerialization();
+			}
 		}
 
 		/// <summary>
@@ -265,7 +277,11 @@ namespace StockSimulator.Core
 			PriceData = null;
 			VolumeData = null;
 
-			// TODO: For higher timeframe, call the same method?
+			if (HigherTimeframe != null)
+			{
+				HigherTimeframe.FreeResourcesAfterSerialization();
+				HigherTimeframeIndicator.FreeResourcesAfterSerialization();
+			}
 		}
 
 		/// <summary>
@@ -322,7 +338,7 @@ namespace StockSimulator.Core
 			int barCount = 0;
 
 			// Reset the states since we'll calculate them again.
-			HigherTimeFrame = new TickerData(TickerAndExchange);
+			HigherTimeframe = new TickerData(TickerAndExchange);
 			HigherTimeframeMomentum = new List<HigherMomentumState>();
 
 			// Aggregate all the data into the higher timeframe.
@@ -364,13 +380,13 @@ namespace StockSimulator.Core
 				{
 					close = Close[i];
 
-					HigherTimeFrame.Dates.Add(Dates[i]); // Use the ending aggregated date as the date for the higher timeframe.
-					HigherTimeFrame.Open.Add(open);
-					HigherTimeFrame.High.Add(high);
-					HigherTimeFrame.Low.Add(low);
-					HigherTimeFrame.Close.Add(close);
-					HigherTimeFrame.Volume.Add(volume);
-					HigherTimeFrame.NumBars = HigherTimeFrame.Dates.Count;
+					HigherTimeframe.Dates.Add(Dates[i]); // Use the ending aggregated date as the date for the higher timeframe.
+					HigherTimeframe.Open.Add(open);
+					HigherTimeframe.High.Add(high);
+					HigherTimeframe.Low.Add(low);
+					HigherTimeframe.Close.Add(close);
+					HigherTimeframe.Volume.Add(volume);
+					HigherTimeframe.NumBars = HigherTimeframe.Dates.Count;
 
 					// Start aggregating a new set.
 					barCount = 0;
@@ -378,17 +394,17 @@ namespace StockSimulator.Core
 			}
 
 			// Run the indicator and save it.
-			StochasticsFast momentumInd = new StochasticsFast(HigherTimeFrame, new RunnableFactory(HigherTimeFrame));
-			momentumInd.Run();
+			HigherTimeframeIndicator = new StochasticsFast(HigherTimeframe, new RunnableFactory(HigherTimeframe));
+			HigherTimeframeIndicator.Run();
 
 			// Run through all the dates and see what state we're in.
 			int lowerTimeframeStartBar = 0;
-			for (int i = 0; i < HigherTimeFrame.Dates.Count; i++)
+			for (int i = 0; i < HigherTimeframe.Dates.Count; i++)
 			{
-				HigherMomentumState momentumState = GetHigherTimeframeMomentumState(momentumInd, i);
+				HigherMomentumState momentumState = GetHigherTimeframeMomentumState(HigherTimeframeIndicator, i);
 
 				// Assign the lower timeframe the state of the higher timeframe at this time.
-				int lowerTimeframeEndBar = _dateToBar[HigherTimeFrame.Dates[i]];
+				int lowerTimeframeEndBar = _dateToBar[HigherTimeframe.Dates[i]];
 				for (int j = lowerTimeframeStartBar; j < lowerTimeframeEndBar; j++)
 				{
 					HigherTimeframeMomentum.Add(momentumState);
@@ -396,7 +412,8 @@ namespace StockSimulator.Core
 
 				lowerTimeframeStartBar = lowerTimeframeEndBar;
 
-				if (i + 1 == HigherTimeFrame.Dates.Count)
+				// Unsure if this is right, but it makes the bar counts add up at least.
+				if (i + 1 == HigherTimeframe.Dates.Count)
 				{
 					HigherTimeframeMomentum.Add(momentumState);
 				}

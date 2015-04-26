@@ -63,8 +63,6 @@ namespace StockSimulator.Core
 		/// <param name="factory">Factory for creating runnables</param>
 		public Indicator(TickerData tickerData, RunnableFactory factory) : base(tickerData, factory)
 		{
-			Simulator.DataOutput.SaveIndicator(this);
-			ChartPlots = new Dictionary<string, PlotSeries>();
 		}
 
 		/// <summary>
@@ -73,7 +71,7 @@ namespace StockSimulator.Core
 		/// </summary>
 		public virtual void PrepareForSerialization()
 		{
-
+			ChartPlots = new Dictionary<string, PlotSeries>();
 		}
 
 		/// <summary>

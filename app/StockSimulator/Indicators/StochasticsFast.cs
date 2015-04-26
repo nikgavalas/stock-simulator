@@ -11,7 +11,7 @@ namespace StockSimulator.Indicators
 	/// <summary>
 	/// StochasticsFast
 	/// </summary>
-	class StochasticsFast : Indicator
+	public class StochasticsFast : Indicator
 	{
 		public List<double> D { get; set; }
 		public List<double> K { get; set; }
