@@ -137,6 +137,11 @@ namespace StockSimulator.Core
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
+					case "Stochastics":
+						requestedItem = new Stochastics(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
+						break;
+
 					case "Swing":
 						requestedItem = new Swing(_tickerData, this);
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
@@ -247,6 +252,10 @@ namespace StockSimulator.Core
 
 					case "BullStochasticsFastCrossover":
 						requestedItem = new BullStochasticsFastCrossover(_tickerData, this);
+						break;
+
+					case "BullStochasticsCrossover":
+						requestedItem = new BullStochasticsCrossover(_tickerData, this);
 						break;
 
 					case "BullSwingStart":

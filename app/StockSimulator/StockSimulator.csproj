@@ -129,6 +129,7 @@
     <Compile Include="Indicators\Cci.cs" />
     <Compile Include="Indicators\KeltnerChannel.cs" />
     <Compile Include="Indicators\Momentum.cs" />
+    <Compile Include="Indicators\Stochastics.cs" />
     <Compile Include="Indicators\StochasticsFast.cs" />
     <Compile Include="Indicators\Swing.cs" />
     <Compile Include="Indicators\Trend.cs" />
@@ -137,6 +138,7 @@
     <Compile Include="Strategies\Bear\BearMacdCrossover.cs" />
     <Compile Include="Strategies\BestOfSubStrategies.cs" />
     <Compile Include="Strategies\Bull\BollingerExtended.cs" />
+    <Compile Include="Strategies\Bull\StochasticsCrossover.cs" />
     <Compile Include="Strategies\Candlesticks\BullBeltHoldFound.cs" />
     <Compile Include="Strategies\Candlesticks\BullEngulfingFound.cs" />
     <Compile Include="Strategies\Candlesticks\BullHaramiCrossFound.cs" />

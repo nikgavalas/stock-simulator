@@ -49,7 +49,7 @@ namespace StockSimulator.Core
 		public TickerData HigherTimeframe { get; set; }
 
 		[JsonProperty("higherTimeframeIndicator")]
-		public StochasticsFast HigherTimeframeIndicator { get; set; }
+		public Stochastics HigherTimeframeIndicator { get; set; }
 
 		/// <summary>
 		/// A map of a date to a current bar. We need this because there seems to be extra 
@@ -394,7 +394,7 @@ namespace StockSimulator.Core
 			}
 
 			// Run the indicator and save it.
-			HigherTimeframeIndicator = new StochasticsFast(HigherTimeframe, new RunnableFactory(HigherTimeframe));
+			HigherTimeframeIndicator = new Stochastics(HigherTimeframe, new RunnableFactory(HigherTimeframe));
 			HigherTimeframeIndicator.Run();
 
 			// Run through all the dates and see what state we're in.
@@ -426,11 +426,11 @@ namespace StockSimulator.Core
 		/// <param name="indicator">Momentum indicator to use</param>
 		/// <param name="curBar">Current bar in the momentum simulation</param>
 		/// <returns>The state of the higher momentum indicator</returns>
-		private HigherMomentumState GetHigherTimeframeMomentumState(StochasticsFast indicator, int curBar)
+		private HigherMomentumState GetHigherTimeframeMomentumState(Stochastics indicator, int curBar)
 		{
 			if (DataSeries.IsAbove(indicator.K, indicator.D, curBar, 0) != -1 || indicator.K[curBar] == indicator.D[curBar])
 			{
-				if (indicator.K[curBar] > 75.0)
+				if (indicator.K[curBar] > 80.0)
 				{
 					return HigherMomentumState.BullOverBought;
 				}
@@ -441,7 +441,7 @@ namespace StockSimulator.Core
 			}
 			else if (DataSeries.IsBelow(indicator.K, indicator.D, curBar, 0) != -1)
 			{
-				if (indicator.K[curBar] < 25.0)
+				if (indicator.K[curBar] < 20.0)
 				{
 					return HigherMomentumState.BearOverSold;
 				}

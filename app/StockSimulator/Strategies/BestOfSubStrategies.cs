@@ -88,6 +88,7 @@ namespace StockSimulator.Strategies
 					//"BullSmaCrossover",
 					//"StickSandwitchFound",
 					//"BullStochasticsFastCrossover",
+					"BullStochasticsCrossover",
 					//"BullSwingStart",
 					//"ThreeWhiteSoldiersFound",
 					//"BullTrendStart",
