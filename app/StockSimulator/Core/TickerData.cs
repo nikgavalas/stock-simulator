@@ -293,6 +293,11 @@ namespace StockSimulator.Core
 			}
 		}
 
+		/// <summary>
+		/// Uses the current ticker data and aggregates it for a higher time frame set of data.
+		/// Then will run a momentum indicator on that data and compute the 4 different types
+		/// of momentum states we can be in. 
+		/// </summary>
 		public void CalcHigherTimeframe()
 		{
 			double open = 0;
@@ -331,7 +336,12 @@ namespace StockSimulator.Core
 
 				// The last bar close is treated as the close. Now it's time to save all
 				// the aggregated data as one bar for the higher timeframe.
-				if (barCount == Simulator.Config.NumBarsHigherTimeframe)
+				// We also want to do this if the for loop is just about to exit. We may not
+				// have the number of bars we wanted for the aggregate, but we want to at least have
+				// something for the last bar. Ex. We have 5 bars set for the higher timeframe length,
+				// but we've only got 3 bars of data and the for loop will end on the next iteration.
+				// In that case we want to use the 3 bars we have for the data.
+				if (barCount == Simulator.Config.NumBarsHigherTimeframe || (i + 1) == Dates.Count)
 				{
 					close = Close[i];
 
