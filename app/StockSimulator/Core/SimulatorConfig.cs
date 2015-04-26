@@ -72,6 +72,13 @@ namespace StockSimulator.Core
 		[Description("The number of bars for a trend")]
 		public int TrendStrength { get; set; }
 
+		//////////////////////////// HIGHER TIMEFRAME /////////////////////////////
+
+		[Category("Higher Timeframe")]
+		[DisplayName("Number Bars")]
+		[Description("The number of bars to aggregate the lower timeframe for the higher timeframe")]
+		public int NumBarsHigherTimeframe { get; set; }
+
 		/////////////////////////////// OUTPUT ////////////////////////////////////
 
 		[Category("Output")]
@@ -247,6 +254,8 @@ namespace StockSimulator.Core
 			UseAbbreviatedOutput = false;
 			OnlyOutputLastBuyList = false;
 			ShouldOpenWebPage = true;
+
+			NumBarsHigherTimeframe = 5;
 
 			// Desktop
 			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\test-large.csv";

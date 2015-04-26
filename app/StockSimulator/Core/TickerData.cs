@@ -34,6 +34,9 @@ namespace StockSimulator.Core
 		[JsonProperty("volume")]
 		public List<List<object>> VolumeData { get; set; }
 
+		[JsonProperty("higherTimeframe")]
+		public TickerData HigherTimeFrame { get; set; }
+
 		/// <summary>
 		/// A map of a date to a current bar. We need this because there seems to be extra 
 		/// trading dates on NYSE that don't exist on NASDAQ.
@@ -61,6 +64,8 @@ namespace StockSimulator.Core
 			Typical = new List<double>();
 			Median = new List<double>();
 			Volume = new List<long>();
+
+			HigherTimeFrame = new TickerData(tickerAndExchange);
 		}
 
 		/// <summary>
@@ -238,6 +243,8 @@ namespace StockSimulator.Core
 					Volume[i]
 				});
 			}
+
+			// TODO: Call the same method for higher timeframe?
 		}
 
 		/// <summary>
@@ -247,6 +254,8 @@ namespace StockSimulator.Core
 		{
 			PriceData = null;
 			VolumeData = null;
+
+			// TODO: For higher timeframe, call the same method?
 		}
 
 		/// <summary>
@@ -282,6 +291,63 @@ namespace StockSimulator.Core
 			{
 				_dateToBar[Dates[i]] = i;
 			}
+		}
+
+		public void CalcHigherTimeframe()
+		{
+			double open = 0;
+			double high = 0;
+			double low = 0;
+			double close = 0;
+			long volume = 0;
+			int barCount = 0;
+
+			for (int i = 0; i < Dates.Count; i++)
+			{
+				// The first bar open we'll treat as the open price and set the high and low.
+				// Volume gets reset as it's cumulative through all the bars.
+				if (barCount == 0)
+				{
+					open = Open[i];
+					low = Low[i];
+					high = High[i];
+					volume = 0;
+				}
+
+				// If this low is lower than the saved low, we have a new low. 
+				// Same for high but opposite of course.
+				if (Low[i] < low)
+				{
+					low = Low[i];
+				}
+				if (High[i] > high)
+				{
+					high = High[i];
+				}
+
+				// Move to the next bar to aggregate from.
+				++barCount;
+				volume += Volume[i];
+
+				// The last bar close is treated as the close. Now it's time to save all
+				// the aggregated data as one bar for the higher timeframe.
+				if (barCount == Simulator.Config.NumBarsHigherTimeframe)
+				{
+					close = Close[i];
+
+					HigherTimeFrame.Dates.Add(Dates[i]); // Use the ending aggregated date as the date for the higher timeframe.
+					HigherTimeFrame.Open.Add(open);
+					HigherTimeFrame.High.Add(high);
+					HigherTimeFrame.Low.Add(low);
+					HigherTimeFrame.Close.Add(close);
+					HigherTimeFrame.Volume.Add(volume);
+					HigherTimeFrame.NumBars = HigherTimeFrame.Dates.Count;
+
+					// Start aggregating a new set.
+					barCount = 0;
+				}
+			}
+
 		}
 	}
 }
