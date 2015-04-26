@@ -14,15 +14,6 @@ namespace StockSimulator.Core
 	[JsonObject(MemberSerialization.OptIn)]
 	public class TickerData
 	{
-		public enum HigherMomentumState
-		{
-			Bull,
-			BullOverBought,
-			Bear,
-			BearOverSold
-		}
-
-
 		public DateTime Start { get; set; }
 		public DateTime End { get; set; }
 		public List<DateTime> Dates { get; set; }
@@ -33,7 +24,7 @@ namespace StockSimulator.Core
 		public List<double> Typical { get; set; }
 		public List<double> Median { get; set; }
 		public List<long> Volume { get; set; }
-		public List<HigherMomentumState> HigherTimeframeMomentum { get; set; }
+		public List<Order.OrderType> HigherTimeframeMomentum { get; set; }
 		public int NumBars { get; set; }
 		public TickerExchangePair TickerAndExchange { get; set; }
 		public double TickSize { get { return 0.01; } }
@@ -339,7 +330,7 @@ namespace StockSimulator.Core
 
 			// Reset the states since we'll calculate them again.
 			HigherTimeframe = new TickerData(TickerAndExchange);
-			HigherTimeframeMomentum = new List<HigherMomentumState>();
+			HigherTimeframeMomentum = new List<Order.OrderType>();
 
 			// Aggregate all the data into the higher timeframe.
 			for (int i = 0; i < Dates.Count; i++)
@@ -401,7 +392,7 @@ namespace StockSimulator.Core
 			int lowerTimeframeStartBar = 0;
 			for (int i = 0; i < HigherTimeframe.Dates.Count; i++)
 			{
-				HigherMomentumState momentumState = GetHigherTimeframeMomentumState(HigherTimeframeIndicator, i);
+				Order.OrderType momentumState = GetHigherTimeframeMomentumState(HigherTimeframeIndicator, i);
 
 				// Assign the lower timeframe the state of the higher timeframe at this time.
 				int lowerTimeframeEndBar = _dateToBar[HigherTimeframe.Dates[i]];
@@ -426,29 +417,15 @@ namespace StockSimulator.Core
 		/// <param name="indicator">Momentum indicator to use</param>
 		/// <param name="curBar">Current bar in the momentum simulation</param>
 		/// <returns>The state of the higher momentum indicator</returns>
-		private HigherMomentumState GetHigherTimeframeMomentumState(Stochastics indicator, int curBar)
+		private Order.OrderType GetHigherTimeframeMomentumState(Stochastics indicator, int curBar)
 		{
 			if (DataSeries.IsAbove(indicator.K, indicator.D, curBar, 0) != -1 || indicator.K[curBar] == indicator.D[curBar])
 			{
-				if (indicator.K[curBar] > 80.0)
-				{
-					return HigherMomentumState.BullOverBought;
-				}
-				else
-				{
-					return HigherMomentumState.Bull;
-				}
+				return Order.OrderType.Long;
 			}
 			else if (DataSeries.IsBelow(indicator.K, indicator.D, curBar, 0) != -1)
 			{
-				if (indicator.K[curBar] < 20.0)
-				{
-					return HigherMomentumState.BearOverSold;
-				}
-				else
-				{
-					return HigherMomentumState.Bear;
-				}
+				return Order.OrderType.Short;
 			}
 
 			throw new Exception("Unknown higher momentum state");

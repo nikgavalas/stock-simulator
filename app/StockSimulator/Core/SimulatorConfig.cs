@@ -79,6 +79,16 @@ namespace StockSimulator.Core
 		[Description("The number of bars to aggregate the lower timeframe for the higher timeframe")]
 		public int NumBarsHigherTimeframe { get; set; }
 
+		[Category("Higher Timeframe")]
+		[DisplayName("Use for Substrategies")]
+		[Description("Use the higher timeframe momentum on substrategies")]
+		public bool UseHigherTimeframeSubstrategies { get; set; }
+
+		[Category("Higher Timeframe")]
+		[DisplayName("Use for Main Strategy")]
+		[Description("Use the higher timeframe momentum on the main strategy")]
+		public bool UseHigherTimeframeMainStrategy { get; set; }
+
 		/////////////////////////////// OUTPUT ////////////////////////////////////
 
 		[Category("Output")]
@@ -256,6 +266,8 @@ namespace StockSimulator.Core
 			ShouldOpenWebPage = true;
 
 			NumBarsHigherTimeframe = 5;
+			UseHigherTimeframeSubstrategies = true;
+			UseHigherTimeframeMainStrategy = true;
 
 			// Desktop
 			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\test-large.csv";
@@ -267,11 +279,12 @@ namespace StockSimulator.Core
 			//OutputFolder = @"C:\Users\Nik\Documents\github\stock-simulator\output\output";
 
 			// Testing parameters for indicator correctness.
-			//startDate = DateTime.Parse("12/31/2013");
-			//endDate = DateTime.Parse("12/31/2014");
+			//StartDate = DateTime.Parse("12/31/2013");
+			//EndDate = DateTime.Parse("12/31/2014");
 			//PercentForBuy = 25;
 			//MinComboSizeToBuy = 1;
 			//MinRequiredOrders = 1;
+			//NumBarsToDelayStart = 0;
 			//InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\indtest.csv";
 
 		}

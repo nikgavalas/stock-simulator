@@ -70,32 +70,32 @@ namespace StockSimulator.Strategies
 			{
 				string[] deps = {
 					// Bull strategies
-					//"BullBollingerExtended",
-					//"BullBeltHoldFound",
-					//"BullEngulfingFound",
-					//"BullHaramiFound",
-					//"BullHaramiCrossFound",
+					"BullBollingerExtended",
+					"BullBeltHoldFound",
+					"BullEngulfingFound",
+					"BullHaramiFound",
+					"BullHaramiCrossFound",
 					"BullCciCrossover",
-					//"DojiFound",
-					//"HammerFound",
-					//"BullKeltnerCloseAbove",
+					"DojiFound",
+					"HammerFound",
+					"BullKeltnerCloseAbove",
 					"BullMacdCrossover",
-					//"BullMomentumCrossover",
-					//"MorningStarFound",
-					//"PiercingLineFound",
-					//"RisingThreeMethodsFound",
-					//"BullRsiCrossover30",
-					//"BullSmaCrossover",
-					//"StickSandwitchFound",
-					//"BullStochasticsFastCrossover",
+					"BullMomentumCrossover",
+					"MorningStarFound",
+					"PiercingLineFound",
+					"RisingThreeMethodsFound",
+					"BullRsiCrossover30",
+					"BullSmaCrossover",
+					"StickSandwitchFound",
+					"BullStochasticsFastCrossover",
 					"BullStochasticsCrossover",
-					//"BullSwingStart",
-					//"ThreeWhiteSoldiersFound",
-					//"BullTrendStart",
-					//"BullTrixSignalCrossover",
-					//"BullTrixZeroCrossover",
-					//"UpsideTasukiGapFound",
-					//"BullWilliamsRCrossover",
+					"BullSwingStart",
+					"ThreeWhiteSoldiersFound",
+					"BullTrendStart",
+					"BullTrixSignalCrossover",
+					"BullTrixZeroCrossover",
+					"UpsideTasukiGapFound",
+					"BullWilliamsRCrossover",
 
 					// Bear strategies
 					"BearMacdCrossover"
@@ -210,10 +210,12 @@ namespace StockSimulator.Strategies
 						continue;
 					}
 
-
-					// TODO: check here that the strategy order type matches
+					// Check here that the strategy order type matches
 					// with the higher timeframe trend. Continue if it doesn't.
-
+					if (Simulator.Config.UseHigherTimeframeSubstrategies == true && dependentStrategy.OrderType != dependentStrategy.Data.HigherTimeframeMomentum[currentBar])
+					{
+						continue;
+					}
 
 					// The logic here that searches the current bar
 					// and back a few days to make the finding not so exact. It adds

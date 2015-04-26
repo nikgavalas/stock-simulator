@@ -368,6 +368,13 @@ namespace StockSimulator.Core
 		/// <param name="currentBar">Current bar of the simulation</param>
 		private void EnterOrder(List<StrategyStatistics> stats, Order.OrderType orderType, TickerData ticker, int currentBar)
 		{
+			// Check here that the strategy order type matches
+			// with the higher timeframe trend. Continue if it doesn't.
+			if (Config.UseHigherTimeframeMainStrategy == true && orderType != ticker.HigherTimeframeMomentum[currentBar])
+			{
+				return;
+			}
+
 			MainStrategyOrder order = new MainStrategyOrder(stats, orderType, ticker, "MainStrategy", currentBar);
 			Simulator.Orders.AddOrder(order);
 			_activeOrders.Add(order);
