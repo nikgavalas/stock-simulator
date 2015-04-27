@@ -4,14 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
+
 using StockSimulator.Core;
 using StockSimulator.Indicators;
 
 namespace StockSimulator.Strategies
 {
-	class BullCciCrossover : Strategy
+	class BearSmaCrossover : Strategy
 	{
-		public BullCciCrossover(TickerData tickerData, RunnableFactory factory)
+		public BearSmaCrossover(TickerData tickerData, RunnableFactory factory) 
 			: base(tickerData, factory)
 		{
 
@@ -25,7 +26,7 @@ namespace StockSimulator.Strategies
 			get
 			{
 				string[] deps = {
-					"Cci14"
+					"Sma"
 				};
 
 				return deps;
@@ -38,7 +39,7 @@ namespace StockSimulator.Strategies
 		/// <returns>The name of this strategy</returns>
 		public override string ToString()
 		{
-			return "BullCciCrossover";
+			return "BearSmaCrossover";
 		}
 
 		/// <summary>
@@ -49,8 +50,8 @@ namespace StockSimulator.Strategies
 		{
 			base.OnBarUpdate(currentBar);
 
-			Cci ind = (Cci)Dependents[0];
-			if (DataSeries.CrossAbove(ind.Value, -100, currentBar, 0) != -1)
+			Sma sma = (Sma)Dependents[0];
+			if (DataSeries.CrossBelow(Data.Close, sma.Avg, currentBar, 0) != -1)
 			{
 				WasFound[currentBar] = true;
 			}

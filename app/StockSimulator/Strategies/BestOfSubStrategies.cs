@@ -98,7 +98,20 @@ namespace StockSimulator.Strategies
 					"BullWilliamsRCrossover",
 
 					// Bear strategies
-					"BearMacdCrossover"
+					"BearBollingerExtended",
+					"BearCciCrossover",
+					"BearKeltnerCloseAbove",
+					"BearMacdCrossover",
+					"BearMomentumCrossover",
+					"BearRsiCrossover70",
+					"BearSmaCrossover",
+					"BearStochasticsCrossover",
+					"BearStochasticsFastCrossover",
+					"BearSwingStart",
+					"BearTrendStart",
+					"BearTrixSignalCrossover",
+					"BearTrixZeroCrossover",
+					"BearWilliamsRCrossover"
 				};
 
 				return deps;

@@ -220,7 +220,7 @@ namespace StockSimulator.Core
 			string fileAndPath = GetTickerFilename(ticker);
 			string contents = UtilityMethods.UnixTicks(start) + "," + UtilityMethods.UnixTicks(end) + "," + Environment.NewLine;
 			contents += "Date,Open,High,Low,Close,Volume," + Environment.NewLine;
-			contents += newData.ToString();
+			contents += newData.WriteToString();
 			try
 			{
 				File.WriteAllText(fileAndPath, contents);

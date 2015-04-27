@@ -210,22 +210,22 @@ namespace StockSimulator.Core
 		/// Returns a string with one data set per line.
 		/// </summary>
 		/// <returns>String of data</returns>
-		//public override string ToString()
-		//{
-		//	string output = "";
-		//	for (int i = 0; i < Dates.Count; i++)
-		//	{
-		//		output += UtilityMethods.UnixTicks(Dates[i]).ToString() + ',';
-		//		output += Open[i].ToString() + ',';
-		//		output += High[i].ToString() + ',';
-		//		output += Low[i].ToString() + ',';
-		//		output += Close[i].ToString() + ',';
-		//		output += Volume[i].ToString();
-		//		output += Environment.NewLine;
-		//	}
+		public string WriteToString()
+		{
+			string output = "";
+			for (int i = 0; i < Dates.Count; i++)
+			{
+				output += UtilityMethods.UnixTicks(Dates[i]).ToString() + ',';
+				output += Open[i].ToString() + ',';
+				output += High[i].ToString() + ',';
+				output += Low[i].ToString() + ',';
+				output += Close[i].ToString() + ',';
+				output += Volume[i].ToString();
+				output += Environment.NewLine;
+			}
 
-		//	return output;
-		//}
+			return output;
+		}
 
 		/// <summary>
 		/// Inits the list so they can be outputted in a json/highcharts friendly way.

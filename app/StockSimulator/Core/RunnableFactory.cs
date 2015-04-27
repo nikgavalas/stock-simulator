@@ -290,8 +290,60 @@ namespace StockSimulator.Core
 					// Bear
 					//
 
+					case "BearBollingerExtended":
+						requestedItem = new BearBollingerExtended(_tickerData, this);
+						break;
+
+					case "BearCciCrossover":
+						requestedItem = new BearCciCrossover(_tickerData, this);
+						break;
+
+					case "BearKeltnerCloseAbove":
+						requestedItem = new BearKeltnerCloseAbove(_tickerData, this);
+						break;
+
 					case "BearMacdCrossover":
 						requestedItem = new BearMacdCrossover(_tickerData, this);
+						break;
+
+					case "BearMomentumCrossover":
+						requestedItem = new BearMomentumCrossover(_tickerData, this);
+						break;
+
+					case "BearRsiCrossover70":
+						requestedItem = new BearRsiCrossover70(_tickerData, this);
+						break;
+
+					case "BearSmaCrossover":
+						requestedItem = new BearSmaCrossover(_tickerData, this);
+						break;
+
+					case "BearStochasticsCrossover":
+						requestedItem = new BearStochasticsCrossover(_tickerData, this);
+						break;
+
+					case "BearStochasticsFastCrossover":
+						requestedItem = new BearStochasticsFastCrossover(_tickerData, this);
+						break;
+
+					case "BearSwingStart":
+						requestedItem = new BearSwingStart(_tickerData, this);
+						break;
+
+					case "BearTrendStart":
+						requestedItem = new BearTrendStart(_tickerData, this);
+						break;
+
+					case "BearTrixSignalCrossover":
+						requestedItem = new BearTrixSignalCrossover(_tickerData, this);
+						break;
+
+					case "BearTrixZeroCrossover":
+						requestedItem = new BearTrixZeroCrossover(_tickerData, this);
+						break;
+
+					case "BearWilliamsRCrossover":
+						requestedItem = new BearWilliamsRCrossover(_tickerData, this);
 						break;
 
 					default:

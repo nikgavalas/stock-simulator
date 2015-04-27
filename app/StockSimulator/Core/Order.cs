@@ -72,9 +72,11 @@ namespace StockSimulator.Core
 		[JsonProperty("orderStatus")]
 		public OrderStatus Status { get; set; }
 
+		[JsonProperty("orderType")]
+		public OrderType Type { get; set; }
+
 		public int BuyBar { get; set; }
 		public int SellBar { get; set; }
-		public OrderType Type { get; set; }
 		public double ProfitTargetPrice { get; set; }
 		public double StopPrice { get; set; }
 		public string StrategyName { get; set; }
