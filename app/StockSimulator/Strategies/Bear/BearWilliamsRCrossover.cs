@@ -14,7 +14,7 @@ namespace StockSimulator.Strategies
 		public BearWilliamsRCrossover(TickerData tickerData, RunnableFactory factory)
 			: base(tickerData, factory)
 		{
-
+			_orderType = Order.OrderType.Short;
 		}
 
 		/// <summary>
