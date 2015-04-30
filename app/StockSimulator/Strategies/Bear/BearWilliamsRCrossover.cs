@@ -50,7 +50,7 @@ namespace StockSimulator.Strategies
 			base.OnBarUpdate(currentBar);
 
 			WilliamsR ind = (WilliamsR)Dependents[0];
-			if (DataSeries.CrossBelow(ind.Value, 80, currentBar, 0) != -1)
+			if (DataSeries.CrossBelow(ind.Value, -20, currentBar, 0) != -1)
 			{
 				WasFound[currentBar] = true;
 			}
