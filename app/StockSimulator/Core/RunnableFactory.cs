@@ -118,7 +118,7 @@ namespace StockSimulator.Core
 						break;
 
 					case "Rsi14":
-						requestedItem = new Rsi(_tickerData, this, 14);
+						requestedItem = new Rsi(_tickerData, this, 18);
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
