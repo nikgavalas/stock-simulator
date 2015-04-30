@@ -161,7 +161,7 @@ namespace StockSimulator.Core
 
 			Parallel.ForEach(Instruments, task =>
 			{
-				WriteMessage("Running " + task.Value.Data.TickerAndExchange.ToString());
+				//WriteMessage("Running " + task.Value.Data.TickerAndExchange.ToString());
 				task.Value.Run();
 			});
 
