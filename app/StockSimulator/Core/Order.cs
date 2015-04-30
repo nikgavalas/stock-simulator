@@ -80,13 +80,14 @@ namespace StockSimulator.Core
 		public double ProfitTargetPrice { get; set; }
 		public double StopPrice { get; set; }
 		public string StrategyName { get; set; }
-		public double Value { get; set; }
 		public StrategyStatistics StartStatistics { get; set; }
 		public StrategyStatistics EndStatistics { get; set; }
 		public List<string> DependentIndicatorNames { get; set; }
 
 		private double LimitBuyPrice { get; set; }
 		private int LimitOpenedBar { get; set; }
+
+		private double _orderValue;
 
 		/// <summary>
 		/// Contructor for the order.
@@ -98,6 +99,8 @@ namespace StockSimulator.Core
 		/// <param name="dependentIndicatorNames">Names of the dependent indicators so they can be shown on the web with the order</param>
 		public Order(OrderType type, TickerData tickerData, string fromStrategyName, int currentBar, List<string> dependentIndicatorNames)
 		{
+			_orderValue = 0;
+
 			StrategyName = fromStrategyName;
 			OrderId = GetUniqueId();
 			Type = type;
@@ -113,6 +116,24 @@ namespace StockSimulator.Core
 				Ticker.TickerAndExchange,
 				currentBar,
 				Simulator.Config.MaxLookBackBars);
+		}
+
+		/// <summary>
+		/// Returns the value of the order as positive regardless of a long or short order.
+		/// Ex. If we short order bought 10 shares at $100, then after 3 bars the value price
+		/// of the stock is $90. The value of the order is actually $1100 because we made 
+		/// $10 per share since we shorted it. Long orders are much easier to visualize.
+		/// The reason for this is so that in our account value we always store how much of
+		/// an overall value our portfolio is and we want that to account for short orders too.
+		/// </summary>
+		public double Value
+		{
+			get
+			{
+				double direction = Type == OrderType.Long ? 1.0 : -1.0;
+				double startingValue = NumberOfShares * BuyPrice;
+				return ((_orderValue - startingValue) * direction) + startingValue;
+			}
 		}
 
 		/// <summary>
@@ -172,7 +193,7 @@ namespace StockSimulator.Core
 					//}
 
 					NumberOfShares = BuyPrice > 0.0 ? Convert.ToInt32(Math.Floor(sizeOfOrder / BuyPrice)) : 0;
-					Value = NumberOfShares * BuyPrice;
+					_orderValue = NumberOfShares * BuyPrice;
 
 					double direction = Type == OrderType.Long ? 1.0 : -1.0;
 
@@ -185,7 +206,7 @@ namespace StockSimulator.Core
 			// Close any orders that need to be closed
 			if (Status == OrderStatus.Filled)
 			{
-				Value = NumberOfShares * Ticker.Close[curBar];
+				_orderValue = NumberOfShares * Ticker.Close[curBar];
 
 				if (Type == OrderType.Long)
 				{
@@ -285,7 +306,7 @@ namespace StockSimulator.Core
 		private void FinishOrder(double sellPrice, int currentBar, OrderStatus sellStatus)
 		{
 			double direction = Type == OrderType.Long ? 1.0 : -1.0;
-
+			
 			// If the sell price is 0 then it's a bug that no more data for this stock exists 
 			// and we had an order open. This is not really realistic so we'll just have the order
 			// gain $0.
@@ -293,8 +314,9 @@ namespace StockSimulator.Core
 			SellBar = currentBar;
 			SellDate = Ticker.Dates[currentBar];
 			Status = sellStatus;
-			Value = NumberOfShares * SellPrice;
-			Gain = (Value - (NumberOfShares * BuyPrice)) * direction;
+			Gain = ((NumberOfShares * SellPrice) - (NumberOfShares * BuyPrice)) * direction;
+
+			_orderValue = NumberOfShares * SellPrice;
 
 			// Get things like win/loss percent up to the point this order was finished.
 			// TODO: not sure if this is needed.

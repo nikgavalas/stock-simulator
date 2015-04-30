@@ -37,8 +37,8 @@ mainApp.factory('AccountSummaryFactory', [
 			 * @param {Number} value Value of the account on this date
 			 */
 			addValue: function(dateOfValue, value) {
-				var month = parseInt(dateOfValue.getMonth(), 10);
-				var monthName = monthNames[dateOfValue.getMonth()];
+				var month = parseInt(dateOfValue.getUTCMonth(), 10);
+				var monthName = monthNames[dateOfValue.getUTCMonth()];
 				
 				// Create a new month to hold the values.
 				if (angular.isUndefined(this.monthNameToIndex[monthName])) {

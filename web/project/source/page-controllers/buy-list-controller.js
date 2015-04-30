@@ -17,15 +17,15 @@ angular.module('mainApp').controller('BuyListCtrl', [
 	) {
 
 		function convertDateToString(date) {
-			var month = (date.getMonth() + 1).toString();
+			var month = (date.getUTCMonth() + 1).toString();
 			if (month.length < 2) {
 				month = '0' + month;
 			}
-			var day = (date.getDate()).toString();
+			var day = (date.getUTCDate()).toString();
 			if (day.length < 2) {
 				day = '0' + day;
 			}
-			return date.getFullYear() + '-' + month + '-' + day;
+			return date.getUTCFullYear() + '-' + month + '-' + day;
 		}
 
 		function isValidDate(d) {

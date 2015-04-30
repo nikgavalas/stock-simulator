@@ -161,7 +161,6 @@ namespace StockSimulator.Core
 
 			Parallel.ForEach(Instruments, task =>
 			{
-				//WriteMessage("Running " + task.Value.Data.TickerAndExchange.ToString());
 				task.Value.Run();
 			});
 
@@ -331,12 +330,25 @@ namespace StockSimulator.Core
 					order.Update(barNum);
 				}
 
-				// If the order has just been filled, then subtract that amount from the account.
-				if (previousStatus == Order.OrderStatus.Open && order.Status == Order.OrderStatus.Filled)
+				// If the order was open before the update, then there are two possible outcomes:
+				// 1. It filled and did NOT close this update.
+				// 2. It filled and did close this update.
+				if (previousStatus == Order.OrderStatus.Open)
 				{
-					Broker.AccountCash -= order.Value;
+					// If it filled but didn't close, then subtract it from our cash.
+					if (order.Status == Order.OrderStatus.Filled)
+					{
+						Broker.AccountCash -= order.NumberOfShares * order.BuyPrice;
+					}
+					// If it closed the same bar then it opened, we haven't had a simulated bar to subtract
+					// the cost from our cash, so just add the gain back to the cash.
+					else if (order.IsFinished())
+					{
+						Broker.AccountCash += order.Gain;
+					}
 				}
-				// If the order just finished then add the value back.
+				// If the order just finished then add the value back because we deducted the cash from
+				// when the order was filled on a previous update.
 				else if (previousStatus == Order.OrderStatus.Filled && order.IsFinished())
 				{
 					Broker.AccountCash += order.Value;

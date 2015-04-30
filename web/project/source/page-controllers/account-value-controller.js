@@ -22,7 +22,7 @@ angular.module('mainApp').controller('AccountValueCtrl', [
 		$http.get(ConfigFactory.getOutputFolder() + 'overall-account.json').success(function(data) {
 			$scope.chartData = data.accountValue;
 
-			var currentYear = new Date($scope.chartData[0][0]).getFullYear();
+			var currentYear = new Date($scope.chartData[0][0]).getUTCFullYear();
 			var currentSummary = AccountSummaryFactory.newYearSummary(currentYear);
 			$scope.yearSummaries[currentYear] = currentSummary;
 
@@ -31,8 +31,8 @@ angular.module('mainApp').controller('AccountValueCtrl', [
 				var dateOfItem = new Date(timeAndValue[0]);
 
 				// Move to the next year if we need to.
-				if (dateOfItem.getFullYear() !== currentYear) {
-					currentYear = dateOfItem.getFullYear();
+				if (dateOfItem.getUTCFullYear() !== currentYear) {
+					currentYear = dateOfItem.getUTCFullYear();
 					currentSummary = AccountSummaryFactory.newYearSummary(currentYear);
 					$scope.yearSummaries[currentYear] = currentSummary;
 				}
