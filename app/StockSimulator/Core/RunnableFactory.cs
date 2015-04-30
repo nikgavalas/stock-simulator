@@ -222,6 +222,10 @@ namespace StockSimulator.Core
 						requestedItem = new BullMacdCrossover(_tickerData, this);
 						break;
 
+					case "BullMacdMomentum":
+						requestedItem = new BullMacdMomentum(_tickerData, this);
+						break;
+
 					case "BullMomentumCrossover":
 						requestedItem = new BullMomentumCrossover(_tickerData, this);
 						break;
@@ -300,6 +304,10 @@ namespace StockSimulator.Core
 
 					case "BearKeltnerCloseAbove":
 						requestedItem = new BearKeltnerCloseAbove(_tickerData, this);
+						break;
+
+					case "BearMacdMomentum":
+						requestedItem = new BearMacdMomentum(_tickerData, this);
 						break;
 
 					case "BearMacdCrossover":
