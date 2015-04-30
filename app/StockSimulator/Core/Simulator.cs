@@ -258,6 +258,16 @@ namespace StockSimulator.Core
 					int currentCount = 0;
 					for (int i = 0; i < buyList.Count; i++)
 					{
+						// Only allowed to have a maximum number of orders open at 1 time. This will limit us
+						// to working within a budget later in the sim when we make money. Ex. If we start with
+						// $100,000 and we double it in 2 years. We don't want to be investing our $200,000 worth
+						// of cash. We still want to work with our original amount. This way we can see how much 
+						// of a bankroll we'll need to make a living off investing.
+						if (_activeOrders.Count >= Config.MaxOpenOrders)
+						{
+							break;
+						}
+
 						// If the highest percent is enough for a buy, then do it.
 						// If not then since the list is sorted, no other ones will
 						// be high enough and we can early out of the loop.
@@ -266,13 +276,11 @@ namespace StockSimulator.Core
 						if (barStats.HighestPercent >= Config.PercentForBuy && barStats.ComboSizeOfHighestStrategy >= Simulator.Config.MinComboSizeToBuy)
 						{
 							// Don't want to order to late in the strategy where the order can't run it's course.
-							// Also, need to have enough money to buy stocks.
-							double accountValue = (double)Broker.AccountValue[barNumber > 0 ? barNumber - 1 : barNumber][1];
-							double sizeOfOrder = accountValue / Config.MaxBuysPerBar;
+							int lastBarToPlaceOrders = NumberOfBars - (Config.MaxBarsOrderOpen + 1);
 
 							// Make sure we have enough money and also that we have enough time
 							// before the end of the sim to complete the order we place.
-							if (barNumber < NumberOfBars - Config.MaxBarsOrderOpen && Broker.AccountCash > sizeOfOrder * 1.2)
+							if (barNumber < lastBarToPlaceOrders && Broker.AccountCash > Config.SizeOfOrder * 1.1)
 							{
 								bool shouldReallyOrder = true;
 
@@ -295,14 +303,6 @@ namespace StockSimulator.Core
 							}
 						}
 						else
-						{
-							break;
-						}
-
-						// We only allow a set number of buys per frame. This is so we don't just buy
-						// everything all on one frame so that we can try and get different
-						// stocks when we need to.
-						if (currentCount >= Config.MaxBuysPerBar)
 						{
 							break;
 						}

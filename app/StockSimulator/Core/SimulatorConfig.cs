@@ -182,9 +182,9 @@ namespace StockSimulator.Core
 		public int ComboLeewayBars { get; set; }
 
 		[Category("Main Strategy")]
-		[DisplayName("Max Buys Per Bar")]
-		[Description("Maximum number of buys that can be made on a single bar")]
-		public int MaxBuysPerBar { get; set; }
+		[DisplayName("Max Open Orders")]
+		[Description("Maximum number of orders that can be open at a time")]
+		public int MaxOpenOrders { get; set; }
 
 		//[Category("Main Strategy")]
 		//[DisplayName("Max Order Size")]
@@ -250,7 +250,7 @@ namespace StockSimulator.Core
 			//PercentGainPerTrade = 0.02;
 			ComboLeewayBars = 0;
 			MinComboSizeToBuy = 1;
-			MaxBuysPerBar = 3;
+			MaxOpenOrders = 3;
 			MinRequiredOrders = 3;
 			InitialAccountBalance = 20000;
 			PercentForBuy = 80;
