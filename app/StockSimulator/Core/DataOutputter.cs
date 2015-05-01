@@ -242,6 +242,7 @@ namespace StockSimulator.Core
 
 			List<StrategyStatistics> allStrategyStatistics = new List<StrategyStatistics>();
 
+			//Parallel.ForEach(Simulator.Orders.StrategyDictionary, strategy =>
 			foreach (KeyValuePair<int, ConcurrentBag<Order>> strategy in Simulator.Orders.StrategyDictionary)
 			{
 				ConcurrentBag<Order> orders = strategy.Value;
@@ -251,6 +252,7 @@ namespace StockSimulator.Core
 					string strategyName = orders.First().StrategyName;
 					if (strategyName == "MainStrategy")
 					{
+						//return;
 						continue;
 					}
 
@@ -263,7 +265,7 @@ namespace StockSimulator.Core
 						int tickerHash = order.Ticker.TickerAndExchange.GetHashCode();
 						string tickerName = order.Ticker.TickerAndExchange.ToString();
 
-						// If we haven't created the output for this ticker then creat it.
+						// If we haven't created the output for this ticker then create it.
 						if (!tickersForThisStrategy.ContainsKey(tickerHash))
 						{
 							tickersForThisStrategy[tickerHash] = new StrategyTickerPairStatistics(strategyName, tickerName, order.DependentIndicatorNames);
@@ -305,7 +307,7 @@ namespace StockSimulator.Core
 					File.WriteAllText(filename, jsonOutput);
 
 				}
-			}
+			};
 
 			jsonOutput = JsonConvert.SerializeObject(allStrategyStatistics);
 			filename = GetOutputFolder(timeString) + "overall-strategies.json";
