@@ -22,26 +22,7 @@
 						<td><strong>Gain</strong></td>
 						<td><span ng-class="{'text-danger': fileData.gain < 0, 'text-success': fileData.gain >= 0}"><span class="glyphicon" ng-class="{'glyphicon-circle-arrow-up': fileData.gain >= 0, 'glyphicon-circle-arrow-down': fileData.gain < 0}"></span>&nbsp;${{abs(fileData.gain)}}</span></td>
 					</tr>
-					<tr>
-						<td><strong>Avg Order Length</strong></td>
-						<td>{{fileData.averageOrderLength}} Bars</td>
-					</tr>
-					<tr>
-						<td><strong>Avg Order Length (Profit Orders)</strong></td>
-						<td>{{fileData.averageProfitOrderLength}} Bars</td>
-					</tr>
-					<tr>
-						<td><strong>Avg Order Length (Stop Orders)</strong></td>
-						<td>{{fileData.averageStopOrderLength}} Bars</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
 
-		<!-- Right side stats -->
-		<div class="col-sm-6">
-			<table class="table">
-				<tbody>
 					<tr>
 						<td><strong>Number of Orders</strong></td>
 						<td>{{fileData.numberOfOrders}}</td>
@@ -58,6 +39,72 @@
 						<td><strong>Length Exceeded %</strong></td>
 						<td>{{fileData.lengthExceededPercent}} %</td>
 					</tr>
+
+					<tr>
+						<td><strong>Avg Order Length</strong></td>
+						<td>{{fileData.averageOrderLength}} Bars</td>
+					</tr>
+					<tr>
+						<td><strong>Avg Order Length (Profit Orders)</strong></td>
+						<td>{{fileData.averageProfitOrderLength}} Bars</td>
+					</tr>
+					<tr>
+						<td><strong>Avg Order Length (Stop Orders)</strong></td>
+						<td>{{fileData.averageStopOrderLength}} Bars</td>
+					</tr>
+
+				</tbody>
+			</table>
+		</div>
+
+		<!-- Right side stats -->
+		<div class="col-sm-6">
+			<table class="table">
+				<tbody>
+					<!-- Long Order Statistics -->
+					<tr>
+						<td><strong>Long Number of Orders</strong></td>
+						<td>{{fileData.longNumberOfOrders}}</td>
+					</tr>
+					<tr>
+						<td><strong>Long Win %</strong></td>
+						<td>{{fileData.longWinPercent}}%</td>
+					</tr>
+					<tr>
+						<td><strong>Long Loss %</strong></td>
+						<td>{{fileData.longLossPercent}}%</td>
+					</tr>
+					<tr>
+						<td><strong>Long Stop Loss %</strong></td>
+						<td>{{fileData.longStopLossPercent}}%</td>
+					</tr>
+					<tr>
+						<td><strong>Long Length Exceeded %</strong></td>
+						<td>{{fileData.longLengthExceededPercent}} %</td>
+					</tr>
+
+					<!-- Short Order Statistics -->
+					<tr>
+						<td><strong>Short Number of Orders</strong></td>
+						<td>{{fileData.shortNumberOfOrders}}</td>
+					</tr>
+					<tr>
+						<td><strong>Short Win %</strong></td>
+						<td>{{fileData.shortWinPercent}}%</td>
+					</tr>
+					<tr>
+						<td><strong>Short Loss %</strong></td>
+						<td>{{fileData.shortLossPercent}}%</td>
+					</tr>
+					<tr>
+						<td><strong>Short Stop Loss %</strong></td>
+						<td>{{fileData.shortStopLossPercent}}%</td>
+					</tr>
+					<tr>
+						<td><strong>Short Length Exceeded %</strong></td>
+						<td>{{fileData.shortLengthExceededPercent}} %</td>
+					</tr>
+
 				</tbody>
 			</table>
 		</div>

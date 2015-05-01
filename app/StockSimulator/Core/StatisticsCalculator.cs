@@ -37,6 +37,57 @@ namespace StockSimulator.Core
 		[JsonConverter(typeof(RoundedDoubleConverter))]
 		public double LengthExceededPercent { get; set; }
 
+		////////////////////// LONG //////////////////////
+
+		[JsonProperty("longWinPercent")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
+		public double LongWinPercent { get; set; }
+
+		[JsonProperty("longLossPercent")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
+		public double LongLossPercent { get; set; }
+
+		[JsonProperty("longProfitTargetPercent")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
+		public double LongProfitTargetPercent { get; set; }
+
+		[JsonProperty("longStopLossPercent")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
+		public double LongStopLossPercent { get; set; }
+
+		[JsonProperty("longLengthExceededPercent")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
+		public double LongLengthExceededPercent { get; set; }
+
+		[JsonProperty("longNumberOfOrders")]
+		public long LongNumberOfOrders { get; set; }
+
+		////////////////////// SHORT /////////////////////
+
+		[JsonProperty("shortWinPercent")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
+		public double ShortWinPercent { get; set; }
+
+		[JsonProperty("shortLossPercent")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
+		public double ShortLossPercent { get; set; }
+
+		[JsonProperty("shortProfitTargetPercent")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
+		public double ShortProfitTargetPercent { get; set; }
+
+		[JsonProperty("shortStopLossPercent")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
+		public double ShortStopLossPercent { get; set; }
+
+		[JsonProperty("shortLengthExceededPercent")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
+		public double ShortLengthExceededPercent { get; set; }
+
+		[JsonProperty("shortNumberOfOrders")]
+		public long ShortNumberOfOrders { get; set; }
+
+	
 		[JsonProperty("gain")]
 		[JsonConverter(typeof(RoundedDoubleConverter))]
 		public double Gain { get; set; }
@@ -61,6 +112,19 @@ namespace StockSimulator.Core
 		private long _numberOfProfitTargets = 0;
 		private long _numberOfStopLosses = 0;
 		private long _numberOfLengthExceeded = 0;
+
+		private long _longNumberOfWins = 0;
+		private long _longNumberOfLosses = 0;
+		private long _longNumberOfProfitTargets = 0;
+		private long _longNumberOfStopLosses = 0;
+		private long _longNumberOfLengthExceeded = 0;
+
+		private long _shortNumberOfWins = 0;
+		private long _shortNumberOfLosses = 0;
+		private long _shortNumberOfProfitTargets = 0;
+		private long _shortNumberOfStopLosses = 0;
+		private long _shortNumberOfLengthExceeded = 0;
+
 		private long _totalLengthOfAllOrders = 0;
 		private long _totalLengthOfProfitOrders = 0;
 		private long _totalLengthOfStopOrders = 0;
@@ -110,6 +174,9 @@ namespace StockSimulator.Core
 					++_numberOfLengthExceeded;
 				}
 
+				AddOrderLong(order);
+				AddOrderShort(order);
+
 				_totalLengthOfAllOrders += order.SellBar - order.BuyBar;
 				_totalGain += order.Gain;
 			}
@@ -128,6 +195,18 @@ namespace StockSimulator.Core
 			StopLossPercent = 0;
 			LengthExceededPercent = 0;
 
+			LongWinPercent = 0;
+			LongLossPercent = 0;
+			LongProfitTargetPercent = 0;
+			LongStopLossPercent = 0;
+			LongLengthExceededPercent = 0;
+
+			ShortWinPercent = 0;
+			ShortLossPercent = 0;
+			ShortProfitTargetPercent = 0;
+			ShortStopLossPercent = 0;
+			ShortLengthExceededPercent = 0;
+
 			AverageOrderLength = 0;
 			AverageProfitOrderLength = 0;
 			AverageStopOrderLength = 0;
@@ -139,6 +218,24 @@ namespace StockSimulator.Core
 				ProfitTargetPercent = Math.Round(((double)_numberOfProfitTargets / NumberOfOrders) * 100.0);
 				StopLossPercent = Math.Round(((double)_numberOfStopLosses / NumberOfOrders) * 100.0);
 				LengthExceededPercent = Math.Round(((double)_numberOfLengthExceeded / NumberOfOrders) * 100.0);
+
+				if (LongNumberOfOrders > 0)
+				{
+					LongWinPercent = Math.Round(((double)_longNumberOfWins / LongNumberOfOrders) * 100.0);
+					LongLossPercent = Math.Round(((double)_longNumberOfLosses / LongNumberOfOrders) * 100.0);
+					LongProfitTargetPercent = Math.Round(((double)_longNumberOfProfitTargets / LongNumberOfOrders) * 100.0);
+					LongStopLossPercent = Math.Round(((double)_longNumberOfStopLosses / LongNumberOfOrders) * 100.0);
+					LongLengthExceededPercent = Math.Round(((double)_longNumberOfLengthExceeded / LongNumberOfOrders) * 100.0);
+				}
+
+				if (ShortNumberOfOrders > 0)
+				{
+					ShortWinPercent = Math.Round(((double)_shortNumberOfWins / ShortNumberOfOrders) * 100.0);
+					ShortLossPercent = Math.Round(((double)_shortNumberOfLosses / ShortNumberOfOrders) * 100.0);
+					ShortProfitTargetPercent = Math.Round(((double)_shortNumberOfProfitTargets / ShortNumberOfOrders) * 100.0);
+					ShortStopLossPercent = Math.Round(((double)_shortNumberOfStopLosses / ShortNumberOfOrders) * 100.0);
+					ShortLengthExceededPercent = Math.Round(((double)_shortNumberOfLengthExceeded / ShortNumberOfOrders) * 100.0);
+				}
 
 				AverageOrderLength = Math.Round((double)_totalLengthOfAllOrders / NumberOfOrders);
 				AverageProfitOrderLength = _numberOfProfitTargets > 0 ? (double)_totalLengthOfProfitOrders / _numberOfProfitTargets : 0;
@@ -160,9 +257,92 @@ namespace StockSimulator.Core
 			Gain = stats.Gain;
 			NumberOfOrders = stats.NumberOfOrders;
 
+			LongWinPercent = stats.LongWinPercent;
+			LongLossPercent = stats.LongLossPercent;
+			LongProfitTargetPercent = stats.LongProfitTargetPercent;
+			LongStopLossPercent = stats.LongStopLossPercent;
+			LongLengthExceededPercent = stats.LongLengthExceededPercent;
+			LongNumberOfOrders = stats.LongNumberOfOrders;
+
+			ShortWinPercent = stats.ShortWinPercent;
+			ShortLossPercent = stats.ShortLossPercent;
+			ShortProfitTargetPercent = stats.ShortProfitTargetPercent;
+			ShortStopLossPercent = stats.ShortStopLossPercent;
+			ShortLengthExceededPercent = stats.ShortLengthExceededPercent;
+			ShortNumberOfOrders = stats.ShortNumberOfOrders;
+
 			AverageOrderLength = stats.AverageOrderLength;
 			AverageProfitOrderLength = stats.AverageProfitOrderLength;
 			AverageStopOrderLength = stats.AverageStopOrderLength;
 		}
+
+		/// <summary>
+		/// Increments values for long orders.
+		/// </summary>
+		/// <param name="order">Order being added from AddOrder</param>
+		private void AddOrderLong(Order order)
+		{
+			if (order.Type == Order.OrderType.Long)
+			{
+				++LongNumberOfOrders;
+
+				if (order.Gain > 0)
+				{
+					++_longNumberOfWins;
+				}
+				else
+				{
+					++_longNumberOfLosses;
+				}
+
+				if (order.Status == Order.OrderStatus.ProfitTarget)
+				{
+					++_longNumberOfProfitTargets;
+				}
+				else if (order.Status == Order.OrderStatus.StopTarget)
+				{
+					++_longNumberOfStopLosses;
+				}
+				else if (order.Status == Order.OrderStatus.LengthExceeded)
+				{
+					++_longNumberOfLengthExceeded;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Increments values for short orders.
+		/// </summary>
+		/// <param name="order">Order being added from AddOrder</param>
+		private void AddOrderShort(Order order)
+		{
+			if (order.Type == Order.OrderType.Short)
+			{
+				++ShortNumberOfOrders;
+
+				if (order.Gain > 0)
+				{
+					++_shortNumberOfWins;
+				}
+				else
+				{
+					++_shortNumberOfLosses;
+				}
+
+				if (order.Status == Order.OrderStatus.ProfitTarget)
+				{
+					++_shortNumberOfProfitTargets;
+				}
+				else if (order.Status == Order.OrderStatus.StopTarget)
+				{
+					++_shortNumberOfStopLosses;
+				}
+				else if (order.Status == Order.OrderStatus.LengthExceeded)
+				{
+					++_shortNumberOfLengthExceeded;
+				}
+			}
+		}
+	
 	}
 }
