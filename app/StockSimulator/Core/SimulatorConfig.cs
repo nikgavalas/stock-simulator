@@ -170,12 +170,6 @@ namespace StockSimulator.Core
 
 		///////////////////////////// MAIN STRATEGY ///////////////////////////////
 
-		// Disabled-see the comment in Order.cs
-		//[Category("Main Strategy")]
-		//[DisplayName("Percent Gain Per Trade")]
-		//[Description("Percentage of account value to gain (or lose) on each trade")]
-		//public double PercentGainPerTrade { get; set; }
-
 		[Category("Main Strategy")]
 		[DisplayName("Combo Leeway")]
 		[Description("Number of bars back in time allowed to find a combo from the current bar")]
@@ -185,11 +179,6 @@ namespace StockSimulator.Core
 		[DisplayName("Max Open Orders")]
 		[Description("Maximum number of orders that can be open at a time")]
 		public int MaxOpenOrders { get; set; }
-
-		//[Category("Main Strategy")]
-		//[DisplayName("Max Order Size")]
-		//[Description("Maximum amount of money used for a single order")]
-		//public double MaxOrderSize { get; set; }
 
 		[Category("Main Strategy")]
 		[DisplayName("Min Required Orders")]
@@ -234,43 +223,41 @@ namespace StockSimulator.Core
 
 			TrendStrength = 4;
 
-			MaxComboSize = 6;
+			MaxComboSize = 4;
 			MinOrders = 3;
 			UseLookbackBars = false;
-			MaxLookBackBars = 400;
+			MaxLookBackBars = 500;
 			MaxLookBackOrders = 10;
 			MaxConcurrentOrders = 1;
-			ProfitTarget = 0.07;
+			ProfitTarget = 0.05;
 			StopTarget = 0.04;
-			MaxBarsOrderOpen = 15;
+			MaxBarsOrderOpen = 5;
 			SizeOfOrder = 6000;
 			UseLimitOrders = false;
 			MaxBarsLimitOrderFill = 3;
 
-			//PercentGainPerTrade = 0.02;
 			ComboLeewayBars = 0;
 			MinComboSizeToBuy = 1;
 			MaxOpenOrders = 3;
 			MinRequiredOrders = 3;
-			InitialAccountBalance = 20000;
+			InitialAccountBalance = 99999999;
 			PercentForBuy = 80;
 			NumBarsToDelayStart = 250;
-			//MaxOrderSize = 100000;
 
 			ShouldFilterBad = true;
-			NumBarsBadFilter = 400;
-			BadFilterProfitTarget = 0.15;
+			NumBarsBadFilter = 500;
+			BadFilterProfitTarget = 0.30;
 
 			UseAbbreviatedOutput = false;
 			OnlyOutputLastBuyList = false;
 			ShouldOpenWebPage = true;
 
 			NumBarsHigherTimeframe = 5;
-			UseHigherTimeframeSubstrategies = true;
-			UseHigherTimeframeMainStrategy = true;
+			UseHigherTimeframeSubstrategies = false;
+			UseHigherTimeframeMainStrategy = false;
 
 			// Desktop
-			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\test-large.csv";
+			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\test.csv";
 			// Laptop
 			//InstrumentListFile = @"C:\Users\Nik\Documents\github\stock-simulator\input\test.csv";
 			// Desktop

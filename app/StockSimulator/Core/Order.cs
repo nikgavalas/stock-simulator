@@ -174,23 +174,6 @@ namespace StockSimulator.Core
 					Status = OrderStatus.Filled;
 
 					double sizeOfOrder = Simulator.Config.SizeOfOrder;
-					// TODO: not sure I like this since it's not a fixed order. Its hard to know how much of
-					// and account value we'll need to make a consistent profit. Seems easier to just always 
-					// place the same amount so we can tinker with our initial value and find out how much
-					// an investment we'll need to make enough money for a living. Which is the goal =p.
-					//if (GetType() == typeof(MainStrategyOrder))
-					//{
-					//	double accountValue = (double)Simulator.Broker.AccountValue[curBar > 0 ? curBar - 1 : curBar][1];
-						
-					//	// We only ever want to gain (or lose) a percent of our account value.
-					//	sizeOfOrder = (accountValue * Simulator.Config.PercentGainPerTrade) / Simulator.Config.ProfitTarget;
-
-					//	// Make sure we don't have an order of an unrealistic amount.
-					//	if (sizeOfOrder > Simulator.Config.MaxOrderSize)
-					//	{
-					//		sizeOfOrder = Simulator.Config.MaxOrderSize;
-					//	}
-					//}
 
 					NumberOfShares = BuyPrice > 0.0 ? Convert.ToInt32(Math.Floor(sizeOfOrder / BuyPrice)) : 0;
 					_orderValue = NumberOfShares * BuyPrice;
