@@ -100,7 +100,11 @@ namespace StockSimulator.Strategies
 
 					// Bear strategies
 					"BearBollingerExtended",
+					"BearBeltHoldFound",
 					"BearCciCrossover",
+					"BearEngulfingFound",
+					"BearHaramiFound",
+					"BearHaramiCrossFound",
 					"BearKeltnerCloseAbove",
 					"BearMacdMomentum",
 					"BearMacdCrossover",
@@ -113,7 +117,16 @@ namespace StockSimulator.Strategies
 					"BearTrendStart",
 					"BearTrixSignalCrossover",
 					"BearTrixZeroCrossover",
-					"BearWilliamsRCrossover"
+					"BearWilliamsRCrossover",
+					"DarkCloudCoverFound",
+					"DownsideTasukiGapFound",
+					"EveningStarFound",
+					"FallingThreeMethodsFound",
+					"HangingManFound",
+					"InvertedHammerFound",
+					"ShootingStarFound",
+					"ThreeBlackCrowsFound",
+					"UpsideGapTwoCrowsFound"
 				};
 
 				return deps;

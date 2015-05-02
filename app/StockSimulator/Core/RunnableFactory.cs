@@ -52,6 +52,26 @@ namespace StockSimulator.Core
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
+					case "BearBeltHold":
+						requestedItem = new BearBeltHold(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
+						break;
+
+					case "BearEngulfing":
+						requestedItem = new BearEngulfing(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
+						break;
+
+					case "BearHarami":
+						requestedItem = new BearHarami(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
+						break;
+
+					case "BearHaramiCross":
+						requestedItem = new BearHaramiCross(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
+						break;
+
 					case "BullBeltHold":
 						requestedItem = new BullBeltHold(_tickerData, this);
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
@@ -77,13 +97,43 @@ namespace StockSimulator.Core
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
+					case "DarkCloudCover":
+						requestedItem = new DarkCloudCover(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
+						break;
+
 					case "Doji":
 						requestedItem = new Doji(_tickerData, this);
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
+					case "DownsideTasukiGap":
+						requestedItem = new DownsideTasukiGap(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
+						break;
+
+					case "EveningStar":
+						requestedItem = new EveningStar(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
+						break;
+
+					case "FallingThreeMethods":
+						requestedItem = new FallingThreeMethods(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
+						break;
+
 					case "Hammer":
 						requestedItem = new Hammer(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
+						break;
+
+					case "HangingMan":
+						requestedItem = new HangingMan(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
+						break;
+
+					case "InvertedHammer":
+						requestedItem = new InvertedHammer(_tickerData, this);
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
@@ -122,6 +172,11 @@ namespace StockSimulator.Core
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
+					case "ShootingStar":
+						requestedItem = new ShootingStar(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
+						break;
+
 					case "Sma":
 						requestedItem = new Sma(_tickerData, this);
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
@@ -152,6 +207,11 @@ namespace StockSimulator.Core
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
+					case "ThreeBlackCrows":
+						requestedItem = new ThreeBlackCrows(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
+						break;
+
 					case "ThreeWhiteSoldiers":
 						requestedItem = new ThreeWhiteSoldiers(_tickerData, this);
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
@@ -159,6 +219,11 @@ namespace StockSimulator.Core
 
 					case "Trix":
 						requestedItem = new Trix(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
+						break;
+
+					case "UpsideGapTwoCrows":
+						requestedItem = new UpsideGapTwoCrows(_tickerData, this);
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
@@ -352,6 +417,58 @@ namespace StockSimulator.Core
 
 					case "BearWilliamsRCrossover":
 						requestedItem = new BearWilliamsRCrossover(_tickerData, this);
+						break;
+
+					case "BearBeltHoldFound":
+						requestedItem = new BearBeltHoldFound(_tickerData, this);
+						break;
+
+					case "BearEngulfingFound":
+						requestedItem = new BearEngulfingFound(_tickerData, this);
+						break;
+
+					case "BearHaramiFound":
+						requestedItem = new BearHaramiFound(_tickerData, this);
+						break;
+
+					case "BearHaramiCrossFound":
+						requestedItem = new BearHaramiCrossFound(_tickerData, this);
+						break;
+
+					case "DarkCloudCoverFound":
+						requestedItem = new DarkCloudCoverFound(_tickerData, this);
+						break;
+
+					case "DownsideTasukiGapFound":
+						requestedItem = new DownsideTasukiGapFound(_tickerData, this);
+						break;
+
+					case "EveningStarFound":
+						requestedItem = new EveningStarFound(_tickerData, this);
+						break;
+
+					case "FallingThreeMethodsFound":
+						requestedItem = new FallingThreeMethodsFound(_tickerData, this);
+						break;
+
+					case "HangingManFound":
+						requestedItem = new HangingManFound(_tickerData, this);
+						break;
+
+					case "InvertedHammerFound":
+						requestedItem = new InvertedHammerFound(_tickerData, this);
+						break;
+
+					case "ShootingStarFound":
+						requestedItem = new ShootingStarFound(_tickerData, this);
+						break;
+
+					case "ThreeBlackCrowsFound":
+						requestedItem = new ThreeBlackCrowsFound(_tickerData, this);
+						break;
+
+					case "UpsideGapTwoCrowsFound":
+						requestedItem = new UpsideGapTwoCrowsFound(_tickerData, this);
 						break;
 
 					default:
