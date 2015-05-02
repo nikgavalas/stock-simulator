@@ -238,7 +238,7 @@ namespace StockSimulator.Core
 
 			ComboLeewayBars = 0;
 			MinComboSizeToBuy = 1;
-			MaxOpenOrders = 3;
+			MaxOpenOrders = 1000;
 			MinRequiredOrders = 3;
 			InitialAccountBalance = 99999999;
 			PercentForBuy = 80;
@@ -256,14 +256,8 @@ namespace StockSimulator.Core
 			UseHigherTimeframeSubstrategies = false;
 			UseHigherTimeframeMainStrategy = false;
 
-			// Desktop
 			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\test.csv";
-			// Laptop
-			//InstrumentListFile = @"C:\Users\Nik\Documents\github\stock-simulator\input\test.csv";
-			// Desktop
 			OutputFolder = @"C:\Users\Nik\Documents\Code\github\stock-simulator\output\output";
-			// Laptop
-			//OutputFolder = @"C:\Users\Nik\Documents\github\stock-simulator\output\output";
 
 			// Testing parameters for indicator correctness.
 			//StartDate = DateTime.Parse("12/31/2013");
