@@ -34,14 +34,14 @@
 			<thead>
 				<th class="col-xs-1">Rank #</th>
 				<th class="col-sm-4">Ticker</th>
-				<th>Strategy Name</th>
+				<th>Order Type</th>
 				<th>Buy value</th>
 			</thead>
 			<tbody>
 				<tr ng-repeat="item in buyList" class="hover-pointer">
 					<td>{{$index + 1}}</td>
 					<td>{{item.ticker}}</td>
-					<td>{{item.strategyName}}</td>
+					<td>{{item.orderType}}</td>
 					<td>{{item.percent}}</td>
 				</tr>
 			</tbody>

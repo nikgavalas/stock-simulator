@@ -22,15 +22,19 @@ namespace StockSimulator.Core
 			[JsonProperty("ticker")]
 			public string Ticker { get; set; }
 
+			[JsonProperty("orderType")]
+			public string OrderType { get; set; }
+
 			[JsonProperty("strategyName")]
 			public string StrategyName { get; set; }
 
 			[JsonProperty("percent")]
 			public double Percent { get; set; }
 
-			public JsonBuyList(string ticker, string strategyName, double percent)
+			public JsonBuyList(string ticker, string orderType, string strategyName, double percent)
 			{
 				Ticker = ticker;
+				OrderType = orderType;
 				StrategyName = strategyName;
 				Percent = percent;
 			}
@@ -92,6 +96,7 @@ namespace StockSimulator.Core
 			for (int i = 0; i < buyList.Count; i++)
 			{
 				outputList.Add(new JsonBuyList(buyList[i].Data.TickerAndExchange.ToString(),
+					buyList[i].Bars[buyList[i].Data.GetBar(currentDate)].StrategyOrderType == Order.OrderType.Long ? "Long" : "Short",
 					buyList[i].Bars[buyList[i].Data.GetBar(currentDate)].HighestStrategyName,
 					buyList[i].Bars[buyList[i].Data.GetBar(currentDate)].HighestPercent
 				));
