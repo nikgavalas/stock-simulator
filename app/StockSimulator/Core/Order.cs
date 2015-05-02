@@ -201,9 +201,20 @@ namespace StockSimulator.Core
 				}
 
 				// Limit the order since we won't want to be in the market forever.
-				if (curBar - BuyBar >= Simulator.Config.MaxBarsOrderOpen)
+				// Also have an option where we can close main orders at a different
+				// length of bars than substrategy orders.
+				int numBarsOpen = curBar - BuyBar;
+				bool shouldForceCloseOrder = (numBarsOpen >= Simulator.Config.MaxBarsOrderOpen) ||
+					(GetType() == typeof(MainStrategyOrder) && numBarsOpen >= Simulator.Config.MaxBarsOrderOpenMain);
+				if (shouldForceCloseOrder)
 				{
-					FinishOrder(Ticker.Close[curBar], curBar, OrderStatus.LengthExceeded);
+					// We'll simulate it so that if we are holding for 0 bars (opening and 
+					// closing in 1 day), then we'll just sell at the end of the day ignoring
+					// profit targets but heeding stop loss targets.
+					if (IsFinished() == false || (GetType() == typeof(MainStrategyOrder) && Simulator.Config.MaxBarsOrderOpenMain == 0 && Status == OrderStatus.ProfitTarget))
+					{
+						FinishOrder(Ticker.Close[curBar], curBar, OrderStatus.LengthExceeded);
+					}
 				}
 			}
 		}

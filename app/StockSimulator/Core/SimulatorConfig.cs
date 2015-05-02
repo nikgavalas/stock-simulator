@@ -181,6 +181,11 @@ namespace StockSimulator.Core
 		public int MaxOpenOrders { get; set; }
 
 		[Category("Main Strategy")]
+		[DisplayName("Main Order Max Bars Open")]
+		[Description("Maximum number of bars a main order can be open for")]
+		public int MaxBarsOrderOpenMain { get; set; }
+
+		[Category("Main Strategy")]
 		[DisplayName("Min Required Orders")]
 		[Description("Number of orders needed before we start counting the statistics as valid")]
 		public int MinRequiredOrders { get; set; }
@@ -243,6 +248,7 @@ namespace StockSimulator.Core
 			InitialAccountBalance = 99999999;
 			PercentForBuy = 80;
 			NumBarsToDelayStart = 250;
+			MaxBarsOrderOpenMain = 1;
 
 			ShouldFilterBad = true;
 			NumBarsBadFilter = 500;
