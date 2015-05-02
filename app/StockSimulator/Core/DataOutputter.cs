@@ -236,15 +236,15 @@ namespace StockSimulator.Core
 				return;
 			}
 
-			string jsonOutput;
-			string folderName;
-			string filename;
+			ConcurrentBag<StrategyStatistics> allStrategyStatistics = new ConcurrentBag<StrategyStatistics>();
 
-			List<StrategyStatistics> allStrategyStatistics = new List<StrategyStatistics>();
-
-			//Parallel.ForEach(Simulator.Orders.StrategyDictionary, strategy =>
-			foreach (KeyValuePair<int, ConcurrentBag<Order>> strategy in Simulator.Orders.StrategyDictionary)
+			Parallel.ForEach(Simulator.Orders.StrategyDictionary, strategy =>
+			//foreach (KeyValuePair<int, ConcurrentBag<Order>> strategy in Simulator.Orders.StrategyDictionary)
 			{
+				string jsonOutput;
+				string folderName;
+				string filename;
+
 				ConcurrentBag<Order> orders = strategy.Value;
 				if (orders.Count > Simulator.Config.MinRequiredOrders)
 				{
@@ -252,8 +252,8 @@ namespace StockSimulator.Core
 					string strategyName = orders.First().StrategyName;
 					if (strategyName == "MainStrategy")
 					{
-						//return;
-						continue;
+						return;
+						//continue;
 					}
 
 					Dictionary<int, StrategyTickerPairStatistics> tickersForThisStrategy = new Dictionary<int, StrategyTickerPairStatistics>();
@@ -307,11 +307,11 @@ namespace StockSimulator.Core
 					File.WriteAllText(filename, jsonOutput);
 
 				}
-			};
+			});
 
-			jsonOutput = JsonConvert.SerializeObject(allStrategyStatistics);
-			filename = GetOutputFolder(timeString) + "overall-strategies.json";
-			File.WriteAllText(filename, jsonOutput);
+			string overallJsonOutput = JsonConvert.SerializeObject(allStrategyStatistics.ToArray());
+			string overallFilename = GetOutputFolder(timeString) + "overall-strategies.json";
+			File.WriteAllText(overallFilename, overallJsonOutput);
 		}
 
 		/// <summary>

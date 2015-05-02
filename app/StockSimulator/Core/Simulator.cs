@@ -157,7 +157,7 @@ namespace StockSimulator.Core
 		/// </summary>
 		public void Run()
 		{
-			WriteMessage("Running historical analysis for");
+			WriteMessage("Running historical analysis for all tickers");
 
 			// Run all to start with so we have the data to simulate with.
 			Parallel.ForEach(Instruments, task =>
