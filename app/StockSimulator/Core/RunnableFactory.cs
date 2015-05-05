@@ -167,6 +167,11 @@ namespace StockSimulator.Core
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
+					case "Rsi11":
+						requestedItem = new Rsi(_tickerData, this, 11);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
+						break;
+
 					case "Rsi14":
 						requestedItem = new Rsi(_tickerData, this, 18);
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
@@ -194,6 +199,11 @@ namespace StockSimulator.Core
 
 					case "Stochastics":
 						requestedItem = new Stochastics(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
+						break;
+
+					case "StochRsi":
+						requestedItem = new StochRsi(_tickerData, this);
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
@@ -327,6 +337,10 @@ namespace StockSimulator.Core
 						requestedItem = new BullStochasticsCrossover(_tickerData, this);
 						break;
 
+					case "BullStochRsiFound":
+						requestedItem = new BullStochRsiFound(_tickerData, this);
+						break;
+
 					case "BullSwingStart":
 						requestedItem = new BullSwingStart(_tickerData, this);
 						break;
@@ -397,6 +411,10 @@ namespace StockSimulator.Core
 
 					case "BearStochasticsFastCrossover":
 						requestedItem = new BearStochasticsFastCrossover(_tickerData, this);
+						break;
+
+					case "BearStochRsiFound":
+						requestedItem = new BearStochRsiFound(_tickerData, this);
 						break;
 
 					case "BearSwingStart":

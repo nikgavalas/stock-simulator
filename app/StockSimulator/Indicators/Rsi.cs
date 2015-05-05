@@ -51,7 +51,7 @@ namespace StockSimulator.Indicators
 
 			// Add the rsi for plotting
 			PlotSeries plot = new PlotSeries("line");
-			ChartPlots["Rsi"] = plot;
+			ChartPlots[ToString()] = plot;
 			for (int i = 0; i < Data.Dates.Count; i++)
 			{
 				plot.PlotData.Add(new List<object>()
