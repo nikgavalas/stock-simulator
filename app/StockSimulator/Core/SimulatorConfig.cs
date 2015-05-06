@@ -191,6 +191,11 @@ namespace StockSimulator.Core
 		public int MinRequiredOrders { get; set; }
 
 		[Category("Main Strategy")]
+		[DisplayName("Min Price For Order")]
+		[Description("Minimum price for an order to be placed on a ticker")]
+		public double MinPriceForOrder { get; set; }
+
+		[Category("Main Strategy")]
 		[DisplayName("Min Combo Size")]
 		[Description("Minimum number of strategies that must have been present to buy")]
 		public int MinComboSizeToBuy { get; set; }
@@ -249,6 +254,7 @@ namespace StockSimulator.Core
 			PercentForBuy = 80;
 			NumBarsToDelayStart = 250;
 			MaxBarsOrderOpenMain = 1;
+			MinPriceForOrder = 0.75;
 
 			ShouldFilterBad = true;
 			NumBarsBadFilter = 500;

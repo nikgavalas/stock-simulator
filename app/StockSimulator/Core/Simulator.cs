@@ -229,7 +229,10 @@ namespace StockSimulator.Core
 				if (currentBar != -1)
 				{
 					isTradingBar = true;
-					if (strat.Bars[currentBar].HighestPercent >= Config.PercentForBuy)
+
+					// Check to make sure it meets our percentage and price requirements.
+					if (strat.Bars[currentBar].HighestPercent >= Config.PercentForBuy &&
+						strat.Data.Open[currentBar] >= Config.MinPriceForOrder)
 					{
 						buyList.Add(strat);
 					}
