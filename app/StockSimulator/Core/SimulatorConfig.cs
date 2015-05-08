@@ -163,11 +163,6 @@ namespace StockSimulator.Core
 		[Description("Maximum number of bars to wait for a limit order to fill")]
 		public int MaxBarsLimitOrderFill { get; set; }
 
-		[Category("Orders")]
-		[DisplayName("Maximum Combo Size")]
-		[Description("Maximum size of a combo that can be used")]
-		public int MaxComboSize { get; set; }
-
 		///////////////////////////// MAIN STRATEGY ///////////////////////////////
 
 		[Category("Main Strategy")]
@@ -199,6 +194,11 @@ namespace StockSimulator.Core
 		[DisplayName("Min Combo Size")]
 		[Description("Minimum number of strategies that must have been present to buy")]
 		public int MinComboSizeToBuy { get; set; }
+
+		[Category("Main Strategy")]
+		[DisplayName("Maximum Combo Size")]
+		[Description("Maximum size of a combo that can be used")]
+		public int MaxComboSizeToBuy { get; set; }
 
 		[Category("Main Strategy")]
 		[DisplayName("Initial Account Balance")]
@@ -233,7 +233,6 @@ namespace StockSimulator.Core
 
 			TrendStrength = 4;
 
-			MaxComboSize = 4;
 			MinOrders = 3;
 			UseLookbackBars = false;
 			MaxLookBackBars = 500;
@@ -248,6 +247,7 @@ namespace StockSimulator.Core
 
 			ComboLeewayBars = 0;
 			MinComboSizeToBuy = 1;
+			MaxComboSizeToBuy = 4;
 			MaxOpenOrders = 1000;
 			MinRequiredOrders = 3;
 			InitialAccountBalance = 99999999;

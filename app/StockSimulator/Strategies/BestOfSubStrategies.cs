@@ -168,7 +168,7 @@ namespace StockSimulator.Strategies
 				List<Strategy> comboList = combos[i];
 
 				// Ignore combos greater than a max amount.
-				if (comboList.Count > Simulator.Config.MaxComboSize)
+				if (comboList.Count > Simulator.Config.MaxComboSizeToBuy)
 				{
 					continue;
 				}
