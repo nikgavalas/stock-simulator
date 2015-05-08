@@ -1,6 +1,6 @@
 /* Any bootstrap overrides go here */
-//$font-family-base: 'Roboto Light' !default;
 $icon-font-path: "../fonts/bootstrap/" !default;
+$font-size-base: 13px;
 
 /* Common styles for the entire web project. */
 @import "fonts/roboto/roboto";

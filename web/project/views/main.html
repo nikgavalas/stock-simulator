@@ -4,7 +4,7 @@
 	<!-- The row for the grid -->
 	<div class="row firstrow-container">
 		<!-- The column for the overall stats of our main strategy -->
-		<div class="col-md-6">
+		<div class="col-md-5">
 
 			<div class="panel panel-default">
 				<div class="panel-heading">
@@ -20,7 +20,7 @@
 					<accordion-heading>
 						Input Parameters <span class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></span>
 					</accordion-heading>
-					<table class="table">
+					<table class="table table-condensed">
 						<tbody>
 							<tr ng-repeat="(key, value) in inputParameters">
 								<td><strong>{{key}}</strong></td>
@@ -69,7 +69,7 @@
 		</div>
 
 		<!-- List of all the orders that contributes to the overall stats -->
-		<div class="col-md-6">
+		<div class="col-md-7">
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">Orders</h3>

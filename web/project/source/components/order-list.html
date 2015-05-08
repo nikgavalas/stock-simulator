@@ -2,7 +2,7 @@
 	<div class="text-center">
 		<pagination total-items="orders.length" ng-model="currentPage" items-per-page="numberOrdersPerPage" max-size="10" rotate="true" boundary-links="true" class="pagination-sm"></pagination>
 	</div>
-	<table class="table table-hover">
+	<table class="table table-condensed table-hover">
 		<thead>
 			<th>Type</th>
 			<th>Ticker</th>
@@ -28,7 +28,7 @@
 				<td>${{order.sellPrice}}</td>
 				<td>{{order.numShares}}</td>
 				<td>
-					<span ng-class="{'text-danger': order.gain < 0, 'text-success': order.gain >= 0}"><span class="glyphicon" ng-class="{'glyphicon-circle-arrow-up': order.gain >= 0, 'glyphicon-circle-arrow-down': order.gain < 0}"></span>&nbsp;${{abs(order.gain)}}</span>
+					<span ng-class="{'text-danger': order.gain < 0, 'text-success': order.gain >= 0}"><span class="glyphicon" ng-class="{'glyphicon-circle-arrow-up': order.gain >= 0, 'glyphicon-circle-arrow-down': order.gain < 0}"></span>&nbsp;${{abs(order.gain)}} ({{getPercentGain(order)}}%)</span>
 				</td>
 				<td>
 					<span ng-class="{'text-info': order.orderStatus === 4, 'text-danger': order.orderStatus === 3, 'text-success': order.orderStatus === 2}">{{statusName(order.orderStatus)}}</span>

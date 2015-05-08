@@ -24,9 +24,9 @@ mainApp.directive('orderList', [
 				) {
 
 					var statusNames = {
-						'4': 'Length Exceeded',
-						'3': 'Stop Loss',
-						'2': 'Profit Target'
+						'4': 'Length',
+						'3': 'Stop',
+						'2': 'Profit'
 					};
 
 					/**
@@ -60,6 +60,16 @@ mainApp.directive('orderList', [
 					}
 
 					return $scope.orders.slice(startIndex, endIndex);
+				};
+
+				/**
+				 * Returns the order gain as a percent.
+				 * @param   {Object} order Order to calculate from
+				 * @returns {Number} see description
+				 */
+				$scope.getPercentGain = function(order) {
+					var percent = (((order.sellPrice - order.buyPrice) / order.buyPrice) * 100).toFixed(2);
+					return order.orderType === 0 ? percent : -percent;
 				};
 			}
 		};
