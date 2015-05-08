@@ -274,7 +274,7 @@ namespace StockSimulator.Core
 						if (barStats.HighestPercent >= Config.PercentForBuy && barStats.ComboSizeOfHighestStrategy >= Simulator.Config.MinComboSizeToBuy)
 						{
 							// Don't want to order to late in the strategy where the order can't run it's course.
-							int lastBarToPlaceOrders = NumberOfBars - (Config.MaxBarsOrderOpen + 1);
+							int lastBarToPlaceOrders = NumberOfBars - (Config.MaxBarsOrderOpenMain + 1);
 
 							// Make sure we have enough money and also that we have enough time
 							// before the end of the sim to complete the order we place.
