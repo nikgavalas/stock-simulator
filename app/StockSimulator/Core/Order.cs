@@ -237,19 +237,8 @@ namespace StockSimulator.Core
 		/// <param name="curBar">Current bar of the simulation</param>
 		private void FinishLongOrder(int curBar)
 		{
-			// Gapped open above our profit target, then close at the open price.
-			if (Ticker.Open[curBar] >= ProfitTargetPrice)
-			{
-				FinishOrder(Ticker.Open[curBar], curBar, OrderStatus.ProfitTarget);
-			}
-			// Either the high or close during this bar was above our profit target,
-			// then close at the profit target.
-			else if (Math.Max(Ticker.Close[curBar], Ticker.High[curBar]) >= ProfitTargetPrice)
-			{
-				FinishOrder(ProfitTargetPrice, curBar, OrderStatus.ProfitTarget);
-			}
 			// Gapped open below our stop target, so close at the open price.
-			else if (Ticker.Open[curBar] <= StopPrice)
+			if (Ticker.Open[curBar] <= StopPrice)
 			{
 				FinishOrder(Ticker.Open[curBar], curBar, OrderStatus.StopTarget);
 			}
@@ -258,6 +247,17 @@ namespace StockSimulator.Core
 			else if (Math.Min(Ticker.Close[curBar], Ticker.Low[curBar]) <= StopPrice)
 			{
 				FinishOrder(StopPrice, curBar, OrderStatus.StopTarget);
+			}
+			// Gapped open above our profit target, then close at the open price.
+			else if (Ticker.Open[curBar] >= ProfitTargetPrice)
+			{
+				FinishOrder(Ticker.Open[curBar], curBar, OrderStatus.ProfitTarget);
+			}
+			// Either the high or close during this bar was above our profit target,
+			// then close at the profit target.
+			else if (Math.Max(Ticker.Close[curBar], Ticker.High[curBar]) >= ProfitTargetPrice)
+			{
+				FinishOrder(ProfitTargetPrice, curBar, OrderStatus.ProfitTarget);
 			}
 		}
 
@@ -268,19 +268,8 @@ namespace StockSimulator.Core
 		/// <param name="curBar">Current bar of the simulation</param>
 		private void FinishShortOrder(int curBar)
 		{
-			// Gapped open below our profit target, then close at the open price.
-			if (Ticker.Open[curBar] <= ProfitTargetPrice)
-			{
-				FinishOrder(Ticker.Open[curBar], curBar, OrderStatus.ProfitTarget);
-			}
-			// Either the low or close during this bar was below our profit target,
-			// then close at the profit target.
-			else if (Math.Max(Ticker.Close[curBar], Ticker.Low[curBar]) <= ProfitTargetPrice)
-			{
-				FinishOrder(ProfitTargetPrice, curBar, OrderStatus.ProfitTarget);
-			}
 			// Gapped open above our stop target, so close at the open price.
-			else if (Ticker.Open[curBar] >= StopPrice)
+			if (Ticker.Open[curBar] >= StopPrice)
 			{
 				FinishOrder(Ticker.Open[curBar], curBar, OrderStatus.StopTarget);
 			}
@@ -289,6 +278,17 @@ namespace StockSimulator.Core
 			else if (Math.Min(Ticker.Close[curBar], Ticker.High[curBar]) >= StopPrice)
 			{
 				FinishOrder(StopPrice, curBar, OrderStatus.StopTarget);
+			}
+			// Gapped open below our profit target, then close at the open price.
+			else if (Ticker.Open[curBar] <= ProfitTargetPrice)
+			{
+				FinishOrder(Ticker.Open[curBar], curBar, OrderStatus.ProfitTarget);
+			}
+			// Either the low or close during this bar was below our profit target,
+			// then close at the profit target.
+			else if (Math.Max(Ticker.Close[curBar], Ticker.Low[curBar]) <= ProfitTargetPrice)
+			{
+				FinishOrder(ProfitTargetPrice, curBar, OrderStatus.ProfitTarget);
 			}
 		}
 
