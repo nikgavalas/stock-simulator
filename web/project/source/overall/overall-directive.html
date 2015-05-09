@@ -39,7 +39,14 @@
 						<td><strong>Length Exceeded %</strong></td>
 						<td>{{fileData.lengthExceededPercent}} %</td>
 					</tr>
+				</tbody>
+			</table>
+		</div>
 
+		<!-- Right side stats -->
+		<div class="col-sm-6">
+			<table class="table table-condensed">
+				<tbody>
 					<tr>
 						<td><strong>Avg Order Length</strong></td>
 						<td>{{fileData.averageOrderLength}} Bars</td>
@@ -56,8 +63,10 @@
 				</tbody>
 			</table>
 		</div>
+	</div>
 
-		<!-- Right side stats -->
+	<!-- Second row stats -->
+	<div class="row">
 		<div class="col-sm-6">
 			<table class="table table-condensed">
 				<tbody>
@@ -86,8 +95,30 @@
 						<td><strong>Long Length Exceeded %</strong></td>
 						<td>{{fileData.longLengthExceededPercent}} %</td>
 					</tr>
+					<tr>
+						<td><strong>Long Win Avg</strong></td>
+						<td>{{fileData.longWinAvg}}</td>
+					</tr>
+					<tr>
+						<td><strong>Long Win Avg %</strong></td>
+						<td>{{fileData.longWinAvgPercent}}%</td>
+					</tr>
+					<tr>
+						<td><strong>Long Loss Avg</strong></td>
+						<td>{{fileData.longLossAvg}}</td>
+					</tr>
+					<tr>
+						<td><strong>Long Loss Avg %</strong></td>
+						<td>{{fileData.longLossAvgPercent}}%</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
 
-					<!-- Short Order Statistics -->
+		<!-- Short Order Statistics -->
+		<div class="col-sm-6">
+			<table class="table table-condensed">
+				<tbody>
 					<tr>
 						<td><strong>Short Number of Orders</strong></td>
 						<td>{{fileData.shortNumberOfOrders}}</td>
@@ -112,7 +143,22 @@
 						<td><strong>Short Length Exceeded %</strong></td>
 						<td>{{fileData.shortLengthExceededPercent}} %</td>
 					</tr>
-
+					<tr>
+						<td><strong>Short Win Avg</strong></td>
+						<td>{{fileData.shortWinAvg}}</td>
+					</tr>
+					<tr>
+						<td><strong>Short Win Avg %</strong></td>
+						<td>{{fileData.shortWinAvgPercent}}%</td>
+					</tr>
+					<tr>
+						<td><strong>Short Loss Avg</strong></td>
+						<td>{{fileData.shortLossAvg}}</td>
+					</tr>
+					<tr>
+						<td><strong>Short Loss Avg %</strong></td>
+						<td>{{fileData.shortLossAvgPercent}}%</td>
+					</tr>
 				</tbody>
 			</table>
 		</div>

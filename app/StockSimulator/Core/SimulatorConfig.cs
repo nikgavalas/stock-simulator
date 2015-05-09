@@ -251,9 +251,9 @@ namespace StockSimulator.Core
 			MaxOpenOrders = 1000;
 			MinRequiredOrders = 3;
 			InitialAccountBalance = 99999999;
-			PercentForBuy = 80;
+			PercentForBuy = 65;
 			NumBarsToDelayStart = 250;
-			MaxBarsOrderOpenMain = 1;
+			MaxBarsOrderOpenMain = 0;
 			MinPriceForOrder = 0.75;
 
 			ShouldFilterBad = true;

@@ -126,5 +126,17 @@ namespace StockSimulator.Core
 			int startIndex = currentBar - Math.Min(currentBar, period - 1);
 			return series.GetRange(startIndex, Math.Min(currentBar, period)).Max();
 		}
+
+		/// <summary>
+		/// Returns the percentage change from b to a.
+		/// </summary>
+		/// <param name="a">Buy price</param>
+		/// <param name="b">Sell price</param>
+		/// <returns>The percentage change from b to a</returns>
+		public static double PercentChange(double a, double b)
+		{
+			return a > 0.0 ? ((b - a) / a) * 100.0 : 0.0;
+		}
+
 	}
 }

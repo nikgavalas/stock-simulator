@@ -59,6 +59,22 @@ namespace StockSimulator.Core
 		[JsonConverter(typeof(RoundedDoubleConverter))]
 		public double LongLengthExceededPercent { get; set; }
 
+		[JsonProperty("longWinAvg")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
+		public double LongWinAvg { get; set; }
+
+		[JsonProperty("longWinAvgPercent")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
+		public double LongWinAvgPercent { get; set; }
+
+		[JsonProperty("longLossAvg")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
+		public double LongLossAvg { get; set; }
+
+		[JsonProperty("longLossAvgPercent")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
+		public double LongLossAvgPercent { get; set; }
+
 		[JsonProperty("longNumberOfOrders")]
 		public long LongNumberOfOrders { get; set; }
 
@@ -83,6 +99,22 @@ namespace StockSimulator.Core
 		[JsonProperty("shortLengthExceededPercent")]
 		[JsonConverter(typeof(RoundedDoubleConverter))]
 		public double ShortLengthExceededPercent { get; set; }
+
+		[JsonProperty("shortWinAvg")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
+		public double ShortWinAvg { get; set; }
+
+		[JsonProperty("shortWinAvgPercent")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
+		public double ShortWinAvgPercent { get; set; }
+
+		[JsonProperty("shortLossAvg")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
+		public double ShortLossAvg { get; set; }
+
+		[JsonProperty("shortLossAvgPercent")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
+		public double ShortLossAvgPercent { get; set; }
 
 		[JsonProperty("shortNumberOfOrders")]
 		public long ShortNumberOfOrders { get; set; }
@@ -137,6 +169,16 @@ namespace StockSimulator.Core
 		public StatisticsCalculator()
 		{
 			Orders = new List<Order>();
+
+			LongWinAvg = 0;
+			LongWinAvgPercent = 0;
+			LongLossAvg = 0;
+			LongLossAvgPercent = 0;
+
+			ShortWinAvg = 0;
+			ShortWinAvgPercent = 0;
+			ShortLossAvg = 0;
+			ShortLossAvgPercent = 0;
 		}
 
 		/// <summary>
@@ -226,6 +268,10 @@ namespace StockSimulator.Core
 					LongProfitTargetPercent = Math.Round(((double)_longNumberOfProfitTargets / LongNumberOfOrders) * 100.0);
 					LongStopLossPercent = Math.Round(((double)_longNumberOfStopLosses / LongNumberOfOrders) * 100.0);
 					LongLengthExceededPercent = Math.Round(((double)_longNumberOfLengthExceeded / LongNumberOfOrders) * 100.0);
+					LongWinAvg = _longNumberOfWins > 0 ? LongWinAvg / _longNumberOfWins : 0;
+					LongWinAvgPercent = _longNumberOfWins > 0 ? LongWinAvgPercent / _longNumberOfWins : 0;
+					LongLossAvg = _longNumberOfLosses > 0 ? LongLossAvg / _longNumberOfLosses : 0;
+					LongLossAvgPercent = _longNumberOfLosses > 0 ? LongLossAvgPercent / _longNumberOfLosses : 0;
 				}
 
 				if (ShortNumberOfOrders > 0)
@@ -235,6 +281,10 @@ namespace StockSimulator.Core
 					ShortProfitTargetPercent = Math.Round(((double)_shortNumberOfProfitTargets / ShortNumberOfOrders) * 100.0);
 					ShortStopLossPercent = Math.Round(((double)_shortNumberOfStopLosses / ShortNumberOfOrders) * 100.0);
 					ShortLengthExceededPercent = Math.Round(((double)_shortNumberOfLengthExceeded / ShortNumberOfOrders) * 100.0);
+					ShortWinAvg = _shortNumberOfWins > 0 ? ShortWinAvg / _shortNumberOfWins : 0;
+					ShortWinAvgPercent = (_shortNumberOfWins > 0 ? ShortWinAvgPercent / _shortNumberOfWins : 0) * -1;
+					ShortLossAvg = _shortNumberOfLosses > 0 ? ShortLossAvg / _shortNumberOfLosses : 0;
+					ShortLossAvgPercent = (_shortNumberOfLosses > 0 ? ShortLossAvgPercent / _shortNumberOfLosses : 0) * -1;
 				}
 
 				AverageOrderLength = Math.Round((double)_totalLengthOfAllOrders / NumberOfOrders);
@@ -263,6 +313,10 @@ namespace StockSimulator.Core
 			LongStopLossPercent = stats.LongStopLossPercent;
 			LongLengthExceededPercent = stats.LongLengthExceededPercent;
 			LongNumberOfOrders = stats.LongNumberOfOrders;
+			LongWinAvg = stats.LongWinAvg;
+			LongWinAvgPercent = stats.LongWinAvgPercent;
+			LongLossAvg = stats.LongLossAvg;
+			LongLossAvgPercent = stats.LongLossAvgPercent;
 
 			ShortWinPercent = stats.ShortWinPercent;
 			ShortLossPercent = stats.ShortLossPercent;
@@ -270,6 +324,10 @@ namespace StockSimulator.Core
 			ShortStopLossPercent = stats.ShortStopLossPercent;
 			ShortLengthExceededPercent = stats.ShortLengthExceededPercent;
 			ShortNumberOfOrders = stats.ShortNumberOfOrders;
+			ShortWinAvg = stats.ShortWinAvg;
+			ShortWinAvgPercent = stats.ShortWinAvgPercent;
+			ShortLossAvg = stats.ShortLossAvg;
+			ShortLossAvgPercent = stats.ShortLossAvgPercent;
 
 			AverageOrderLength = stats.AverageOrderLength;
 			AverageProfitOrderLength = stats.AverageProfitOrderLength;
@@ -289,10 +347,14 @@ namespace StockSimulator.Core
 				if (order.Gain > 0)
 				{
 					++_longNumberOfWins;
+					LongWinAvg += order.Gain;
+					LongWinAvgPercent += UtilityMethods.PercentChange(order.BuyPrice, order.SellPrice);
 				}
 				else
 				{
 					++_longNumberOfLosses;
+					LongLossAvg += order.Gain;
+					LongLossAvgPercent += UtilityMethods.PercentChange(order.BuyPrice, order.SellPrice);
 				}
 
 				if (order.Status == Order.OrderStatus.ProfitTarget)
@@ -323,10 +385,14 @@ namespace StockSimulator.Core
 				if (order.Gain > 0)
 				{
 					++_shortNumberOfWins;
+					ShortWinAvg += order.Gain;
+					ShortWinAvgPercent += UtilityMethods.PercentChange(order.BuyPrice, order.SellPrice);
 				}
 				else
 				{
 					++_shortNumberOfLosses;
+					ShortLossAvg += order.Gain;
+					ShortLossAvgPercent += UtilityMethods.PercentChange(order.BuyPrice, order.SellPrice);
 				}
 
 				if (order.Status == Order.OrderStatus.ProfitTarget)
