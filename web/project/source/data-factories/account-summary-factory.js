@@ -1,24 +1,12 @@
 'use strict';
 
 mainApp.factory('AccountSummaryFactory', [
+	'DateFactory',
 	function(
+		DateFactory
 	) {
 		var factory = {};
 
-		var monthNames = [
-			'Jan',
-			'Feb',
-			'Mar',
-			'Apr',
-			'May',
-			'Jun',
-			'Jul',
-			'Aug',
-			'Sep',
-			'Oct',
-			'Nov',
-			'Dec'
-		];
 
 		/**
 		 * Calculates the yearly and monthly returns of all the values added to the class.
@@ -38,7 +26,7 @@ mainApp.factory('AccountSummaryFactory', [
 			 */
 			addValue: function(dateOfValue, value) {
 				var month = parseInt(dateOfValue.getUTCMonth(), 10);
-				var monthName = monthNames[dateOfValue.getUTCMonth()];
+				var monthName = DateFactory.getMonthName(month);
 				
 				// Create a new month to hold the values.
 				if (angular.isUndefined(this.monthNameToIndex[monthName])) {

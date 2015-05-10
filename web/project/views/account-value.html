@@ -21,14 +21,20 @@
 						<th>End Value</th>
 						<th>Gain</th>
 						<th>Percent Gain</th>
+						<th>Num Orders</th>
+						<th>Win %</th>
+						<th>Loss %</th>
 					</thead>
 					<tbody>
-						<tr ng-repeat="monthSummary in yearSummary.months">
+						<tr ng-repeat="monthSummary in yearSummary.months" ng-init="ordersSummary = getMonthOrderSummary(yearSummary.year, monthSummary.name)">
 							<td>{{monthSummary.name}}</td>
 							<td>{{monthSummary.startValue}}</td>
 							<td>{{monthSummary.endValue}}</td>
 							<td>{{monthSummary.gain}}</td>
 							<td>{{monthSummary.percentGain}}</td>
+							<td>{{ordersSummary.getNumOrders()}}</td>
+							<td>{{ordersSummary.getWinPercent()}}</td>
+							<td>{{ordersSummary.getLossPercent()}}</td>							
 						</tr>
 						<tr>
 							<td>Total</td>
@@ -36,6 +42,9 @@
 							<td>{{yearSummary.getEndValue()}}</td>
 							<td>{{yearSummary.getGain()}}</td>
 							<td>{{yearSummary.getPercentGain()}}</td>
+							<td>0</td>
+							<td>0</td>
+							<td>0</td>
 						</tr>
 					</tbody>
 				</table>
