@@ -24,16 +24,17 @@
   "SizeOfOrder": 20000.0,
   "UseLimitOrders": false,
   "MaxBarsLimitOrderFill": 3,
-  "MaxComboSize": 4,
   "ComboLeewayBars": 0,
   "MaxOpenOrders": 4,
   "MaxBarsOrderOpenMain": 0,
   "MinRequiredOrders": 7,
   "MinPriceForOrder": 0.75,
+  "MinPriceForShort": 5.0,
   "MinComboSizeToBuy": 1,
+  "MaxComboSizeToBuy": 4,
   "InitialAccountBalance": 80000,
   "PercentForBuy": 72.0,
   "NumBarsToDelayStart": 250,
-  "InstrumentListFile": "C:\\Users\\Nik\\Documents\\Investing\\StocksRelease\\input\\beta.csv",
-  "OutputFolder": "C:\\Users\\Nik\\Documents\\Investing\\StocksRelease\\web\\output"
+  "InstrumentListFile": "C:\\Users\\Nik\\Documents\\Code\\github\\stock-simulator\\input\\beta.csv",
+  "OutputFolder": "C:\\Users\\Nik\\Documents\\Code\\github\\stock-simulator\\output\\output"
 }
