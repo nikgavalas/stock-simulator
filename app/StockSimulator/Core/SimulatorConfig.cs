@@ -191,6 +191,11 @@ namespace StockSimulator.Core
 		public double MinPriceForOrder { get; set; }
 
 		[Category("Main Strategy")]
+		[DisplayName("Min Price For Short")]
+		[Description("Minimum price for a short order to be placed on a ticker")]
+		public double MinPriceForShort { get; set; }
+
+		[Category("Main Strategy")]
 		[DisplayName("Min Combo Size")]
 		[Description("Minimum number of strategies that must have been present to buy")]
 		public int MinComboSizeToBuy { get; set; }
@@ -255,6 +260,7 @@ namespace StockSimulator.Core
 			NumBarsToDelayStart = 250;
 			MaxBarsOrderOpenMain = 0;
 			MinPriceForOrder = 0.75;
+			MinPriceForShort = 5.00;
 
 			ShouldFilterBad = true;
 			NumBarsBadFilter = 500;

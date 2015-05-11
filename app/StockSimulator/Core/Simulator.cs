@@ -234,7 +234,12 @@ namespace StockSimulator.Core
 					if (strat.Bars[currentBar].HighestPercent >= Config.PercentForBuy &&
 						strat.Data.Open[currentBar] >= Config.MinPriceForOrder)
 					{
-						buyList.Add(strat);
+						// If this is a short order, some brokers have min prices they allow for shorts.
+						if (strat.Bars[currentBar].StrategyOrderType == Order.OrderType.Long ||
+							(strat.Bars[currentBar].StrategyOrderType == Order.OrderType.Short && strat.Data.Open[currentBar] >= Config.MinPriceForShort))
+						{
+							buyList.Add(strat);
+						}
 					}
 				}
 			}
