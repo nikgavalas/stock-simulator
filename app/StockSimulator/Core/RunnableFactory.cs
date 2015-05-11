@@ -107,6 +107,11 @@ namespace StockSimulator.Core
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
+					case "BearDoji":
+						requestedItem = new BearDoji(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
+						break;
+
 					case "DownsideTasukiGap":
 						requestedItem = new DownsideTasukiGap(_tickerData, this);
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
@@ -283,6 +288,10 @@ namespace StockSimulator.Core
 
 					case "DojiFound":
 						requestedItem = new DojiFound(_tickerData, this);
+						break;
+
+					case "BearDojiFound":
+						requestedItem = new BearDojiFound(_tickerData, this);
 						break;
 
 					case "HammerFound":

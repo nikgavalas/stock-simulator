@@ -115,6 +115,7 @@
     <Compile Include="Indicators\Bollinger.cs" />
     <Compile Include="Indicators\Candlesticks\BaseCandlestick.cs" />
     <Compile Include="Indicators\Candlesticks\BearBeltHold.cs" />
+    <Compile Include="Indicators\Candlesticks\BearDoji.cs" />
     <Compile Include="Indicators\Candlesticks\BearEngulfing.cs" />
     <Compile Include="Indicators\Candlesticks\BearHarami.cs" />
     <Compile Include="Indicators\Candlesticks\BearHaramiCross.cs" />
@@ -171,6 +172,7 @@
     <Compile Include="Strategies\Bull\BullStochRsiFound.cs" />
     <Compile Include="Strategies\Bull\StochasticsCrossover.cs" />
     <Compile Include="Strategies\Candlesticks\BearBeltHoldFound.cs" />
+    <Compile Include="Strategies\Candlesticks\BearDojiFound.cs" />
     <Compile Include="Strategies\Candlesticks\BearEngulfingFound.cs" />
     <Compile Include="Strategies\Candlesticks\BearHaramiFound.cs" />
     <Compile Include="Strategies\Candlesticks\BearHaramiCrossFound.cs" />

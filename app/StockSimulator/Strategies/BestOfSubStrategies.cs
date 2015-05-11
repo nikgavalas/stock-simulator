@@ -77,6 +77,7 @@ namespace StockSimulator.Strategies
 					"BullHaramiCrossFound",
 					"BullCciCrossover",
 					"DojiFound",
+					"BearDojiFound",
 					"HammerFound",
 					"BullKeltnerCloseAbove",
 					"BullMacdCrossover",

@@ -10,9 +10,9 @@ namespace StockSimulator.Indicators
 	/// <summary>
 	/// Doji
 	/// </summary>
-	class Doji : BaseCandlestick
+	class BearDoji : BaseCandlestick
 	{
-		public Doji(TickerData tickerData, RunnableFactory factory)
+		public BearDoji(TickerData tickerData, RunnableFactory factory)
 			: base(tickerData, factory)
 		{
 		}
@@ -23,7 +23,7 @@ namespace StockSimulator.Indicators
 		/// <returns>The name of this indicator</returns>
 		public override string ToString()
 		{
-			return "Doji";
+			return "BearDoji";
 		}
 
 		/// <summary>
@@ -36,7 +36,7 @@ namespace StockSimulator.Indicators
 
 			Trend trend = (Trend)Dependents[0];
 
-			if (Simulator.Config.TrendStrength > 0 && trend.UpTrend[currentBar] == true)
+			if (Simulator.Config.TrendStrength > 0 && trend.DownTrend[currentBar] == true)
 			{
 				return;
 			}
