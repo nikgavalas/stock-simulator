@@ -178,23 +178,10 @@ namespace StockSimulator.Core
 						serverData = GetIntraDayDataFromGoogleServer(ticker, start, end, interval);
 					}
 
-					// TODO: This is where we can probably have some logic that only downloads
-					// the dates that we don't have saved on disk. Like if we have all data except
-					// todays data, we can just download todays data and then append it to the data
-					// returned from disk. 
-					// We may NOT want to do this incase we have very obselete data and the new data
-					// from the server is actually better...It could also be that the data gets worse,
-					// who knows!
-
-					// Append the server data to the disk data so that we have it for another time.
-					if (data != null)
-					{
-						data.AppendData(serverData);
-					}
-					else
-					{
-						data = serverData;
-					}
+					// Anytime we have to download data from the server always save the entire
+					// data set. This is because the data is split adjusted so the data from
+					// yesteray may not match the data from today.
+					data = serverData;
 
 					// Save the data so we can resuse it again without hitting the server.
 					SaveTickerData(ticker, data, start, end);
