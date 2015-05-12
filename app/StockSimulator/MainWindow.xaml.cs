@@ -165,10 +165,13 @@ namespace StockSimulator
 
 		private void UpdateStatus(string message)
 		{
-			_statusText.Focus();
-			_statusText.Text += DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss.fff-") + message + Environment.NewLine;
-			_statusText.CaretIndex = _statusText.Text.Length;
-			_statusText.ScrollToEnd();
+			Dispatcher.Invoke((Action)(() =>
+			{
+				_statusText.Focus();
+				_statusText.Text += DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss.fff-") + message + Environment.NewLine;
+				_statusText.CaretIndex = _statusText.Text.Length;
+				_statusText.ScrollToEnd();
+			}));
 		}
 
 		private void EnableOptions(bool shouldEnable)

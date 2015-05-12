@@ -159,11 +159,17 @@ namespace StockSimulator.Core
 		{
 			WriteMessage("Running historical analysis for all tickers");
 
+			int totalInstruments = Instruments.Count;
+			int amountFinished = 0;
+
 			// Run all to start with so we have the data to simulate with.
 			Parallel.ForEach(Instruments, task =>
 			//foreach (KeyValuePair<int, BestOfSubStrategies> task in Instruments)
 			{
 				task.Value.Run();
+
+				Interlocked.Increment(ref amountFinished);
+				WriteMessage((((double)amountFinished / totalInstruments) * 100.0).ToString("##.##") + "% Complete");
 			});
 
 			DateTime startDate = DataStore.SimTickerDates.First().Key;
