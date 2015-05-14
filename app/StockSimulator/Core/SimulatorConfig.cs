@@ -171,6 +171,11 @@ namespace StockSimulator.Core
 		public int ComboLeewayBars { get; set; }
 
 		[Category("Main Strategy")]
+		[DisplayName("Max Orders Per Bar")]
+		[Description("Maximum number of orders that can be placed in a bar")]
+		public int MaxOrdersPerBar { get; set; }
+
+		[Category("Main Strategy")]
 		[DisplayName("Max Open Orders")]
 		[Description("Maximum number of orders that can be open at a time")]
 		public int MaxOpenOrders { get; set; }
@@ -251,6 +256,7 @@ namespace StockSimulator.Core
 			MaxBarsLimitOrderFill = 3;
 
 			ComboLeewayBars = 0;
+			MaxOrdersPerBar = 4;
 			MinComboSizeToBuy = 1;
 			MaxComboSizeToBuy = 4;
 			MaxOpenOrders = 1000;

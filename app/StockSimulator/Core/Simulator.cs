@@ -272,7 +272,7 @@ namespace StockSimulator.Core
 						// $100,000 and we double it in 2 years. We don't want to be investing our $200,000 worth
 						// of cash. We still want to work with our original amount. This way we can see how much 
 						// of a bankroll we'll need to make a living off investing.
-						if (_activeOrders.Count >= Config.MaxOpenOrders)
+						if (_activeOrders.Count >= Config.MaxOpenOrders || currentCount >= Config.MaxOrdersPerBar)
 						{
 							break;
 						}
@@ -306,8 +306,7 @@ namespace StockSimulator.Core
 
 								if (shouldReallyOrder == true)
 								{
-									EnterOrder(buyList[i].Bars[strategyBarIndex].Statistics, barStats.StrategyOrderType, buyList[i].Data, strategyBarIndex);
-									++currentCount;
+									currentCount += EnterOrder(buyList[i].Bars[strategyBarIndex].Statistics, barStats.StrategyOrderType, buyList[i].Data, strategyBarIndex);
 								}
 							}
 						}
@@ -387,18 +386,19 @@ namespace StockSimulator.Core
 		/// <param name="orderType">Type of order to place for the found strategy (long or short)</param>
 		/// <param name="ticker">Ticker we're placing the order on</param>
 		/// <param name="currentBar">Current bar of the simulation</param>
-		private void EnterOrder(List<StrategyStatistics> stats, Order.OrderType orderType, TickerData ticker, int currentBar)
+		private int EnterOrder(List<StrategyStatistics> stats, Order.OrderType orderType, TickerData ticker, int currentBar)
 		{
 			// Check here that the strategy order type matches
 			// with the higher timeframe trend. Continue if it doesn't.
 			if (Config.UseHigherTimeframeMainStrategy == true && orderType != ticker.HigherTimeframeMomentum[currentBar])
 			{
-				return;
+				return 0;
 			}
 
 			MainStrategyOrder order = new MainStrategyOrder(stats, orderType, ticker, "MainStrategy", currentBar);
 			Simulator.Orders.AddOrder(order);
 			_activeOrders.Add(order);
+			return 1;
 		}
 
 	}
