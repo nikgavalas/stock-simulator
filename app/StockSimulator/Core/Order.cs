@@ -142,6 +142,8 @@ namespace StockSimulator.Core
 		/// <param name="curBar">Current bar of the simulation</param>
 		public void Update(int curBar)
 		{
+			bool isMainOrder = GetType() == typeof(MainStrategyOrder);
+
 			// If the order is open and not filled we need to fill it.
 			if (Status == OrderStatus.Open)
 			{
@@ -181,8 +183,10 @@ namespace StockSimulator.Core
 					double direction = Type == OrderType.Long ? 1.0 : -1.0;
 
 					// Set prices to exit.
-					ProfitTargetPrice = BuyPrice + ((BuyPrice * Simulator.Config.ProfitTarget) * direction);
-					StopPrice = BuyPrice - ((BuyPrice * Simulator.Config.StopTarget) * direction);
+					double configProfitTarget = isMainOrder ? Simulator.Config.MainProfitTarget : Simulator.Config.ProfitTarget;
+					double configStopTarget = isMainOrder ? Simulator.Config.MainStopTarget : Simulator.Config.StopTarget;
+					ProfitTargetPrice = BuyPrice + ((BuyPrice * configProfitTarget) * direction);
+					StopPrice = BuyPrice - ((BuyPrice * configStopTarget) * direction);
 				}
 			}
 
@@ -204,17 +208,10 @@ namespace StockSimulator.Core
 				// Also have an option where we can close main orders at a different
 				// length of bars than substrategy orders.
 				int numBarsOpen = curBar - BuyBar;
-				bool shouldForceCloseOrder = (numBarsOpen >= Simulator.Config.MaxBarsOrderOpen) ||
-					(GetType() == typeof(MainStrategyOrder) && numBarsOpen >= Simulator.Config.MaxBarsOrderOpenMain);
-				if (shouldForceCloseOrder)
+				int maxOpenBars = isMainOrder ? Simulator.Config.MaxBarsOrderOpenMain : Simulator.Config.MaxBarsOrderOpen;
+				if (numBarsOpen >= maxOpenBars && IsFinished() == false)
 				{
-					// We'll simulate it so that if we are holding for 0 bars (opening and 
-					// closing in 1 day), then we'll just sell at the end of the day ignoring
-					// profit targets but heeding stop loss targets.
-					if (IsFinished() == false || (GetType() == typeof(MainStrategyOrder) && Simulator.Config.MaxBarsOrderOpenMain == 0 && Status == OrderStatus.ProfitTarget))
-					{
-						FinishOrder(Ticker.Close[curBar], curBar, OrderStatus.LengthExceeded);
-					}
+					FinishOrder(Ticker.Close[curBar], curBar, OrderStatus.LengthExceeded);
 				}
 			}
 		}

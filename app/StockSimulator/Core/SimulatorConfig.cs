@@ -226,6 +226,16 @@ namespace StockSimulator.Core
 		public int NumBarsToDelayStart { get; set; }
 
 		[Category("Main Strategy")]
+		[DisplayName("Main profit Target")]
+		[Description("Main profit target for all orders")]
+		public double MainProfitTarget { get; set; }
+
+		[Category("Main Strategy")]
+		[DisplayName("Main stop Loss Target")]
+		[Description("Main stop loss target for all orders")]
+		public double MainStopTarget { get; set; }
+
+		[Category("Main Strategy")]
 		[DisplayName("Stock List File")]
 		[Description("File with a list of stocks to run the sim on")]
 		public string InstrumentListFile { get; set; }
@@ -267,6 +277,8 @@ namespace StockSimulator.Core
 			MaxBarsOrderOpenMain = 0;
 			MinPriceForOrder = 0.75;
 			MinPriceForShort = 5.00;
+			MainProfitTarget = 0.20;
+			MainStopTarget = 0.04;
 
 			ShouldFilterBad = true;
 			NumBarsBadFilter = 500;
