@@ -146,7 +146,6 @@
     <Compile Include="Indicators\Stochastics.cs" />
     <Compile Include="Indicators\StochasticsFast.cs" />
     <Compile Include="Indicators\StochRsi.cs" />
-    <Compile Include="Indicators\Swing.cs" />
     <Compile Include="Indicators\Trend.cs" />
     <Compile Include="Indicators\Trix.cs" />
     <Compile Include="Indicators\WilliamsR.cs" />
@@ -161,7 +160,6 @@
     <Compile Include="Strategies\Bear\BearStochasticsCrossover.cs" />
     <Compile Include="Strategies\Bear\BearStochasticsFastCrossover.cs" />
     <Compile Include="Strategies\Bear\BearStochRsiFound.cs" />
-    <Compile Include="Strategies\Bear\BearSwingStart.cs" />
     <Compile Include="Strategies\Bear\BearTrendStart.cs" />
     <Compile Include="Strategies\Bear\BearTrixCrossover.cs" />
     <Compile Include="Strategies\Bear\BearTrixSignalCrossover.cs" />
@@ -206,7 +204,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Strategies\Bull\StochasticsFastCrossover.cs" />
-    <Compile Include="Strategies\Bull\SwingStart.cs" />
     <Compile Include="Strategies\Bull\TrendStart.cs" />
     <Compile Include="Strategies\Bull\TrixCrossover.cs" />
     <Compile Include="Strategies\Bull\TrixSignalCrossover.cs" />

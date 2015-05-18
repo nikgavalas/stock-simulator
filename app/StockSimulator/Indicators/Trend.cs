@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using StockSimulator.Core;
+using Newtonsoft.Json;
 
 namespace StockSimulator.Indicators
 {
@@ -15,27 +16,25 @@ namespace StockSimulator.Indicators
 	{
 		public List<bool> UpTrend { get; set; }
 		public List<bool> DownTrend { get; set; }
+		public List<double> UpTrendPlot { get; set; }
+		public List<double> DownTrendPlot { get; set; }
 
 		public Trend(TickerData tickerData, RunnableFactory factory)
 			: base(tickerData, factory)
 		{
 			UpTrend = Enumerable.Repeat(false, Data.NumBars).ToList();
 			DownTrend = Enumerable.Repeat(false, Data.NumBars).ToList();
+			UpTrendPlot = Enumerable.Repeat(0d, Data.NumBars).ToList();
+			DownTrendPlot = Enumerable.Repeat(0d, Data.NumBars).ToList();
 		}
 
 		/// <summary>
-		/// Returns an array of dependent names.
+		/// This indicator is plotted on the price bars.
 		/// </summary>
-		public override string[] DependentNames
+		[JsonProperty("plotOnPrice")]
+		public override bool PlotOnPrice
 		{
-			get
-			{
-				string[] deps = {
-					"Swing"
-				};
-
-				return deps;
-			}
+			get { return true; }
 		}
 
 		/// <summary>
@@ -55,22 +54,34 @@ namespace StockSimulator.Indicators
 			base.PrepareForSerialization();
 
 			// Add the rsi for plotting
-			PlotSeries plotUp = new PlotSeries("column");
-			PlotSeries plotDown = new PlotSeries("column");
+			PlotSeries plotUp = new PlotSeries("line");
+			PlotSeries plotDown = new PlotSeries("line");
 			ChartPlots[ToString() + "Up"] = plotUp;
 			ChartPlots[ToString() + "Down"] = plotDown;
 			for (int i = 0; i < Data.Dates.Count; i++)
 			{
 				long ticks = UtilityMethods.UnixTicks(Data.Dates[i]);
+
+				object upValue = null;
+				if (UpTrendPlot[i] > 0.0)
+				{
+					upValue = UpTrendPlot[i];
+				}
 				plotUp.PlotData.Add(new List<object>()
 				{
 					ticks,
-					UpTrend[i] ? 1 : 0
+					upValue
 				});
+
+				object downValue = null;
+				if (DownTrendPlot[i] > 0.0)
+				{
+					downValue = DownTrendPlot[i];
+				}
 				plotDown.PlotData.Add(new List<object>()
 				{
 					ticks,
-					DownTrend[i] ? -1 : 0
+					downValue
 				});
 			}
 		}
@@ -100,6 +111,16 @@ namespace StockSimulator.Indicators
 			}
 			UpTrend[currentBar] = isUptrend;
 
+			// Plot the downtrend at the top of the prices.
+			if (isUptrend == true)
+			{
+				for (int i = 0; i < Simulator.Config.TrendStrength; i++)
+				{
+					int index = currentBar - i;
+					UpTrendPlot[index] = Data.Low[index];
+				}
+			}
+
 			// A downtrend is a series of bars with lower and lower highs.
 			bool isDowntrend = true;
 			for (int i = currentBar; i > currentBar - Simulator.Config.TrendStrength; i--)
@@ -112,69 +133,16 @@ namespace StockSimulator.Indicators
 			}
 			DownTrend[currentBar] = isDowntrend;
 
-			//CalculateTrendLines(currentBar);
+			// Plot the downtrend at the top of the prices.
+			if (isDowntrend == true)
+			{
+				for (int i = 0; i < Simulator.Config.TrendStrength; i++)
+				{
+					int index = currentBar - i;
+					DownTrendPlot[index] = Data.High[index];
+				}
+			}
 		}
 
-		/// <summary>
-		/// Calculate trend lines and prevailing trend
-		/// <param name="currentBar">Current bar of the simulation</param>
-		/// </summary>
-		private void CalculateTrendLines(int currentBar)
-		{
-			// Calculate up trend line
-			int upTrendStartBarsAgo = 0;
-			int upTrendEndBarsAgo = 0;
-			int upTrendOccurence = 1;
-
-			Swing swing = (Swing)Dependents[0];
-
-			while (Data.Low[currentBar - upTrendEndBarsAgo] <= Data.Low[currentBar - upTrendStartBarsAgo])
-			{
-				upTrendStartBarsAgo = swing.SwingLowBar(currentBar, 0, upTrendOccurence + 1, currentBar);
-				upTrendEndBarsAgo = swing.SwingLowBar(currentBar, 0, upTrendOccurence, currentBar);
-
-				if (upTrendStartBarsAgo < 0 || upTrendEndBarsAgo < 0)
-				{
-					break;
-				}
-
-				upTrendOccurence++;
-			}
-
-
-			// Calculate down trend line	
-			int downTrendStartBarsAgo = 0;
-			int downTrendEndBarsAgo = 0;
-			int downTrendOccurence = 1;
-
-			while (Data.High[currentBar - downTrendEndBarsAgo] >= Data.High[currentBar - downTrendStartBarsAgo])
-			{
-				downTrendStartBarsAgo = swing.SwingHighBar(currentBar, 0, downTrendOccurence + 1, currentBar);
-				downTrendEndBarsAgo = swing.SwingHighBar(currentBar, 0, downTrendOccurence, currentBar);
-
-				if (downTrendStartBarsAgo < 0 || downTrendEndBarsAgo < 0)
-				{
-					break;
-				}
-
-				downTrendOccurence++;
-			}
-
-			if (upTrendStartBarsAgo > 0 && upTrendEndBarsAgo > 0 && upTrendStartBarsAgo < downTrendStartBarsAgo)
-			{
-				UpTrend[currentBar] = true;
-				DownTrend[currentBar] = false;
-			}
-			else if (downTrendStartBarsAgo > 0 && downTrendEndBarsAgo > 0 && upTrendStartBarsAgo > downTrendStartBarsAgo)
-			{
-				UpTrend[currentBar] = false;
-				DownTrend[currentBar] = true;
-			}
-			else
-			{
-				UpTrend[currentBar] = false;
-				DownTrend[currentBar] = false;
-			}
-		}
 	}
 }

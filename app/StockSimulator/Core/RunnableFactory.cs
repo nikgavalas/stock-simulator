@@ -212,11 +212,6 @@ namespace StockSimulator.Core
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
-					case "Swing":
-						requestedItem = new Swing(_tickerData, this);
-						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
-						break;
-
 					case "Trend":
 						requestedItem = new Trend(_tickerData, this);
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
@@ -350,10 +345,6 @@ namespace StockSimulator.Core
 						requestedItem = new BullStochRsiFound(_tickerData, this);
 						break;
 
-					case "BullSwingStart":
-						requestedItem = new BullSwingStart(_tickerData, this);
-						break;
-
 					case "ThreeWhiteSoldiersFound":
 						requestedItem = new ThreeWhiteSoldiersFound(_tickerData, this);
 						break;
@@ -424,10 +415,6 @@ namespace StockSimulator.Core
 
 					case "BearStochRsiFound":
 						requestedItem = new BearStochRsiFound(_tickerData, this);
-						break;
-
-					case "BearSwingStart":
-						requestedItem = new BearSwingStart(_tickerData, this);
 						break;
 
 					case "BearTrendStart":
