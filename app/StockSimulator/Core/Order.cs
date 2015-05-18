@@ -107,8 +107,8 @@ namespace StockSimulator.Core
 			Ticker = tickerData;
 			DependentIndicatorNames = dependentIndicatorNames;
 			AccountValue = 0;
-			LimitBuyPrice = tickerData.Close[currentBar];
-			LimitOpenedBar = currentBar;
+			LimitBuyPrice = tickerData.High[currentBar];
+			LimitOpenedBar = currentBar + 1;
 
 			// Get things like win/loss percent up to the point this order was finished.
 			StartStatistics = Simulator.Orders.GetStrategyStatistics(StrategyName,
@@ -149,7 +149,7 @@ namespace StockSimulator.Core
 			{
 				// If we are using limit orders make sure the price is higher than that 
 				// limit before buying.
-				if (Simulator.Config.UseLimitOrders)
+				if (isMainOrder && Simulator.Config.UseLimitOrders)
 				{
 					if (curBar - LimitOpenedBar >= Simulator.Config.MaxBarsLimitOrderFill)
 					{

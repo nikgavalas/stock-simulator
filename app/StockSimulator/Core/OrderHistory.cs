@@ -135,7 +135,7 @@ namespace StockSimulator.Core
 				for (int i = tickerOrders.Count - 1; i >= 0; i--)
 				{
 					Order order = tickerOrders[i];
-					if (order.BuyBar >= cutoffBar && order.IsFinished())
+					if (order.BuyBar >= cutoffBar)
 					{
 						stats.AddOrder(order);
 					}

@@ -396,7 +396,9 @@ namespace StockSimulator.Core
 				filename = GetOutputFolder(timeString) + "overall.json";
 				File.WriteAllText(filename, jsonOutput);
 
-				jsonOutput = JsonConvert.SerializeObject(mainStrategyOrders.ToArray());
+				List<Order> mainOrders = mainStrategyOrders.ToList();
+				mainOrders.RemoveAll(order => order.Status == Order.OrderStatus.Cancelled);
+				jsonOutput = JsonConvert.SerializeObject(mainOrders);
 				filename = GetOutputFolder(timeString) + "overall-orders.json";
 				File.WriteAllText(filename, jsonOutput);
 
