@@ -12,7 +12,6 @@ namespace StockSimulator.Core
 	/// <summary>
 	/// Tracks the stats of a strategy for a single ticker.
 	/// Very similar to StrategyStatistics except it serializes the orders. 
-	/// TODO: There is probably a way to combine the two.
 	/// </summary>
 	public class StrategyTickerPairStatistics : StatisticsCalculator
 	{

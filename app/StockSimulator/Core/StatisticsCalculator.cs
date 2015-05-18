@@ -168,7 +168,7 @@ namespace StockSimulator.Core
 		/// </summary>
 		public StatisticsCalculator()
 		{
-			Orders = new List<Order>();
+			Orders = null;
 
 			LongWinAvg = 0;
 			LongWinAvgPercent = 0;
@@ -189,7 +189,12 @@ namespace StockSimulator.Core
 		{
 			if (order.IsFinished())
 			{
-				Orders.Add(order);
+				// The only time this is used is if the StrategyTickerPairStatisctics uses it
+				// for outputting all the order data.
+				if (Orders != null)
+				{
+					Orders.Add(order);
+				}
 
 				++NumberOfOrders;
 				if (order.Gain > 0)
