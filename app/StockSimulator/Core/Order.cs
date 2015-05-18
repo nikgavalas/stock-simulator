@@ -109,13 +109,6 @@ namespace StockSimulator.Core
 			AccountValue = 0;
 			LimitBuyPrice = tickerData.High[currentBar];
 			LimitOpenedBar = currentBar + 1;
-
-			// Get things like win/loss percent up to the point this order was finished.
-			StartStatistics = Simulator.Orders.GetStrategyStatistics(StrategyName,
-				type,
-				Ticker.TickerAndExchange,
-				currentBar,
-				Simulator.Config.MaxLookBackBars);
 		}
 
 		/// <summary>

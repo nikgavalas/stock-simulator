@@ -193,7 +193,12 @@ namespace StockSimulator.Strategies
 				Order placedOrder = EnterOrder(comboName, currentBar, comboList[0].OrderType, dependentIndicators);
 				if (placedOrder != null)
 				{
-					stats.Add(placedOrder.StartStatistics);
+					// Get things like win/loss percent up to the point this order was started.
+					stats.Add(Simulator.Orders.GetStrategyStatistics(placedOrder.StrategyName,
+						placedOrder.Type,
+						placedOrder.Ticker.TickerAndExchange,
+						currentBar,
+						Simulator.Config.MaxLookBackBars));
 				}
 			}
 
