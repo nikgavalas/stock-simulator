@@ -21,7 +21,7 @@ namespace StockSimulator.Core
 		/// The list of all the instruments to be simulated to find the best
 		/// stocks to buy on a particular day.
 		/// </summary>
-		public Dictionary<int, BestOfSubStrategies> Instruments { get; set; }
+		public SortedDictionary<string, BestOfSubStrategies> Instruments { get; set; }
 
 		/// <summary>
 		/// Holds all the orders for every strategy and ticker used.
@@ -84,7 +84,7 @@ namespace StockSimulator.Core
 
 			// Load the config file with the instument list for all the symbols that we 
 			// want to test.
-			Dictionary<int, TickerExchangePair> fileInstruments = new Dictionary<int, TickerExchangePair>();
+			SortedDictionary<string, TickerExchangePair> fileInstruments = new SortedDictionary<string, TickerExchangePair>();
 			string line;
 			try
 			{
@@ -93,9 +93,10 @@ namespace StockSimulator.Core
 				{
 					string[] pair = line.Split(',');
 					TickerExchangePair newTicker = new TickerExchangePair(pair[1], pair[0]);
-					if (fileInstruments.ContainsKey(newTicker.GetHashCode()) == false)
+					string key = newTicker.ToString();
+					if (fileInstruments.ContainsKey(key) == false)
 					{
-						fileInstruments[newTicker.GetHashCode()] = newTicker;
+						fileInstruments[key] = newTicker;
 					}
 					else
 					{
@@ -112,8 +113,8 @@ namespace StockSimulator.Core
 			WriteMessage("Initializing ticker data");
 
 			// Add all the symbols as dependent strategies using the bestofsubstrategies
-			Instruments = new Dictionary<int, BestOfSubStrategies>();
-			foreach (KeyValuePair<int, TickerExchangePair> item in fileInstruments)
+			Instruments = new SortedDictionary<string, BestOfSubStrategies>();
+			foreach (KeyValuePair<string, TickerExchangePair> item in fileInstruments)
 			{
 				// Get the data for the symbol and save it for later so we can output it.
 				TickerData tickerData = DataStore.GetTickerData(item.Value, config.StartDate, config.EndDate);
@@ -122,7 +123,7 @@ namespace StockSimulator.Core
 					DataOutput.SaveTickerData(tickerData);
 					RunnableFactory factory = new RunnableFactory(tickerData);
 					// This strategy will find the best strategy for this instrument everyday and save the value.
-					Instruments[item.Value.GetHashCode()] = new BestOfSubStrategies(tickerData, factory);
+					Instruments[item.Value.ToString()] = new BestOfSubStrategies(tickerData, factory);
 				}
 				else
 				{
@@ -146,7 +147,7 @@ namespace StockSimulator.Core
 			// Reinit all the orders
 			Orders = new OrderHistory();
 
-			foreach (KeyValuePair<int, BestOfSubStrategies> task in Instruments)
+			foreach (KeyValuePair<string, BestOfSubStrategies> task in Instruments)
 			{
 				task.Value.Initialize();
 			}
@@ -164,7 +165,7 @@ namespace StockSimulator.Core
 
 			// Run all to start with so we have the data to simulate with.
 			Parallel.ForEach(Instruments, task =>
-			//foreach (KeyValuePair<int, BestOfSubStrategies> task in Instruments)
+			//foreach (KeyValuePair<string, BestOfSubStrategies> task in Instruments)
 			{
 				task.Value.Run();
 
@@ -228,7 +229,7 @@ namespace StockSimulator.Core
 			List<BestOfSubStrategies> buyList = new List<BestOfSubStrategies>();
 
 			// Add all the tickers that are above our set percent to buy.
-			foreach (KeyValuePair<int, BestOfSubStrategies> instrument in Instruments)
+			foreach (KeyValuePair<string, BestOfSubStrategies> instrument in Instruments)
 			{
 				BestOfSubStrategies strat = instrument.Value;
 				int currentBar = strat.Data.GetBar(currentDate);

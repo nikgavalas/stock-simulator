@@ -45,9 +45,9 @@ namespace StockSimulator.Core
 		public virtual void Initialize()
 		{
 			_isFinishedRunning = false;
-			foreach (Runnable runnable in Dependents)
+			for (int i = 0; i < Dependents.Count; i++)
 			{
-				runnable.Initialize();
+				Dependents[i].Initialize();
 			}
 		}
 
@@ -63,9 +63,9 @@ namespace StockSimulator.Core
 			}
 
 			// Run all the dependents before this one.
-			foreach (Runnable runnable in Dependents)
+			for (int i = 0; i < Dependents.Count; i++)
 			{
-				runnable.Run();
+				Dependents[i].Run();
 			}
  
 			// Then run this one. Just use the closing data as the number of bars to run.
@@ -87,9 +87,9 @@ namespace StockSimulator.Core
 		/// </summary>
 		public virtual void Shutdown()
 		{
-			foreach (Runnable runnable in Dependents)
+			for (int i = 0; i < Dependents.Count; i++)
 			{
-				runnable.Shutdown();
+				Dependents[i].Shutdown();
 			}
 		}
 
