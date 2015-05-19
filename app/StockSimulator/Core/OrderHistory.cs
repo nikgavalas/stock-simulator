@@ -37,6 +37,14 @@ namespace StockSimulator.Core
 		}
 
 		/// <summary>
+		/// Frees the orders for a ticker when it finished.
+		/// </summary>
+		/// <param name="tickerAndExchange">Ticker to free</param>
+		public void PurgeTickerOrders(TickerExchangePair tickerAndExchange)
+		{
+		}
+
+		/// <summary>
 		/// Calculates things like win/loss percent, gain, etc. for the strategy used on the ticker.
 		/// </summary>
 		/// <param name="strategyName">Name of the strategy the statistics are for</param>

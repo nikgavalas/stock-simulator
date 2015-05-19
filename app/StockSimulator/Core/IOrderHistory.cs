@@ -38,5 +38,11 @@ namespace StockSimulator.Core
 		/// <param name="maxBarsAgo">Maximum number of bars in the past to consider for calculating</param>
 		/// <returns>Class holding the statistics calculated</returns>
 		StrategyStatistics GetTickerStatistics(TickerExchangePair tickerAndExchange, int currentBar, int maxBarsAgo);
+
+		/// <summary>
+		/// Frees the orders for a ticker when it finished.
+		/// </summary>
+		/// <param name="tickerAndExchange">Ticker to free</param>
+		void PurgeTickerOrders(TickerExchangePair tickerAndExchange);
 	}
 }

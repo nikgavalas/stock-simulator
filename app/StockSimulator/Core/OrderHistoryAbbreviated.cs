@@ -14,7 +14,7 @@ namespace StockSimulator.Core
 	/// </summary>
 	public class OrderHistoryAbbreviated : IOrderHistory
 	{
-		public ConcurrentDictionary<int, List<Order>> TickerStrategyOrders;
+		public ConcurrentDictionary<int, Dictionary<int, List<Order>>> TickerStrategyOrders;
 
 		public ConcurrentDictionary<int, ConcurrentBag<Order>> StrategyDictionary { get; set; }
 		public ConcurrentDictionary<int, List<Order>> TickerDictionary { get; set; }
@@ -26,7 +26,7 @@ namespace StockSimulator.Core
 		{
 			TickerDictionary = new ConcurrentDictionary<int, List<Order>>();
 			StrategyDictionary = new ConcurrentDictionary<int, ConcurrentBag<Order>>();
-			TickerStrategyOrders = new ConcurrentDictionary<int, List<Order>>();
+			TickerStrategyOrders = new ConcurrentDictionary<int, Dictionary<int, List<Order>>>();
 		}
 
 		/// <summary>
@@ -36,39 +36,6 @@ namespace StockSimulator.Core
 		/// <param name="currentBar">Current bar the order is being added in</param>
 		public void AddOrder(Order order, int currentBar)
 		{
-			// We only need to add the order to the ticker order if we are filtering bad tickers
-			// which looks at the history of tickers and removes the bad ones.
-			if (Simulator.Config.ShouldFilterBad == true)
-			{
-				int hash = order.Ticker.TickerAndExchange.GetHashCode();
-				if (TickerDictionary.ContainsKey(hash) == false)
-				{
-					TickerDictionary[hash] = new List<Order>();
-				}
-
-				int cutoffBar = currentBar - Simulator.Config.NumBarsBadFilter;
-				if (cutoffBar < 0)
-				{
-					cutoffBar = 0;
-				}
-
-				TickerDictionary[hash].RemoveAll(o => o.BuyBar < cutoffBar);
-				TickerDictionary[hash].Add(order);
-			}
-
-			// If this is the first time we've seen this strategy for this ticker, create a
-			// new list to hold all the orders for it.
-			int key = (order.Ticker.TickerAndExchange.ToString() + order.StrategyName).GetHashCode();
-			if (TickerStrategyOrders.ContainsKey(key) == false)
-			{
-				TickerStrategyOrders[key] = new List<Order>();
-			}
-
-			// Remove any old orders before adding the new one to the list.
-			List<Order> orders = TickerStrategyOrders[key];
-			RemoveOldOrders(orders, currentBar);
-			orders.Add(order);
-
 			// Save the main order in the regular strategy dictionary since we want to 
 			// save all of it's orders with no weird processing.
 			if (order.GetType() == typeof(MainStrategyOrder))
@@ -81,6 +48,60 @@ namespace StockSimulator.Core
 
 				StrategyDictionary[mainKey].Add(order);
 			}
+			else
+			{
+				// We only need to add the order to the ticker order if we are filtering bad tickers
+				// which looks at the history of tickers and removes the bad ones.
+				if (Simulator.Config.ShouldFilterBad == true)
+				{
+					int hash = order.Ticker.TickerAndExchange.GetHashCode();
+					if (TickerDictionary.ContainsKey(hash) == false)
+					{
+						TickerDictionary[hash] = new List<Order>();
+					}
+
+					int cutoffBar = currentBar - Simulator.Config.NumBarsBadFilter;
+					if (cutoffBar < 0)
+					{
+						cutoffBar = 0;
+					}
+
+					TickerDictionary[hash].RemoveAll(o => o.BuyBar < cutoffBar);
+					TickerDictionary[hash].Add(order);
+				}
+
+				// If this is the first time we've seen this ticker, need a new strategy dictionary 
+				// for this ticker.
+				int tickerKey = order.Ticker.TickerAndExchange.GetHashCode();
+				if (TickerStrategyOrders.ContainsKey(tickerKey) == false)
+				{
+					TickerStrategyOrders[tickerKey] = new Dictionary<int, List<Order>>();
+				}
+
+				Dictionary<int, List<Order>> tickerDictionary = TickerStrategyOrders[tickerKey];
+
+				// If this is the first time we've seen this strategy for this ticker, create a 
+				// new list of orders to track it.
+				int strategyKey = order.StrategyName.GetHashCode();
+				if (tickerDictionary.ContainsKey(strategyKey) == false)
+				{
+					tickerDictionary[strategyKey] = new List<Order>();
+				}
+
+				// Remove any old orders before adding the new one to the list.
+				List<Order> orders = tickerDictionary[strategyKey];
+				RemoveOldOrders(orders, currentBar);
+				orders.Add(order);
+			}
+		}
+
+		/// <summary>
+		/// Frees the orders for a ticker when it finished.
+		/// </summary>
+		/// <param name="tickerAndExchange">Ticker to free</param>
+		public void PurgeTickerOrders(TickerExchangePair tickerAndExchange)
+		{
+			TickerStrategyOrders[tickerAndExchange.GetHashCode()] = null;
 		}
 
 		/// <summary>
@@ -103,30 +124,36 @@ namespace StockSimulator.Core
 
 			StrategyStatistics stats = new StrategyStatistics(strategyName, orderType);
 
-			int key = (tickerAndExchange.ToString() + strategyName).GetHashCode();
-			if (TickerStrategyOrders.ContainsKey(key))
+			int tickerKey = tickerAndExchange.GetHashCode();
+			if (TickerStrategyOrders.ContainsKey(tickerKey))
 			{
-				List<Order> tickerOrders = TickerStrategyOrders[key];
+				Dictionary<int, List<Order>> tickerDictionary = TickerStrategyOrders[tickerKey];
 
-				for (int i = tickerOrders.Count - 1; i >= 0; i--)
+				int strategyKey = strategyName.GetHashCode();
+				if (tickerDictionary.ContainsKey(strategyKey))
 				{
-					Order order = tickerOrders[i];
-					bool shouldAddOrder = false;
+					List<Order> tickerOrders = tickerDictionary[strategyKey];
 
-					// For the date
-					if (Simulator.Config.UseLookbackBars)
+					for (int i = tickerOrders.Count - 1; i >= 0; i--)
 					{
-						shouldAddOrder = order.BuyBar >= cutoffBar && order.IsFinished();
-					}
-					// For the number of orders as the cutoff
-					else
-					{
-						shouldAddOrder = stats.NumberOfOrders < Simulator.Config.MaxLookBackOrders && order.IsFinished();
-					}
+						Order order = tickerOrders[i];
+						bool shouldAddOrder = false;
 
-					if (shouldAddOrder == true)
-					{
-						stats.AddOrder(order);
+						// For the date
+						if (Simulator.Config.UseLookbackBars)
+						{
+							shouldAddOrder = order.BuyBar >= cutoffBar && order.IsFinished();
+						}
+						// For the number of orders as the cutoff
+						else
+						{
+							shouldAddOrder = stats.NumberOfOrders < Simulator.Config.MaxLookBackOrders && order.IsFinished();
+						}
+
+						if (shouldAddOrder == true)
+						{
+							stats.AddOrder(order);
+						}
 					}
 				}
 			}

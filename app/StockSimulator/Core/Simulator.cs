@@ -175,6 +175,7 @@ namespace StockSimulator.Core
 			//foreach (KeyValuePair<string, BestOfSubStrategies> task in Instruments)
 			{
 				task.Value.Run();
+				Orders.PurgeTickerOrders(task.Value.Data.TickerAndExchange);
 
 				Interlocked.Increment(ref amountFinished);
 				WriteMessage((((double)amountFinished / totalInstruments) * 100.0).ToString("##.##") + "% Complete");
