@@ -206,6 +206,7 @@ namespace StockSimulator.Strategies
 			// for it and save those values for the bar.
 			double highestWinPercent = 0;
 			string highestName = "None";
+			StrategyStatistics highestStats = null;
 			int comboSize = 0;
 			Order.OrderType orderType = Order.OrderType.Long;
 			for (int i = 0; i < stats.Count; i++)
@@ -216,7 +217,14 @@ namespace StockSimulator.Strategies
 					highestName = stats[i].StrategyName;
 					comboSize = stats[i].StrategyName.Split('-').Length;
 					orderType = stats[i].StrategyOrderType;
+					highestStats = stats[i];
 				}
+			}
+
+			if (Simulator.Config.UseAbbreviatedOutput == true)
+			{
+				stats = new List<StrategyStatistics>();
+				stats.Add(highestStats);
 			}
 
 			Bars[currentBar] = new BarStatistics(highestWinPercent, highestName, comboSize, orderType, stats);
