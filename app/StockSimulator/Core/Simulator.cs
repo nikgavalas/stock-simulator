@@ -26,7 +26,7 @@ namespace StockSimulator.Core
 		/// <summary>
 		/// Holds all the orders for every strategy and ticker used.
 		/// </summary>
-		public static OrderHistory Orders { get; set; }
+		public static IOrderHistory Orders { get; set; }
 
 		/// <summary>
 		/// Config settings for this simulator run.
@@ -145,7 +145,14 @@ namespace StockSimulator.Core
 			WriteMessage("Initializing all the strategies");
 
 			// Reinit all the orders
-			Orders = new OrderHistory();
+			if (Config.UseAbbreviatedOutput == true)
+			{
+				Orders = new OrderHistoryAbbreviated();
+			}
+			else
+			{
+				Orders = new OrderHistory();
+			}
 
 			foreach (KeyValuePair<string, BestOfSubStrategies> task in Instruments)
 			{
@@ -397,7 +404,7 @@ namespace StockSimulator.Core
 			}
 
 			MainStrategyOrder order = new MainStrategyOrder(stats, orderType, ticker, "MainStrategy", currentBar);
-			Simulator.Orders.AddOrder(order);
+			Simulator.Orders.AddOrder(order, currentBar);
 			_activeOrders.Add(order);
 			return 1;
 		}

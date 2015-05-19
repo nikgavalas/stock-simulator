@@ -1,0 +1,192 @@
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace StockSimulator.Core
+{
+	/// <summary>
+	/// Holds all the orders but in a very short history. Only enough to get the
+	/// stats needed to run the sim. Doesn't hold enough stats to output
+	/// all the order history for analyzing.
+	/// </summary>
+	public class OrderHistoryAbbreviated : IOrderHistory
+	{
+		public ConcurrentDictionary<int, List<Order>> TickerStrategyOrders;
+
+		public ConcurrentDictionary<int, ConcurrentBag<Order>> StrategyDictionary { get; set; }
+		public ConcurrentDictionary<int, List<Order>> TickerDictionary { get; set; }
+
+		/// <summary>
+		/// Initialize the object.
+		/// </summary>
+		public OrderHistoryAbbreviated()
+		{
+			TickerDictionary = new ConcurrentDictionary<int, List<Order>>();
+			StrategyDictionary = new ConcurrentDictionary<int, ConcurrentBag<Order>>();
+			TickerStrategyOrders = new ConcurrentDictionary<int, List<Order>>();
+		}
+
+		/// <summary>
+		/// Adds an order to all the dictionaries for searching by multiple key types.
+		/// </summary>
+		/// <param name="order">The order to add</param>
+		/// <param name="currentBar">Current bar the order is being added in</param>
+		public void AddOrder(Order order, int currentBar)
+		{
+			// We only need to add the order to the ticker order if we are filtering bad tickers
+			// which looks at the history of tickers and removes the bad ones.
+			if (Simulator.Config.ShouldFilterBad == true)
+			{
+				int hash = order.Ticker.TickerAndExchange.GetHashCode();
+				if (TickerDictionary.ContainsKey(hash) == false)
+				{
+					TickerDictionary[hash] = new List<Order>();
+				}
+
+				int cutoffBar = currentBar - Simulator.Config.NumBarsBadFilter;
+				if (cutoffBar < 0)
+				{
+					cutoffBar = 0;
+				}
+
+				TickerDictionary[hash].RemoveAll(o => o.BuyBar < cutoffBar);
+				TickerDictionary[hash].Add(order);
+			}
+
+			// If this is the first time we've seen this strategy for this ticker, create a
+			// new list to hold all the orders for it.
+			int key = (order.Ticker.TickerAndExchange.ToString() + order.StrategyName).GetHashCode();
+			if (TickerStrategyOrders.ContainsKey(key) == false)
+			{
+				TickerStrategyOrders[key] = new List<Order>();
+			}
+
+			// Remove any old orders before adding the new one to the list.
+			List<Order> orders = TickerStrategyOrders[key];
+			RemoveOldOrders(orders, currentBar);
+			orders.Add(order);
+
+			// Save the main order in the regular strategy dictionary since we want to 
+			// save all of it's orders with no weird processing.
+			if (order.GetType() == typeof(MainStrategyOrder))
+			{
+				int mainKey = order.StrategyName.GetHashCode();
+				if (StrategyDictionary.ContainsKey(mainKey) == false)
+				{
+					StrategyDictionary[mainKey] = new ConcurrentBag<Order>();
+				}
+
+				StrategyDictionary[mainKey].Add(order);
+			}
+		}
+
+		/// <summary>
+		/// Calculates things like win/loss percent, gain, etc. for the strategy used on the ticker.
+		/// </summary>
+		/// <param name="strategyName">Name of the strategy the statistics are for</param>
+		/// <param name="orderType">Type of orders placed with this strategy (long or short)</param>
+		/// <param name="tickerAndExchange">Ticker the strategy used</param>
+		/// <param name="currentBar">Current bar of the simulation</param>
+		/// <param name="maxBarsAgo">Maximum number of bars in the past to consider for calculating</param>
+		/// <returns>Class holding the statistics calculated</returns>
+		public StrategyStatistics GetStrategyStatistics(string strategyName, Order.OrderType orderType, TickerExchangePair tickerAndExchange, int currentBar, int maxBarsAgo)
+		{
+			// Orders that started less than this bar will not be considered.
+			int cutoffBar = currentBar - maxBarsAgo;
+			if (cutoffBar < 0)
+			{
+				cutoffBar = 0;
+			}
+
+			StrategyStatistics stats = new StrategyStatistics(strategyName, orderType);
+
+			int key = (tickerAndExchange.ToString() + strategyName).GetHashCode();
+			if (TickerStrategyOrders.ContainsKey(key))
+			{
+				List<Order> tickerOrders = TickerStrategyOrders[key];
+
+				for (int i = tickerOrders.Count - 1; i >= 0; i--)
+				{
+					Order order = tickerOrders[i];
+					bool shouldAddOrder = false;
+
+					// For the date
+					if (Simulator.Config.UseLookbackBars)
+					{
+						shouldAddOrder = order.BuyBar >= cutoffBar && order.IsFinished();
+					}
+					// For the number of orders as the cutoff
+					else
+					{
+						shouldAddOrder = stats.NumberOfOrders < Simulator.Config.MaxLookBackOrders && order.IsFinished();
+					}
+
+					if (shouldAddOrder == true)
+					{
+						stats.AddOrder(order);
+					}
+				}
+			}
+
+			// Only count the statistics if we have a bit more data to deal with.
+			// We want to avoid having a strategy say it's 100% correct when it 
+			// only has 1 winning trade.
+			if (stats.NumberOfOrders > Simulator.Config.MinRequiredOrders)
+			{
+				stats.CalculateStatistics();
+			}
+			else
+			{
+				stats = new StrategyStatistics(strategyName, orderType);
+			}
+
+			return stats;
+		}
+
+		/// <summary>
+		/// Calculates things like win/loss percent, gain, etc. for the ticker.
+		/// </summary>
+		/// <param name="tickerAndExchange">Ticker to calculate for</param>
+		/// <param name="currentBar">Current bar of the simulation</param>
+		/// <param name="maxBarsAgo">Maximum number of bars in the past to consider for calculating</param>
+		/// <returns>Class holding the statistics calculated</returns>
+		public StrategyStatistics GetTickerStatistics(TickerExchangePair tickerAndExchange, int currentBar, int maxBarsAgo)
+		{
+			// TODO: add way to calculate this.
+			return new StrategyStatistics(tickerAndExchange.ToString(), Order.OrderType.Long);
+		}
+
+		/// <summary>
+		/// Removes any orders that are too old to be used to calculate statistics from.
+		/// </summary>
+		/// <param name="orders">Array of orders</param>
+		/// <param name="currentBar">Current bar to base the age from</param>
+		private void RemoveOldOrders(List<Order> orders, int currentBar)
+		{
+			// If we're using amount of bars to calculate strategy statistics remove all the 
+			// orders that come before this current bar.
+			if (Simulator.Config.UseLookbackBars)
+			{
+				int cutoffBar = currentBar - Simulator.Config.MaxLookBackBars;
+				if (cutoffBar < 0)
+				{
+					cutoffBar = 0;
+				}
+
+				orders.RemoveAll(o => o.BuyBar < cutoffBar);
+			}
+			// We're using a maximum number of past orders, so remove any ones that are
+			// greater than the maximum number.
+			else
+			{
+				while (orders.Count > Simulator.Config.MaxLookBackOrders)
+				{
+					orders.RemoveAt(0);
+				}
+			}
+		}
+	}
+}

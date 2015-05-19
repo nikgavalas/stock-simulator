@@ -113,7 +113,7 @@ namespace StockSimulator.Core
 			if (openOrders < Simulator.Config.MaxConcurrentOrders)
 			{
 				order = new Order(orderType, Data, strategyName, currentBar, dependentIndicatorNames);
-				Simulator.Orders.AddOrder(order);
+				Simulator.Orders.AddOrder(order, currentBar);
 				_activeOrders.Add(order);
 			}
 

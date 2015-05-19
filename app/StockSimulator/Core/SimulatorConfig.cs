@@ -280,11 +280,11 @@ namespace StockSimulator.Core
 			MainProfitTarget = 0.20;
 			MainStopTarget = 0.04;
 
-			ShouldFilterBad = true;
+			ShouldFilterBad = false;
 			NumBarsBadFilter = 500;
 			BadFilterProfitTarget = 0.30;
 
-			UseAbbreviatedOutput = false;
+			UseAbbreviatedOutput = true;
 			OnlyOutputLastBuyList = false;
 			ShouldOpenWebPage = true;
 

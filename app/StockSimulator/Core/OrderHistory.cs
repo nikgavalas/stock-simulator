@@ -11,9 +11,8 @@ namespace StockSimulator.Core
 	/// Holds all the orders that are placed from every ticker and strategy. 
 	/// Allows lookup for that order by ticker, strategy, or order id
 	/// </summary>
-	public class OrderHistory
+	public class OrderHistory : IOrderHistory
 	{
-		public ConcurrentDictionary<long, Order> IdDictionary { get; set; }
 		public ConcurrentDictionary<int, List<Order>> TickerDictionary { get; set; }
 		public ConcurrentDictionary<int, ConcurrentBag<Order>> StrategyDictionary { get; set; }
 
@@ -22,7 +21,6 @@ namespace StockSimulator.Core
 		/// </summary>
 		public OrderHistory()
 		{
-			IdDictionary = new ConcurrentDictionary<long, Order>();
 			TickerDictionary = new ConcurrentDictionary<int, List<Order>>();
 			StrategyDictionary = new ConcurrentDictionary<int, ConcurrentBag<Order>>();
 		}
@@ -31,14 +29,9 @@ namespace StockSimulator.Core
 		/// Adds an order to all the dictionaries for searching by multiple key types.
 		/// </summary>
 		/// <param name="order">The order to add</param>
-		public void AddOrder(Order order)
+		/// <param name="currentBar">Current bar the order is being added in</param>
+		public void AddOrder(Order order, int currentBar)
 		{
-			if (IdDictionary.ContainsKey(order.OrderId))
-			{
-				throw new Exception("Duplicate order ids found");	
-			}
-			
-			IdDictionary[order.OrderId] = order;
 			AddToListTable(TickerDictionary, order, order.Ticker.TickerAndExchange.GetHashCode());
 			AddToListTableConcurrent(StrategyDictionary, order, order.StrategyName.GetHashCode());
 		}

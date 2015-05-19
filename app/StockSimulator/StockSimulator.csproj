@@ -102,6 +102,8 @@
     </ApplicationDefinition>
     <Compile Include="Core\ComboSet.cs" />
     <Compile Include="Core\DataOutputter.cs" />
+    <Compile Include="Core\IOrderHistory.cs" />
+    <Compile Include="Core\OrderHistoryAbbreviated.cs" />
     <Compile Include="Core\UtilityMethods.cs" />
     <Compile Include="Core\JsonConverters\RoundedDoubleConverter.cs" />
     <Compile Include="Core\JsonConverters\ShortDateTimeConverter.cs" />
