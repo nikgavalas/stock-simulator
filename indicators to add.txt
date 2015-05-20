@@ -6,7 +6,7 @@ McClellan Oscillator http://www.onlinetradingconcepts.com/TechnicalAnalysis/McCl
 Parabolic SAR http://www.onlinetradingconcepts.com/TechnicalAnalysis/ParabolicSAR.html
 Exponential Ribbons http://www.onlinetradingconcepts.com/TechnicalAnalysis/ExponentialRibbons.html
 Price channels http://www.onlinetradingconcepts.com/TechnicalAnalysis/PriceChannels.html
-Price Oscillator http://www.onlinetradingconcepts.com/TechnicalAnalysis/PriceOscillator.html
 
 Done:
 Ease of movement http://www.onlinetradingconcepts.com/TechnicalAnalysis/EaseofMovement.html
+Price Oscillator http://www.onlinetradingconcepts.com/TechnicalAnalysis/PriceOscillator.html
