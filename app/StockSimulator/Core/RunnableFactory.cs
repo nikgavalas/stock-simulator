@@ -172,6 +172,11 @@ namespace StockSimulator.Core
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
+					case "PriceOscillator":
+						requestedItem = new PriceOscillator(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
+						break;
+
 					case "RisingThreeMethods":
 						requestedItem = new RisingThreeMethods(_tickerData, this);
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
@@ -374,6 +379,10 @@ namespace StockSimulator.Core
 						requestedItem = new BullWilliamsRCrossover(_tickerData, this);
 						break;
 
+					case "BullPriceOscillator":
+						requestedItem = new BullPriceOscillator(_tickerData, this);
+						break;
+
 					//
 					// Bear
 					//
@@ -497,6 +506,11 @@ namespace StockSimulator.Core
 					case "UpsideGapTwoCrowsFound":
 						requestedItem = new UpsideGapTwoCrowsFound(_tickerData, this);
 						break;
+
+					case "BearPriceOscillator":
+						requestedItem = new BearPriceOscillator(_tickerData, this);
+						break;
+
 
 					default:
 						throw new Exception("Trying to create a runnable that doesn't exist");

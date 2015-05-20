@@ -1,6 +1,5 @@
 Swing index http://www.investopedia.com/ask/answers/111714/how-accumulative-swing-index-calculated.asp
 Detrended Price Oscillator http://www.onlinetradingconcepts.com/TechnicalAnalysis/DetrendedPriceOscillator.html
-Ease of movement http://www.onlinetradingconcepts.com/TechnicalAnalysis/EaseofMovement.html
 DMI http://www.onlinetradingconcepts.com/TechnicalAnalysis/DMI.html
 Moving Average Envelopes http://www.onlinetradingconcepts.com/TechnicalAnalysis/MovingAverageEnvelopes.html
 McClellan Oscillator http://www.onlinetradingconcepts.com/TechnicalAnalysis/McClellanOscillator.html
@@ -8,3 +7,6 @@ Parabolic SAR http://www.onlinetradingconcepts.com/TechnicalAnalysis/ParabolicSA
 Exponential Ribbons http://www.onlinetradingconcepts.com/TechnicalAnalysis/ExponentialRibbons.html
 Price channels http://www.onlinetradingconcepts.com/TechnicalAnalysis/PriceChannels.html
 Price Oscillator http://www.onlinetradingconcepts.com/TechnicalAnalysis/PriceOscillator.html
+
+Done:
+Ease of movement http://www.onlinetradingconcepts.com/TechnicalAnalysis/EaseofMovement.html

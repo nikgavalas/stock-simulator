@@ -146,6 +146,7 @@
     <Compile Include="Indicators\EaseOfMovement.cs" />
     <Compile Include="Indicators\KeltnerChannel.cs" />
     <Compile Include="Indicators\Momentum.cs" />
+    <Compile Include="Indicators\PriceOscillator.cs" />
     <Compile Include="Indicators\Stochastics.cs" />
     <Compile Include="Indicators\StochasticsFast.cs" />
     <Compile Include="Indicators\StochRsi.cs" />
@@ -159,6 +160,7 @@
     <Compile Include="Strategies\Bear\BearKeltnerCloseAbove.cs" />
     <Compile Include="Strategies\Bear\BearMacdMomentum.cs" />
     <Compile Include="Strategies\Bear\BearMomentumCrossover.cs" />
+    <Compile Include="Strategies\Bear\BearPriceOscillator.cs" />
     <Compile Include="Strategies\Bear\BearRsiCrossover70.cs" />
     <Compile Include="Strategies\Bear\BearSmaCrossover.cs" />
     <Compile Include="Strategies\Bear\BearStochasticsCrossover.cs" />
@@ -172,6 +174,7 @@
     <Compile Include="Strategies\Bull\BollingerExtended.cs" />
     <Compile Include="Strategies\Bull\BullEaseOfMovement.cs" />
     <Compile Include="Strategies\Bull\BullMacdMomentum.cs" />
+    <Compile Include="Strategies\Bull\BullPriceOscillator.cs" />
     <Compile Include="Strategies\Bull\BullStochRsiFound.cs" />
     <Compile Include="Strategies\Bull\StochasticsCrossover.cs" />
     <Compile Include="Strategies\Candlesticks\BearBeltHoldFound.cs" />
