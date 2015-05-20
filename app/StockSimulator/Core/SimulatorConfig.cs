@@ -89,6 +89,18 @@ namespace StockSimulator.Core
 		[Description("Use the higher timeframe momentum on the main strategy")]
 		public bool UseHigherTimeframeMainStrategy { get; set; }
 
+		/////////////////////////////// ORDER TYPE /////////////////////////////////
+
+		[Category("Order Types")]
+		[DisplayName("Use 1 Bar HL Main")]
+		[Description("Use the 1 bar high low orderering technique for main orders")]
+		public bool UseOneBarHLMain { get; set; }
+
+		[Category("Order Types")]
+		[DisplayName("Use 1 Bar HL Sub")]
+		[Description("Use the 1 bar high low orderering technique for substrategy orders")]
+		public bool UseOneBarHLSub { get; set; }
+
 		/////////////////////////////// OUTPUT ////////////////////////////////////
 
 		[Category("Output")]
@@ -252,6 +264,9 @@ namespace StockSimulator.Core
 			DataType = "daily";
 
 			TrendStrength = 4;
+
+			UseOneBarHLMain = true;
+			UseOneBarHLSub = true;
 
 			MinOrders = 3;
 			UseLookbackBars = false;

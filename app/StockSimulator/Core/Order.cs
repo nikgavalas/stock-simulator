@@ -85,7 +85,7 @@ namespace StockSimulator.Core
 		public List<string> DependentIndicatorNames { get; set; }
 
 		private double LimitBuyPrice { get; set; }
-		private int LimitOpenedBar { get; set; }
+		private int OpenedBar { get; set; }
 
 		private double _orderValue;
 
@@ -108,7 +108,7 @@ namespace StockSimulator.Core
 			DependentIndicatorNames = dependentIndicatorNames;
 			AccountValue = 0;
 			LimitBuyPrice = tickerData.High[currentBar];
-			LimitOpenedBar = currentBar + 1;
+			OpenedBar = currentBar + 1;
 		}
 
 		/// <summary>
@@ -136,6 +136,7 @@ namespace StockSimulator.Core
 		public void Update(int curBar)
 		{
 			bool isMainOrder = GetType() == typeof(MainStrategyOrder);
+			bool stopSetAlready = false;
 
 			// If the order is open and not filled we need to fill it.
 			if (Status == OrderStatus.Open)
@@ -144,7 +145,7 @@ namespace StockSimulator.Core
 				// limit before buying.
 				if (isMainOrder && Simulator.Config.UseLimitOrders)
 				{
-					if (curBar - LimitOpenedBar >= Simulator.Config.MaxBarsLimitOrderFill)
+					if (curBar - OpenedBar >= Simulator.Config.MaxBarsLimitOrderFill)
 					{
 						Status = OrderStatus.Cancelled;
 					}
@@ -155,6 +156,41 @@ namespace StockSimulator.Core
 					else if (Ticker.Close[curBar] > LimitBuyPrice || Ticker.High[curBar] > LimitBuyPrice)
 					{
 						BuyPrice = LimitBuyPrice;
+					}
+				}
+				// Use the last bar and only enter the order if this bar has a higher price than yesterdays
+				// high. Also, set a cancel/stop order on yesterdays low if the price exceeds that.
+				else if (curBar > 0 && ((isMainOrder && Simulator.Config.UseOneBarHLMain) || (!isMainOrder && Simulator.Config.UseOneBarHLSub)))
+				{
+					if (curBar - OpenedBar >= 1)
+					{
+						Status = OrderStatus.Cancelled;
+					}
+					else if (Type == OrderType.Long)
+					{
+						if (Ticker.Low[curBar] <= Ticker.Low[curBar - 1])
+						{
+							Status = OrderStatus.Cancelled;
+						}
+						else if (Ticker.High[curBar] >= Ticker.High[curBar - 1])
+						{
+							BuyPrice = Ticker.Open[curBar] > Ticker.High[curBar - 1] ? Ticker.Open[curBar] : Ticker.High[curBar - 1];
+							StopPrice = Ticker.Low[curBar - 1];
+							stopSetAlready = true;
+						}
+					}
+					else if (Type == OrderType.Short)
+					{
+						if (Ticker.High[curBar] >= Ticker.High[curBar - 1])
+						{
+							Status = OrderStatus.Cancelled;
+						}
+						else if (Ticker.Low[curBar] <= Ticker.Low[curBar - 1])
+						{
+							BuyPrice = Ticker.Open[curBar] < Ticker.Low[curBar - 1] ? Ticker.Open[curBar] : Ticker.Low[curBar - 1];
+							StopPrice = Ticker.High[curBar - 1];
+							stopSetAlready = true;
+						}
 					}
 				}
 				else
@@ -179,7 +215,11 @@ namespace StockSimulator.Core
 					double configProfitTarget = isMainOrder ? Simulator.Config.MainProfitTarget : Simulator.Config.ProfitTarget;
 					double configStopTarget = isMainOrder ? Simulator.Config.MainStopTarget : Simulator.Config.StopTarget;
 					ProfitTargetPrice = BuyPrice + ((BuyPrice * configProfitTarget) * direction);
-					StopPrice = BuyPrice - ((BuyPrice * configStopTarget) * direction);
+
+					if (stopSetAlready == false)
+					{
+						StopPrice = BuyPrice - ((BuyPrice * configStopTarget) * direction);
+					}
 				}
 			}
 
