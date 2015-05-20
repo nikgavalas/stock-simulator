@@ -117,6 +117,11 @@ namespace StockSimulator.Core
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
+					case "EaseOfMovement":
+						requestedItem = new EaseOfMovement(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
+						break;
+
 					case "EveningStar":
 						requestedItem = new EveningStar(_tickerData, this);
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
@@ -281,12 +286,12 @@ namespace StockSimulator.Core
 						requestedItem = new BullCciCrossover(_tickerData, this);
 						break;
 
-					case "DojiFound":
-						requestedItem = new DojiFound(_tickerData, this);
+					case "BullEaseOfMovement":
+						requestedItem = new BullEaseOfMovement(_tickerData, this);
 						break;
 
-					case "BearDojiFound":
-						requestedItem = new BearDojiFound(_tickerData, this);
+					case "DojiFound":
+						requestedItem = new DojiFound(_tickerData, this);
 						break;
 
 					case "HammerFound":
@@ -379,6 +384,14 @@ namespace StockSimulator.Core
 
 					case "BearCciCrossover":
 						requestedItem = new BearCciCrossover(_tickerData, this);
+						break;
+
+					case "BearEaseOfMovement":
+						requestedItem = new BearEaseOfMovement(_tickerData, this);
+						break;
+
+					case "BearDojiFound":
+						requestedItem = new BearDojiFound(_tickerData, this);
 						break;
 
 					case "BearKeltnerCloseAbove":
