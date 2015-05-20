@@ -216,9 +216,12 @@ namespace StockSimulator.Core
 					double configStopTarget = isMainOrder ? Simulator.Config.MainStopTarget : Simulator.Config.StopTarget;
 					ProfitTargetPrice = BuyPrice + ((BuyPrice * configProfitTarget) * direction);
 
-					if (stopSetAlready == false)
+					double absoluteStop = BuyPrice - ((BuyPrice * configStopTarget) * direction);
+					if (stopSetAlready == false ||
+						(stopSetAlready == true && Type == OrderType.Long && StopPrice < absoluteStop) ||
+						(stopSetAlready == true && Type == OrderType.Short && configStopTarget > absoluteStop))
 					{
-						StopPrice = BuyPrice - ((BuyPrice * configStopTarget) * direction);
+						StopPrice = absoluteStop;
 					}
 				}
 			}
