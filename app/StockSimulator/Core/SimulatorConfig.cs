@@ -165,6 +165,11 @@ namespace StockSimulator.Core
 		[Description("Amount of money to invest in each stock order")]
 		public double SizeOfOrder { get; set; }
 
+		[Category("Orders")]
+		[DisplayName("Commission Per Trade")]
+		[Description("Broker commission per trade. There are two trades per order.")]
+		public double Commission { get; set; }
+
 		///////////////////////////// MAIN STRATEGY ///////////////////////////////
 
 		[Category("Main Strategy")]
@@ -277,6 +282,7 @@ namespace StockSimulator.Core
 			StopTarget = 0.04;
 			MaxBarsOrderOpen = 5;
 			SizeOfOrder = 6000;
+			Commission = 4.95;
 
 			UseLimitOrders = false;
 			MaxBarsLimitOrderFill = 1;

@@ -342,6 +342,7 @@ namespace StockSimulator.Core
 			SellDate = Ticker.Dates[currentBar];
 			Status = sellStatus;
 			Gain = ((NumberOfShares * SellPrice) - (NumberOfShares * BuyPrice)) * direction;
+			Gain -= Simulator.Config.Commission * 2;
 
 			_orderValue = NumberOfShares * SellPrice;
 
