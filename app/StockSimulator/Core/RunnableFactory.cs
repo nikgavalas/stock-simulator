@@ -257,6 +257,11 @@ namespace StockSimulator.Core
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
+					case "Dmi":
+						requestedItem = new Dmi(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
+						break;
+
 					///////////////////////////// Strategies ////////////////////////////
 
 					//
@@ -381,6 +386,10 @@ namespace StockSimulator.Core
 
 					case "BullPriceOscillator":
 						requestedItem = new BullPriceOscillator(_tickerData, this);
+						break;
+
+					case "BullDmi":
+						requestedItem = new BullDmi(_tickerData, this);
 						break;
 
 					//
@@ -509,6 +518,10 @@ namespace StockSimulator.Core
 
 					case "BearPriceOscillator":
 						requestedItem = new BearPriceOscillator(_tickerData, this);
+						break;
+
+					case "BearDmi":
+						requestedItem = new BearDmi(_tickerData, this);
 						break;
 
 

@@ -100,6 +100,7 @@ namespace StockSimulator.Strategies
 					"BullWilliamsRCrossover",
 					"BullEaseOfMovement",
 					"BullPriceOscillator",
+					"BullDmi",
 
 					// Bear strategies
 					"BearBollingerExtended",
@@ -131,7 +132,8 @@ namespace StockSimulator.Strategies
 					"ThreeBlackCrowsFound",
 					"UpsideGapTwoCrowsFound",
 					"BearEaseOfMovement",
-					"BearPriceOscillator"
+					"BearPriceOscillator",
+					"BearDmi"
 				};
 
 				return deps;

@@ -143,6 +143,7 @@
     <Compile Include="Indicators\Candlesticks\UpsideGapTwoCrows.cs" />
     <Compile Include="Indicators\Candlesticks\UpsideTasukiGap.cs" />
     <Compile Include="Indicators\Cci.cs" />
+    <Compile Include="Indicators\Dmi.cs" />
     <Compile Include="Indicators\EaseOfMovement.cs" />
     <Compile Include="Indicators\KeltnerChannel.cs" />
     <Compile Include="Indicators\Momentum.cs" />
@@ -153,6 +154,7 @@
     <Compile Include="Indicators\Trend.cs" />
     <Compile Include="Indicators\Trix.cs" />
     <Compile Include="Indicators\WilliamsR.cs" />
+    <Compile Include="Strategies\Bear\BearDmi.cs" />
     <Compile Include="Strategies\Bear\BearEaseOfMovement.cs" />
     <Compile Include="Strategies\Bear\BearMacdCrossover.cs" />
     <Compile Include="Strategies\Bear\BearBollingerExtended.cs" />
@@ -172,6 +174,7 @@
     <Compile Include="Strategies\Bear\BearWilliamsRCrossover.cs" />
     <Compile Include="Strategies\BestOfSubStrategies.cs" />
     <Compile Include="Strategies\Bull\BollingerExtended.cs" />
+    <Compile Include="Strategies\Bull\BullDmi.cs" />
     <Compile Include="Strategies\Bull\BullEaseOfMovement.cs" />
     <Compile Include="Strategies\Bull\BullMacdMomentum.cs" />
     <Compile Include="Strategies\Bull\BullPriceOscillator.cs" />
