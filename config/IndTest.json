@@ -10,6 +10,8 @@
   "NumBarsHigherTimeframe": 5,
   "UseHigherTimeframeSubstrategies": false,
   "UseHigherTimeframeMainStrategy": false,
+  "UseOneBarHLMain": false,
+  "UseOneBarHLSub": false,
   "UseAbbreviatedOutput": false,
   "OnlyOutputLastBuyList": false,
   "ShouldOpenWebPage": true,
