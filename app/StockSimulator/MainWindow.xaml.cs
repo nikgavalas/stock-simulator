@@ -18,6 +18,7 @@ using StockSimulator.Core;
 using System.Threading;
 using System.IO;
 using Newtonsoft.Json;
+using System.Media;
 
 namespace StockSimulator
 {
@@ -126,6 +127,7 @@ namespace StockSimulator
 
 			// Free the memory.
 			Sim = null;
+			SystemSounds.Exclamation.Play();
 		}
 
 		private void InitFromCommandLine()
