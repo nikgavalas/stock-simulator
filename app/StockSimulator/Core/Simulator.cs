@@ -7,6 +7,7 @@ using System.Threading;
 using System.IO;
 
 using StockSimulator.Strategies;
+using System.Collections.Concurrent;
 
 namespace StockSimulator.Core
 {
@@ -113,8 +114,9 @@ namespace StockSimulator.Core
 			WriteMessage("Initializing ticker data");
 
 			// Add all the symbols as dependent strategies using the bestofsubstrategies
-			Instruments = new SortedDictionary<string, BestOfSubStrategies>();
-			foreach (KeyValuePair<string, TickerExchangePair> item in fileInstruments)
+			ConcurrentDictionary<string, BestOfSubStrategies> downloadedInstruments = new ConcurrentDictionary<string, BestOfSubStrategies>();
+			Parallel.ForEach(fileInstruments, item =>
+			//foreach (KeyValuePair<string, TickerExchangePair> item in fileInstruments)
 			{
 				// Get the data for the symbol and save it for later so we can output it.
 				TickerData tickerData = DataStore.GetTickerData(item.Value, config.StartDate, config.EndDate);
@@ -122,14 +124,19 @@ namespace StockSimulator.Core
 				{
 					DataOutput.SaveTickerData(tickerData);
 					RunnableFactory factory = new RunnableFactory(tickerData);
+
 					// This strategy will find the best strategy for this instrument everyday and save the value.
-					Instruments[item.Value.ToString()] = new BestOfSubStrategies(tickerData, factory);
+					downloadedInstruments[item.Value.ToString()] = new BestOfSubStrategies(tickerData, factory);
 				}
 				else
 				{
 					WriteMessage("No ticker data for " + item.Value.ToString());
 				}
-			}
+			});
+
+			// Want to store the instrument data in a sorted way so that we always run things
+			// in the same order.
+			Instruments = new SortedDictionary<string, BestOfSubStrategies>(downloadedInstruments.ToDictionary(kvp => kvp.Key, kvp => kvp.Value));
 
 			NumberOfBars = DataStore.SimTickerDates.Count;
 			Broker = new Broker(Config.InitialAccountBalance, NumberOfBars);

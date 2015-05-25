@@ -33,8 +33,6 @@ mainApp.directive('highstock', [
 				var indicatorHeight = 180;
 				var axisIds = [];
 
-				var isHigherTimeframe = angular.isDefined($attrs.higherTimeframe);
-
 				function addIndicator(data, args) {
 					try {
 						var seriesName, seriesData, newSeries;
@@ -151,7 +149,7 @@ mainApp.directive('highstock', [
 				});
 
 
-				var heightsAndTops = $scope.setTotalHeightAndGetAxisTopAndHeights(isHigherTimeframe ? 1 : 2);
+				var heightsAndTops = $scope.setTotalHeightAndGetAxisTopAndHeights(2);
 
 				// Get the data first before creating the chart.
 				ChartDataFactory.getPriceData($scope.ticker).then(function(data) {
@@ -290,26 +288,11 @@ mainApp.directive('highstock', [
 						]
 					}; // end highstock config
 
-					// If we're displaying the higher timeframe, we don't care about volume. We do
-					// care about the momentum indicator so we need to add that after the chart
-					// is created.
-					if (isHigherTimeframe) {
-						highstockConfig.series.pop();
-						highstockConfig.yAxis.pop();
-						axisIds.pop();
-
-						highstockConfig.series[0].data = data.higherTimeframe.price;
-					}
-
 					// Create the chart on the element.
 					$element.highcharts('StockChart', highstockConfig);
 
 					// Save for later
 					chart = $element.highcharts();
-
-					if (isHigherTimeframe) {
-						addIndicator(data.higherTimeframeIndicator, { name: 'HigherMomentum' });
-					}
 
 					// Add the events to the chart.
 					$scope.$watch('events', function(eventData, oldEventData) {

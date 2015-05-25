@@ -8,6 +8,7 @@ using System.IO;
 
 using StockSimulator.GoogleFinanceDownloader;
 using StockSimulator.YahooFinanceDownloader;
+using StockSimulator.Indicators;
 
 namespace StockSimulator.Core
 {
@@ -24,6 +25,21 @@ namespace StockSimulator.Core
 
 		private readonly string _cacheFolder = @"DataCache\";
 		private readonly DateTime _earliestStartAllowed = new DateTime(2000, 1, 4); // Max allowed is the first trading day of the year.
+
+		private object _dateLock = new object();
+
+		private enum DataFields
+		{
+			Date = 0,
+			Open,
+			High,
+			Low,
+			Close,
+			Volume,
+			Typical,
+			Median,
+			HigherState
+		}
 
 		/// <summary>
 		/// Constructor
@@ -118,15 +134,16 @@ namespace StockSimulator.Core
 				// iterate through for trading periods. This is because each ticker can potentially have
 				// different trading dates but for the main sim we want to go through all dates and if
 				// the ticker has data for that time, we'll use it.
-				for (int i = 0; i < data.Dates.Count; i++)
+				lock (_dateLock)
 				{
-					if (SimTickerDates.ContainsKey(data.Dates[i]) == false)
+					for (int i = 0; i < data.Dates.Count; i++)
 					{
-						SimTickerDates[data.Dates[i]] = true;
+						if (SimTickerDates.ContainsKey(data.Dates[i]) == false)
+						{
+							SimTickerDates[data.Dates[i]] = true;
+						}
 					}
 				}
-
-				data.CalcHigherTimeframe();
 			}
 
 			return data;
@@ -206,7 +223,7 @@ namespace StockSimulator.Core
 		{
 			string fileAndPath = GetTickerFilename(ticker);
 			string contents = UtilityMethods.UnixTicks(start) + "," + UtilityMethods.UnixTicks(end) + "," + Environment.NewLine;
-			contents += "Date,Open,High,Low,Close,Volume," + Environment.NewLine;
+			contents += "Date,Open,High,Low,Close,Volume,Typical,Median,HigherState" + Environment.NewLine;
 			contents += newData.WriteToString();
 			try
 			{
@@ -267,7 +284,7 @@ namespace StockSimulator.Core
 
 					file.Close();
 
-					return CreateTickerDataFromString(sb.ToString(), ticker, new DateTime(1970, 1, 1), new DateTime(1970, 1, 1));
+					return CreateTickerDataFromString(sb.ToString(), ticker, true, new DateTime(1970, 1, 1), new DateTime(1970, 1, 1));
 				}
 				catch (Exception e)
 				{
@@ -323,7 +340,7 @@ namespace StockSimulator.Core
 				}
 
 				string resultValue = sb.ToString();
-				return CreateTickerDataFromString(resultValue, ticker, start, end);
+				return CreateTickerDataFromString(resultValue, ticker, false, start, end);
 			}
 		}
 
@@ -363,7 +380,7 @@ namespace StockSimulator.Core
 				}
 				else
 				{
-					return CreateTickerDataFromString(resultValue, ticker, start, end);
+					return CreateTickerDataFromString(resultValue, ticker, false, start, end);
 				}
 			}
 		}
@@ -372,10 +389,12 @@ namespace StockSimulator.Core
 		/// Creates an object of ticker data from the stream passed in.
 		/// </summary>
 		/// <param name="data">String of ticker data</param>
+		/// <param name="ticker">Ticker name for this data string</param>
+		/// <param name="isFromDisk">True if this string is loaded from our disk, saves a lot of calculation time</param>
 		/// <param name="start">Start date of the data</param>
 		/// <param name="end">End date of the data</param>
 		/// <returns>Returns an object created from the ticker data string</returns>
-		private TickerData CreateTickerDataFromString(string data, TickerExchangePair ticker, DateTime start, DateTime end)
+		private TickerData CreateTickerDataFromString(string data, TickerExchangePair ticker, bool isFromDisk, DateTime start, DateTime end)
 		{
 			if (string.IsNullOrEmpty(data))
 			{
@@ -451,22 +470,43 @@ namespace StockSimulator.Core
 						tickerData.Volume.Add(volume);
 						tickerData.NumBars = tickerData.Dates.Count;
 
-						// Extra non-downloaded data.
-						tickerData.Typical.Add((high + low + close) / 3);
-						tickerData.Median.Add((high + low) / 2);
-
 						// Google has a weird bug where sometimes the open price will turn out to be
 						// zero for some random bars. If this happens we'll just hack it now so that 
 						// the open price = the close from the previous day.
 						if (tickerData.Open[tickerData.Open.Count - 1] <= 0)
 						{
-							tickerData.Open[tickerData.Open.Count - 1] = (tickerData.Close.Count > 1) ? tickerData.Close[tickerData.Close.Count - 2] :
-								tickerData.Close[tickerData.Close.Count - 1];
+							tickerData.Open[tickerData.Open.Count - 1] = (tickerData.Close.Count > 1) 
+								? tickerData.Close[tickerData.Close.Count - 2]
+								: tickerData.Close[tickerData.Close.Count - 1];
 							//Simulator.WriteMessage("[" + ticker.ToString() + "] Open price 0 for bar: " + (tickerData.Open.Count - 1));
 						}
 						if (tickerData.Close[tickerData.Close.Count - 1] <= 0)
 						{
 							//Simulator.WriteMessage("[" + ticker.ToString() + "] Close price 0 for bar: " + (tickerData.Open.Count - 1));
+						}
+
+						// If this data is from the disk we don't need to calculate the extra fields since
+						// we've already saved them in the file.
+						if (isFromDisk)
+						{
+							tickerData.Typical.Add(Convert.ToDouble(splitData[(int)DataFields.Typical]));
+							tickerData.Median.Add(Convert.ToDouble(splitData[(int)DataFields.Median]));
+							tickerData.HigherTimeframeMomentum.Add(splitData[(int)DataFields.HigherState] == "Long"
+								? Order.OrderType.Long : Order.OrderType.Short);
+						}
+						else
+						{
+							// Extra non-downloaded data.
+							high = tickerData.High[tickerData.NumBars - 1];
+							low = tickerData.Low[tickerData.NumBars - 1];
+							close = tickerData.Close[tickerData.NumBars - 1];
+							tickerData.Typical.Add((high + low + close) / 3);
+							tickerData.Median.Add((high + low) / 2);
+
+							// Calculate the higher momentum state for this bar. This is a pretty
+							// time consuming function since it has to loop back through all the
+							// bars before (and including) this one.
+							tickerData.HigherTimeframeMomentum.Add(GetHigherTimerframeMomentumState(tickerData));
 						}
 					}
 				} while (line != null);
@@ -487,6 +527,117 @@ namespace StockSimulator.Core
 		private bool IsDataFieldValid(string[] data, int index)
 		{
 			return index < data.Length && data[index] != "-";
+		}
+
+		/// <summary>
+		/// Returns what type of orders are allowed for this bar based on the
+		/// higher time frame momentum analysis.
+		/// </summary>
+		/// <param name="ticker">Ticker data</param>
+		/// <returns>Order type allowed for the last bar of the ticker data</returns>
+		private Order.OrderType GetHigherTimerframeMomentumState(TickerData ticker)
+		{
+			// Get all the bars for the higher timeframe.
+			TickerData higherTickerData = GetHigherTimeframeBars(ticker);
+
+			// Run the indicator and save it.
+			Stochastics higherTimeframeIndicator = new Stochastics(higherTickerData, new RunnableFactory(higherTickerData));
+			higherTimeframeIndicator.Run();
+
+			// Return what kind orders are allowed.
+			return GetHigherTimeframeStateFromIndicator(higherTimeframeIndicator, higherTimeframeIndicator.Data.NumBars - 1);
+		}
+
+		/// <summary>
+		/// Returns aggregated bars for the higher timeframe from the lower time frame data.
+		/// </summary>
+		/// <param name="ticker">Lower timeframe ticker data</param>
+		/// <returns>Higher timeframe ticker data</returns>
+		private TickerData GetHigherTimeframeBars(TickerData ticker)
+		{
+			double open = 0;
+			double high = 0;
+			double low = 0;
+			double close = 0;
+			long volume = 0;
+			int barCount = 0;
+
+			// Reset the states since we'll calculate them again.
+			TickerData higherData = new TickerData(ticker.TickerAndExchange);
+
+			// Aggregate all the data into the higher timeframe.
+			for (int i = 0; i < ticker.Dates.Count; i++)
+			{
+				// The first bar open we'll treat as the open price and set the high and low.
+				// Volume gets reset as it's cumulative through all the bars.
+				if (barCount == 0)
+				{
+					open = ticker.Open[i];
+					low = ticker.Low[i];
+					high = ticker.High[i];
+					volume = 0;
+				}
+
+				// If this low is lower than the saved low, we have a new low. 
+				// Same for high but opposite of course.
+				if (ticker.Low[i] < low)
+				{
+					low = ticker.Low[i];
+				}
+				if (ticker.High[i] > high)
+				{
+					high = ticker.High[i];
+				}
+
+				// Move to the next bar to aggregate from.
+				++barCount;
+				volume += ticker.Volume[i];
+
+				// The last bar close is treated as the close. Now it's time to save all
+				// the aggregated data as one bar for the higher timeframe.
+				// We also want to do this if the for loop is just about to exit. We may not
+				// have the number of bars we wanted for the aggregate, but we want to at least have
+				// something for the last bar. Ex. We have 5 bars set for the higher timeframe length,
+				// but we've only got 3 bars of data and the for loop will end on the next iteration.
+				// In that case we want to use the 3 bars we have for the data.
+				if (barCount == Simulator.Config.NumBarsHigherTimeframe || (i + 1) == ticker.Dates.Count)
+				{
+					close = ticker.Close[i];
+
+					higherData.Dates.Add(ticker.Dates[i]); // Use the ending aggregated date as the date for the higher timeframe.
+					higherData.Open.Add(open);
+					higherData.High.Add(high);
+					higherData.Low.Add(low);
+					higherData.Close.Add(close);
+					higherData.Volume.Add(volume);
+					higherData.NumBars = higherData.Dates.Count;
+
+					// Start aggregating a new set.
+					barCount = 0;
+				}
+			}
+
+			return higherData;
+		}
+
+		/// <summary>
+		/// Returns the state of the higher momentum bar. Any momentum indicator can be used here.
+		/// </summary>
+		/// <param name="indicator">Momentum indicator to use</param>
+		/// <param name="curBar">Current bar in the momentum simulation</param>
+		/// <returns>The state of the higher momentum indicator</returns>
+		private Order.OrderType GetHigherTimeframeStateFromIndicator(Stochastics indicator, int curBar)
+		{
+			if (DataSeries.IsAbove(indicator.K, indicator.D, curBar, 0) != -1 || indicator.K[curBar] == indicator.D[curBar])
+			{
+				return Order.OrderType.Long;
+			}
+			else if (DataSeries.IsBelow(indicator.K, indicator.D, curBar, 0) != -1)
+			{
+				return Order.OrderType.Short;
+			}
+
+			throw new Exception("Unknown higher momentum state");
 		}
 
 		/// <summary>

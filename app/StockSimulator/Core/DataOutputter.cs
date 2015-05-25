@@ -46,6 +46,8 @@ namespace StockSimulator.Core
 
 		private Dictionary<DateTime, List<JsonBuyList>> _buyLists;
 
+		private object tickerLock;
+		private object indicatorLock;
 
 		/// <summary>
 		/// Constructor
@@ -55,6 +57,8 @@ namespace StockSimulator.Core
 			_tickerData = new Dictionary<int, TickerData>();
 			_indicators = new Dictionary<int, Indicator>();
 			_buyLists = new Dictionary<DateTime, List<JsonBuyList>>();
+			tickerLock = new object();
+			indicatorLock = new object();
 		}
 
 		/// <summary>
@@ -63,10 +67,13 @@ namespace StockSimulator.Core
 		/// <param name="data">Ticker data to save</param>
 		public void SaveTickerData(TickerData data)
 		{
-			int key = data.TickerAndExchange.GetHashCode();
-			if (!_tickerData.ContainsKey(key))
+			lock (tickerLock)
 			{
-				_tickerData[key] = data;
+				int key = data.TickerAndExchange.GetHashCode();
+				if (!_tickerData.ContainsKey(key))
+				{
+					_tickerData[key] = data;
+				}
 			}
 		}
 
@@ -76,10 +83,13 @@ namespace StockSimulator.Core
 		/// <param name="indicator">The indicator to save</param>
 		public void SaveIndicator(Indicator indicator)
 		{
-			int key = (indicator.Data.TickerAndExchange.ToString() + indicator.ToString()).GetHashCode();
-			if (!_indicators.ContainsKey(key))
+			lock (indicatorLock)
 			{
-				_indicators[key] = indicator;
+				int key = (indicator.Data.TickerAndExchange.ToString() + indicator.ToString()).GetHashCode();
+				if (!_indicators.ContainsKey(key))
+				{
+					_indicators[key] = indicator;
+				}
 			}
 		}
 

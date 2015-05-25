@@ -36,12 +36,6 @@ namespace StockSimulator.Core
 		[JsonProperty("volume")]
 		public List<List<object>> VolumeData { get; set; }
 
-		[JsonProperty("higherTimeframe")]
-		public TickerData HigherTimeframe { get; set; }
-
-		[JsonProperty("higherTimeframeIndicator")]
-		public Stochastics HigherTimeframeIndicator { get; set; }
-
 		/// <summary>
 		/// A map of a date to a current bar. We need this because there seems to be extra 
 		/// trading dates on NYSE that don't exist on NASDAQ.
@@ -66,13 +60,12 @@ namespace StockSimulator.Core
 			Close = new List<double>();
 			High = new List<double>();
 			Low = new List<double>();
-			Typical = new List<double>();
-			Median = new List<double>();
 			Volume = new List<long>();
 
-			HigherTimeframeMomentum = null;
-			HigherTimeframe = null;
-			HigherTimeframeIndicator = null;
+			// Extras.
+			Typical = new List<double>();
+			Median = new List<double>();
+			HigherTimeframeMomentum = new List<Order.OrderType>();
 		}
 
 		/// <summary>
@@ -101,9 +94,12 @@ namespace StockSimulator.Core
 				Close.InsertRange(0, otherData.Close.GetRange(0, copyEndIndex));
 				High.InsertRange(0, otherData.High.GetRange(0, copyEndIndex));
 				Low.InsertRange(0, otherData.Low.GetRange(0, copyEndIndex));
+				Volume.InsertRange(0, otherData.Volume.GetRange(0, copyEndIndex));
+
+				// Extras
 				Typical.InsertRange(0, otherData.Typical.GetRange(0, copyEndIndex));
 				Median.InsertRange(0, otherData.Median.GetRange(0, copyEndIndex));
-				Volume.InsertRange(0, otherData.Volume.GetRange(0, copyEndIndex));
+				HigherTimeframeMomentum.InsertRange(0, otherData.HigherTimeframeMomentum.GetRange(0, copyEndIndex));
 			}
 
 			// Append
@@ -125,9 +121,12 @@ namespace StockSimulator.Core
 				Close.AddRange(otherData.Close.GetRange(copyStartIndex, otherData.Close.Count - copyStartIndex));
 				High.AddRange(otherData.High.GetRange(copyStartIndex, otherData.High.Count - copyStartIndex));
 				Low.AddRange(otherData.Low.GetRange(copyStartIndex, otherData.Low.Count - copyStartIndex));
+				Volume.AddRange(otherData.Volume.GetRange(copyStartIndex, otherData.Volume.Count - copyStartIndex));
+
+				// Extras
 				Typical.AddRange(otherData.Typical.GetRange(copyStartIndex, otherData.Typical.Count - copyStartIndex));
 				Median.AddRange(otherData.Median.GetRange(copyStartIndex, otherData.Median.Count - copyStartIndex));
-				Volume.AddRange(otherData.Volume.GetRange(copyStartIndex, otherData.Volume.Count - copyStartIndex));
+				HigherTimeframeMomentum.AddRange(otherData.HigherTimeframeMomentum.GetRange(copyStartIndex, otherData.HigherTimeframeMomentum.Count - copyStartIndex));
 			}
 
 			Start = Dates[0];
@@ -176,9 +175,12 @@ namespace StockSimulator.Core
 			copyData.Close.AddRange(Close.GetRange(copyStartIndex, amountToCopy));
 			copyData.High.AddRange(High.GetRange(copyStartIndex, amountToCopy));
 			copyData.Low.AddRange(Low.GetRange(copyStartIndex, amountToCopy));
+			copyData.Volume.AddRange(Volume.GetRange(copyStartIndex, amountToCopy));
+
+			// Extras
 			copyData.Typical.AddRange(Typical.GetRange(copyStartIndex, amountToCopy));
 			copyData.Median.AddRange(Median.GetRange(copyStartIndex, amountToCopy));
-			copyData.Volume.AddRange(Volume.GetRange(copyStartIndex, amountToCopy));
+			copyData.HigherTimeframeMomentum.AddRange(HigherTimeframeMomentum.GetRange(copyStartIndex, amountToCopy));
 
 			copyData.Start = copyData.Dates[0];
 			copyData.End = copyData.Dates[copyData.Dates.Count - 1];
@@ -198,9 +200,12 @@ namespace StockSimulator.Core
 				Close[i] = 0;
 				High[i] = 0;
 				Low[i] = 0;
+				Volume[i] = 0;
+
+				// Extras
 				Typical[i] = 0;
 				Median[i] = 0;
-				Volume[i] = 0;
+				HigherTimeframeMomentum[i] = Order.OrderType.Long;
 			}
 		}
 
@@ -220,7 +225,14 @@ namespace StockSimulator.Core
 				output += High[i].ToString() + ',';
 				output += Low[i].ToString() + ',';
 				output += Close[i].ToString() + ',';
-				output += Volume[i].ToString();
+				output += Volume[i].ToString() + ',';
+
+				// Extras
+				output += Typical[i].ToString() + ',';
+				output += Median[i].ToString() + ',';
+				output += HigherTimeframeMomentum[i].ToString() + ',';
+
+				// End with a new line so it's easier to view raw
 				output += Environment.NewLine;
 			}
 
@@ -252,12 +264,6 @@ namespace StockSimulator.Core
 					Volume[i]
 				});
 			}
-
-			if (HigherTimeframe != null)
-			{
-				HigherTimeframe.PrepareForSerialization();
-				HigherTimeframeIndicator.PrepareForSerialization();
-			}
 		}
 
 		/// <summary>
@@ -267,12 +273,6 @@ namespace StockSimulator.Core
 		{
 			PriceData = null;
 			VolumeData = null;
-
-			if (HigherTimeframe != null)
-			{
-				HigherTimeframe.FreeResourcesAfterSerialization();
-				HigherTimeframeIndicator.FreeResourcesAfterSerialization();
-			}
 		}
 
 		/// <summary>
@@ -308,127 +308,6 @@ namespace StockSimulator.Core
 			{
 				_dateToBar[Dates[i]] = i;
 			}
-		}
-
-		/// <summary>
-		/// Uses the current ticker data and aggregates it for a higher time frame set of data.
-		/// Then will run a momentum indicator on that data and compute the 4 different types
-		/// of momentum states we can be in.
-		/// Bull, not OB = Long orders
-		/// Bull, OB = Short orders
-		/// Bear, not OS = Short orders
-		/// Bear, OS = Long orders
-		/// </summary>
-		public void CalcHigherTimeframe()
-		{
-			double open = 0;
-			double high = 0;
-			double low = 0;
-			double close = 0;
-			long volume = 0;
-			int barCount = 0;
-
-			// Reset the states since we'll calculate them again.
-			HigherTimeframe = new TickerData(TickerAndExchange);
-			HigherTimeframeMomentum = new List<Order.OrderType>();
-
-			// Aggregate all the data into the higher timeframe.
-			for (int i = 0; i < Dates.Count; i++)
-			{
-				// The first bar open we'll treat as the open price and set the high and low.
-				// Volume gets reset as it's cumulative through all the bars.
-				if (barCount == 0)
-				{
-					open = Open[i];
-					low = Low[i];
-					high = High[i];
-					volume = 0;
-				}
-
-				// If this low is lower than the saved low, we have a new low. 
-				// Same for high but opposite of course.
-				if (Low[i] < low)
-				{
-					low = Low[i];
-				}
-				if (High[i] > high)
-				{
-					high = High[i];
-				}
-
-				// Move to the next bar to aggregate from.
-				++barCount;
-				volume += Volume[i];
-
-				// The last bar close is treated as the close. Now it's time to save all
-				// the aggregated data as one bar for the higher timeframe.
-				// We also want to do this if the for loop is just about to exit. We may not
-				// have the number of bars we wanted for the aggregate, but we want to at least have
-				// something for the last bar. Ex. We have 5 bars set for the higher timeframe length,
-				// but we've only got 3 bars of data and the for loop will end on the next iteration.
-				// In that case we want to use the 3 bars we have for the data.
-				if (barCount == Simulator.Config.NumBarsHigherTimeframe || (i + 1) == Dates.Count)
-				{
-					close = Close[i];
-
-					HigherTimeframe.Dates.Add(Dates[i]); // Use the ending aggregated date as the date for the higher timeframe.
-					HigherTimeframe.Open.Add(open);
-					HigherTimeframe.High.Add(high);
-					HigherTimeframe.Low.Add(low);
-					HigherTimeframe.Close.Add(close);
-					HigherTimeframe.Volume.Add(volume);
-					HigherTimeframe.NumBars = HigherTimeframe.Dates.Count;
-
-					// Start aggregating a new set.
-					barCount = 0;
-				}
-			}
-
-			// Run the indicator and save it.
-			HigherTimeframeIndicator = new Stochastics(HigherTimeframe, new RunnableFactory(HigherTimeframe));
-			HigherTimeframeIndicator.Run();
-
-			// Run through all the dates and see what state we're in.
-			int lowerTimeframeStartBar = 0;
-			for (int i = 0; i < HigherTimeframe.Dates.Count; i++)
-			{
-				Order.OrderType momentumState = GetHigherTimeframeMomentumState(HigherTimeframeIndicator, i);
-
-				// Assign the lower timeframe the state of the higher timeframe at this time.
-				int lowerTimeframeEndBar = _dateToBar[HigherTimeframe.Dates[i]];
-				for (int j = lowerTimeframeStartBar; j < lowerTimeframeEndBar; j++)
-				{
-					HigherTimeframeMomentum.Add(momentumState);
-				}
-
-				lowerTimeframeStartBar = lowerTimeframeEndBar;
-
-				// Unsure if this is right, but it makes the bar counts add up at least.
-				if (i + 1 == HigherTimeframe.Dates.Count)
-				{
-					HigherTimeframeMomentum.Add(momentumState);
-				}
-			}
-		}
-
-		/// <summary>
-		/// Returns the state of the higher momentum bar. Any momentum indicator can be used here.
-		/// </summary>
-		/// <param name="indicator">Momentum indicator to use</param>
-		/// <param name="curBar">Current bar in the momentum simulation</param>
-		/// <returns>The state of the higher momentum indicator</returns>
-		private Order.OrderType GetHigherTimeframeMomentumState(Stochastics indicator, int curBar)
-		{
-			if (DataSeries.IsAbove(indicator.K, indicator.D, curBar, 0) != -1 || indicator.K[curBar] == indicator.D[curBar])
-			{
-				return Order.OrderType.Long;
-			}
-			else if (DataSeries.IsBelow(indicator.K, indicator.D, curBar, 0) != -1)
-			{
-				return Order.OrderType.Short;
-			}
-
-			throw new Exception("Unknown higher momentum state");
 		}
 	}
 }
