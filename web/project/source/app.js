@@ -41,6 +41,10 @@ var mainApp = angular.module('mainApp', [
 			templateUrl: 'views/account-value.html',
 			controller: 'AccountValueCtrl'
 		})
+		.when('/higher', {
+			templateUrl: 'views/higher-timeframe.html',
+			controller: 'HigherTimeframeCtrl'
+		})
 		.otherwise({
 			redirectTo: '/'
 		});

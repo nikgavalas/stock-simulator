@@ -134,6 +134,27 @@ namespace StockSimulator.Core
 			return timeString;
 		}
 
+		public void OutputHigherTimeframeData(DateTime date, Indicator ind, TickerData higherData, List<Order.OrderType> states)
+		{
+			Directory.CreateDirectory(Simulator.Config.OutputFolder + "\\higher");
+
+			ind.PrepareForSerialization();
+			higherData.PrepareForSerialization();
+
+			string folderName = Simulator.Config.OutputFolder + "\\higher\\" + date.ToString("yyyy-MM-dd");
+
+			string jsonOutput = JsonConvert.SerializeObject(higherData);
+			string filename = folderName + "-data.json";
+			File.WriteAllText(filename, jsonOutput);
+
+			jsonOutput = JsonConvert.SerializeObject(ind);
+			filename = folderName + "-ind.json";
+			File.WriteAllText(filename, jsonOutput);
+
+			ind.FreeResourcesAfterSerialization();
+			higherData.FreeResourcesAfterSerialization();
+		}
+
 		/// <summary>
 		/// Uses the date string as a subfolder for the output.
 		/// </summary>

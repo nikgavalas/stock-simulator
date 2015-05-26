@@ -545,7 +545,23 @@ namespace StockSimulator.Core
 			higherTimeframeIndicator.Run();
 
 			// Return what kind orders are allowed.
-			return GetHigherTimeframeStateFromIndicator(higherTimeframeIndicator, higherTimeframeIndicator.Data.NumBars - 1);
+			Order.OrderType state = GetHigherTimeframeStateFromIndicator(higherTimeframeIndicator, higherTimeframeIndicator.Data.NumBars - 1);
+
+			////////////////// START HIGHER TIME FRAME DEBUGGING ////////////////////
+			if (ticker.TickerAndExchange.ToString() == "NFLX-NASDAQ")
+			{
+				DateTime outputDate = higherTickerData.Dates[higherTickerData.Dates.Count - 1];
+				List<Order.OrderType> states = new List<Order.OrderType>(ticker.HigherTimeframeMomentum);
+				states.Add(state);
+				Simulator.DataOutput.OutputHigherTimeframeData(
+					outputDate,
+					higherTimeframeIndicator,
+					higherTickerData,
+					states);
+			}
+			//////////////////  END  HIGHER TIME FRAME DEBUGGING ////////////////////
+
+			return state;
 		}
 
 		/// <summary>

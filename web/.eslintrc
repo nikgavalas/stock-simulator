@@ -1,0 +1,41 @@
+{
+	"ecmaFeatures": {},
+	"parser": "espree",
+	"env": {
+		"browser": true,
+	},
+	"globals": {
+		"angular": 1,
+		"mainApp": 1,
+		"L": 1,
+		"module": 1
+	},
+	"rules": {
+		"global-strict": [2, "always"],
+		"strict": [2, "global"],
+		"quotes": [2, "single"],
+		"valid-jsdoc": [2, {
+			"requireReturn": false,
+			"prefer": {
+				"return": "returns"
+			}
+		}],
+		"jsdoc-required": 2,
+		"consistent-this": [0, "self"],
+
+		"eol-last": 0,
+		"no-trailing-spaces": 0,
+		"no-underscore-dangle": 0,
+
+		"newline-before-after-function": 1,
+		"brace-style": [1, "stroustrup", { "allowSingleLine": true }],
+		"space-after-function-name": [1, "never"],
+		"space-after-keywords": [1, "always"],
+		"space-before-blocks": [1, "always"],
+		"space-before-function-paren": [1, "never"],
+		"space-infix-ops": 1,
+		"space-return-throw-case": 1,
+		"space-unary-ops": [1, { "words": true, "nonwords": false }],
+		"spaced-line-comment": [1, "always", { "exceptions": ["/", "-"] }]
+	}
+}

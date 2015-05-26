@@ -1,0 +1,49 @@
+<div class="container-fluid container-padding">
+	<navbar></navbar>
+	
+	<!-- The row for the grid -->
+	<div class="row firstrow-container">
+
+		<div class="col-lg-3">
+			<label>Show Higher Timerframe data for Date:</label>
+			<div>
+				<datepicker ng-model="calendarDate" show-weeks="true" class="well well-sm"></datepicker>
+			</div>
+			<br>
+
+			<form class="form-inline" ng-submit="setDate()">
+				<div class="form-group">
+					<div class="input-group">
+						<div class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></div>
+						<input ng-model="highFrameDate" type="text" class="form-control" id="inputDate" placeholder="Date">
+						<div ng-click="setDate()" class="input-group-addon hover-pointer">Go</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	
+	</div>
+
+	<br>
+
+	<div class="row">
+		<div class="col-md-6">
+
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Charts</h3>
+				</div>
+				<div class="panel-body">
+					<div class="row">
+						<div class="col-xs-12">
+							<highstock ticker="{{ticker}}" chart-name="higherTimeframe"></highstock>
+						</div>
+					</div>
+				</div>
+			</div><!-- End chart panel -->
+
+		</div>
+
+	</div>
+
+</div>
