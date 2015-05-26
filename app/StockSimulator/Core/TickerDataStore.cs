@@ -541,25 +541,26 @@ namespace StockSimulator.Core
 			TickerData higherTickerData = GetHigherTimeframeBars(ticker);
 
 			// Run the indicator and save it.
-			Stochastics higherTimeframeIndicator = new Stochastics(higherTickerData, new RunnableFactory(higherTickerData));
+			//Stochastics higherTimeframeIndicator = new Stochastics(higherTickerData, new RunnableFactory(higherTickerData));
+			Macd higherTimeframeIndicator = new Macd(higherTickerData, new RunnableFactory(higherTickerData));
 			higherTimeframeIndicator.Run();
 
 			// Return what kind orders are allowed.
 			Order.OrderType state = GetHigherTimeframeStateFromIndicator(higherTimeframeIndicator, higherTimeframeIndicator.Data.NumBars - 1);
 
 			////////////////// START HIGHER TIME FRAME DEBUGGING ////////////////////
-			if (ticker.TickerAndExchange.ToString() == "NFLX-NASDAQ")
-			{
-				DateTime outputDate = higherTickerData.Dates[higherTickerData.Dates.Count - 1];
-				List<Order.OrderType> states = new List<Order.OrderType>(ticker.HigherTimeframeMomentum);
-				states.Add(state);
-				Simulator.DataOutput.OutputHigherTimeframeData(
-					outputDate,
-					higherTimeframeIndicator,
-					higherTickerData,
-					ticker,
-					states);
-			}
+			//if (ticker.TickerAndExchange.ToString() == "NFLX-NASDAQ")
+			//{
+			//	DateTime outputDate = higherTickerData.Dates[higherTickerData.Dates.Count - 1];
+			//	List<Order.OrderType> states = new List<Order.OrderType>(ticker.HigherTimeframeMomentum);
+			//	states.Add(state);
+			//	Simulator.DataOutput.OutputHigherTimeframeData(
+			//		outputDate,
+			//		higherTimeframeIndicator,
+			//		higherTickerData,
+			//		ticker,
+			//		states);
+			//}
 			//////////////////  END  HIGHER TIME FRAME DEBUGGING ////////////////////
 
 			return state;
@@ -643,19 +644,37 @@ namespace StockSimulator.Core
 		/// <param name="indicator">Momentum indicator to use</param>
 		/// <param name="curBar">Current bar in the momentum simulation</param>
 		/// <returns>The state of the higher momentum indicator</returns>
-		private Order.OrderType GetHigherTimeframeStateFromIndicator(Stochastics indicator, int curBar)
+		private Order.OrderType GetHigherTimeframeStateFromIndicator(Macd macd, int currentBar)
 		{
-			if (DataSeries.IsAbove(indicator.K, indicator.D, curBar, 0) != -1 || indicator.K[curBar] == indicator.D[curBar])
+			while (currentBar >= 2)
 			{
-				return Order.OrderType.Long;
-			}
-			else if (DataSeries.IsBelow(indicator.K, indicator.D, curBar, 0) != -1)
-			{
-				return Order.OrderType.Short;
+				if (macd.Diff[currentBar - 2] > macd.Diff[currentBar - 1] && macd.Diff[currentBar] > macd.Diff[currentBar - 1])
+				{
+					return Order.OrderType.Long;
+				}
+				if (macd.Diff[currentBar - 2] < macd.Diff[currentBar - 1] && macd.Diff[currentBar] < macd.Diff[currentBar - 1])
+				{
+					return Order.OrderType.Short;
+				}
+
+				--currentBar;
 			}
 
-			throw new Exception("Unknown higher momentum state");
-		}
+			return Order.OrderType.Long;
+		}		
+		//private Order.OrderType GetHigherTimeframeStateFromIndicator(Stochastics indicator, int curBar)
+		//{
+		//	if (DataSeries.IsAbove(indicator.K, indicator.D, curBar, 0) != -1 || indicator.K[curBar] == indicator.D[curBar])
+		//	{
+		//		return Order.OrderType.Long;
+		//	}
+		//	else if (DataSeries.IsBelow(indicator.K, indicator.D, curBar, 0) != -1)
+		//	{
+		//		return Order.OrderType.Short;
+		//	}
+
+		//	throw new Exception("Unknown higher momentum state");
+		//}
 
 		/// <summary>
 		/// Gets the data from the webserver and saves it onto disk for later usage.

@@ -55,14 +55,9 @@ namespace StockSimulator.Strategies
 			}
 
 			Macd macd = (Macd)Dependents[0];
-			if (macd.Diff[currentBar] < 0 && macd.Diff[currentBar - 1] < 0 && macd.Diff[currentBar - 2] < 0)
+			if (macd.Diff[currentBar - 2] > macd.Diff[currentBar - 1] && macd.Diff[currentBar] > macd.Diff[currentBar - 1])
 			{
-				bool leftPeak = macd.Diff[currentBar - 2] > macd.Diff[currentBar - 1];
-				bool rightPeak = macd.Diff[currentBar - 1] < macd.Diff[currentBar];
-				if (leftPeak == true && rightPeak == true)
-				{
-					WasFound[currentBar] = true;
-				}
+				WasFound[currentBar] = true;
 			}
 		}
 	}

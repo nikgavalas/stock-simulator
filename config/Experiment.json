@@ -1,6 +1,6 @@
 {
   "StartDate": "2005-01-04T00:00:00",
-  "EndDate": "2015-05-15T00:00:00",
+  "EndDate": "2015-05-26T00:00:00",
   "UseTodaysDate": false,
   "DataType": "daily",
   "ShouldFilterBad": false,
@@ -41,6 +41,6 @@
   "NumBarsToDelayStart": 770,
   "MainProfitTarget": 0.51,
   "MainStopTarget": 0.04,
-  "InstrumentListFile": "C:\\Users\\Nik\\Documents\\Code\\github\\stock-simulator\\input\\experiment.csv",
+  "InstrumentListFile": "C:\\Users\\Nik\\Documents\\Code\\github\\stock-simulator\\input\\exp-small.csv",
   "OutputFolder": "C:\\Users\\Nik\\Documents\\Code\\github\\stock-simulator\\output\\output"
 }
