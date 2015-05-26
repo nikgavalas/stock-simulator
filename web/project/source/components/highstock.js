@@ -248,6 +248,31 @@ mainApp.directive('highstock', [
 					// Save for later
 					chart = $element.highcharts();
 
+					// Add the events to the chart.
+					$scope.$watch('events', function(eventData, oldEventData) {
+						if (!eventData) {
+							return;
+						}
+
+						var newSeries = chart.addSeries({
+							data: eventData,
+							name: 'Events',
+							type: 'flags',
+							onSeries: 'price-series',
+							shape: 'squarepin',
+							width: 16,
+							color: '#ff0000'
+						}, false);
+					});
+
+					$scope.$watch('extremes', function(newExtremes, oldExtremes) {
+						if (newExtremes === oldExtremes) {
+							return;
+						}
+
+						chart.xAxis[0].setExtremes(newExtremes.min, newExtremes.max);
+					});
+
 				}
 
 				$scope.setTotalHeightAndGetAxisTopAndHeights = function(numberOfyAxis) {
@@ -313,30 +338,6 @@ mainApp.directive('highstock', [
 					}
 				}); // end $http.get
 
-				// Add the events to the chart.
-				$scope.$watch('events', function(eventData, oldEventData) {
-					if (!eventData) {
-						return;
-					}
-
-					var newSeries = chart.addSeries({
-						data: eventData,
-						name: 'Events',
-						type: 'flags',
-						onSeries: 'price-series',
-						shape: 'squarepin',
-						width: 16,
-						color: '#ff0000'
-					}, false);
-				});
-
-				$scope.$watch('extremes', function(newExtremes, oldExtremes) {
-					if (newExtremes === oldExtremes) {
-						return;
-					}
-
-					chart.xAxis[0].setExtremes(newExtremes.min, newExtremes.max);
-				});
 
 			}
 		};
