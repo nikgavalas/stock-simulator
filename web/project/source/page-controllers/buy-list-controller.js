@@ -7,35 +7,22 @@ angular.module('mainApp').controller('BuyListCtrl', [
 	'$window',
 	'ConfigFactory',
 	'BuyListFactory',
+	'DateFactory',
 	function(
 		$scope,
 		$routeParams,
 		$location,
 		$window,
 		ConfigFactory,
-		BuyListFactory
+		BuyListFactory,
+		DateFactory
 	) {
 
-		function convertDateToString(date) {
-			var month = (date.getUTCMonth() + 1).toString();
-			if (month.length < 2) {
-				month = '0' + month;
-			}
-			var day = (date.getUTCDate()).toString();
-			if (day.length < 2) {
-				day = '0' + day;
-			}
-			return date.getUTCFullYear() + '-' + month + '-' + day;
-		}
-
-		function isValidDate(d) {
-			return Object.prototype.toString.call(d) === '[object Date]' && !isNaN(d.getTime());
-		}
 
 		function getNewList() {
 			var date = $scope.buyListDate;
 			if (!angular.isString(date)) {
-				date = convertDateToString(date);
+				date = DateFactory.convertDateToString(date);
 			}
 
 			BuyListFactory.getBuyList(date).then(function(data) {
@@ -52,7 +39,7 @@ angular.module('mainApp').controller('BuyListCtrl', [
 		$scope.calendarDate = new Date();
 		$scope.buyListDate = $routeParams.date;
 		if (!$scope.buyListDate) {
-			$scope.buyListDate = convertDateToString(new Date());
+			$scope.buyListDate = DateFactory.convertDateToString(new Date());
 		}
 
 		$scope.buyList = [];
@@ -60,14 +47,14 @@ angular.module('mainApp').controller('BuyListCtrl', [
 		$scope.setDate = function() {
 			// TODO: use moment.js for better date manipulation...
 			$scope.calendarDate = new Date($scope.buyListDate);
-			if (!isValidDate($scope.calendarDate)) {
+			if (!DateFactory.isValidDate($scope.calendarDate)) {
 				$scope.calendarDate = new Date();
 			}
 		};
 
 
 		$scope.$watch('calendarDate', function(newValue) {
-			$scope.buyListDate = convertDateToString($scope.calendarDate);
+			$scope.buyListDate = DateFactory.convertDateToString($scope.calendarDate);
 			getNewList();
 		});
 

@@ -43,6 +43,22 @@
 			</div><!-- End chart panel -->
 
 		</div>
+		
+		<div class="col-md-6">
+	<table class="table table-condensed table-hover">
+		<thead>
+			<th>Date</th>
+			<th>Order State</th>
+		</thead>
+		<tbody>
+			<tr ng-repeat="date in datesAndStates.dates">
+				<td>{{date}}</td>
+				<td>{{datesAndStates.states[$index]}}</td>
+			</tr>
+		</tbody>
+	</table>
+
+		</div>
 
 	</div>
 

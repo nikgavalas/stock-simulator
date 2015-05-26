@@ -112,6 +112,9 @@ namespace StockSimulator.Core
 			}
 
 			WriteMessage("Initializing ticker data");
+			
+			// TODO: there has to be a better place for this!
+			Directory.Delete(Simulator.Config.OutputFolder + "\\higher", true);
 
 			// Add all the symbols as dependent strategies using the bestofsubstrategies
 			ConcurrentDictionary<string, BestOfSubStrategies> downloadedInstruments = new ConcurrentDictionary<string, BestOfSubStrategies>();

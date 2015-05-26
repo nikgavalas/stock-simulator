@@ -15,6 +15,7 @@ mainApp.directive('navbar', [
 			link: function($scope) {
 				$scope.buyListLink = '#/' + ConfigFactory.getOutputName() + '/buylist';
 				$scope.accountValueLink = '#/' + ConfigFactory.getOutputName() + '/account';
+				$scope.higherTimeframeLink = '#/' + ConfigFactory.getOutputName() + '/higher';
 			}
 		};
 	}

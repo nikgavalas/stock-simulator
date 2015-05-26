@@ -8,7 +8,9 @@ using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using System.Collections.Concurrent;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using StockSimulator.Strategies;
+using StockSimulator.Core.JsonConverters;
 
 namespace StockSimulator.Core
 {
@@ -37,6 +39,21 @@ namespace StockSimulator.Core
 				OrderType = orderType;
 				StrategyName = strategyName;
 				Percent = percent;
+			}
+		}
+
+		private class JsonOrderState
+		{
+			[JsonProperty("dates")]
+			public List<DateTime> Dates { get; set; }
+
+			[JsonProperty("states")]
+			public List<Order.OrderType> States { get; set; }
+
+			public JsonOrderState(List<DateTime> _dates, List<Order.OrderType> _states)
+			{
+				Dates = _dates;
+				States = _states;
 			}
 		}
 
@@ -134,7 +151,15 @@ namespace StockSimulator.Core
 			return timeString;
 		}
 
-		public void OutputHigherTimeframeData(DateTime date, Indicator ind, TickerData higherData, List<Order.OrderType> states)
+		/// <summary>
+		/// Outputs all the higher time frame debug output for a date.
+		/// </summary>
+		/// <param name="date">Date to ouput</param>
+		/// <param name="ind">Indicator data used for the higher timeframe calculations</param>
+		/// <param name="higherData">Higher timeframe bar data</param>
+		/// <param name="lowerData">Lower timeframe bar data</param>
+		/// <param name="states">Order type states for each lower timeframe bar up to this date</param>
+		public void OutputHigherTimeframeData(DateTime date, Indicator ind, TickerData higherData, TickerData lowerData, List<Order.OrderType> states)
 		{
 			Directory.CreateDirectory(Simulator.Config.OutputFolder + "\\higher");
 
@@ -149,6 +174,11 @@ namespace StockSimulator.Core
 
 			jsonOutput = JsonConvert.SerializeObject(ind);
 			filename = folderName + "-ind.json";
+			File.WriteAllText(filename, jsonOutput);
+
+			JsonOrderState orderState = new JsonOrderState(lowerData.Dates, states);
+			jsonOutput = JsonConvert.SerializeObject(orderState);
+			filename = folderName + "-states.json";
 			File.WriteAllText(filename, jsonOutput);
 
 			ind.FreeResourcesAfterSerialization();

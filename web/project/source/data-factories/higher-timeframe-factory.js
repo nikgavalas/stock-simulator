@@ -17,14 +17,20 @@ mainApp.factory('HigherTimeframeFactory', [
 		 * Gets the price data of the higher timeframe.
 		 * @return {Object} Deferred promise
 		 */
-		factory.getPriceData = function(date) {
+		factory.get = function(date) {
 			var deffered = $q.defer();
 
-			$http.get(dataFolder + date + '-data.json').success(function(data) {
-				deffered.resolve(data);
-			})
-			.error(function() {
-				deffered.resolve(null);
+			var dataPromise = $http.get(dataFolder + date + '-data.json');
+			var indicatorPromise = $http.get(dataFolder + date + '-ind.json');
+			var statesPromise = $http.get(dataFolder + date + '-states.json');
+
+			// Wait for both requests to complete.
+			$q.all([dataPromise, indicatorPromise, statesPromise]).then(function(data) {
+				deffered.resolve({
+					priceData: data[0].data,
+					indicatorData: data[1].data,
+					statesData: data[2].data
+				});
 			});
 
 			return deffered.promise;

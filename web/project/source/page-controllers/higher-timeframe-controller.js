@@ -2,39 +2,58 @@
 
 angular.module('mainApp').controller('HigherTimeframeCtrl', [
 	'$scope',
+	'$routeParams',
 	'HigherTimeframeFactory',
+	'ConfigFactory',
+	'DateFactory',
 	function(
 		$scope,
-		HigherTimeframeFactory
+		$routeParams,
+		HigherTimeframeFactory,
+		ConfigFactory,
+		DateFactory
 	) {
 
-		$scope.ticker = $routeParams.ticker;
+		$scope.datesAndStates = [];
 
-
-		HigherTimeframeFactory.getPriceData().then(function(data) {
-					// Add all the indicators to the chart.
-					for (var i = 0; i < data.indicators.length; i++) {
-						$scope.$broadcast('AddIndicator', { name: data.indicators[i], chartName: 'lowerTimeframe' });
-					}
-				});
+		function updateChartsAndTable() {
+			var date = $scope.highFrameDate;
+			if (!angular.isString(date)) {
+				date = DateFactory.convertDateToString(date);
 			}
-		});
 
+			$scope.datesAndStates = [];
 
-		/**
-		 * Called when the user clicks on a row in the strategy table
-		 * @param  {Object} strategy The strategy row that was clicked
-		 */
-		$scope.strategyClick = function(strategy, $event) {
-			var url = ConfigFactory.getOutputName() + '/strategy/' + strategy.name + '/' + orderData.ticker + '/' + ConfigFactory.getSimDataType();
+			HigherTimeframeFactory.get(date).then(function(data) {
+				$scope.datesAndStates = data.statesData;
+				$scope.$broadcast('CreateChartExistingData', { data: data.priceData, chartName: 'higherTimeframe' });
+				$scope.$broadcast('AddIndicatorExistingData', { data: data.indicatorData, chartName: 'higherTimeframe' });
+			});
+		}
 
-			if ($event && ($event.ctrlKey || $event.shiftKey)) {
-				$window.open('#/' + url);
-			}
-			else {
-				$location.url(url);
+		// Save since it will be used in the rest of the app.
+		ConfigFactory.setOutputFolder($routeParams.runName);
+
+		$scope.calendarDate = new Date();
+		$scope.highFrameDate = $routeParams.date;
+		if (!$scope.highFrameDate) {
+			$scope.highFrameDate = DateFactory.convertDateToString(new Date());
+		}
+
+		$scope.setDate = function() {
+			// TODO: use moment.js for better date manipulation...
+			$scope.calendarDate = new Date($scope.highFrameDate);
+			if (!DateFactory.isValidDate($scope.calendarDate)) {
+				$scope.calendarDate = new Date();
 			}
 		};
+
+
+		$scope.$watch('calendarDate', function(newValue) {
+			$scope.highFrameDate = DateFactory.convertDateToString($scope.calendarDate);
+			updateChartsAndTable();
+		});
+	
 
 	} // end controller
 ]);

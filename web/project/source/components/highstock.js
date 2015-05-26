@@ -107,53 +107,7 @@ mainApp.directive('highstock', [
 					}
 				}
 
-				$scope.setTotalHeightAndGetAxisTopAndHeights = function(numberOfyAxis) {
-					var heights = [];
-					var tops = [];
-					var extraAxis = numberOfyAxis - 1;
-					var totalHeight = priceHeight + (extraAxis * indicatorHeight);
-					var topTotal = 0;
-					// Percent height for the chart.
-					tops.push(topTotal + '%');
-					var newHeight = (priceHeight / totalHeight) * 100;
-					heights.push(newHeight + '%');
-					topTotal += newHeight;
-
-					for (var i = 0; i < extraAxis; i++) {
-						newHeight = (indicatorHeight / totalHeight) * 100;
-						heights.push(newHeight + '%');
-						tops.push(topTotal + '%');
-						topTotal += newHeight;
-					}
-
-					$scope.elementStyle = {
-						'height': totalHeight + 'px'
-					};
-
-					return {
-						heights: heights,
-						tops: tops
-					};
-				};
-
-				$scope.$on('AddIndicator', function(msgName, args) {
-					// If this is not the chart we are looking for...
-					if ($scope.chartName !== args.chartName) {
-						return;
-					}
-
-					// Get the indicator data and once we have it add it to the chart.
-					ChartDataFactory.getIndicatorData(args.name, $scope.ticker).then(function(data) {
-						addIndicator(data, args);
-					});
-				});
-
-
-				var heightsAndTops = $scope.setTotalHeightAndGetAxisTopAndHeights(2);
-
-				// Get the data first before creating the chart.
-				ChartDataFactory.getPriceData($scope.ticker).then(function(data) {
-
+				function createChart(data) {
 					axisIds = [
 						'price-axis',
 						'volume-axis'
@@ -294,32 +248,96 @@ mainApp.directive('highstock', [
 					// Save for later
 					chart = $element.highcharts();
 
-					// Add the events to the chart.
-					$scope.$watch('events', function(eventData, oldEventData) {
-						if (!eventData) {
-							return;
-						}
+				}
 
-						var newSeries = chart.addSeries({
-							data: eventData,
-							name: 'Events',
-							type: 'flags',
-							onSeries: 'price-series',
-							shape: 'squarepin',
-							width: 16,
-							color: '#ff0000'
-						}, false);
+				$scope.setTotalHeightAndGetAxisTopAndHeights = function(numberOfyAxis) {
+					var heights = [];
+					var tops = [];
+					var extraAxis = numberOfyAxis - 1;
+					var totalHeight = priceHeight + (extraAxis * indicatorHeight);
+					var topTotal = 0;
+					// Percent height for the chart.
+					tops.push(topTotal + '%');
+					var newHeight = (priceHeight / totalHeight) * 100;
+					heights.push(newHeight + '%');
+					topTotal += newHeight;
+
+					for (var i = 0; i < extraAxis; i++) {
+						newHeight = (indicatorHeight / totalHeight) * 100;
+						heights.push(newHeight + '%');
+						tops.push(topTotal + '%');
+						topTotal += newHeight;
+					}
+
+					$scope.elementStyle = {
+						'height': totalHeight + 'px'
+					};
+
+					return {
+						heights: heights,
+						tops: tops
+					};
+				};
+
+				$scope.$on('AddIndicator', function(msgName, args) {
+					// If this is not the chart we are looking for...
+					if ($scope.chartName !== args.chartName) {
+						return;
+					}
+
+					// Get the indicator data and once we have it add it to the chart.
+					ChartDataFactory.getIndicatorData(args.name, $scope.ticker).then(function(data) {
+						addIndicator(data, args);
 					});
+				});
 
-					$scope.$watch('extremes', function(newExtremes, oldExtremes) {
-						if (newExtremes === oldExtremes) {
-							return;
-						}
+				$scope.$on('AddIndicatorExistingData', function(msgName, args) {
+					// If this is not the chart we are looking for...
+					if ($scope.chartName !== args.chartName) {
+						return;
+					}
 
-						chart.xAxis[0].setExtremes(newExtremes.min, newExtremes.max);
-					});
+					addIndicator(args.data, args);
+				});
 
+				$scope.$on('CreateChartExistingData', function(msgName, args) {
+					createChart(args.data);
+				});
+
+				var heightsAndTops = $scope.setTotalHeightAndGetAxisTopAndHeights(2);
+
+				// Get the data first before creating the chart.
+				ChartDataFactory.getPriceData($scope.ticker).then(function(data) {
+					if (data) {
+						createChart(data);
+					}
 				}); // end $http.get
+
+				// Add the events to the chart.
+				$scope.$watch('events', function(eventData, oldEventData) {
+					if (!eventData) {
+						return;
+					}
+
+					var newSeries = chart.addSeries({
+						data: eventData,
+						name: 'Events',
+						type: 'flags',
+						onSeries: 'price-series',
+						shape: 'squarepin',
+						width: 16,
+						color: '#ff0000'
+					}, false);
+				});
+
+				$scope.$watch('extremes', function(newExtremes, oldExtremes) {
+					if (newExtremes === oldExtremes) {
+						return;
+					}
+
+					chart.xAxis[0].setExtremes(newExtremes.min, newExtremes.max);
+				});
+
 			}
 		};
 	}

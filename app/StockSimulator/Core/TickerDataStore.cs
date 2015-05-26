@@ -557,6 +557,7 @@ namespace StockSimulator.Core
 					outputDate,
 					higherTimeframeIndicator,
 					higherTickerData,
+					ticker,
 					states);
 			}
 			//////////////////  END  HIGHER TIME FRAME DEBUGGING ////////////////////
