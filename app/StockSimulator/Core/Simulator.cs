@@ -320,7 +320,7 @@ namespace StockSimulator.Core
 								if (Config.ShouldFilterBad)
 								{
 									StrategyStatistics tickerStats = Orders.GetTickerStatistics(buyList[i].Data.TickerAndExchange, barNumber, Simulator.Config.NumBarsBadFilter);
-									if (tickerStats.Gain < 0 || tickerStats.ProfitTargetPercent < Config.BadFilterProfitTarget * 100)
+									if (tickerStats.Gain < 0 || tickerStats.WinPercent < Config.BadFilterProfitTarget * 100)
 									{
 										shouldReallyOrder = false;
 									}

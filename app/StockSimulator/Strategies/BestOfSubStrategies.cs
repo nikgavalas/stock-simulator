@@ -252,9 +252,9 @@ namespace StockSimulator.Strategies
 			Order.OrderType orderType = Order.OrderType.Long;
 			for (int i = 0; i < stats.Count; i++)
 			{
-				if (stats[i].ProfitTargetPercent > highestWinPercent)
+				if (stats[i].WinPercent > highestWinPercent)
 				{
-					highestWinPercent = stats[i].ProfitTargetPercent;
+					highestWinPercent = stats[i].WinPercent;
 					highestName = stats[i].StrategyName;
 					comboSize = stats[i].StrategyName.Split('-').Length;
 					orderType = stats[i].StrategyOrderType;

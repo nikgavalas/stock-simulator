@@ -46,7 +46,7 @@ angular.module('mainApp').controller('OrderDetailsCtrl', [
 			
 			// Sort so the strategy with the highest is at the top and that is the one that is shown first.
 			$scope.strategies.sort(function(a, b) {
-				return b.profitTargetPercent - a.profitTargetPercent;
+				return b.winPercent - a.winPercent;
 			});
 
 			// Display the indicators from the winning strategy.
