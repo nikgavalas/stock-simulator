@@ -121,8 +121,11 @@ namespace StockSimulator.Core
 
 			// Add all the symbols as dependent strategies using the bestofsubstrategies
 			ConcurrentDictionary<string, BestOfSubStrategies> downloadedInstruments = new ConcurrentDictionary<string, BestOfSubStrategies>();
+#if DEBUG			
+			foreach (KeyValuePair<string, TickerExchangePair> item in fileInstruments)
+#else
 			Parallel.ForEach(fileInstruments, item =>
-			//foreach (KeyValuePair<string, TickerExchangePair> item in fileInstruments)
+#endif
 			{
 				// Get the data for the symbol and save it for later so we can output it.
 				TickerData tickerData = DataStore.GetTickerData(item.Value, config.StartDate, config.EndDate);
@@ -138,7 +141,11 @@ namespace StockSimulator.Core
 				{
 					WriteMessage("No ticker data for " + item.Value.ToString());
 				}
+#if DEBUG
+			}
+#else
 			});
+#endif
 
 			// Want to store the instrument data in a sorted way so that we always run things
 			// in the same order.
@@ -184,15 +191,22 @@ namespace StockSimulator.Core
 			int amountFinished = 0;
 
 			// Run all to start with so we have the data to simulate with.
+#if DEBUG
+			foreach (KeyValuePair<string, BestOfSubStrategies> task in Instruments)
+#else
 			Parallel.ForEach(Instruments, task =>
-			//foreach (KeyValuePair<string, BestOfSubStrategies> task in Instruments)
+#endif
 			{
 				task.Value.Run();
 				Orders.PurgeTickerOrders(task.Value.Data.TickerAndExchange);
 
 				Interlocked.Increment(ref amountFinished);
 				WriteMessage((((double)amountFinished / totalInstruments) * 100.0).ToString("##.##") + "% Complete");
+#if DEBUG
+			}
+#else
 			});
+#endif
 
 			DateTime startDate = DataStore.SimTickerDates.First().Key;
 			DateTime endDate = DataStore.SimTickerDates.Last().Key;
