@@ -9,9 +9,9 @@ using StockSimulator.Indicators;
 
 namespace StockSimulator.Strategies
 {
-	class BullStochRsiFound : Strategy
+	class BullDmiPredicted : Strategy
 	{
-		public BullStochRsiFound(TickerData tickerData, RunnableFactory factory)
+		public BullDmiPredicted(TickerData tickerData, RunnableFactory factory)
 			: base(tickerData, factory)
 		{
 
@@ -25,7 +25,7 @@ namespace StockSimulator.Strategies
 			get
 			{
 				string[] deps = {
-					"StochRsi"
+					"Dmi"
 				};
 
 				return deps;
@@ -38,7 +38,7 @@ namespace StockSimulator.Strategies
 		/// <returns>The name of this strategy</returns>
 		public override string ToString()
 		{
-			return "BullStochRsiFound";
+			return "BullDmiPredicted";
 		}
 
 		/// <summary>
@@ -49,8 +49,8 @@ namespace StockSimulator.Strategies
 		{
 			base.OnBarUpdate(currentBar);
 
-			StochRsi ind = (StochRsi)Dependents[0];
-			if (DataSeries.CrossAbove(ind.Value, 0.20, currentBar, 0) != -1)
+			Dmi ind = (Dmi)Dependents[0];
+			if (DataSeries.IsAboutToCrossAbove(ind.Value, 0, currentBar) == true)
 			{
 				WasFound[currentBar] = true;
 			}

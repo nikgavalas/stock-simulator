@@ -91,7 +91,7 @@ namespace StockSimulator.Strategies
 					"StickSandwitchFound",
 					"BullStochasticsFastCrossover",
 					"BullStochasticsCrossover",
-					"BullStochRsiFound",
+					"BullStochRsiCrossover",
 					"ThreeWhiteSoldiersFound",
 					"BullTrendStart",
 					"BullTrixSignalCrossover",
@@ -102,6 +102,23 @@ namespace StockSimulator.Strategies
 					"BullPriceOscillator",
 					"BullDmi",
 
+					// Predicted bull strategies
+					"BullCciCrossoverPredicted",
+					"BullDmiPredicted",
+					"BullEaseOfMovementPredicted",
+					"BullKeltnerCloseAbovePredicted",
+					"BullMacdCrossoverPredicted",
+					"BullMomentumCrossoverPredicted",
+					"BullPriceOscillatorPredicted",
+					"BullRsiCrossover30Predicted",
+					"BullSmaCrossoverPredicted",
+					"BullStochasticsCrossoverPredicted",
+					"BullStochasticsFastCrossoverPredicted",
+					"BullStochRsiCrossoverPredicted",
+					"BullTrixSignalCrossoverPredicted",
+					"BullTrixZeroCrossoverPredicted",
+					"BullWilliamsRCrossoverPredicted",
+
 					// Bear strategies
 					"BearBollingerExtended",
 					"BearBeltHoldFound",
@@ -109,7 +126,7 @@ namespace StockSimulator.Strategies
 					"BearEngulfingFound",
 					"BearHaramiFound",
 					"BearHaramiCrossFound",
-					"BearKeltnerCloseAbove",
+					"BearKeltnerCloseBelow",
 					"BearMacdMomentum",
 					"BearMacdCrossover",
 					"BearMomentumCrossover",
@@ -117,7 +134,7 @@ namespace StockSimulator.Strategies
 					"BearSmaCrossover",
 					"BearStochasticsCrossover",
 					"BearStochasticsFastCrossover",
-					"BearStochRsiFound",
+					"BearStochRsiCrossover",
 					"BearTrendStart",
 					"BearTrixSignalCrossover",
 					"BearTrixZeroCrossover",
@@ -133,7 +150,25 @@ namespace StockSimulator.Strategies
 					"UpsideGapTwoCrowsFound",
 					"BearEaseOfMovement",
 					"BearPriceOscillator",
-					"BearDmi"
+					"BearDmi",
+
+					// Predicted bear strategies
+					"BearCciCrossoverPredicted",
+					"BearDmiPredicted",
+					"BearEaseOfMovementPredicted",
+					"BearKeltnerCloseBelowPredicted",
+					"BearMacdCrossoverPredicted",
+					"BearMomentumCrossoverPredicted",
+					"BearPriceOscillatorPredicted",
+					"BearRsiCrossover70Predicted",
+					"BearSmaCrossoverPredicted",
+					"BearStochasticsCrossoverPredicted",
+					"BearStochasticsFastCrossoverPredicted",
+					"BearStochRsiCrossoverPredicted",
+					"BearTrixSignalCrossoverPredicted",
+					"BearTrixZeroCrossoverPredicted",
+					"BearWilliamsRCrossoverPredicted",
+
 				};
 
 				return deps;

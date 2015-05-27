@@ -9,12 +9,12 @@ using StockSimulator.Indicators;
 
 namespace StockSimulator.Strategies
 {
-	class BearDmi : Strategy
+	class BullPriceOscillatorPredicted : Strategy
 	{
-		public BearDmi(TickerData tickerData, RunnableFactory factory)
+		public BullPriceOscillatorPredicted(TickerData tickerData, RunnableFactory factory)
 			: base(tickerData, factory)
 		{
-			_orderType = Order.OrderType.Short;
+
 		}
 
 		/// <summary>
@@ -25,7 +25,7 @@ namespace StockSimulator.Strategies
 			get
 			{
 				string[] deps = {
-					"Dmi"
+					"PriceOscillator"
 				};
 
 				return deps;
@@ -38,7 +38,7 @@ namespace StockSimulator.Strategies
 		/// <returns>The name of this strategy</returns>
 		public override string ToString()
 		{
-			return "BearDmi";
+			return "BullPriceOscillatorPredicted";
 		}
 
 		/// <summary>
@@ -49,8 +49,8 @@ namespace StockSimulator.Strategies
 		{
 			base.OnBarUpdate(currentBar);
 
-			Dmi ind = (Dmi)Dependents[0];
-			if (DataSeries.CrossBelow(ind.Value, 0, currentBar, 0) != -1)
+			PriceOscillator ind = (PriceOscillator)Dependents[0];
+			if (DataSeries.IsAboutToCrossAbove(ind.Value, 0, currentBar) == true)
 			{
 				WasFound[currentBar] = true;
 			}

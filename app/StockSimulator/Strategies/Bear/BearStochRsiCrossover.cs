@@ -9,9 +9,9 @@ using StockSimulator.Indicators;
 
 namespace StockSimulator.Strategies
 {
-	class BearDmi : Strategy
+	class BearStochRsiCrossover : Strategy
 	{
-		public BearDmi(TickerData tickerData, RunnableFactory factory)
+		public BearStochRsiCrossover(TickerData tickerData, RunnableFactory factory)
 			: base(tickerData, factory)
 		{
 			_orderType = Order.OrderType.Short;
@@ -25,7 +25,7 @@ namespace StockSimulator.Strategies
 			get
 			{
 				string[] deps = {
-					"Dmi"
+					"StochRsi"
 				};
 
 				return deps;
@@ -38,7 +38,7 @@ namespace StockSimulator.Strategies
 		/// <returns>The name of this strategy</returns>
 		public override string ToString()
 		{
-			return "BearDmi";
+			return "BearStochRsiCrossover";
 		}
 
 		/// <summary>
@@ -49,8 +49,8 @@ namespace StockSimulator.Strategies
 		{
 			base.OnBarUpdate(currentBar);
 
-			Dmi ind = (Dmi)Dependents[0];
-			if (DataSeries.CrossBelow(ind.Value, 0, currentBar, 0) != -1)
+			StochRsi ind = (StochRsi)Dependents[0];
+			if (DataSeries.CrossBelow(ind.Value, 0.80, currentBar, 0) != -1)
 			{
 				WasFound[currentBar] = true;
 			}

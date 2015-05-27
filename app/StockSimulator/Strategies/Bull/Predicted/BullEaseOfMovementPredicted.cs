@@ -9,12 +9,12 @@ using StockSimulator.Indicators;
 
 namespace StockSimulator.Strategies
 {
-	class BearStochRsiFound : Strategy
+	class BullEaseOfMovementPredicted : Strategy
 	{
-		public BearStochRsiFound(TickerData tickerData, RunnableFactory factory)
+		public BullEaseOfMovementPredicted(TickerData tickerData, RunnableFactory factory)
 			: base(tickerData, factory)
 		{
-			_orderType = Order.OrderType.Short;
+
 		}
 
 		/// <summary>
@@ -25,7 +25,7 @@ namespace StockSimulator.Strategies
 			get
 			{
 				string[] deps = {
-					"StochRsi"
+					"EaseOfMovement"
 				};
 
 				return deps;
@@ -38,7 +38,7 @@ namespace StockSimulator.Strategies
 		/// <returns>The name of this strategy</returns>
 		public override string ToString()
 		{
-			return "BearStochRsiFound";
+			return "BullEaseOfMovementPredicted";
 		}
 
 		/// <summary>
@@ -49,8 +49,8 @@ namespace StockSimulator.Strategies
 		{
 			base.OnBarUpdate(currentBar);
 
-			StochRsi ind = (StochRsi)Dependents[0];
-			if (DataSeries.CrossBelow(ind.Value, 0.80, currentBar, 0) != -1)
+			EaseOfMovement ind = (EaseOfMovement)Dependents[0];
+			if (DataSeries.IsAboutToCrossAbove(ind.Value, 0, currentBar) == true)
 			{
 				WasFound[currentBar] = true;
 			}

@@ -9,9 +9,9 @@ using StockSimulator.Indicators;
 
 namespace StockSimulator.Strategies
 {
-	class BearDmi : Strategy
+	class BearStochasticsFastCrossoverPredicted : Strategy
 	{
-		public BearDmi(TickerData tickerData, RunnableFactory factory)
+		public BearStochasticsFastCrossoverPredicted(TickerData tickerData, RunnableFactory factory)
 			: base(tickerData, factory)
 		{
 			_orderType = Order.OrderType.Short;
@@ -25,7 +25,7 @@ namespace StockSimulator.Strategies
 			get
 			{
 				string[] deps = {
-					"Dmi"
+					"StochasticsFast"
 				};
 
 				return deps;
@@ -38,7 +38,7 @@ namespace StockSimulator.Strategies
 		/// <returns>The name of this strategy</returns>
 		public override string ToString()
 		{
-			return "BearDmi";
+			return "BearStochasticsFastCrossoverPredicted";
 		}
 
 		/// <summary>
@@ -49,10 +49,13 @@ namespace StockSimulator.Strategies
 		{
 			base.OnBarUpdate(currentBar);
 
-			Dmi ind = (Dmi)Dependents[0];
-			if (DataSeries.CrossBelow(ind.Value, 0, currentBar, 0) != -1)
+			StochasticsFast ind = (StochasticsFast)Dependents[0];
+			if (DataSeries.IsAbove(ind.D, 80, currentBar, 0) != -1)
 			{
-				WasFound[currentBar] = true;
+				if (DataSeries.IsAboutToCrossBelow(ind.K, ind.D, currentBar) == true)
+				{
+					WasFound[currentBar] = true;
+				}
 			}
 		}
 	}

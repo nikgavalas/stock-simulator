@@ -14,7 +14,7 @@ namespace StockSimulator.Strategies
 		public BearEaseOfMovement(TickerData tickerData, RunnableFactory factory)
 			: base(tickerData, factory)
 		{
-
+			_orderType = Order.OrderType.Short;
 		}
 
 		/// <summary>

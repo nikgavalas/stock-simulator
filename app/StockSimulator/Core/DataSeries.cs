@@ -59,8 +59,40 @@ namespace StockSimulator.Core
 			return -1;
 		}
 
+		/// <summary>
+		/// Calculate the slope of the line and see if the next (predicted) point will be above the value.
+		/// </summary>
+		/// <param name="series">Series to check</param>
+		/// <param name="value">Value to see if the next point will cross above</param>
+		/// <param name="bar">What bar to start from</param>
+		/// <returns>True if the series will cross above the value in the next bar</returns>
+		public static bool IsAboutToCrossAbove(List<double> series, double value, int bar)
+		{
+			if (bar < 1)
+			{
+				return false;
+			}
 
+			return series[bar] <= value && GetPredictedValue(series, bar) > value;
+		}
 
+		/// <summary>
+		/// Calculate the slope of the lines and returns if the next points will generate a crossover
+		/// if the slope remains constant.
+		/// </summary>
+		/// <param name="series1">Series to check</param>
+		/// <param name="series2">Second series for the other line</param>
+		/// <param name="bar">What bar to start from</param>
+		/// <returns>True if the first series is predicted to cross above the second series</returns>
+		public static bool IsAboutToCrossAbove(List<double> series1, List<double> series2, int bar)
+		{
+			if (bar < 1)
+			{
+				return false;
+			}
+
+			return series1[bar] <= series2[bar] && GetPredictedValue(series1, bar) > GetPredictedValue(series2, bar);
+		}
 
 		/// <summary>
 		/// Checks if a series crosses below a value anytime in a range of bars.
@@ -109,8 +141,41 @@ namespace StockSimulator.Core
 			}
 			return -1;
 		}
-	
-		
+
+		/// <summary>
+		/// Calculate the slope of the line and see if the next (predicted) point will be above the value.
+		/// </summary>
+		/// <param name="series">Series to check</param>
+		/// <param name="value">Value to see if the next point will cross above</param>
+		/// <param name="bar">What bar to start from</param>
+		/// <returns>True if the series will cross below the value in the next bar</returns>
+		public static bool IsAboutToCrossBelow(List<double> series, double value, int bar)
+		{
+			if (bar < 1)
+			{
+				return false;
+			}
+
+			return series[bar] >= value && GetPredictedValue(series, bar) < value;
+		}
+
+		/// <summary>
+		/// Calculate the slope of the lines and returns if the next points will generate a crossover
+		/// if the slope remains constant.
+		/// </summary>
+		/// <param name="series1">Series to check</param>
+		/// <param name="series2">Second series for the other line</param>
+		/// <param name="bar">What bar to start from</param>
+		/// <returns>True if the first series is predicted to cross below the second series</returns>
+		public static bool IsAboutToCrossBelow(List<double> series1, List<double> series2, int bar)
+		{
+			if (bar < 1)
+			{
+				return false;
+			}
+
+			return series1[bar] >= series2[bar] && GetPredictedValue(series1, bar) < GetPredictedValue(series2, bar);
+		}
 
 		/// <summary>
 		/// Is a series above a value.
@@ -194,6 +259,19 @@ namespace StockSimulator.Core
 				}
 			}
 			return -1;
+		}
+
+		/// <summary>
+		/// Returns the next predicted value of the data series based on the slop of the
+		/// line formed by the point at the start bar and the previous point.
+		/// </summary>
+		/// <param name="series">Data series used for calculation</param>
+		/// <param name="startBar">Bar to start from</param>
+		/// <returns>Slope of the line</returns>
+		private static double GetPredictedValue(List<double> series, int startBar)
+		{
+			double slope = (series[startBar - 1] - series[startBar]) / -1;
+			return slope + series[startBar];
 		}
 	}
 }

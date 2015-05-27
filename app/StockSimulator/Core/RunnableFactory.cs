@@ -356,8 +356,8 @@ namespace StockSimulator.Core
 						requestedItem = new BullStochasticsCrossover(_tickerData, this);
 						break;
 
-					case "BullStochRsiFound":
-						requestedItem = new BullStochRsiFound(_tickerData, this);
+					case "BullStochRsiCrossover":
+						requestedItem = new BullStochRsiCrossover(_tickerData, this);
 						break;
 
 					case "ThreeWhiteSoldiersFound":
@@ -392,6 +392,69 @@ namespace StockSimulator.Core
 						requestedItem = new BullDmi(_tickerData, this);
 						break;
 
+					//////////// Predicted bull strategies ///////////
+
+					case "BullCciCrossoverPredicted":
+						requestedItem = new BullCciCrossoverPredicted(_tickerData, this);
+						break;
+
+					case "BullDmiPredicted":
+						requestedItem = new BullDmiPredicted(_tickerData, this);
+						break;
+
+					case "BullEaseOfMovementPredicted":
+						requestedItem = new BullEaseOfMovementPredicted(_tickerData, this);
+						break;
+
+					case "BullKeltnerCloseAbovePredicted":
+						requestedItem = new BullKeltnerCloseAbovePredicted(_tickerData, this);
+						break;
+
+					case "BullMacdCrossoverPredicted":
+						requestedItem = new BullMacdCrossoverPredicted(_tickerData, this);
+						break;
+
+					case "BullMomentumCrossoverPredicted":
+						requestedItem = new BullMomentumCrossoverPredicted(_tickerData, this);
+						break;
+
+					case "BullPriceOscillatorPredicted":
+						requestedItem = new BullPriceOscillatorPredicted(_tickerData, this);
+						break;
+
+					case "BullRsiCrossover30Predicted":
+						requestedItem = new BullRsiCrossover30Predicted(_tickerData, this);
+						break;
+
+					case "BullSmaCrossoverPredicted":
+						requestedItem = new BullSmaCrossoverPredicted(_tickerData, this);
+						break;
+
+					case "BullStochasticsCrossoverPredicted":
+						requestedItem = new BullStochasticsCrossoverPredicted(_tickerData, this);
+						break;
+
+					case "BullStochasticsFastCrossoverPredicted":
+						requestedItem = new BullStochasticsFastCrossoverPredicted(_tickerData, this);
+						break;
+
+					case "BullStochRsiCrossoverPredicted":
+						requestedItem = new BullStochRsiCrossoverPredicted(_tickerData, this);
+						break;
+
+					case "BullTrixSignalCrossoverPredicted":
+						requestedItem = new BullTrixSignalCrossoverPredicted(_tickerData, this);
+						break;
+
+					case "BullTrixZeroCrossoverPredicted":
+						requestedItem = new BullTrixZeroCrossoverPredicted(_tickerData, this);
+						break;
+
+					case "BullWilliamsRCrossoverPredicted":
+						requestedItem = new BullWilliamsRCrossoverPredicted(_tickerData, this);
+						break;
+
+
 					//
 					// Bear
 					//
@@ -412,8 +475,8 @@ namespace StockSimulator.Core
 						requestedItem = new BearDojiFound(_tickerData, this);
 						break;
 
-					case "BearKeltnerCloseAbove":
-						requestedItem = new BearKeltnerCloseAbove(_tickerData, this);
+					case "BearKeltnerCloseBelow":
+						requestedItem = new BearKeltnerCloseBelow(_tickerData, this);
 						break;
 
 					case "BearMacdMomentum":
@@ -444,8 +507,8 @@ namespace StockSimulator.Core
 						requestedItem = new BearStochasticsFastCrossover(_tickerData, this);
 						break;
 
-					case "BearStochRsiFound":
-						requestedItem = new BearStochRsiFound(_tickerData, this);
+					case "BearStochRsiCrossover":
+						requestedItem = new BearStochRsiCrossover(_tickerData, this);
 						break;
 
 					case "BearTrendStart":
@@ -524,6 +587,67 @@ namespace StockSimulator.Core
 						requestedItem = new BearDmi(_tickerData, this);
 						break;
 
+					//////////// Predicted bear strategies ///////////
+
+					case "BearCciCrossoverPredicted":
+						requestedItem = new BearCciCrossoverPredicted(_tickerData, this);
+						break;
+
+					case "BearDmiPredicted":
+						requestedItem = new BearDmiPredicted(_tickerData, this);
+						break;
+
+					case "BearEaseOfMovementPredicted":
+						requestedItem = new BearEaseOfMovementPredicted(_tickerData, this);
+						break;
+
+					case "BearKeltnerCloseBelowPredicted":
+						requestedItem = new BearKeltnerCloseBelowPredicted(_tickerData, this);
+						break;
+
+					case "BearMacdCrossoverPredicted":
+						requestedItem = new BearMacdCrossoverPredicted(_tickerData, this);
+						break;
+
+					case "BearMomentumCrossoverPredicted":
+						requestedItem = new BearMomentumCrossoverPredicted(_tickerData, this);
+						break;
+
+					case "BearPriceOscillatorPredicted":
+						requestedItem = new BearPriceOscillatorPredicted(_tickerData, this);
+						break;
+
+					case "BearRsiCrossover70Predicted":
+						requestedItem = new BearRsiCrossover70Predicted(_tickerData, this);
+						break;
+
+					case "BearSmaCrossoverPredicted":
+						requestedItem = new BearSmaCrossoverPredicted(_tickerData, this);
+						break;
+
+					case "BearStochasticsCrossoverPredicted":
+						requestedItem = new BearStochasticsCrossoverPredicted(_tickerData, this);
+						break;
+
+					case "BearStochasticsFastCrossoverPredicted":
+						requestedItem = new BearStochasticsFastCrossoverPredicted(_tickerData, this);
+						break;
+
+					case "BearStochRsiCrossoverPredicted":
+						requestedItem = new BearStochRsiCrossoverPredicted(_tickerData, this);
+						break;
+
+					case "BearTrixSignalCrossoverPredicted":
+						requestedItem = new BearTrixSignalCrossoverPredicted(_tickerData, this);
+						break;
+
+					case "BearTrixZeroCrossoverPredicted":
+						requestedItem = new BearTrixZeroCrossoverPredicted(_tickerData, this);
+						break;
+
+					case "BearWilliamsRCrossoverPredicted":
+						requestedItem = new BearWilliamsRCrossoverPredicted(_tickerData, this);
+						break;
 
 					default:
 						throw new Exception("Trying to create a runnable that doesn't exist");
