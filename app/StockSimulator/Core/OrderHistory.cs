@@ -72,21 +72,11 @@ namespace StockSimulator.Core
 				for (int i = tickerOrders.Count - 1; i >= 0; i--)
 				{
 					Order order = tickerOrders[i];
-					bool shouldAddOrder = false;
 
 					// For the date
-					if (Simulator.Config.UseLookbackBars)
-					{
-						shouldAddOrder = order.BuyBar >= cutoffBar && order.IsFinished() && order.StrategyName == strategyName;
-					}
-					// For the number of orders as the cutoff
-					else
-					{
-						shouldAddOrder = stats.NumberOfOrders < Simulator.Config.MaxLookBackOrders && order.IsFinished() && order.StrategyName == strategyName;
-					}
-
-					if (shouldAddOrder == true)
-					{
+					if (order.IsFinished() && order.StrategyName == strategyName &&
+						order.BuyBar >= cutoffBar && stats.NumberOfOrders < Simulator.Config.MaxLookBackOrders)
+					{ 
 						stats.AddOrder(order);
 					}
 				}

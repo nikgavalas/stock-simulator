@@ -126,11 +126,6 @@ namespace StockSimulator.Core
 		public int MinOrders { get; set; }
 
 		[Category("Orders")]
-		[DisplayName("Use Bars for Lookback")]
-		[Description("If true, use the look back bars for calculating strategy statistics")]
-		public bool UseLookbackBars { get; set; }
-
-		[Category("Orders")]
 		[DisplayName("Max Lookback")]
 		[Description("Maximum number of bars to look back when calculating the statistics for the strategy")]
 		public int MaxLookBackBars { get; set; }
@@ -274,7 +269,6 @@ namespace StockSimulator.Core
 			UseOneBarHLSub = true;
 
 			MinOrders = 3;
-			UseLookbackBars = false;
 			MaxLookBackBars = 500;
 			MaxLookBackOrders = 10;
 			MaxConcurrentOrders = 1;

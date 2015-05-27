@@ -137,20 +137,11 @@ namespace StockSimulator.Core
 					for (int i = tickerOrders.Count - 1; i >= 0; i--)
 					{
 						Order order = tickerOrders[i];
-						bool shouldAddOrder = false;
 
-						// For the date
-						if (Simulator.Config.UseLookbackBars)
-						{
-							shouldAddOrder = order.BuyBar >= cutoffBar && order.IsFinished();
-						}
-						// For the number of orders as the cutoff
-						else
-						{
-							shouldAddOrder = stats.NumberOfOrders < Simulator.Config.MaxLookBackOrders && order.IsFinished();
-						}
-
-						if (shouldAddOrder == true)
+						// Add orders that are newer than the maximum lookback and only keep a set
+						// amount of orders.
+						if (order.IsFinished() && order.BuyBar >= cutoffBar &&
+							stats.NumberOfOrders < Simulator.Config.MaxLookBackOrders)
 						{
 							stats.AddOrder(order);
 						}
@@ -193,26 +184,19 @@ namespace StockSimulator.Core
 		/// <param name="currentBar">Current bar to base the age from</param>
 		private void RemoveOldOrders(List<Order> orders, int currentBar)
 		{
-			// If we're using amount of bars to calculate strategy statistics remove all the 
-			// orders that come before this current bar.
-			if (Simulator.Config.UseLookbackBars)
+			// Remove all the orders that come before this current bar.
+			int cutoffBar = currentBar - Simulator.Config.MaxLookBackBars;
+			if (cutoffBar < 0)
 			{
-				int cutoffBar = currentBar - Simulator.Config.MaxLookBackBars;
-				if (cutoffBar < 0)
-				{
-					cutoffBar = 0;
-				}
-
-				orders.RemoveAll(o => o.BuyBar < cutoffBar);
+				cutoffBar = 0;
 			}
-			// We're using a maximum number of past orders, so remove any ones that are
-			// greater than the maximum number.
-			else
+
+			orders.RemoveAll(o => o.BuyBar < cutoffBar);
+
+			// Remove any ones that are greater than the maximum number.
+			while (orders.Count > Simulator.Config.MaxLookBackOrders)
 			{
-				while (orders.Count > Simulator.Config.MaxLookBackOrders)
-				{
-					orders.RemoveAt(0);
-				}
+				orders.RemoveAt(0);
 			}
 		}
 	}
