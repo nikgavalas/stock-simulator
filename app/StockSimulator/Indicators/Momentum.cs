@@ -15,7 +15,7 @@ namespace StockSimulator.Indicators
 	{
 		public List<double> Value { get; set; }
 
-		private int _period = 14;
+		private int _period = 9;
 
 		public Momentum(TickerData tickerData, RunnableFactory factory, int period) 
 			: base(tickerData, factory)

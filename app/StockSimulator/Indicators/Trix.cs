@@ -20,8 +20,8 @@ namespace StockSimulator.Indicators
 		private List<double> _secondEma { get; set; }
 		private List<double> _tripleEma { get; set; }
 
-		private int _period = 14;
-		private int _signalPeriod = 3;
+		private int _period = 5;
+		private int _signalPeriod = 5;
 
 		public Trix(TickerData tickerData, RunnableFactory factory)
 			: base(tickerData, factory)

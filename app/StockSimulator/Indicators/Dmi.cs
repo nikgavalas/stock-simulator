@@ -15,7 +15,7 @@ namespace StockSimulator.Indicators
 	{
 		public List<double> Value { get; set; }
 
-		private int period = 14;
+		private int period = 9;
 		private List<double> dmMinus;
 		private List<double> dmPlus;
 		private List<double> tr;

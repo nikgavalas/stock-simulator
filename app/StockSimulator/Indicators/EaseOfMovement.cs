@@ -15,7 +15,7 @@ namespace StockSimulator.Indicators
 	{
 		public List<double> Value { get; set; }
 
-		private int smoothing = 14;
+		private int smoothing = 4;
 		private int volumeDivisor = 10000;
 		public List<double> emv;
 
