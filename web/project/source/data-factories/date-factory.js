@@ -44,7 +44,7 @@ mainApp.factory('DateFactory', [
 				day = '0' + day;
 			}
 			return date.getUTCFullYear() + '-' + month + '-' + day;
-		}
+		};
 
 		/**
 		 * Returns true if this is a valid date.
@@ -53,7 +53,7 @@ mainApp.factory('DateFactory', [
 		 */
 		factory.isValidDate = function(d) {
 			return Object.prototype.toString.call(d) === '[object Date]' && !isNaN(d.getTime());
-		}
+		};
 
 		return factory;
 	}
