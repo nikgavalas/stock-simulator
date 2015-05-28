@@ -198,6 +198,13 @@ namespace StockSimulator.Core
 					BuyPrice = Ticker.Open[curBar];
 				}
 
+				// Set the stop price to yesterdays low/high depending on order direction.
+				if (Simulator.Config.UseOneBarHLForStop && !Simulator.Config.UseOneBarHLMain && !Simulator.Config.UseOneBarHLSub)
+				{
+					StopPrice = Type == OrderType.Long ? Ticker.Low[curBar - 1] : Ticker.High[curBar - 1];
+					stopSetAlready = true;
+				}
+
 				if (BuyPrice > 0)
 				{
 					BuyBar = curBar;
@@ -219,7 +226,7 @@ namespace StockSimulator.Core
 					double absoluteStop = BuyPrice - ((BuyPrice * configStopTarget) * direction);
 					if (stopSetAlready == false ||
 						(stopSetAlready == true && Type == OrderType.Long && StopPrice < absoluteStop) ||
-						(stopSetAlready == true && Type == OrderType.Short && configStopTarget > absoluteStop))
+						(stopSetAlready == true && Type == OrderType.Short && StopPrice > absoluteStop))
 					{
 						StopPrice = absoluteStop;
 					}
@@ -308,7 +315,7 @@ namespace StockSimulator.Core
 			}
 			// Either the high or close during this bar was above our stop target,
 			// then close at the stop target.
-			else if (Math.Min(Ticker.Close[curBar], Ticker.High[curBar]) >= StopPrice)
+			else if (Math.Max(Ticker.Close[curBar], Ticker.High[curBar]) >= StopPrice)
 			{
 				FinishOrder(StopPrice, curBar, OrderStatus.StopTarget);
 			}
@@ -319,7 +326,7 @@ namespace StockSimulator.Core
 			}
 			// Either the low or close during this bar was below our profit target,
 			// then close at the profit target.
-			else if (Math.Max(Ticker.Close[curBar], Ticker.Low[curBar]) <= ProfitTargetPrice)
+			else if (Math.Min(Ticker.Close[curBar], Ticker.Low[curBar]) <= ProfitTargetPrice)
 			{
 				FinishOrder(ProfitTargetPrice, curBar, OrderStatus.ProfitTarget);
 			}

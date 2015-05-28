@@ -101,6 +101,11 @@ namespace StockSimulator.Core
 		[Description("Use the 1 bar high low orderering technique for substrategy orders")]
 		public bool UseOneBarHLSub { get; set; }
 
+		[Category("Order Types")]
+		[DisplayName("Use HL For Stop")]
+		[Description("Use 1 bar ago high/low for the stop target depending on order direction. Will still use the stop target as the absolute low.")]
+		public bool UseOneBarHLForStop { get; set; }
+
 		/////////////////////////////// OUTPUT ////////////////////////////////////
 
 		[Category("Output")]
@@ -265,8 +270,9 @@ namespace StockSimulator.Core
 
 			TrendStrength = 4;
 
-			UseOneBarHLMain = true;
-			UseOneBarHLSub = true;
+			UseOneBarHLMain = false;
+			UseOneBarHLSub = false;
+			UseOneBarHLForStop = true;
 
 			MinOrders = 3;
 			MaxLookBackBars = 500;
