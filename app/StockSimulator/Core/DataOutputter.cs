@@ -386,11 +386,6 @@ namespace StockSimulator.Core
 		/// <param name="timeString">Time string used for the folder output</param>
 		void OutputPriceData(string timeString)
 		{
-			if (Simulator.Config.UseAbbreviatedOutput == true)
-			{
-				return;
-			}
-
 			string filename;
 			string jsonOutput;
 			string folderName = GetOutputFolder(timeString) + "pricedata";
