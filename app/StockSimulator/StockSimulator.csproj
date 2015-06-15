@@ -100,6 +100,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Core\BuySellConditions\BuyCondition.cs" />
+    <Compile Include="Core\BuySellConditions\SellCondition.cs" />
+    <Compile Include="Core\BuySellConditions\MarketBuyCondition.cs" />
     <Compile Include="Core\ComboSet.cs" />
     <Compile Include="Core\DataOutputter.cs" />
     <Compile Include="Core\IOrderHistory.cs" />

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using StockSimulator.Core.JsonConverters;
+using StockSimulator.Core.BuySellConditions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System.Threading;
@@ -16,10 +17,10 @@ namespace StockSimulator.Core
 		/// <summary>
 		/// Different types of orders that can be placed.
 		/// </summary>
-		public enum OrderType
+		public class OrderType
 		{
-			Long,
-			Short
+			public readonly double Long = 1.0;
+			public readonly double Short = -1.0;
 		}
 
 		/// <summary>
@@ -29,9 +30,7 @@ namespace StockSimulator.Core
 		{
 			Open,
 			Filled,
-			ProfitTarget,
-			StopTarget,
-			LengthExceeded,
+			Closed,
 			Cancelled
 		}
 
@@ -69,12 +68,13 @@ namespace StockSimulator.Core
 		[JsonConverter(typeof(TickerDataStringConverter))]
 		public TickerData Ticker { get; set; }
 
-		[JsonProperty("orderStatus")]
-		public OrderStatus Status { get; set; }
+		[JsonProperty("sellReason")]
+		public string SellReason { get; set; }
 
 		[JsonProperty("orderType")]
-		public OrderType Type { get; set; }
+		public double Type { get; set; }
 
+		public OrderStatus Status { get; set; }
 		public int BuyBar { get; set; }
 		public int SellBar { get; set; }
 		public double ProfitTargetPrice { get; set; }
@@ -89,6 +89,9 @@ namespace StockSimulator.Core
 
 		private double _orderValue;
 
+		private List<BuyCondition> _buyConditions;
+		private List<SellCondition> _sellConditions;
+
 		/// <summary>
 		/// Contructor for the order.
 		/// </summary>
@@ -97,10 +100,27 @@ namespace StockSimulator.Core
 		/// <param name="currentBar">Current bar of the simulation</param>
 		/// <param name="fromStrategyName">Name of the strategy this order is for. Can't use the actual strategy reference because it could come from a strategy combo (ie. MacdCrossover-SmaCrossover)</paramparam>
 		/// <param name="dependentIndicatorNames">Names of the dependent indicators so they can be shown on the web with the order</param>
-		public Order(OrderType type, TickerData tickerData, string fromStrategyName, int currentBar, List<string> dependentIndicatorNames)
+		/// <param name="buyConditions">All the buy conditions that must be met to fill the order</param>
+		/// <param name="sellConditions">Any of the sell conditions trigger a sell</param>
+		public Order(
+			OrderType type, 
+			TickerData tickerData, 
+			string fromStrategyName, 
+			int currentBar, 
+			List<string> dependentIndicatorNames,
+			List<BuyCondition> buyCondtions,
+			List<SellCondition> sellConditions)
 		{
 			_orderValue = 0;
 
+			// Save all the buy/sell conditions and sort them so the less
+			// desirable conditions get executed last.
+			_buyConditions = buyCondtions;
+			_sellConditions = sellConditions;
+			_buyConditions.Sort((a, b) => a.Priority.CompareTo(b));
+			_sellConditions.Sort((a, b) => a.Priority.CompareTo(b));
+
+			SellReason = "Still open";
 			StrategyName = fromStrategyName;
 			OrderId = GetUniqueId();
 			Type = type;
@@ -109,6 +129,8 @@ namespace StockSimulator.Core
 			AccountValue = 0;
 			LimitBuyPrice = tickerData.High[currentBar];
 			OpenedBar = currentBar + 1;
+
+			OrderOpened();
 		}
 
 		/// <summary>
@@ -123,242 +145,114 @@ namespace StockSimulator.Core
 		{
 			get
 			{
-				double direction = Type == OrderType.Long ? 1.0 : -1.0;
 				double startingValue = NumberOfShares * BuyPrice;
-				return ((_orderValue - startingValue) * direction) + startingValue;
+				return ((_orderValue - startingValue) * Type) + startingValue;
 			}
 		}
 
 		/// <summary>
 		/// Updates the order for this bar
 		/// </summary>
-		/// <param name="curBar">Current bar of the simulation</param>
-		public void Update(int curBar)
+		/// <param name="currentBar">Current bar of the simulation</param>
+		public void Update(int currentBar)
 		{
-			bool isMainOrder = GetType() == typeof(MainStrategyOrder);
-			bool stopSetAlready = false;
-
-			// If the order is open and not filled we need to fill it.
+			// If the order hasn't been filled yet then check if any of the buy 
+			// conditions say we should buy. Once one executes the buy, the others
+			// are not processed.
 			if (Status == OrderStatus.Open)
 			{
-				// If we are using limit orders make sure the price is higher than that 
-				// limit before buying.
-				if (isMainOrder && Simulator.Config.UseLimitOrders)
+				for (int i = 0; i < _buyConditions.Count; i++)
 				{
-					if (curBar - OpenedBar >= Simulator.Config.MaxBarsLimitOrderFill)
+					if (_buyConditions[i].OnUpdate(currentBar))
 					{
-						Status = OrderStatus.Cancelled;
-					}
-					else if (Ticker.Open[curBar] >= LimitBuyPrice)
-					{
-						BuyPrice = Ticker.Open[curBar];
-					}
-					else if (Ticker.Close[curBar] > LimitBuyPrice || Ticker.High[curBar] > LimitBuyPrice)
-					{
-						BuyPrice = LimitBuyPrice;
-					}
-				}
-				// Use the last bar and only enter the order if this bar has a higher price than yesterdays
-				// high. Also, set a cancel/stop order on yesterdays low if the price exceeds that.
-				else if (curBar > 0 && ((isMainOrder && Simulator.Config.UseOneBarHLMain) || (!isMainOrder && Simulator.Config.UseOneBarHLSub)))
-				{
-					if (curBar - OpenedBar >= 1)
-					{
-						Status = OrderStatus.Cancelled;
-					}
-					else if (Type == OrderType.Long)
-					{
-						if (Ticker.Low[curBar] <= Ticker.Low[curBar - 1])
-						{
-							Status = OrderStatus.Cancelled;
-						}
-						else if (Ticker.High[curBar] >= Ticker.High[curBar - 1])
-						{
-							BuyPrice = Ticker.Open[curBar] > Ticker.High[curBar - 1] ? Ticker.Open[curBar] : Ticker.High[curBar - 1];
-							StopPrice = Ticker.Low[curBar - 1];
-							stopSetAlready = true;
-						}
-					}
-					else if (Type == OrderType.Short)
-					{
-						if (Ticker.High[curBar] >= Ticker.High[curBar - 1])
-						{
-							Status = OrderStatus.Cancelled;
-						}
-						else if (Ticker.Low[curBar] <= Ticker.Low[curBar - 1])
-						{
-							BuyPrice = Ticker.Open[curBar] < Ticker.Low[curBar - 1] ? Ticker.Open[curBar] : Ticker.Low[curBar - 1];
-							StopPrice = Ticker.High[curBar - 1];
-							stopSetAlready = true;
-						}
-					}
-				}
-				else
-				{
-					BuyPrice = Ticker.Open[curBar];
-				}
-
-				// Set the stop price to yesterdays low/high depending on order direction.
-				if (Simulator.Config.UseOneBarHLForStop && !Simulator.Config.UseOneBarHLMain && !Simulator.Config.UseOneBarHLSub)
-				{
-					StopPrice = Type == OrderType.Long ? Ticker.Low[curBar - 1] : Ticker.High[curBar - 1];
-					stopSetAlready = true;
-				}
-
-				if (BuyPrice > 0)
-				{
-					BuyBar = curBar;
-					BuyDate = Ticker.Dates[curBar];
-					Status = OrderStatus.Filled;
-
-					double sizeOfOrder = Simulator.Config.SizeOfOrder;
-
-					NumberOfShares = BuyPrice > 0.0 ? Convert.ToInt32(Math.Floor(sizeOfOrder / BuyPrice)) : 0;
-					_orderValue = NumberOfShares * BuyPrice;
-
-					double direction = Type == OrderType.Long ? 1.0 : -1.0;
-
-					// Set prices to exit.
-					double configProfitTarget = isMainOrder ? Simulator.Config.MainProfitTarget : Simulator.Config.ProfitTarget;
-					double configStopTarget = isMainOrder ? Simulator.Config.MainStopTarget : Simulator.Config.StopTarget;
-					ProfitTargetPrice = BuyPrice + ((BuyPrice * configProfitTarget) * direction);
-
-					double absoluteStop = BuyPrice - ((BuyPrice * configStopTarget) * direction);
-					if (stopSetAlready == false ||
-						(stopSetAlready == true && Type == OrderType.Long && StopPrice < absoluteStop) ||
-						(stopSetAlready == true && Type == OrderType.Short && StopPrice > absoluteStop))
-					{
-						StopPrice = absoluteStop;
+						break;
 					}
 				}
 			}
 
-			// Close any orders that need to be closed
+			// Once the order is filled, check and see if any of the sell conditions
+			// say we should sell. Once one executes the sell, the others are not processed.
 			if (Status == OrderStatus.Filled)
 			{
-				_orderValue = NumberOfShares * Ticker.Close[curBar];
+				_orderValue = NumberOfShares * Ticker.Close[currentBar];
 
-				if (Type == OrderType.Long)
+				for (int i = 0; i < _sellConditions.Count; i++)
 				{
-					FinishLongOrder(curBar);
-				}
-				else
-				{
-					FinishShortOrder(curBar);
-				}
-
-				// Limit the order since we won't want to be in the market forever.
-				// Also have an option where we can close main orders at a different
-				// length of bars than substrategy orders.
-				int numBarsOpen = curBar - BuyBar;
-				int maxOpenBars = isMainOrder ? Simulator.Config.MaxBarsOrderOpenMain : Simulator.Config.MaxBarsOrderOpen;
-				if (numBarsOpen >= maxOpenBars && IsFinished() == false)
-				{
-					FinishOrder(Ticker.Close[curBar], curBar, OrderStatus.LengthExceeded);
+					if (_sellConditions[i].OnUpdate(currentBar))
+					{
+						break;
+					}
 				}
 			}
 		}
 
 		/// <summary>
-		/// Returns whether the order is closed.
+		/// Buys the order
+		/// <param name="buyPrice">Price the order was purchased at</param>
+		/// <param name="buyBar">Bar the order was bought on</param>
+		/// <param name="buyReason">Reason for buying</param>
 		/// </summary>
-		/// <returns>True if the order is any of the closed statuses</returns>
-		public bool IsFinished()
+		public void Buy(double buyPrice, int buyBar, string buyReason)
 		{
-			return Status == OrderStatus.ProfitTarget ||
-				Status == OrderStatus.StopTarget ||
-				Status == OrderStatus.LengthExceeded;
-		}
+			BuyBar = buyBar;
+			BuyDate = Ticker.Dates[buyBar];
+			Status = OrderStatus.Filled;
+			NumberOfShares = BuyPrice > 0.0 ? Convert.ToInt32(Math.Floor(Simulator.Config.SizeOfOrder / BuyPrice)) : 0;
+			
+			_orderValue = NumberOfShares * BuyPrice;
 
-		/// <summary>
-		/// Checks all the conditions that could close a long order and if any
-		/// are true then close the order.
-		/// </summary>
-		/// <param name="curBar">Current bar of the simulation</param>
-		private void FinishLongOrder(int curBar)
-		{
-			// Gapped open below our stop target, so close at the open price.
-			if (Ticker.Open[curBar] <= StopPrice)
-			{
-				FinishOrder(Ticker.Open[curBar], curBar, OrderStatus.StopTarget);
-			}
-			// Either the low or close during this bar was below our stop target,
-			// then close at the stop target.
-			else if (Math.Min(Ticker.Close[curBar], Ticker.Low[curBar]) <= StopPrice)
-			{
-				FinishOrder(StopPrice, curBar, OrderStatus.StopTarget);
-			}
-			// Gapped open above our profit target, then close at the open price.
-			else if (Ticker.Open[curBar] >= ProfitTargetPrice)
-			{
-				FinishOrder(Ticker.Open[curBar], curBar, OrderStatus.ProfitTarget);
-			}
-			// Either the high or close during this bar was above our profit target,
-			// then close at the profit target.
-			else if (Math.Max(Ticker.Close[curBar], Ticker.High[curBar]) >= ProfitTargetPrice)
-			{
-				FinishOrder(ProfitTargetPrice, curBar, OrderStatus.ProfitTarget);
-			}
-		}
+			// TODO: this should be moved to a profit or stop sell condition
+			//double direction = Type == OrderType.Long ? 1.0 : -1.0;
 
-		/// <summary>
-		/// Checks all the conditions that could close a short order and if any
-		/// are true then close the order.
-		/// </summary>
-		/// <param name="curBar">Current bar of the simulation</param>
-		private void FinishShortOrder(int curBar)
-		{
-			// Gapped open above our stop target, so close at the open price.
-			if (Ticker.Open[curBar] >= StopPrice)
-			{
-				FinishOrder(Ticker.Open[curBar], curBar, OrderStatus.StopTarget);
-			}
-			// Either the high or close during this bar was above our stop target,
-			// then close at the stop target.
-			else if (Math.Max(Ticker.Close[curBar], Ticker.High[curBar]) >= StopPrice)
-			{
-				FinishOrder(StopPrice, curBar, OrderStatus.StopTarget);
-			}
-			// Gapped open below our profit target, then close at the open price.
-			else if (Ticker.Open[curBar] <= ProfitTargetPrice)
-			{
-				FinishOrder(Ticker.Open[curBar], curBar, OrderStatus.ProfitTarget);
-			}
-			// Either the low or close during this bar was below our profit target,
-			// then close at the profit target.
-			else if (Math.Min(Ticker.Close[curBar], Ticker.Low[curBar]) <= ProfitTargetPrice)
-			{
-				FinishOrder(ProfitTargetPrice, curBar, OrderStatus.ProfitTarget);
-			}
-		}
+			//// Set prices to exit.
+			//double configProfitTarget = isMainOrder ? Simulator.Config.MainProfitTarget : Simulator.Config.ProfitTarget;
+			//double configStopTarget = isMainOrder ? Simulator.Config.MainStopTarget : Simulator.Config.StopTarget;
+			//ProfitTargetPrice = BuyPrice + ((BuyPrice * configProfitTarget) * direction);
 
+			//double absoluteStop = BuyPrice - ((BuyPrice * configStopTarget) * direction);
+			//if (stopSetAlready == false ||
+			//	(stopSetAlready == true && Type == OrderType.Long && StopPrice < absoluteStop) ||
+			//	(stopSetAlready == true && Type == OrderType.Short && StopPrice > absoluteStop))
+			//{
+			//	StopPrice = absoluteStop;
+			//}
+		}
 		/// <summary>
-		/// Closes the order and records current stats for orders for this strategy.
+		/// Sells the order.
 		/// </summary>
 		/// <param name="sellPrice">Price the stock was sold at</param>
-		/// <param name="currentBar">Current bar of the simulation</param>
-		private void FinishOrder(double sellPrice, int currentBar, OrderStatus sellStatus)
+		/// <param name="sellBar">Current bar of the simulation</param>
+		/// <param name="sellReason">Reason for selling</param>
+		public void Sell(double sellPrice, int sellBar, string sellReason)
 		{
-			double direction = Type == OrderType.Long ? 1.0 : -1.0;
-			
 			// If the sell price is 0 then it's a bug that no more data for this stock exists 
 			// and we had an order open. This is not really realistic so we'll just have the order
 			// gain $0.
 			SellPrice = sellPrice > 0.0 ? sellPrice : BuyPrice;
-			SellBar = currentBar;
-			SellDate = Ticker.Dates[currentBar];
-			Status = sellStatus;
-			Gain = ((NumberOfShares * SellPrice) - (NumberOfShares * BuyPrice)) * direction;
+			SellBar = sellBar;
+			SellDate = Ticker.Dates[sellBar];
+			Status = OrderStatus.Closed;
+			Gain = ((NumberOfShares * SellPrice) - (NumberOfShares * BuyPrice)) * Type;
 			Gain -= Simulator.Config.Commission * 2;
+			SellReason = sellReason;
 
 			_orderValue = NumberOfShares * SellPrice;
+		}
 
-			// Get things like win/loss percent up to the point this order was finished.
-			// TODO: not sure if this is needed.
-			//EndStatistics = Simulator.Orders.GetStrategyStatistics(StrategyName,
-			//	Ticker.TickerAndExchange.ToString(),
-			//	currentBar,
-			//	Simulator.Config.MaxLookBackBars);
+		/// <summary>
+		/// Updates the conditions when the order is opened.
+		/// </summary>
+		private void OrderOpened()
+		{
+			for (int i = 0; i < _buyConditions.Count; i++)
+			{
+				_buyConditions[i].OnOpen(this);
+			}
+
+			for (int i = 0; i < _sellConditions.Count; i++)
+			{
+				_sellConditions[i].OnOpen(this);
+			}
 		}
 
 		/// <summary>
@@ -369,5 +263,206 @@ namespace StockSimulator.Core
 		{
 			return Interlocked.Increment(ref _uniqueId);
 		}
+
+		//public void Update(int curBar)
+		//{
+		//	bool isMainOrder = GetType() == typeof(MainStrategyOrder);
+		//	bool stopSetAlready = false;
+
+		//	// If the order is open and not filled we need to fill it.
+		//	if (Status == OrderStatus.Open)
+		//	{
+		//		// If we are using limit orders make sure the price is higher than that 
+		//		// limit before buying.
+		//		if (isMainOrder && Simulator.Config.UseLimitOrders)
+		//		{
+		//			if (curBar - OpenedBar >= Simulator.Config.MaxBarsLimitOrderFill)
+		//			{
+		//				Status = OrderStatus.Cancelled;
+		//			}
+		//			else if (Ticker.Open[curBar] >= LimitBuyPrice)
+		//			{
+		//				BuyPrice = Ticker.Open[curBar];
+		//			}
+		//			else if (Ticker.Close[curBar] > LimitBuyPrice || Ticker.High[curBar] > LimitBuyPrice)
+		//			{
+		//				BuyPrice = LimitBuyPrice;
+		//			}
+		//		}
+		//		// Use the last bar and only enter the order if this bar has a higher price than yesterdays
+		//		// high. Also, set a cancel/stop order on yesterdays low if the price exceeds that.
+		//		else if (curBar > 0 && ((isMainOrder && Simulator.Config.UseOneBarHLMain) || (!isMainOrder && Simulator.Config.UseOneBarHLSub)))
+		//		{
+		//			if (curBar - OpenedBar >= 1)
+		//			{
+		//				Status = OrderStatus.Cancelled;
+		//			}
+		//			else if (Type == OrderType.Long)
+		//			{
+		//				if (Ticker.Low[curBar] <= Ticker.Low[curBar - 1])
+		//				{
+		//					Status = OrderStatus.Cancelled;
+		//				}
+		//				else if (Ticker.High[curBar] >= Ticker.High[curBar - 1])
+		//				{
+		//					BuyPrice = Ticker.Open[curBar] > Ticker.High[curBar - 1] ? Ticker.Open[curBar] : Ticker.High[curBar - 1];
+		//					StopPrice = Ticker.Low[curBar - 1];
+		//					stopSetAlready = true;
+		//				}
+		//			}
+		//			else if (Type == OrderType.Short)
+		//			{
+		//				if (Ticker.High[curBar] >= Ticker.High[curBar - 1])
+		//				{
+		//					Status = OrderStatus.Cancelled;
+		//				}
+		//				else if (Ticker.Low[curBar] <= Ticker.Low[curBar - 1])
+		//				{
+		//					BuyPrice = Ticker.Open[curBar] < Ticker.Low[curBar - 1] ? Ticker.Open[curBar] : Ticker.Low[curBar - 1];
+		//					StopPrice = Ticker.High[curBar - 1];
+		//					stopSetAlready = true;
+		//				}
+		//			}
+		//		}
+		//		else
+		//		{
+		//			BuyPrice = Ticker.Open[curBar];
+		//		}
+
+		//		// Set the stop price to yesterdays low/high depending on order direction.
+		//		if (Simulator.Config.UseOneBarHLForStop && !Simulator.Config.UseOneBarHLMain && !Simulator.Config.UseOneBarHLSub)
+		//		{
+		//			StopPrice = Type == OrderType.Long ? Ticker.Low[curBar - 1] : Ticker.High[curBar - 1];
+		//			stopSetAlready = true;
+		//		}
+
+		//		if (BuyPrice > 0)
+		//		{
+		//			BuyBar = curBar;
+		//			BuyDate = Ticker.Dates[curBar];
+		//			Status = OrderStatus.Filled;
+
+		//			double sizeOfOrder = Simulator.Config.SizeOfOrder;
+
+		//			NumberOfShares = BuyPrice > 0.0 ? Convert.ToInt32(Math.Floor(sizeOfOrder / BuyPrice)) : 0;
+		//			_orderValue = NumberOfShares * BuyPrice;
+
+		//			double direction = Type == OrderType.Long ? 1.0 : -1.0;
+
+		//			// Set prices to exit.
+		//			double configProfitTarget = isMainOrder ? Simulator.Config.MainProfitTarget : Simulator.Config.ProfitTarget;
+		//			double configStopTarget = isMainOrder ? Simulator.Config.MainStopTarget : Simulator.Config.StopTarget;
+		//			ProfitTargetPrice = BuyPrice + ((BuyPrice * configProfitTarget) * direction);
+
+		//			double absoluteStop = BuyPrice - ((BuyPrice * configStopTarget) * direction);
+		//			if (stopSetAlready == false ||
+		//				(stopSetAlready == true && Type == OrderType.Long && StopPrice < absoluteStop) ||
+		//				(stopSetAlready == true && Type == OrderType.Short && StopPrice > absoluteStop))
+		//			{
+		//				StopPrice = absoluteStop;
+		//			}
+		//		}
+		//	}
+
+		//	// Close any orders that need to be closed
+		//	if (Status == OrderStatus.Filled)
+		//	{
+		//		_orderValue = NumberOfShares * Ticker.Close[curBar];
+
+		//		if (Type == OrderType.Long)
+		//		{
+		//			FinishLongOrder(curBar);
+		//		}
+		//		else
+		//		{
+		//			FinishShortOrder(curBar);
+		//		}
+
+		//		// Limit the order since we won't want to be in the market forever.
+		//		// Also have an option where we can close main orders at a different
+		//		// length of bars than substrategy orders.
+		//		int numBarsOpen = curBar - BuyBar;
+		//		int maxOpenBars = isMainOrder ? Simulator.Config.MaxBarsOrderOpenMain : Simulator.Config.MaxBarsOrderOpen;
+		//		if (numBarsOpen >= maxOpenBars && IsFinished() == false)
+		//		{
+		//			FinishOrder(Ticker.Close[curBar], curBar, OrderStatus.LengthExceeded);
+		//		}
+		//	}
+		//}
+
+		///// <summary>
+		///// Returns whether the order is closed.
+		///// </summary>
+		///// <returns>True if the order is any of the closed statuses</returns>
+		//public bool IsFinished()
+		//{
+		//	return Status == OrderStatus.ProfitTarget ||
+		//		Status == OrderStatus.StopTarget ||
+		//		Status == OrderStatus.LengthExceeded;
+		//}
+
+		///// <summary>
+		///// Checks all the conditions that could close a long order and if any
+		///// are true then close the order.
+		///// </summary>
+		///// <param name="curBar">Current bar of the simulation</param>
+		//private void FinishLongOrder(int curBar)
+		//{
+		//	// Gapped open below our stop target, so close at the open price.
+		//	if (Ticker.Open[curBar] <= StopPrice)
+		//	{
+		//		FinishOrder(Ticker.Open[curBar], curBar, OrderStatus.StopTarget);
+		//	}
+		//	// Either the low or close during this bar was below our stop target,
+		//	// then close at the stop target.
+		//	else if (Math.Min(Ticker.Close[curBar], Ticker.Low[curBar]) <= StopPrice)
+		//	{
+		//		FinishOrder(StopPrice, curBar, OrderStatus.StopTarget);
+		//	}
+		//	// Gapped open above our profit target, then close at the open price.
+		//	else if (Ticker.Open[curBar] >= ProfitTargetPrice)
+		//	{
+		//		FinishOrder(Ticker.Open[curBar], curBar, OrderStatus.ProfitTarget);
+		//	}
+		//	// Either the high or close during this bar was above our profit target,
+		//	// then close at the profit target.
+		//	else if (Math.Max(Ticker.Close[curBar], Ticker.High[curBar]) >= ProfitTargetPrice)
+		//	{
+		//		FinishOrder(ProfitTargetPrice, curBar, OrderStatus.ProfitTarget);
+		//	}
+		//}
+
+		///// <summary>
+		///// Checks all the conditions that could close a short order and if any
+		///// are true then close the order.
+		///// </summary>
+		///// <param name="curBar">Current bar of the simulation</param>
+		//private void FinishShortOrder(int curBar)
+		//{
+		//	// Gapped open above our stop target, so close at the open price.
+		//	if (Ticker.Open[curBar] >= StopPrice)
+		//	{
+		//		FinishOrder(Ticker.Open[curBar], curBar, OrderStatus.StopTarget);
+		//	}
+		//	// Either the high or close during this bar was above our stop target,
+		//	// then close at the stop target.
+		//	else if (Math.Max(Ticker.Close[curBar], Ticker.High[curBar]) >= StopPrice)
+		//	{
+		//		FinishOrder(StopPrice, curBar, OrderStatus.StopTarget);
+		//	}
+		//	// Gapped open below our profit target, then close at the open price.
+		//	else if (Ticker.Open[curBar] <= ProfitTargetPrice)
+		//	{
+		//		FinishOrder(Ticker.Open[curBar], curBar, OrderStatus.ProfitTarget);
+		//	}
+		//	// Either the low or close during this bar was below our profit target,
+		//	// then close at the profit target.
+		//	else if (Math.Min(Ticker.Close[curBar], Ticker.Low[curBar]) <= ProfitTargetPrice)
+		//	{
+		//		FinishOrder(ProfitTargetPrice, curBar, OrderStatus.ProfitTarget);
+		//	}
+		//}
+
+
 	}
 }
