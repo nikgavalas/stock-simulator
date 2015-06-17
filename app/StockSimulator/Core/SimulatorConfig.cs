@@ -148,7 +148,7 @@ namespace StockSimulator.Core
 
 		[Category("Combo Strategy")]
 		[PropertyOrder(2)]
-		[DisplayName("Maximum Combo Size")]
+		[DisplayName("Max Combo Size")]
 		[Description("Maximum size of a combo that can be used")]
 		public int ComboMaxComboSize { get; set; }
 
@@ -248,12 +248,18 @@ namespace StockSimulator.Core
 
 			// Higher timeframe
 			NumBarsHigherTimeframe = 5;
-			UseHigherTimeframeSubstrategies = false;
-			UseHigherTimeframeMainStrategy = false;
+			UseHigherTimeframeSubstrategies = true;
+			UseHigherTimeframeMainStrategy = true;
 
 			// Combo strategy
+			ComboPercentForBuy = 65;
+			ComboMinComboSize = 1;
+			ComboMaxComboSize = 4;
+			ComboLeewayBars = 0;
+			ComboMinRequiredOrders = 3;
 			ComboStopPercent = 0.04;
 			ComboMaxBarsOpen = 10;
+			ComboSizeOfOrder = 10000;
 
 			// Main strategy
 			ComboLeewayBars = 0;
