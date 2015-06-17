@@ -304,22 +304,28 @@ namespace StockSimulator.Core
 
 			ConcurrentBag<StrategyStatistics> allStrategyStatistics = new ConcurrentBag<StrategyStatistics>();
 
+#if DEBUG			
+			foreach (KeyValuePair<int, ConcurrentBag<Order>> strategy in Simulator.Orders.StrategyDictionary)
+#else
 			Parallel.ForEach(Simulator.Orders.StrategyDictionary, strategy =>
-			//foreach (KeyValuePair<int, ConcurrentBag<Order>> strategy in Simulator.Orders.StrategyDictionary)
+#endif
 			{
 				string jsonOutput;
 				string folderName;
 				string filename;
 
 				ConcurrentBag<Order> orders = strategy.Value;
-				if (orders.Count > Simulator.Config.MinRequiredOrders)
+				if (orders.Count > 0)
 				{
 					// Get the strategy name but skip the main strategy as it gets process differently.
 					string strategyName = orders.First().StrategyName;
 					if (strategyName == "MainStrategy")
 					{
+#if DEBUG
+						continue;
+#else
 						return;
-						//continue;
+#endif
 					}
 
 					Dictionary<int, StrategyTickerPairStatistics> tickersForThisStrategy = new Dictionary<int, StrategyTickerPairStatistics>();
@@ -373,7 +379,11 @@ namespace StockSimulator.Core
 					File.WriteAllText(filename, jsonOutput);
 
 				}
+#if DEBUG
+			}
+#else
 			});
+#endif
 
 			string overallJsonOutput = JsonConvert.SerializeObject(allStrategyStatistics.ToArray());
 			string overallFilename = GetOutputFolder(timeString) + "overall-strategies.json";

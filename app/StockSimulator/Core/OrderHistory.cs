@@ -82,10 +82,7 @@ namespace StockSimulator.Core
 				}
 			}
 
-			// Only count the statistics if we have a bit more data to deal with.
-			// We want to avoid having a strategy say it's 100% correct when it 
-			// only has 1 winning trade.
-			if (stats.NumberOfOrders > Simulator.Config.MinRequiredOrders)
+			if (stats.NumberOfOrders > 0)
 			{
 				stats.CalculateStatistics();
 			}
@@ -136,7 +133,7 @@ namespace StockSimulator.Core
 			// Only count the statistics if we have a bit more data to deal with.
 			// We want to avoid having a strategy say it's 100% correct when it 
 			// only has 1 winning trade.
-			if (stats.NumberOfOrders > Simulator.Config.MinRequiredOrders)
+			if (stats.NumberOfOrders > 0)
 			{
 				stats.CalculateStatistics();
 			}

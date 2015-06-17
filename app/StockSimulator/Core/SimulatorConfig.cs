@@ -48,23 +48,6 @@ namespace StockSimulator.Core
 		[ItemsSource(typeof(DataItemsSource))]
 		public string DataType { get; set; }
 
-		//////////////////////////// FILTER BAD ///////////////////////////////////
-
-		[Category("Bad Filter")]
-		[DisplayName("Should Filter Bad")]
-		[Description("Should we filter bad performing stocks in the main strategy")]
-		public bool ShouldFilterBad { get; set; }
-
-		[Category("Bad Filter")]
-		[DisplayName("Look Back Bars")]
-		[Description("How many bars to look back to filter bad stocks")]
-		public int NumBarsBadFilter { get; set; }
-
-		[Category("Bad Filter")]
-		[DisplayName("Min Profit Target")]
-		[Description("The profit target that all orders for a ticker must be above to be considered in the main strategy")]
-		public double BadFilterProfitTarget { get; set; }
-
 		//////////////////////////// CANDLESTICKS /////////////////////////////////
 
 		[Category("Candlesticks")]
@@ -89,23 +72,6 @@ namespace StockSimulator.Core
 		[Description("Use the higher timeframe momentum on the main strategy")]
 		public bool UseHigherTimeframeMainStrategy { get; set; }
 
-		/////////////////////////////// ORDER TYPE /////////////////////////////////
-
-		[Category("Order Types")]
-		[DisplayName("Use 1 Bar HL Main")]
-		[Description("Use the 1 bar high low orderering technique for main orders")]
-		public bool UseOneBarHLMain { get; set; }
-
-		[Category("Order Types")]
-		[DisplayName("Use 1 Bar HL Sub")]
-		[Description("Use the 1 bar high low orderering technique for substrategy orders")]
-		public bool UseOneBarHLSub { get; set; }
-
-		[Category("Order Types")]
-		[DisplayName("Use HL For Stop")]
-		[Description("Use 1 bar ago high/low for the stop target depending on order direction. Will still use the stop target as the absolute low.")]
-		public bool UseOneBarHLForStop { get; set; }
-
 		/////////////////////////////// OUTPUT ////////////////////////////////////
 
 		[Category("Output")]
@@ -123,49 +89,29 @@ namespace StockSimulator.Core
 		[Description("Should auto open the web page after the sim finishes running.")]
 		public bool ShouldOpenWebPage { get; set; }
 
+		[Category("Output")]
+		[DisplayName("Output Folder")]
+		[Description("Folder to output the results to")]
+		public string OutputFolder { get; set; }
+
 		//////////////////////////// ALL ORDERS ///////////////////////////////////
 
-		[Category("Orders")]
-		[DisplayName("Min Order Number")]
-		[Description("Minimum number of orders a strategy needs for it's statistics to be calculated")]
-		public int MinOrders { get; set; }
-
-		[Category("Orders")]
+		[Category("All Orders")]
 		[DisplayName("Max Lookback")]
 		[Description("Maximum number of bars to look back when calculating the statistics for the strategy")]
 		public int MaxLookBackBars { get; set; }
 
-		[Category("Orders")]
+		[Category("All Orders")]
 		[DisplayName("Max Lookback Orders")]
 		[Description("Maximum number of orders to look back when calculating the statistics for the strategy")]
 		public int MaxLookBackOrders { get; set; }
 
-		[Category("Orders")]
+		[Category("All Orders")]
 		[DisplayName("Max Concurrent Orders")]
 		[Description("Maximum number of orders that can be for a particular strategy at one time")]
 		public int MaxConcurrentOrders { get; set; }
 
-		[Category("Orders")]
-		[DisplayName("Profit Target")]
-		[Description("Profit target for all orders")]
-		public double ProfitTarget { get; set; }
-
-		[Category("Orders")]
-		[DisplayName("Stop Loss Target")]
-		[Description("Stop loss target for all orders")]
-		public double StopTarget { get; set; }
-
-		[Category("Orders")]
-		[DisplayName("Max Bars Order Open")]
-		[Description("Maximum number of bars and order can be open in the market before we close it")]
-		public int MaxBarsOrderOpen { get; set; }
-
-		[Category("Orders")]
-		[DisplayName("Size Of Order")]
-		[Description("Amount of money to invest in each stock order")]
-		public double SizeOfOrder { get; set; }
-
-		[Category("Orders")]
+		[Category("All Orders")]
 		[DisplayName("Commission Per Trade")]
 		[Description("Broker commission per trade. There are two trades per order.")]
 		public double Commission { get; set; }
@@ -182,23 +128,38 @@ namespace StockSimulator.Core
 		[Description("Max bars open for the combo strategy")]
 		public int ComboMaxBarsOpen { get; set; }
 
-		///////////////////////////// MAIN STRATEGY ///////////////////////////////
+		[Category("Combo Strategy")]
+		[DisplayName("Size Of Order")]
+		[Description("Amount of money to invest in each stock order")]
+		public double ComboSizeOfOrder { get; set; }
 
-		[Category("Main Strategy")]
-		[DisplayName("Limit Orders For Buy")]
-		[Description("Use a limit order when buying which is equal to the closing price of the previous day")]
-		public bool UseLimitOrders { get; set; }
-
-		[Category("Main Strategy")]
-		[DisplayName("Limit Order To Fill")]
-		[Description("Maximum number of bars to wait for a limit order to fill")]
-		public int MaxBarsLimitOrderFill { get; set; }
-
-		[Category("Main Strategy")]
+		[Category("Combo Strategy")]
 		[DisplayName("Combo Leeway")]
 		[Description("Number of bars back in time allowed to find a combo from the current bar")]
 		public int ComboLeewayBars { get; set; }
 
+		[Category("Combo Strategy")]
+		[DisplayName("Min Required Orders")]
+		[Description("Number of orders needed before we can use buy signals for a strategy")]
+		public int ComboMinRequiredOrders { get; set; }
+
+		[Category("Combo Strategy")]
+		[DisplayName("Min Combo Size")]
+		[Description("Minimum number of strategies that must have been present to buy")]
+		public int ComboMinComboSize { get; set; }
+
+		[Category("Combo Strategy")]
+		[DisplayName("Maximum Combo Size")]
+		[Description("Maximum size of a combo that can be used")]
+		public int ComboMaxComboSize { get; set; }
+
+		[Category("Combo Strategy")]
+		[DisplayName("Percent For Buy")]
+		[Description("Percent returned from best combo strategy to add ticker to the buy list")]
+		public double ComboPercentForBuy { get; set; }
+
+		///////////////////////////// MAIN STRATEGY ///////////////////////////////
+		
 		[Category("Main Strategy")]
 		[DisplayName("Max Orders Per Bar")]
 		[Description("Maximum number of orders that can be placed in a bar")]
@@ -212,12 +173,7 @@ namespace StockSimulator.Core
 		[Category("Main Strategy")]
 		[DisplayName("Main Order Max Bars Open")]
 		[Description("Maximum number of bars a main order can be open for")]
-		public int MaxBarsOrderOpenMain { get; set; }
-
-		[Category("Main Strategy")]
-		[DisplayName("Min Required Orders")]
-		[Description("Number of orders needed before we start counting the statistics as valid")]
-		public int MinRequiredOrders { get; set; }
+		public int MainMaxBarsOrderOpen { get; set; }
 
 		[Category("Main Strategy")]
 		[DisplayName("Min Price For Order")]
@@ -230,24 +186,9 @@ namespace StockSimulator.Core
 		public double MinPriceForShort { get; set; }
 
 		[Category("Main Strategy")]
-		[DisplayName("Min Combo Size")]
-		[Description("Minimum number of strategies that must have been present to buy")]
-		public int MinComboSizeToBuy { get; set; }
-
-		[Category("Main Strategy")]
-		[DisplayName("Maximum Combo Size")]
-		[Description("Maximum size of a combo that can be used")]
-		public int MaxComboSizeToBuy { get; set; }
-
-		[Category("Main Strategy")]
 		[DisplayName("Initial Account Balance")]
 		[Description("Amount of money the trade account starts with")]
 		public int InitialAccountBalance { get; set; }
-
-		[Category("Main Strategy")]
-		[DisplayName("Percent For Buy")]
-		[Description("Percent returned from best of strategy to buy for the main strategy.")]
-		public double PercentForBuy { get; set; }
 
 		[Category("Main Strategy")]
 		[DisplayName("Num Bars to Delay Start")]
@@ -255,82 +196,52 @@ namespace StockSimulator.Core
 		public int NumBarsToDelayStart { get; set; }
 
 		[Category("Main Strategy")]
-		[DisplayName("Main profit Target")]
-		[Description("Main profit target for all orders")]
-		public double MainProfitTarget { get; set; }
-
-		[Category("Main Strategy")]
-		[DisplayName("Main stop Loss Target")]
-		[Description("Main stop loss target for all orders")]
-		public double MainStopTarget { get; set; }
-
-		[Category("Main Strategy")]
 		[DisplayName("Stock List File")]
 		[Description("File with a list of stocks to run the sim on")]
 		public string InstrumentListFile { get; set; }
 
-		[Category("Main Strategy")]
-		[DisplayName("Output Folder")]
-		[Description("Folder to output the results to")]
-		public string OutputFolder { get; set; }
-
+		/// <summary>
+		/// Sets the default values for the options.
+		/// </summary>
 		public SimulatorConfig()
 		{
+			// Dates
 			StartDate = DateTime.Parse("1/4/2010");
 			EndDate = DateTime.Parse("3/31/2015");
 			DataType = "daily";
 
+			// Candlesticks
 			TrendStrength = 4;
 
-			UseOneBarHLMain = false;
-			UseOneBarHLSub = false;
-			UseOneBarHLForStop = true;
-
-			MinOrders = 3;
+			// All orders
 			MaxLookBackBars = 500;
 			MaxLookBackOrders = 10;
 			MaxConcurrentOrders = 1;
-			ProfitTarget = 0.05;
-			StopTarget = 0.04;
-			MaxBarsOrderOpen = 5;
-			SizeOfOrder = 6000;
 			Commission = 4.95;
+
+			// Higher timeframe
+			NumBarsHigherTimeframe = 5;
+			UseHigherTimeframeSubstrategies = false;
+			UseHigherTimeframeMainStrategy = false;
 
 			// Combo strategy
 			ComboStopPercent = 0.04;
 			ComboMaxBarsOpen = 10;
 
 			// Main strategy
-			UseLimitOrders = false;
-			MaxBarsLimitOrderFill = 1;
 			ComboLeewayBars = 0;
 			MaxOrdersPerBar = 4;
-			MinComboSizeToBuy = 1;
-			MaxComboSizeToBuy = 4;
 			MaxOpenOrders = 1000;
-			MinRequiredOrders = 3;
 			InitialAccountBalance = 99999999;
-			PercentForBuy = 65;
 			NumBarsToDelayStart = 250;
-			MaxBarsOrderOpenMain = 0;
 			MinPriceForOrder = 0.75;
 			MinPriceForShort = 5.00;
-			MainProfitTarget = 0.20;
-			MainStopTarget = 0.04;
-
-			ShouldFilterBad = false;
-			NumBarsBadFilter = 500;
-			BadFilterProfitTarget = 0.30;
-
+			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\test.csv";
+			
+			// Output
 			UseAbbreviatedOutput = true;
 			OnlyOutputLastBuyList = false;
 			ShouldOpenWebPage = true;
-
-			NumBarsHigherTimeframe = 5;
-			UseHigherTimeframeSubstrategies = false;
-			UseHigherTimeframeMainStrategy = false;
-
-			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\test.csv";
 			OutputFolder = @"C:\Users\Nik\Documents\Code\github\stock-simulator\output\output";
 
 			// Testing parameters for indicator correctness.

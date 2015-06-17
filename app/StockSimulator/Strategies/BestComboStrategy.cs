@@ -158,6 +158,13 @@ namespace StockSimulator.Strategies
 		{
 			base.OnBarUpdate(currentBar);
 
+			double highestWinPercent = 0;
+			string highestName = "None";
+			double highestOrderType = Order.OrderType.Long;
+			StrategyStatistics highestStats = null;
+			List<BuyCondition> highestBuyConditions = null;
+			List<SellCondition> highestSellConditions = null;
+
 			// Bull and bear strategies can't combo with each other but we still want
 			// to compare them side by side to find our what combo is the best.
 			// So append all the bear combos to the combo list so they can be evaluated too.
@@ -171,7 +178,7 @@ namespace StockSimulator.Strategies
 				List<Strategy> comboList = combos[i];
 
 				// Ignore combos greater than a max amount.
-				if (comboList.Count > Simulator.Config.MaxComboSizeToBuy || comboList.Count < Simulator.Config.MinComboSizeToBuy)
+				if (comboList.Count > Simulator.Config.ComboMaxComboSize || comboList.Count < Simulator.Config.ComboMinComboSize)
 				{
 					continue;
 				}
@@ -203,7 +210,7 @@ namespace StockSimulator.Strategies
 				List<SellCondition> sellConditions = GetSellConditions(comboList);
 
 				// Now that the name of the strategy is found, enter the order.
-				Order placedOrder = EnterOrder(comboName, currentBar, comboList[0].OrderType, 
+				Order placedOrder = EnterOrder(comboName, currentBar, comboList[0].OrderType, Simulator.Config.ComboSizeOfOrder,
 					dependentIndicators, buyConditions, sellConditions);
 
 				if (placedOrder != null)
@@ -214,35 +221,37 @@ namespace StockSimulator.Strategies
 						placedOrder.Ticker.TickerAndExchange,
 						currentBar,
 						Simulator.Config.MaxLookBackBars));
+
+					// For each combo we want to find out the winning % and the gain
+					// for it and save those values for the bar.
+					if (stats[i].WinPercent > highestWinPercent)
+					{
+						highestWinPercent = stats[i].WinPercent;
+						highestName = stats[i].StrategyName;
+						highestOrderType = stats[i].StrategyOrderType;
+						highestStats = stats[i];
+						highestBuyConditions = buyConditions;
+						highestSellConditions = sellConditions;
+					}
 				}
 			}
 
-			// For each combo we want to find out the winning % and the gain
-			// for it and save those values for the bar.
-			double highestWinPercent = 0;
-			string highestName = "None";
-			StrategyStatistics highestStats = null;
-			int comboSize = 0;
-			double orderType = Order.OrderType.Long;
-			for (int i = 0; i < stats.Count; i++)
-			{
-				if (stats[i].WinPercent > highestWinPercent)
-				{
-					highestWinPercent = stats[i].WinPercent;
-					highestName = stats[i].StrategyName;
-					comboSize = stats[i].StrategyName.Split('-').Length;
-					orderType = stats[i].StrategyOrderType;
-					highestStats = stats[i];
-				}
-			}
-
+			// Abbreviated output we only care about the strategy used to do the buy,
+			// not all the ones that could have been found.
 			if (Simulator.Config.UseAbbreviatedOutput == true)
 			{
 				stats = new List<StrategyStatistics>();
 				stats.Add(highestStats);
 			}
 
-			Bars[currentBar] = new BarStatistics(highestWinPercent, highestName, orderType, stats);
+			Bars[currentBar] = new BarStatistics(
+				highestWinPercent,
+				highestName,
+				highestOrderType,
+				Simulator.Config.ComboSizeOfOrder,
+				stats,
+				highestBuyConditions,
+				highestSellConditions);
 		}
 
 		/// <summary>

@@ -8,6 +8,7 @@ using System.IO;
 
 using StockSimulator.Strategies;
 using System.Collections.Concurrent;
+using StockSimulator.Core.BuySellConditions;
 
 namespace StockSimulator.Core
 {
@@ -273,7 +274,7 @@ namespace StockSimulator.Core
 					isTradingBar = true;
 
 					// Check to make sure it meets our percentage and price requirements.
-					if (strat.Bars[currentBar].HighestPercent >= Config.PercentForBuy &&
+					if (strat.Bars[currentBar].HighestPercent >= Config.ComboPercentForBuy &&
 						strat.Data.Open[currentBar] >= Config.MinPriceForOrder)
 					{
 						// If this is a short order, some brokers have min prices they allow for shorts.
@@ -318,19 +319,19 @@ namespace StockSimulator.Core
 						// be high enough and we can early out of the loop.
 						int strategyBarIndex = buyList[i].Data.GetBar(currentDate);
 						BarStatistics barStats = buyList[i].Bars[strategyBarIndex];
-						if (barStats.HighestPercent >= Config.PercentForBuy) // TODO: move to combo strategy && barStats.ComboSizeOfHighestStrategy >= Simulator.Config.MinComboSizeToBuy)
+						if (barStats.HighestPercent > 0) // TODO: move to combo strategy && barStats.ComboSizeOfHighestStrategy >= Simulator.Config.MinComboSizeToBuy)
 						{
-							// Don't want to order to late in the strategy where the order can't run it's course.
-							int lastBarToPlaceOrders = NumberOfBars - (Config.MaxBarsOrderOpenMain + 1);
-
 							// Make sure we have enough money and also that we have enough time
 							// before the end of the sim to complete the order we place.
-							if (barNumber < lastBarToPlaceOrders && Broker.AccountCash > Config.SizeOfOrder * 1.1)
+							if (barNumber < NumberOfBars && Broker.AccountCash > barStats.SizeOfOrder * 1.1)
 							{
 								currentCount += EnterOrder(barStats.Statistics,
 									barStats.StrategyOrderType, 
 									buyList[i].Data, 
-									strategyBarIndex);
+									strategyBarIndex,
+									barStats.SizeOfOrder,
+									barStats.BuyConditions,
+									barStats.SellConditions);
 							}
 						}
 						else
@@ -409,7 +410,17 @@ namespace StockSimulator.Core
 		/// <param name="orderType">Type of order to place for the found strategy (long or short)</param>
 		/// <param name="ticker">Ticker we're placing the order on</param>
 		/// <param name="currentBar">Current bar of the simulation</param>
-		private int EnterOrder(List<StrategyStatistics> stats, double orderType, TickerData ticker, int currentBar)
+		/// <param name="sizeOfOrder">Amount of money to place in this order</param>
+		/// <param name="buyConditions">All the buy conditions that must be met to fill the order</param>
+		/// <param name="sellConditions">Any of the sell conditions trigger a sell</param>
+		private int EnterOrder(
+			List<StrategyStatistics> stats,
+			double orderType, 
+			TickerData ticker,
+			int currentBar,
+			double sizeOfOrder,
+			List<BuyCondition> buyConditions,
+			List<SellCondition> sellConditions)
 		{
 			// Check here that the strategy order type matches
 			// with the higher timeframe trend. Continue if it doesn't.
@@ -418,7 +429,8 @@ namespace StockSimulator.Core
 				return 0;
 			}
 
-			MainStrategyOrder order = new MainStrategyOrder(stats, orderType, ticker, "MainStrategy", currentBar);
+			MainStrategyOrder order = new MainStrategyOrder(stats, orderType, ticker, "MainStrategy",
+				currentBar, sizeOfOrder, buyConditions, sellConditions);
 			Simulator.Orders.AddOrder(order, currentBar);
 			_activeOrders.Add(order);
 			return 1;

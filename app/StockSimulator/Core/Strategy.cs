@@ -94,6 +94,7 @@ namespace StockSimulator.Core
 		/// <param name="strategyName">Name of the strategy that placed the order</param>
 		/// <param name="currentBar">Bar the order was placed on</param>
 		/// <param name="orderType">Type of order to place (long or short)</param>
+		/// <param name="sizeOfOrder">Amount of money to place in this order</param>
 		/// <param name="dependentIndicatorNames">List of all the dependent indicator names</param>
 		/// <param name="buyConditions">All the buy conditions that must be met to fill the order</param>
 		/// <param name="sellConditions">Any of the sell conditions trigger a sell</param>
@@ -102,8 +103,9 @@ namespace StockSimulator.Core
 			string strategyName,
 			int currentBar,
 			double orderType,
+			double sizeOfOrder,
 			List<string> dependentIndicatorNames,
-			List<BuyCondition> buyCondtions,
+			List<BuyCondition> buyConditions,
 			List<SellCondition> sellConditions)
 		{
 			Order order = null;
@@ -126,8 +128,9 @@ namespace StockSimulator.Core
 					Data,
 					strategyName,
 					currentBar,
+					sizeOfOrder,
 					dependentIndicatorNames,
-					buyCondtions,
+					buyConditions,
 					sellConditions);
 
 				Simulator.Orders.AddOrder(order, currentBar);

@@ -99,6 +99,7 @@ namespace StockSimulator.Core
 		private int OpenedBar { get; set; }
 
 		private double _orderValue;
+		private double _sizeOfOrder;
 
 		private List<BuyCondition> _buyConditions;
 		private List<SellCondition> _sellConditions;
@@ -109,6 +110,7 @@ namespace StockSimulator.Core
 		/// <param name="type">Type of order we're placing, long or short</param>
 		/// <param name="tickerData">Ticker data</param>
 		/// <param name="currentBar">Current bar of the simulation</param>
+		/// <param name="sizeOfOrder">Amount of money to place in this order</param>
 		/// <param name="fromStrategyName">Name of the strategy this order is for. Can't use the actual strategy reference because it could come from a strategy combo (ie. MacdCrossover-SmaCrossover)</paramparam>
 		/// <param name="dependentIndicatorNames">Names of the dependent indicators so they can be shown on the web with the order</param>
 		/// <param name="buyConditions">All the buy conditions that must be met to fill the order</param>
@@ -118,15 +120,17 @@ namespace StockSimulator.Core
 			TickerData tickerData, 
 			string fromStrategyName, 
 			int currentBar, 
+			double sizeOfOrder,
 			List<string> dependentIndicatorNames,
-			List<BuyCondition> buyCondtions,
+			List<BuyCondition> buyConditions,
 			List<SellCondition> sellConditions)
 		{
 			_orderValue = 0;
+			_sizeOfOrder = sizeOfOrder;
 
 			// Save all the buy/sell conditions and sort them so the less
 			// desirable conditions get executed last.
-			_buyConditions = buyCondtions;
+			_buyConditions = buyConditions;
 			_sellConditions = sellConditions;
 			_buyConditions.Sort((a, b) => a.Priority.CompareTo(b));
 			_sellConditions.Sort((a, b) => a.Priority.CompareTo(b));
@@ -208,7 +212,7 @@ namespace StockSimulator.Core
 			BuyBar = buyBar;
 			BuyDate = Ticker.Dates[buyBar];
 			Status = OrderStatus.Filled;
-			NumberOfShares = BuyPrice > 0.0 ? Convert.ToInt32(Math.Floor(Simulator.Config.SizeOfOrder / BuyPrice)) : 0;
+			NumberOfShares = BuyPrice > 0.0 ? Convert.ToInt32(Math.Floor(_sizeOfOrder / BuyPrice)) : 0;
 			
 			_orderValue = NumberOfShares * BuyPrice;
 

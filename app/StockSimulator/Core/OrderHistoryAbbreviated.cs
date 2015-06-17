@@ -50,26 +50,6 @@ namespace StockSimulator.Core
 			}
 			else
 			{
-				// We only need to add the order to the ticker order if we are filtering bad tickers
-				// which looks at the history of tickers and removes the bad ones.
-				if (Simulator.Config.ShouldFilterBad == true)
-				{
-					int hash = order.Ticker.TickerAndExchange.GetHashCode();
-					if (TickerDictionary.ContainsKey(hash) == false)
-					{
-						TickerDictionary[hash] = new List<Order>();
-					}
-
-					int cutoffBar = currentBar - Simulator.Config.NumBarsBadFilter;
-					if (cutoffBar < 0)
-					{
-						cutoffBar = 0;
-					}
-
-					TickerDictionary[hash].RemoveAll(o => o.BuyBar < cutoffBar);
-					TickerDictionary[hash].Add(order);
-				}
-
 				// If this is the first time we've seen this ticker, need a new strategy dictionary 
 				// for this ticker.
 				int tickerKey = order.Ticker.TickerAndExchange.GetHashCode();
@@ -149,10 +129,7 @@ namespace StockSimulator.Core
 				}
 			}
 
-			// Only count the statistics if we have a bit more data to deal with.
-			// We want to avoid having a strategy say it's 100% correct when it 
-			// only has 1 winning trade.
-			if (stats.NumberOfOrders > Simulator.Config.MinRequiredOrders)
+			if (stats.NumberOfOrders > 0)
 			{
 				stats.CalculateStatistics();
 			}

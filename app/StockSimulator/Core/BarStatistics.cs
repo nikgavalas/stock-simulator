@@ -16,6 +16,7 @@ namespace StockSimulator.Core
 		public double HighestPercent { get; set; }
 		public string HighestStrategyName { get; set; }
 		public double StrategyOrderType { get; set; }
+		public double SizeOfOrder { get; set; }
 		public List<StrategyStatistics> Statistics { get; set; }
 		public List<BuyCondition> BuyConditions { get; set; }
 		public List<SellCondition> SellConditions { get; set; }
@@ -26,18 +27,27 @@ namespace StockSimulator.Core
 			HighestStrategyName = "None";
 			StrategyOrderType = Order.OrderType.Long;
 			Statistics = new List<StrategyStatistics>();
+			SizeOfOrder = 0.0;
 			BuyConditions = new List<BuyCondition>();
 			SellConditions = new List<SellCondition>();
 		}
 
-		public BarStatistics(double percent, string name, double orderType, List<StrategyStatistics> statistics)
+		public BarStatistics(
+			double percent, 
+			string name,
+			double orderType,
+			double sizeOfOrder,
+			List<StrategyStatistics> statistics,
+			List<BuyCondition> buyConditions,
+			List<SellCondition> sellConditions)
 		{
 			HighestPercent = percent;
 			HighestStrategyName = name;
 			StrategyOrderType = orderType;
+			SizeOfOrder = sizeOfOrder;
 			Statistics = statistics;
-			BuyConditions = new List<BuyCondition>();
-			SellConditions = new List<SellCondition>();
+			BuyConditions = buyConditions;
+			SellConditions = sellConditions;
 		}
 	}
 }
