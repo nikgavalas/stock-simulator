@@ -268,8 +268,8 @@ namespace StockSimulator.Core
 					// Bull
 					//
 
-					case "BestOfSubStrategies":
-						requestedItem = new BestOfSubStrategies(_tickerData, this);
+					case "BestOfRootStrategies":
+						requestedItem = new BestOfRootStrategies(_tickerData, this);
 						break;
 
 					case "BullBollingerExtended":

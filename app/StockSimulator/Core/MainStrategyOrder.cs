@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using StockSimulator.Core.BuySellConditions;
 
 namespace StockSimulator.Core
 {
@@ -23,8 +24,17 @@ namespace StockSimulator.Core
 		/// <param name="tickerData">Ticker that this order was placed on</param>
 		/// <param name="fromStrategyName">The name of the strategy that placed this order</param>
 		/// <param name="currentBar">Current bar that the order was placed</param>
-		public MainStrategyOrder(List<StrategyStatistics> stats, Order.OrderType type, TickerData tickerData, string fromStrategyName, int currentBar)
-			: base(type, tickerData, fromStrategyName, currentBar, null)
+		/// <param name="buyConditions">All the buy conditions that must be met to fill the order</param>
+		/// <param name="sellConditions">Any of the sell conditions trigger a sell</param>
+		public MainStrategyOrder(
+			List<StrategyStatistics> stats, 
+			double type, 
+			TickerData tickerData, 
+			string fromStrategyName, 
+			int currentBar,
+			List<BuyCondition> buyCondtions,
+			List<SellCondition> sellConditions)
+			: base(type, tickerData, fromStrategyName, currentBar, null, buyCondtions, sellConditions)
 		{
 			Statistics = stats;
 		}

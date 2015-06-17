@@ -113,7 +113,7 @@ namespace StockSimulator.Core
 		/// <param name="currentBar">Current bar of the simulation</param>
 		/// <param name="maxBarsAgo">Maximum number of bars in the past to consider for calculating</param>
 		/// <returns>Class holding the statistics calculated</returns>
-		public StrategyStatistics GetStrategyStatistics(string strategyName, Order.OrderType orderType, TickerExchangePair tickerAndExchange, int currentBar, int maxBarsAgo)
+		public StrategyStatistics GetStrategyStatistics(string strategyName, double orderType, TickerExchangePair tickerAndExchange, int currentBar, int maxBarsAgo)
 		{
 			// Orders that started less than this bar will not be considered.
 			int cutoffBar = currentBar - maxBarsAgo;

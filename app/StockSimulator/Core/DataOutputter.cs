@@ -48,9 +48,9 @@ namespace StockSimulator.Core
 			public List<DateTime> Dates { get; set; }
 
 			[JsonProperty("states")]
-			public List<Order.OrderType> States { get; set; }
+			public List<double> States { get; set; }
 
-			public JsonOrderState(List<DateTime> _dates, List<Order.OrderType> _states)
+			public JsonOrderState(List<DateTime> _dates, List<double> _states)
 			{
 				Dates = _dates;
 				States = _states;
@@ -115,7 +115,7 @@ namespace StockSimulator.Core
 		/// </summary>
 		/// <param name="buyList">List of stocks that are displaying a reason to buy</param>
 		/// <param name="currentDate">The date to use as the output index</param>
-		public void SaveBuyList(List<BestOfSubStrategies> buyList, DateTime currentDate)
+		public void SaveBuyList(List<BestOfRootStrategies> buyList, DateTime currentDate)
 		{
 			// Convert the buy list into better serializable data.
 			_buyLists[currentDate] = new List<JsonBuyList>();
@@ -159,7 +159,7 @@ namespace StockSimulator.Core
 		/// <param name="higherData">Higher timeframe bar data</param>
 		/// <param name="lowerData">Lower timeframe bar data</param>
 		/// <param name="states">Order type states for each lower timeframe bar up to this date</param>
-		public void OutputHigherTimeframeData(DateTime date, Indicator ind, TickerData higherData, TickerData lowerData, List<Order.OrderType> states)
+		public void OutputHigherTimeframeData(DateTime date, Indicator ind, TickerData higherData, TickerData lowerData, List<double> states)
 		{
 			Directory.CreateDirectory(Simulator.Config.OutputFolder + "\\higher");
 

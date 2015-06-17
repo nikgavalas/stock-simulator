@@ -7,7 +7,7 @@ using System.Diagnostics;
 
 namespace StockSimulator.Core
 {
-	public class Runnable : Configurable
+	public class Runnable
 	{
 		/// <summary>
 		/// List of dependent runnables that need to be run before this one.
@@ -20,14 +20,18 @@ namespace StockSimulator.Core
 		public List<Runnable> Dependents { get; set; }
 		public TickerData Data { get; set; }
 
+		protected RunnableFactory _factory;
+
 		private bool _isFinishedRunning;
 
 		/// <summary>
 		/// Constructor for the runnable.
 		/// </summary>
-		public Runnable(TickerData tickerData, RunnableFactory factory) : base()
+		public Runnable(TickerData tickerData, RunnableFactory factory)
 		{
+			_factory = factory;
 			_isFinishedRunning = false;
+
 			Data = tickerData;
 
 			// Create all the depenent runnables and save them.

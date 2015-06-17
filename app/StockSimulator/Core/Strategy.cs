@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StockSimulator.Core.BuySellConditions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,12 +17,12 @@ namespace StockSimulator.Core
 		/// <summary>
 		/// Expose the order type of this strategy.
 		/// </summary>
-		public Order.OrderType OrderType { get { return _orderType; } }
+		public double OrderType { get { return _orderType; } }
 
 		/// <summary>
 		/// The type of orders this strategy places.
 		/// </summary>
-		protected Order.OrderType _orderType;
+		protected double _orderType;
 
 		/// <summary>
 		/// List of all the orders that are not closed.
@@ -94,8 +95,16 @@ namespace StockSimulator.Core
 		/// <param name="currentBar">Bar the order was placed on</param>
 		/// <param name="orderType">Type of order to place (long or short)</param>
 		/// <param name="dependentIndicatorNames">List of all the dependent indicator names</param>
+		/// <param name="buyConditions">All the buy conditions that must be met to fill the order</param>
+		/// <param name="sellConditions">Any of the sell conditions trigger a sell</param>
 		/// <returns>The order that was placed or null if none was placed</returns>
-		protected Order EnterOrder(string strategyName, int currentBar, Order.OrderType orderType, List<string> dependentIndicatorNames)
+		protected Order EnterOrder(
+			string strategyName,
+			int currentBar,
+			double orderType,
+			List<string> dependentIndicatorNames,
+			List<BuyCondition> buyCondtions,
+			List<SellCondition> sellConditions)
 		{
 			Order order = null;
 
@@ -112,7 +121,15 @@ namespace StockSimulator.Core
 			// Only place the order if it's less than the allowed amount of concurrent orders allowed.
 			if (openOrders < Simulator.Config.MaxConcurrentOrders)
 			{
-				order = new Order(orderType, Data, strategyName, currentBar, dependentIndicatorNames);
+				order = new Order(
+					orderType,
+					Data,
+					strategyName,
+					currentBar,
+					dependentIndicatorNames,
+					buyCondtions,
+					sellConditions);
+
 				Simulator.Orders.AddOrder(order, currentBar);
 				_activeOrders.Add(order);
 			}

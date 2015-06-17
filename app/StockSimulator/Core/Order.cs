@@ -17,10 +17,21 @@ namespace StockSimulator.Core
 		/// <summary>
 		/// Different types of orders that can be placed.
 		/// </summary>
-		public class OrderType
+		public static class OrderType
 		{
-			public readonly double Long = 1.0;
-			public readonly double Short = -1.0;
+			public static readonly double Long = 1.0;
+			public static readonly double Short = -1.0;
+		}
+
+		/// <summary>
+		/// Class that defines the different reasons for selling.
+		/// </summary>
+		public static class SellReasonType
+		{
+			public static readonly string LengthExceeded = "Length Exceeded";
+			public static readonly string ProfitTarget = "Profit Target";
+			public static readonly string StopLoss = "Stop Loss";
+			public static readonly string StrategyFound = "Strategy Found";
 		}
 
 		/// <summary>
@@ -103,7 +114,7 @@ namespace StockSimulator.Core
 		/// <param name="buyConditions">All the buy conditions that must be met to fill the order</param>
 		/// <param name="sellConditions">Any of the sell conditions trigger a sell</param>
 		public Order(
-			OrderType type, 
+			double type, 
 			TickerData tickerData, 
 			string fromStrategyName, 
 			int currentBar, 
@@ -217,6 +228,16 @@ namespace StockSimulator.Core
 			//	StopPrice = absoluteStop;
 			//}
 		}
+
+		/// <summary>
+		/// Returns true if this order has closed.
+		/// </summary>
+		/// <returns>True if this order has closed</returns>
+		public bool IsFinished()
+		{
+			return Status == OrderStatus.Closed;
+		}
+
 		/// <summary>
 		/// Sells the order.
 		/// </summary>

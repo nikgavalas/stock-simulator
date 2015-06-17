@@ -535,7 +535,7 @@ namespace StockSimulator.Core
 		/// </summary>
 		/// <param name="ticker">Ticker data</param>
 		/// <returns>Order type allowed for the last bar of the ticker data</returns>
-		private Order.OrderType GetHigherTimerframeMomentumState(TickerData ticker)
+		private double GetHigherTimerframeMomentumState(TickerData ticker)
 		{
 			// Get all the bars for the higher timeframe.
 			TickerData higherTickerData = GetHigherTimeframeBars(ticker);
@@ -546,7 +546,7 @@ namespace StockSimulator.Core
 			higherTimeframeIndicator.Run();
 
 			// Return what kind orders are allowed.
-			Order.OrderType state = GetHigherTimeframeStateFromIndicator(higherTimeframeIndicator, higherTimeframeIndicator.Data.NumBars - 1);
+			double state = GetHigherTimeframeStateFromIndicator(higherTimeframeIndicator, higherTimeframeIndicator.Data.NumBars - 1);
 
 			////////////////// START HIGHER TIME FRAME DEBUGGING ////////////////////
 			//if (ticker.TickerAndExchange.ToString() == "NFLX-NASDAQ")
@@ -644,7 +644,7 @@ namespace StockSimulator.Core
 		/// <param name="indicator">Momentum indicator to use</param>
 		/// <param name="curBar">Current bar in the momentum simulation</param>
 		/// <returns>The state of the higher momentum indicator</returns>
-		private Order.OrderType GetHigherTimeframeStateFromIndicator(Macd macd, int currentBar)
+		private double GetHigherTimeframeStateFromIndicator(Macd macd, int currentBar)
 		{
 			while (currentBar >= 2)
 			{

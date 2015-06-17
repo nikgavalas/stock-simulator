@@ -170,6 +170,18 @@ namespace StockSimulator.Core
 		[Description("Broker commission per trade. There are two trades per order.")]
 		public double Commission { get; set; }
 
+		///////////////////////////// COMBO STRATEGY //////////////////////////////
+		
+		[Category("Combo Strategy")]
+		[DisplayName("Stop Loss Percent")]
+		[Description("Stop loss percent for the combo strategy")]
+		public double ComboStopPercent { get; set; }
+
+		[Category("Combo Strategy")]
+		[DisplayName("Max Bars Open")]
+		[Description("Max bars open for the combo strategy")]
+		public int ComboMaxBarsOpen { get; set; }
+
 		///////////////////////////// MAIN STRATEGY ///////////////////////////////
 
 		[Category("Main Strategy")]
@@ -284,6 +296,11 @@ namespace StockSimulator.Core
 			SizeOfOrder = 6000;
 			Commission = 4.95;
 
+			// Combo strategy
+			ComboStopPercent = 0.04;
+			ComboMaxBarsOpen = 10;
+
+			// Main strategy
 			UseLimitOrders = false;
 			MaxBarsLimitOrderFill = 1;
 			ComboLeewayBars = 0;

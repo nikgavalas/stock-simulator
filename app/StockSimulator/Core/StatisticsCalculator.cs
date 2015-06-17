@@ -206,17 +206,17 @@ namespace StockSimulator.Core
 					++_numberOfLosses;
 				}
 
-				if (order.Status == Order.OrderStatus.ProfitTarget)
+				if (order.SellReason == Order.SellReasonType.ProfitTarget)
 				{
 					++_numberOfProfitTargets;
 					_totalLengthOfProfitOrders += order.SellBar - order.BuyBar;
 				}
-				else if (order.Status == Order.OrderStatus.StopTarget)
+				else if (order.SellReason == Order.SellReasonType.StopLoss)
 				{
 					++_numberOfStopLosses;
 					_totalLengthOfStopOrders += order.SellBar - order.BuyBar;
 				}
-				else if (order.Status == Order.OrderStatus.LengthExceeded)
+				else if (order.SellReason == Order.SellReasonType.LengthExceeded)
 				{
 					++_numberOfLengthExceeded;
 				}
@@ -362,15 +362,15 @@ namespace StockSimulator.Core
 					LongLossAvgPercent += UtilityMethods.PercentChange(order.BuyPrice, order.SellPrice);
 				}
 
-				if (order.Status == Order.OrderStatus.ProfitTarget)
+				if (order.SellReason == Order.SellReasonType.ProfitTarget)
 				{
 					++_longNumberOfProfitTargets;
 				}
-				else if (order.Status == Order.OrderStatus.StopTarget)
+				else if (order.SellReason == Order.SellReasonType.StopLoss)
 				{
 					++_longNumberOfStopLosses;
 				}
-				else if (order.Status == Order.OrderStatus.LengthExceeded)
+				else if (order.SellReason == Order.SellReasonType.LengthExceeded)
 				{
 					++_longNumberOfLengthExceeded;
 				}
@@ -400,15 +400,15 @@ namespace StockSimulator.Core
 					ShortLossAvgPercent += UtilityMethods.PercentChange(order.BuyPrice, order.SellPrice);
 				}
 
-				if (order.Status == Order.OrderStatus.ProfitTarget)
+				if (order.SellReason == Order.SellReasonType.ProfitTarget)
 				{
 					++_shortNumberOfProfitTargets;
 				}
-				else if (order.Status == Order.OrderStatus.StopTarget)
+				else if (order.SellReason == Order.SellReasonType.StopLoss)
 				{
 					++_shortNumberOfStopLosses;
 				}
-				else if (order.Status == Order.OrderStatus.LengthExceeded)
+				else if (order.SellReason == Order.SellReasonType.LengthExceeded)
 				{
 					++_shortNumberOfLengthExceeded;
 				}

@@ -24,7 +24,7 @@ namespace StockSimulator.Core
 		public List<double> Typical { get; set; }
 		public List<double> Median { get; set; }
 		public List<long> Volume { get; set; }
-		public List<Order.OrderType> HigherTimeframeMomentum { get; set; }
+		public List<double> HigherTimeframeMomentum { get; set; }
 		public int NumBars { get; set; }
 		public TickerExchangePair TickerAndExchange { get; set; }
 		public double TickSize { get { return 0.01; } }
@@ -65,7 +65,7 @@ namespace StockSimulator.Core
 			// Extras.
 			Typical = new List<double>();
 			Median = new List<double>();
-			HigherTimeframeMomentum = new List<Order.OrderType>();
+			HigherTimeframeMomentum = new List<double>();
 		}
 
 		/// <summary>

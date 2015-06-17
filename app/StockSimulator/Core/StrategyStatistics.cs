@@ -17,14 +17,14 @@ namespace StockSimulator.Core
 		public string StrategyName { get; set; }
 
 		[JsonProperty("orderType")]
-		public Order.OrderType StrategyOrderType { get; set; }
+		public double StrategyOrderType { get; set; }
 
 		/// <summary>
 		/// Constructor that doesn't calculate the stats to be used with add order.
 		/// </summary>
 		/// <param name="strategyName">Name of the strategy</param>
 		/// <param name="orderType">Type of the order this strategy is for</param>
-		public StrategyStatistics(string strategyName, Order.OrderType orderType)
+		public StrategyStatistics(string strategyName, double orderType)
 			: base()
 		{
 			StrategyName = strategyName;

@@ -22,7 +22,7 @@ namespace StockSimulator.Core
 		/// The list of all the instruments to be simulated to find the best
 		/// stocks to buy on a particular day.
 		/// </summary>
-		public SortedDictionary<string, BestOfSubStrategies> Instruments { get; set; }
+		public SortedDictionary<string, BestOfRootStrategies> Instruments { get; set; }
 
 		/// <summary>
 		/// Holds all the orders for every strategy and ticker used.
@@ -120,7 +120,7 @@ namespace StockSimulator.Core
 			//}
 
 			// Add all the symbols as dependent strategies using the bestofsubstrategies
-			ConcurrentDictionary<string, BestOfSubStrategies> downloadedInstruments = new ConcurrentDictionary<string, BestOfSubStrategies>();
+			ConcurrentDictionary<string, BestOfRootStrategies> downloadedInstruments = new ConcurrentDictionary<string, BestOfRootStrategies>();
 #if DEBUG			
 			foreach (KeyValuePair<string, TickerExchangePair> item in fileInstruments)
 #else
@@ -135,7 +135,7 @@ namespace StockSimulator.Core
 					RunnableFactory factory = new RunnableFactory(tickerData);
 
 					// This strategy will find the best strategy for this instrument everyday and save the value.
-					downloadedInstruments[item.Value.ToString()] = new BestOfSubStrategies(tickerData, factory);
+					downloadedInstruments[item.Value.ToString()] = new BestOfRootStrategies(tickerData, factory);
 				}
 				else
 				{
@@ -149,7 +149,7 @@ namespace StockSimulator.Core
 
 			// Want to store the instrument data in a sorted way so that we always run things
 			// in the same order.
-			Instruments = new SortedDictionary<string, BestOfSubStrategies>(downloadedInstruments.ToDictionary(kvp => kvp.Key, kvp => kvp.Value));
+			Instruments = new SortedDictionary<string, BestOfRootStrategies>(downloadedInstruments.ToDictionary(kvp => kvp.Key, kvp => kvp.Value));
 
 			NumberOfBars = DataStore.SimTickerDates.Count;
 			Broker = new Broker(Config.InitialAccountBalance, NumberOfBars);
@@ -174,7 +174,7 @@ namespace StockSimulator.Core
 				Orders = new OrderHistory();
 			}
 
-			foreach (KeyValuePair<string, BestOfSubStrategies> task in Instruments)
+			foreach (KeyValuePair<string, BestOfRootStrategies> task in Instruments)
 			{
 				task.Value.Initialize();
 			}
@@ -192,7 +192,7 @@ namespace StockSimulator.Core
 
 			// Run all to start with so we have the data to simulate with.
 #if DEBUG
-			foreach (KeyValuePair<string, BestOfSubStrategies> task in Instruments)
+			foreach (KeyValuePair<string, BestOfRootStrategies> task in Instruments)
 #else
 			Parallel.ForEach(Instruments, task =>
 #endif
@@ -261,12 +261,12 @@ namespace StockSimulator.Core
 		private void OnBarUpdate(DateTime currentDate, int barNumber)
 		{
 			bool isTradingBar = false;
-			List<BestOfSubStrategies> buyList = new List<BestOfSubStrategies>();
+			List<BestOfRootStrategies> buyList = new List<BestOfRootStrategies>();
 
 			// Add all the tickers that are above our set percent to buy.
-			foreach (KeyValuePair<string, BestOfSubStrategies> instrument in Instruments)
+			foreach (KeyValuePair<string, BestOfRootStrategies> instrument in Instruments)
 			{
-				BestOfSubStrategies strat = instrument.Value;
+				BestOfRootStrategies strat = instrument.Value;
 				int currentBar = strat.Data.GetBar(currentDate);
 				if (currentBar != -1)
 				{
@@ -317,8 +317,8 @@ namespace StockSimulator.Core
 						// If not then since the list is sorted, no other ones will
 						// be high enough and we can early out of the loop.
 						int strategyBarIndex = buyList[i].Data.GetBar(currentDate);
-						BestOfSubStrategies.BarStatistics barStats = buyList[i].Bars[strategyBarIndex];
-						if (barStats.HighestPercent >= Config.PercentForBuy && barStats.ComboSizeOfHighestStrategy >= Simulator.Config.MinComboSizeToBuy)
+						BarStatistics barStats = buyList[i].Bars[strategyBarIndex];
+						if (barStats.HighestPercent >= Config.PercentForBuy) // TODO: move to combo strategy && barStats.ComboSizeOfHighestStrategy >= Simulator.Config.MinComboSizeToBuy)
 						{
 							// Don't want to order to late in the strategy where the order can't run it's course.
 							int lastBarToPlaceOrders = NumberOfBars - (Config.MaxBarsOrderOpenMain + 1);
@@ -327,23 +327,10 @@ namespace StockSimulator.Core
 							// before the end of the sim to complete the order we place.
 							if (barNumber < lastBarToPlaceOrders && Broker.AccountCash > Config.SizeOfOrder * 1.1)
 							{
-								bool shouldReallyOrder = true;
-
-								// As a last optional check, see how this ticker has been performing
-								// across all strategies. If it's been doing bad then lets not buy it.
-								if (Config.ShouldFilterBad)
-								{
-									StrategyStatistics tickerStats = Orders.GetTickerStatistics(buyList[i].Data.TickerAndExchange, barNumber, Simulator.Config.NumBarsBadFilter);
-									if (tickerStats.Gain < 0 || tickerStats.WinPercent < Config.BadFilterProfitTarget * 100)
-									{
-										shouldReallyOrder = false;
-									}
-								}
-
-								if (shouldReallyOrder == true)
-								{
-									currentCount += EnterOrder(buyList[i].Bars[strategyBarIndex].Statistics, barStats.StrategyOrderType, buyList[i].Data, strategyBarIndex);
-								}
+								currentCount += EnterOrder(barStats.Statistics,
+									barStats.StrategyOrderType, 
+									buyList[i].Data, 
+									strategyBarIndex);
 							}
 						}
 						else
@@ -422,7 +409,7 @@ namespace StockSimulator.Core
 		/// <param name="orderType">Type of order to place for the found strategy (long or short)</param>
 		/// <param name="ticker">Ticker we're placing the order on</param>
 		/// <param name="currentBar">Current bar of the simulation</param>
-		private int EnterOrder(List<StrategyStatistics> stats, Order.OrderType orderType, TickerData ticker, int currentBar)
+		private int EnterOrder(List<StrategyStatistics> stats, double orderType, TickerData ticker, int currentBar)
 		{
 			// Check here that the strategy order type matches
 			// with the higher timeframe trend. Continue if it doesn't.
