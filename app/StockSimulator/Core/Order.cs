@@ -132,8 +132,8 @@ namespace StockSimulator.Core
 			// desirable conditions get executed last.
 			_buyConditions = buyConditions;
 			_sellConditions = sellConditions;
-			_buyConditions.Sort((a, b) => a.Priority.CompareTo(b));
-			_sellConditions.Sort((a, b) => a.Priority.CompareTo(b));
+			_buyConditions.Sort((a, b) => a.Priority.CompareTo(b.Priority));
+			_sellConditions.Sort((a, b) => a.Priority.CompareTo(b.Priority));
 
 			SellReason = "Still open";
 			StrategyName = fromStrategyName;

@@ -4,18 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
-
 using StockSimulator.Core;
 using StockSimulator.Indicators;
 
 namespace StockSimulator.Strategies
 {
-	class DojiFound : Strategy
+	class BearKeltnerExtendedPredicted : Strategy
 	{
-		public DojiFound(TickerData tickerData, RunnableFactory factory)
+		public BearKeltnerExtendedPredicted(TickerData tickerData, RunnableFactory factory)
 			: base(tickerData, factory)
 		{
-
+			_orderType = Order.OrderType.Short;
 		}
 
 		/// <summary>
@@ -26,7 +25,7 @@ namespace StockSimulator.Strategies
 			get
 			{
 				string[] deps = {
-					"Doji"
+					"KeltnerChannel"
 				};
 
 				return deps;
@@ -39,7 +38,7 @@ namespace StockSimulator.Strategies
 		/// <returns>The name of this strategy</returns>
 		public override string ToString()
 		{
-			return "DojiFound";
+			return "BearKeltnerExtendedPredicted";
 		}
 
 		/// <summary>
@@ -50,8 +49,11 @@ namespace StockSimulator.Strategies
 		{
 			base.OnBarUpdate(currentBar);
 
-			Doji cs = (Doji)Dependents[0];
-			WasFound[currentBar] = cs.Found[currentBar];
+			KeltnerChannel ind = (KeltnerChannel)Dependents[0];
+			if (DataSeries.IsAboutToCrossBelow(Data.Close, ind.Lower, currentBar) == true)
+			{
+				WasFound[currentBar] = true;
+			}
 		}
 	}
 }

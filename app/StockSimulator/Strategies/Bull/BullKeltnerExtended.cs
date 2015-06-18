@@ -9,9 +9,9 @@ using StockSimulator.Indicators;
 
 namespace StockSimulator.Strategies
 {
-	class BullKeltnerCloseAbovePredicted : Strategy
+	class BullKeltnerExtended : Strategy
 	{
-		public BullKeltnerCloseAbovePredicted(TickerData tickerData, RunnableFactory factory)
+		public BullKeltnerExtended(TickerData tickerData, RunnableFactory factory)
 			: base(tickerData, factory)
 		{
 
@@ -38,7 +38,7 @@ namespace StockSimulator.Strategies
 		/// <returns>The name of this strategy</returns>
 		public override string ToString()
 		{
-			return "BullKeltnerCloseAbovePredicted";
+			return "BullKeltnerExtended";
 		}
 
 		/// <summary>
@@ -50,7 +50,7 @@ namespace StockSimulator.Strategies
 			base.OnBarUpdate(currentBar);
 
 			KeltnerChannel ind = (KeltnerChannel)Dependents[0];
-			if (DataSeries.IsAboutToCrossAbove(Data.Close, ind.Upper, currentBar) == true)
+			if (DataSeries.CrossAbove(Data.Close, ind.Upper, currentBar, 0) != -1)
 			{
 				WasFound[currentBar] = true;
 			}

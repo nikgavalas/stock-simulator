@@ -264,13 +264,17 @@ namespace StockSimulator.Core
 
 					///////////////////////////// Strategies ////////////////////////////
 
-					//
-					// Bull
-					//
-
 					case "BestOfRootStrategies":
 						requestedItem = new BestOfRootStrategies(_tickerData, this);
 						break;
+
+					case "BestComboStrategy":
+						requestedItem = new BestComboStrategy(_tickerData, this);
+						break;
+
+					//
+					// Bull
+					//
 
 					case "BullBollingerExtended":
 						requestedItem = new BullBollingerExtended(_tickerData, this);
@@ -300,16 +304,16 @@ namespace StockSimulator.Core
 						requestedItem = new BullEaseOfMovement(_tickerData, this);
 						break;
 
-					case "DojiFound":
-						requestedItem = new DojiFound(_tickerData, this);
+					case "BullDojiFound":
+						requestedItem = new BullDojiFound(_tickerData, this);
 						break;
 
 					case "HammerFound":
 						requestedItem = new HammerFound(_tickerData, this);
 						break;
 
-					case "BullKeltnerCloseAbove":
-						requestedItem = new BullKeltnerCloseAbove(_tickerData, this);
+					case "BullKeltnerExtended":
+						requestedItem = new BullKeltnerExtended(_tickerData, this);
 						break;
 
 					case "BullMacdCrossover":
@@ -336,8 +340,8 @@ namespace StockSimulator.Core
 						requestedItem = new RisingThreeMethodsFound(_tickerData, this);
 						break;
 
-					case "BullRsiCrossover30":
-						requestedItem = new BullRsiCrossover30(_tickerData, this);
+					case "BullRsiCrossover":
+						requestedItem = new BullRsiCrossover(_tickerData, this);
 						break;
 
 					case "BullSmaCrossover":
@@ -406,8 +410,8 @@ namespace StockSimulator.Core
 						requestedItem = new BullEaseOfMovementPredicted(_tickerData, this);
 						break;
 
-					case "BullKeltnerCloseAbovePredicted":
-						requestedItem = new BullKeltnerCloseAbovePredicted(_tickerData, this);
+					case "BullKeltnerExtendedPredicted":
+						requestedItem = new BullKeltnerExtendedPredicted(_tickerData, this);
 						break;
 
 					case "BullMacdCrossoverPredicted":
@@ -422,8 +426,8 @@ namespace StockSimulator.Core
 						requestedItem = new BullPriceOscillatorPredicted(_tickerData, this);
 						break;
 
-					case "BullRsiCrossover30Predicted":
-						requestedItem = new BullRsiCrossover30Predicted(_tickerData, this);
+					case "BullRsiCrossoverPredicted":
+						requestedItem = new BullRsiCrossoverPredicted(_tickerData, this);
 						break;
 
 					case "BullSmaCrossoverPredicted":
@@ -475,8 +479,8 @@ namespace StockSimulator.Core
 						requestedItem = new BearDojiFound(_tickerData, this);
 						break;
 
-					case "BearKeltnerCloseBelow":
-						requestedItem = new BearKeltnerCloseBelow(_tickerData, this);
+					case "BearKeltnerExtended":
+						requestedItem = new BearKeltnerExtended(_tickerData, this);
 						break;
 
 					case "BearMacdMomentum":
@@ -491,8 +495,8 @@ namespace StockSimulator.Core
 						requestedItem = new BearMomentumCrossover(_tickerData, this);
 						break;
 
-					case "BearRsiCrossover70":
-						requestedItem = new BearRsiCrossover70(_tickerData, this);
+					case "BearRsiCrossover":
+						requestedItem = new BearRsiCrossover(_tickerData, this);
 						break;
 
 					case "BearSmaCrossover":
@@ -601,8 +605,8 @@ namespace StockSimulator.Core
 						requestedItem = new BearEaseOfMovementPredicted(_tickerData, this);
 						break;
 
-					case "BearKeltnerCloseBelowPredicted":
-						requestedItem = new BearKeltnerCloseBelowPredicted(_tickerData, this);
+					case "BearKeltnerExtendedPredicted":
+						requestedItem = new BearKeltnerExtendedPredicted(_tickerData, this);
 						break;
 
 					case "BearMacdCrossoverPredicted":
@@ -617,8 +621,8 @@ namespace StockSimulator.Core
 						requestedItem = new BearPriceOscillatorPredicted(_tickerData, this);
 						break;
 
-					case "BearRsiCrossover70Predicted":
-						requestedItem = new BearRsiCrossover70Predicted(_tickerData, this);
+					case "BearRsiCrossoverPredicted":
+						requestedItem = new BearRsiCrossoverPredicted(_tickerData, this);
 						break;
 
 					case "BearSmaCrossoverPredicted":
@@ -650,7 +654,7 @@ namespace StockSimulator.Core
 						break;
 
 					default:
-						throw new Exception("Trying to create a runnable that doesn't exist");
+						throw new Exception(runnableName + " doesn't exist");
 				}
 
 				_createdItems[key] = requestedItem;

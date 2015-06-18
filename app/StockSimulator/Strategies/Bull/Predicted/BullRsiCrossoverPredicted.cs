@@ -9,9 +9,9 @@ using StockSimulator.Indicators;
 
 namespace StockSimulator.Strategies
 {
-	class BullRsiCrossover30Predicted : Strategy
+	class BullRsiCrossoverPredicted : Strategy
 	{
-		public BullRsiCrossover30Predicted(TickerData tickerData, RunnableFactory factory) 
+		public BullRsiCrossoverPredicted(TickerData tickerData, RunnableFactory factory) 
 			: base(tickerData, factory)
 		{
 
@@ -38,7 +38,7 @@ namespace StockSimulator.Strategies
 		/// <returns>The name of this strategy</returns>
 		public override string ToString()
 		{
-			return "BullRsiCrossover30Predicted";
+			return "BullRsiCrossoverPredicted";
 		}
 
 		/// <summary>

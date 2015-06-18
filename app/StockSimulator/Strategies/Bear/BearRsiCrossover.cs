@@ -9,12 +9,12 @@ using StockSimulator.Indicators;
 
 namespace StockSimulator.Strategies
 {
-	class BullRsiCrossover30 : Strategy
+	class BearRsiCrossover : Strategy
 	{
-		public BullRsiCrossover30(TickerData tickerData, RunnableFactory factory) 
+		public BearRsiCrossover(TickerData tickerData, RunnableFactory factory) 
 			: base(tickerData, factory)
 		{
-
+			_orderType = Order.OrderType.Short;
 		}
 
 		/// <summary>
@@ -38,7 +38,7 @@ namespace StockSimulator.Strategies
 		/// <returns>The name of this strategy</returns>
 		public override string ToString()
 		{
-			return "BullRsiCrossover30";
+			return "BearRsiCrossover";
 		}
 
 		/// <summary>
@@ -50,7 +50,7 @@ namespace StockSimulator.Strategies
 			base.OnBarUpdate(currentBar);
 
 			Rsi rsi = (Rsi)Dependents[0];
-			if (DataSeries.CrossAbove(rsi.Value, 30, currentBar, 0) != -1)
+			if (DataSeries.CrossBelow(rsi.Value, 70, currentBar, 0) != -1)
 			{
 				WasFound[currentBar] = true;
 			}

@@ -9,9 +9,9 @@ using StockSimulator.Indicators;
 
 namespace StockSimulator.Strategies
 {
-	class BearRsiCrossover70 : Strategy
+	class BearKeltnerExtended : Strategy
 	{
-		public BearRsiCrossover70(TickerData tickerData, RunnableFactory factory) 
+		public BearKeltnerExtended(TickerData tickerData, RunnableFactory factory)
 			: base(tickerData, factory)
 		{
 			_orderType = Order.OrderType.Short;
@@ -25,7 +25,7 @@ namespace StockSimulator.Strategies
 			get
 			{
 				string[] deps = {
-					"Rsi14"
+					"KeltnerChannel"
 				};
 
 				return deps;
@@ -38,7 +38,7 @@ namespace StockSimulator.Strategies
 		/// <returns>The name of this strategy</returns>
 		public override string ToString()
 		{
-			return "BearRsiCrossover70";
+			return "BearKeltnerExtended";
 		}
 
 		/// <summary>
@@ -49,8 +49,8 @@ namespace StockSimulator.Strategies
 		{
 			base.OnBarUpdate(currentBar);
 
-			Rsi rsi = (Rsi)Dependents[0];
-			if (DataSeries.CrossBelow(rsi.Value, 70, currentBar, 0) != -1)
+			KeltnerChannel ind = (KeltnerChannel)Dependents[0];
+			if (DataSeries.CrossBelow(Data.Close, ind.Lower, currentBar, 0) != -1)
 			{
 				WasFound[currentBar] = true;
 			}

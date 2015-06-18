@@ -4,17 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
+
 using StockSimulator.Core;
 using StockSimulator.Indicators;
 
 namespace StockSimulator.Strategies
 {
-	class BearRsiCrossover70Predicted : Strategy
+	class BullDojiFound : Strategy
 	{
-		public BearRsiCrossover70Predicted(TickerData tickerData, RunnableFactory factory) 
+		public BullDojiFound(TickerData tickerData, RunnableFactory factory)
 			: base(tickerData, factory)
 		{
-			_orderType = Order.OrderType.Short;
+
 		}
 
 		/// <summary>
@@ -25,7 +26,7 @@ namespace StockSimulator.Strategies
 			get
 			{
 				string[] deps = {
-					"Rsi14"
+					"Doji"
 				};
 
 				return deps;
@@ -38,7 +39,7 @@ namespace StockSimulator.Strategies
 		/// <returns>The name of this strategy</returns>
 		public override string ToString()
 		{
-			return "BearRsiCrossover70Predicted";
+			return "BullDojiFound";
 		}
 
 		/// <summary>
@@ -49,11 +50,8 @@ namespace StockSimulator.Strategies
 		{
 			base.OnBarUpdate(currentBar);
 
-			Rsi rsi = (Rsi)Dependents[0];
-			if (DataSeries.IsAboutToCrossBelow(rsi.Value, 70, currentBar) == true)
-			{
-				WasFound[currentBar] = true;
-			}
+			Doji cs = (Doji)Dependents[0];
+			WasFound[currentBar] = cs.Found[currentBar];
 		}
 	}
 }
