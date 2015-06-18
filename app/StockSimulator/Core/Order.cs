@@ -32,6 +32,7 @@ namespace StockSimulator.Core
 			public static readonly string ProfitTarget = "Profit Target";
 			public static readonly string StopLoss = "Stop Loss";
 			public static readonly string StrategyFound = "Strategy Found";
+			public static readonly string ForceClose = "Force Closed";
 		}
 
 		/// <summary>
@@ -191,12 +192,20 @@ namespace StockSimulator.Core
 			{
 				_orderValue = NumberOfShares * Ticker.Close[currentBar];
 
+				bool didSell = false;
 				for (int i = 0; i < _sellConditions.Count; i++)
 				{
 					if (_sellConditions[i].OnUpdate(currentBar))
 					{
+						didSell = true;
 						break;
 					}
+				}
+
+				// Close this order if it would remain open past the simulation date.
+				if (didSell == false && currentBar == Ticker.NumBars - 1)
+				{
+					ForceClose();
 				}
 			}
 		}
@@ -263,6 +272,15 @@ namespace StockSimulator.Core
 			SellReason = sellReason;
 
 			_orderValue = NumberOfShares * SellPrice;
+		}
+
+		/// <summary>
+		/// Closes the open order with data from the last bar.
+		/// </summary>
+		private void ForceClose()
+		{
+			int lastBar = Ticker.NumBars - 1;
+			Sell(Ticker.Close[lastBar], lastBar, SellReasonType.ForceClose);
 		}
 
 		/// <summary>
