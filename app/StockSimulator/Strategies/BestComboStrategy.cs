@@ -276,10 +276,15 @@ namespace StockSimulator.Strategies
 				Strategy s = strategies[i];
 				string strategyTypeName = s.OrderType == Order.OrderType.Long ? "Bull" : "Bear";
 				string oppositeTypeStrategyName = s.OrderType == Order.OrderType.Long ? "Bear" : "Bull";
+				string currentStrategyName = s.ToString();
 
-				string oppositeStrategyName = s.ToString().Replace(strategyTypeName, oppositeTypeStrategyName);
-				Strategy oppositeStrategy = (Strategy)_factory.GetRunnable(oppositeStrategyName);
-				conditions.Add(new StrategyFoundSellCondition(s));
+				// Some strategies don't have opposites. So we'll just not add it as a sell condition.
+				if (currentStrategyName.StartsWith(strategyTypeName))
+				{
+					string oppositeStrategyName = s.ToString().Replace(strategyTypeName, oppositeTypeStrategyName);
+					Strategy oppositeStrategy = (Strategy)_factory.GetRunnable(oppositeStrategyName);
+					conditions.Add(new StrategyFoundSellCondition(s));
+				}
 			}
 
 			return conditions;
