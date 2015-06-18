@@ -242,7 +242,7 @@ namespace StockSimulator.Core
 
 			// All orders
 			MaxLookBackBars = 500;
-			MinRequiredOrders = 20;
+			MinRequiredOrders = 5;
 			MaxLookBackOrders = 10;
 			MaxConcurrentOrders = 1;
 			Commission = 4.95;
@@ -255,7 +255,7 @@ namespace StockSimulator.Core
 			// Combo strategy
 			ComboPercentForBuy = 65;
 			ComboMinComboSize = 1;
-			ComboMaxComboSize = 4;
+			ComboMaxComboSize = 1;
 			ComboLeewayBars = 0;
 			ComboStopPercent = 0.04;
 			ComboMaxBarsOpen = 10;

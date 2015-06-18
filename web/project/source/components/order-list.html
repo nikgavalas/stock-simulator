@@ -17,8 +17,8 @@
 		<tbody>
 			<tr ng-repeat="order in getPageOrders()" ng-click="orderClick(order, $event)" class="hover-pointer" ng-class="{'info': activeOrder === order}">
 				<td>
-					<span ng-class="{'text-success': order.orderType === 0, 'text-danger': order.orderType !== 0}">
-						<strong>{{order.orderType === 0 ? 'L' : 'S'}}</strong>
+					<span ng-class="{'text-success': order.orderType > 0, 'text-danger': order.orderType < 0}">
+						<strong>{{order.orderType > 0 ? 'L' : 'S'}}</strong>
 					</span>
 				</td>
 				<td>{{order.ticker}}</td>

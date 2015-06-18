@@ -158,7 +158,7 @@ namespace StockSimulator.Strategies
 		{
 			base.OnBarUpdate(currentBar);
 
-			double highestWinPercent = 0;
+			double highestWinPercent = 0.0;
 			string highestName = "None";
 			double highestOrderType = Order.OrderType.Long;
 			StrategyStatistics highestStats = null;
@@ -216,20 +216,21 @@ namespace StockSimulator.Strategies
 				if (placedOrder != null)
 				{
 					// Get things like win/loss percent up to the point this order was started.
-					stats.Add(Simulator.Orders.GetStrategyStatistics(placedOrder.StrategyName,
+					StrategyStatistics orderStats = Simulator.Orders.GetStrategyStatistics(placedOrder.StrategyName,
 						placedOrder.Type,
 						placedOrder.Ticker.TickerAndExchange,
 						currentBar,
-						Simulator.Config.MaxLookBackBars));
+						Simulator.Config.MaxLookBackBars);
+					stats.Add(orderStats);
 
 					// For each combo we want to find out the winning % and the gain
 					// for it and save those values for the bar.
-					if (stats[i].WinPercent > highestWinPercent)
+					if (orderStats.WinPercent > highestWinPercent)
 					{
-						highestWinPercent = stats[i].WinPercent;
-						highestName = stats[i].StrategyName;
-						highestOrderType = stats[i].StrategyOrderType;
-						highestStats = stats[i];
+						highestWinPercent = orderStats.WinPercent;
+						highestName = orderStats.StrategyName;
+						highestOrderType = orderStats.StrategyOrderType;
+						highestStats = orderStats;
 						highestBuyConditions = buyConditions;
 						highestSellConditions = sellConditions;
 					}

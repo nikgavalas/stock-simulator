@@ -55,7 +55,7 @@ mainApp.directive('orderList', [
 				 */
 				$scope.getPercentGain = function(order) {
 					var percent = (((order.sellPrice - order.buyPrice) / order.buyPrice) * 100).toFixed(2);
-					return order.orderType === 0 ? percent : -percent;
+					return order.orderType > 0 ? percent : -percent;
 				};
 			}
 		};
