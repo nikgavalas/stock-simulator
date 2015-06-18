@@ -283,7 +283,7 @@ namespace StockSimulator.Strategies
 				{
 					string oppositeStrategyName = s.ToString().Replace(strategyTypeName, oppositeTypeStrategyName);
 					Strategy oppositeStrategy = (Strategy)_factory.GetRunnable(oppositeStrategyName);
-					conditions.Add(new StrategyFoundSellCondition(s));
+					conditions.Add(new StrategyFoundSellCondition(oppositeStrategy));
 				}
 			}
 
