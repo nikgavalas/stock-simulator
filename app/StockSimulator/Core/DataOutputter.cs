@@ -315,7 +315,7 @@ namespace StockSimulator.Core
 				string filename;
 
 				ConcurrentBag<Order> orders = strategy.Value;
-				if (orders.Count > 0)
+				if (orders.Count > Simulator.Config.MinRequiredOrders)
 				{
 					// Get the strategy name but skip the main strategy as it gets process differently.
 					string strategyName = orders.First().StrategyName;

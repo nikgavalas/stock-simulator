@@ -129,7 +129,7 @@ namespace StockSimulator.Core
 				}
 			}
 
-			if (stats.NumberOfOrders > 0)
+			if (stats.NumberOfOrders > Simulator.Config.MinRequiredOrders)
 			{
 				stats.CalculateStatistics();
 			}

@@ -30,9 +30,7 @@
 				<td>
 					<span ng-class="{'text-danger': order.gain < 0, 'text-success': order.gain >= 0}"><span class="glyphicon" ng-class="{'glyphicon-circle-arrow-up': order.gain >= 0, 'glyphicon-circle-arrow-down': order.gain < 0}"></span>&nbsp;${{abs(order.gain)}} ({{getPercentGain(order)}}%)</span>
 				</td>
-				<td>
-					<span ng-class="{'text-info': order.orderStatus === 4, 'text-danger': order.orderStatus === 3, 'text-success': order.orderStatus === 2}">{{statusName(order.orderStatus)}}</span>
-				</td>
+				<td>{{order.sellReason}}</td>
 			</tr>
 		</tbody>
 	</table>

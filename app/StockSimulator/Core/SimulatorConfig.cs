@@ -122,12 +122,18 @@ namespace StockSimulator.Core
 
 		[Category("All Orders")]
 		[PropertyOrder(2)]
+		[DisplayName("Min Required Orders")]
+		[Description("Number of orders needed before we can use buy signals for a strategy")]
+		public int MinRequiredOrders { get; set; }
+
+		[Category("All Orders")]
+		[PropertyOrder(3)]
 		[DisplayName("Max Lookback Orders")]
 		[Description("Maximum number of orders to look back when calculating the statistics for the strategy")]
 		public int MaxLookBackOrders { get; set; }
 
 		[Category("All Orders")]
-		[PropertyOrder(3)]
+		[PropertyOrder(4)]
 		[DisplayName("Max Lookback")]
 		[Description("Maximum number of bars to look back when calculating the statistics for the strategy")]
 		public int MaxLookBackBars { get; set; }
@@ -157,12 +163,6 @@ namespace StockSimulator.Core
 		[DisplayName("Combo Leeway")]
 		[Description("Number of bars back in time allowed to find a combo from the current bar")]
 		public int ComboLeewayBars { get; set; }
-
-		[Category("Combo Strategy")]
-		[PropertyOrder(4)]
-		[DisplayName("Min Required Orders")]
-		[Description("Number of orders needed before we can use buy signals for a strategy")]
-		public int ComboMinRequiredOrders { get; set; }
 
 		[Category("Combo Strategy")]
 		[PropertyOrder(5)]
@@ -242,6 +242,7 @@ namespace StockSimulator.Core
 
 			// All orders
 			MaxLookBackBars = 500;
+			MinRequiredOrders = 20;
 			MaxLookBackOrders = 10;
 			MaxConcurrentOrders = 1;
 			Commission = 4.95;
@@ -256,13 +257,11 @@ namespace StockSimulator.Core
 			ComboMinComboSize = 1;
 			ComboMaxComboSize = 4;
 			ComboLeewayBars = 0;
-			ComboMinRequiredOrders = 3;
 			ComboStopPercent = 0.04;
 			ComboMaxBarsOpen = 10;
 			ComboSizeOfOrder = 10000;
 
 			// Main strategy
-			ComboLeewayBars = 0;
 			MaxOrdersPerBar = 4;
 			MaxOpenOrders = 1000;
 			InitialAccountBalance = 99999999;
