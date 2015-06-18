@@ -46,7 +46,7 @@ namespace StockSimulator.Core.BuySellConditions
 
 				// Sell at the open price for the next day since we would only find out 
 				// about this event after the market is closed.
-				if (currentBar < data.NumBars)
+				if (currentBar < data.NumBars - 1)
 				{
 					_order.Sell(data.Open[currentBar + 1], currentBar + 1, sellReason);
 				}

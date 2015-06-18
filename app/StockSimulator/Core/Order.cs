@@ -209,6 +209,7 @@ namespace StockSimulator.Core
 		/// </summary>
 		public void Buy(double buyPrice, int buyBar, string buyReason)
 		{
+			BuyPrice = buyPrice;
 			BuyBar = buyBar;
 			BuyDate = Ticker.Dates[buyBar];
 			Status = OrderStatus.Filled;

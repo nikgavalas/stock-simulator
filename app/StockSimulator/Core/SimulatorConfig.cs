@@ -272,7 +272,7 @@ namespace StockSimulator.Core
 			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\test.csv";
 			
 			// Output
-			UseAbbreviatedOutput = true;
+			UseAbbreviatedOutput = false;
 			OnlyOutputLastBuyList = false;
 			ShouldOpenWebPage = true;
 			OutputFolder = @"C:\Users\Nik\Documents\Code\github\stock-simulator\output\output";
