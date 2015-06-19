@@ -32,7 +32,8 @@ namespace StockSimulator.Strategies
 			get
 			{
 				string[] deps = {
-					"BestComboStrategy"
+					//"BestComboStrategy",
+					"BressertApproach"
 				};
 
 				return deps;

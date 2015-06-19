@@ -92,7 +92,7 @@ namespace StockSimulator.Core
 		}
 
 		/// <summary>
-		/// Returns the minimum value of a series from the current back back to the period value.
+		/// Returns the minimum value of a series from the current bar back to the period value.
 		/// </summary>
 		/// <param name="currentBar">Curent bar of the simulation</param>
 		/// <param name="series">The series to get the min from</param>
@@ -106,11 +106,11 @@ namespace StockSimulator.Core
 			}
 
 			int startIndex = currentBar - Math.Min(currentBar, period - 1);
-			return series.GetRange(startIndex, Math.Min(currentBar, period)).Min();
+			return series.GetRange(startIndex, Math.Min(currentBar + 1, period)).Min();
 		}
 
 		/// <summary>
-		/// Returns the maximum value of a series from the current back back to the period value.
+		/// Returns the maximum value of a series from the current bar back to the period value.
 		/// </summary>
 		/// <param name="currentBar">Curent bar of the simulation</param>
 		/// <param name="series">The series to get the max from</param>
@@ -124,7 +124,7 @@ namespace StockSimulator.Core
 			}
 
 			int startIndex = currentBar - Math.Min(currentBar, period - 1);
-			return series.GetRange(startIndex, Math.Min(currentBar, period)).Max();
+			return series.GetRange(startIndex, Math.Min(currentBar + 1, period)).Max();
 		}
 
 		/// <summary>
@@ -138,5 +138,34 @@ namespace StockSimulator.Core
 			return a > 0.0 ? ((b - a) / a) * 100.0 : 0.0;
 		}
 
+		/// <summary>
+		/// Checks to see if a valley occured in a data series. A valley is where
+		/// the price dips down then comes back up. Will return true for the current
+		/// bar which is on the uptick of the valley.
+		/// </summary>
+		/// <param name="series">Series to test</param>
+		/// <param name="currentBar">Current bar to check from</param>
+		/// <returns>True if this bar is the end of the valley</returns>
+		public static bool IsValley(List<double> series, int currentBar)
+		{
+			// Not less than equal for the last condition because we want to make sure
+			// that we acutally turned up.
+			return series[currentBar - 2] >= series[currentBar - 1] && series[currentBar - 1] < series[currentBar];
+		}
+
+		/// <summary>
+		/// Checks to see if a peak occured in a data series. A peak is where
+		/// the price goes up then comes back down. Will return true for the current
+		/// bar which is on the downtick of the peak.
+		/// </summary>
+		/// <param name="series">Series to test</param>
+		/// <param name="currentBar">Current bar to check from</param>
+		/// <returns>True if this bar is the end of the peak</returns>
+		public static bool IsPeak(List<double> series, int currentBar)
+		{
+			// Not greater than equal for the last condition because we want to make sure
+			// that we acutally turned down.
+			return series[currentBar - 2] <= series[currentBar - 1] && series[currentBar - 1] > series[currentBar];
+		}
 	}
 }

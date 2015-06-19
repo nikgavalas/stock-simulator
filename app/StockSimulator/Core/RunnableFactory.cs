@@ -52,6 +52,16 @@ namespace StockSimulator.Core
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
+					case "BressertDss":
+						requestedItem = new BressertDss(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
+						break;
+
+					case "BressertTimingBands":
+						requestedItem = new BressertTimingBands(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
+						break;
+
 					case "BearBeltHold":
 						requestedItem = new BearBeltHold(_tickerData, this);
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
@@ -272,6 +282,10 @@ namespace StockSimulator.Core
 						requestedItem = new BestComboStrategy(_tickerData, this);
 						break;
 
+					case "BressertApproach":
+						requestedItem = new BressertApproach(_tickerData, this);
+						break;
+
 					//
 					// Bull
 					//
@@ -394,6 +408,10 @@ namespace StockSimulator.Core
 
 					case "BullDmi":
 						requestedItem = new BullDmi(_tickerData, this);
+						break;
+
+					case "BullBressert":
+						requestedItem = new BullBressert(_tickerData, this);
 						break;
 
 					//////////// Predicted bull strategies ///////////
@@ -589,6 +607,10 @@ namespace StockSimulator.Core
 
 					case "BearDmi":
 						requestedItem = new BearDmi(_tickerData, this);
+						break;
+
+					case "BearBressert":
+						requestedItem = new BearBressert(_tickerData, this);
 						break;
 
 					//////////// Predicted bear strategies ///////////

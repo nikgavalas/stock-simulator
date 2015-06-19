@@ -14,9 +14,10 @@ namespace StockSimulator.Core
 	[CategoryOrder("Output", 1)]
 	[CategoryOrder("All Orders", 2)]
 	[CategoryOrder("Main Strategy", 3)]
-	[CategoryOrder("Combo Strategy", 4)]
-	[CategoryOrder("Higher Timeframe", 5)]
-	[CategoryOrder("Candlesticks", 6)]
+	[CategoryOrder("Bressert Strategy", 4)]
+	[CategoryOrder("Combo Strategy", 5)]
+	[CategoryOrder("Higher Timeframe", 6)]
+	[CategoryOrder("Candlesticks", 7)]
 	public class SimulatorConfig
 	{
 		/////////////////////////////// DATES /////////////////////////////////////
@@ -226,6 +227,37 @@ namespace StockSimulator.Core
 		[Description("Minimum price for a short order to be placed on a ticker")]
 		public double MinPriceForShort { get; set; }
 
+		/////////////////////////// BRESSERT STRATEGY /////////////////////////////
+
+		[Category("Bressert Strategy")]
+		[PropertyOrder(0)]
+		[DisplayName("Timing Cycle Lookback")]
+		[Description("Number of bars to lookback to calculate the average cycle length")]
+		public int BressertCycleLookback { get; set; }
+
+		[Category("Bressert Strategy")]
+		[PropertyOrder(1)]
+		[DisplayName("Bars Between Cycles")]
+		[Description("Number of bars between the cycles (bottom to bottom or top to top). Set to 0 to have it automatically calculated")]
+		public int BressertBarsBetweenCycles { get; set; }
+		
+		[Category("Bressert Strategy")]
+		[PropertyOrder(2)]
+		[DisplayName("Timing Band Padding")]
+		[Description("Number of bars to pad left or right from the predicted cycle target")]
+		public int BressertBandPadding { get; set; }
+
+		[Category("Bressert Strategy")]
+		[PropertyOrder(3)]
+		[DisplayName("Max Bars Open")]
+		[Description("Max bars open for the Bressert strategy")]
+		public int BressertMaxBarsOpen { get; set; }
+
+		[Category("Bressert Strategy")]
+		[PropertyOrder(3)]
+		[DisplayName("Size Of Order")]
+		[Description("Amount of money to invest in each stock order")]
+		public double BressertSizeOfOrder { get; set; }
 
 		/// <summary>
 		/// Sets the default values for the options.
@@ -270,6 +302,13 @@ namespace StockSimulator.Core
 			MinPriceForShort = 5.00;
 			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\test.csv";
 			
+			// Bressert Strategy
+			BressertCycleLookback = 300;
+			BressertBandPadding = 3;
+			BressertBarsBetweenCycles = 20;
+			BressertMaxBarsOpen = 20;
+			BressertSizeOfOrder = 10000;
+
 			// Output
 			UseAbbreviatedOutput = false;
 			OnlyOutputLastBuyList = false;

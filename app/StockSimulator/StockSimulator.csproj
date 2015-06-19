@@ -101,6 +101,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Core\BarStatistics.cs" />
+    <Compile Include="Core\BuySellConditions\AboveSetupBarBuyCondition.cs" />
     <Compile Include="Core\BuySellConditions\BuyCondition.cs" />
     <Compile Include="Core\BuySellConditions\MaxLengthSellCondition.cs" />
     <Compile Include="Core\BuySellConditions\SellCondition.cs" />
@@ -121,6 +122,7 @@
     <Compile Include="Core\StatisticsCalculator.cs" />
     <Compile Include="Core\StrategyStatistics.cs" />
     <Compile Include="Core\StrategyTickerPairStatistics.cs" />
+    <Compile Include="Indicators\BressertTimingBands.cs" />
     <Compile Include="Indicators\Bollinger.cs" />
     <Compile Include="Indicators\Candlesticks\BaseCandlestick.cs" />
     <Compile Include="Indicators\Candlesticks\BearBeltHold.cs" />
@@ -151,6 +153,7 @@
     <Compile Include="Indicators\Candlesticks\UpsideTasukiGap.cs" />
     <Compile Include="Indicators\Cci.cs" />
     <Compile Include="Indicators\Dmi.cs" />
+    <Compile Include="Indicators\BressertDss.cs" />
     <Compile Include="Indicators\EaseOfMovement.cs" />
     <Compile Include="Indicators\KeltnerChannel.cs" />
     <Compile Include="Indicators\Momentum.cs" />
@@ -161,6 +164,7 @@
     <Compile Include="Indicators\Trend.cs" />
     <Compile Include="Indicators\Trix.cs" />
     <Compile Include="Indicators\WilliamsR.cs" />
+    <Compile Include="Strategies\Bear\BearBressert.cs" />
     <Compile Include="Strategies\Bear\BearDmi.cs" />
     <Compile Include="Strategies\Bear\BearEaseOfMovement.cs" />
     <Compile Include="Strategies\Bear\BearMacdCrossover.cs" />
@@ -195,8 +199,10 @@
     <Compile Include="Strategies\Bear\Predicted\BearTrixZeroCrossoverPredicted.cs" />
     <Compile Include="Strategies\Bear\Predicted\BearWilliamsRCrossoverPredicted.cs" />
     <Compile Include="Strategies\BestComboStrategy.cs" />
-    <Compile Include="Strategies\BestOfSubStrategies.cs" />
+    <Compile Include="Strategies\BestOfRootStrategies.cs" />
+    <Compile Include="Strategies\BressertApproach.cs" />
     <Compile Include="Strategies\Bull\BullBollingerExtended.cs" />
+    <Compile Include="Strategies\Bull\BullBressert.cs" />
     <Compile Include="Strategies\Bull\BullDmi.cs" />
     <Compile Include="Strategies\Bull\BullEaseOfMovement.cs" />
     <Compile Include="Strategies\Bull\BullMacdMomentum.cs" />
