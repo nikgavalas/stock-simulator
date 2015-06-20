@@ -16,10 +16,50 @@ namespace StockSimulator.Core.BuySellConditions
 		public override bool OnUpdate(int currentBar)
 		{
 			base.OnUpdate(currentBar);
+			
+			TickerData data = _order.Ticker;
 
-			// Super simple for market orders, just buy.
-			_order.Buy(_order.Ticker.Open[currentBar], currentBar, "Market open order");
-			return true;
+			// The order can be cancelled if it's open too long.
+			if (currentBar + Simulator.Config.BressertMaxBarsToFill > _order.OpenedBar)
+			{
+				_order.Cancel();
+			}
+
+			// Long orders are placed 1 tick above the setup bar high.
+			if (_order.Type == Order.OrderType.Long)
+			{
+				double entryPrice = data.High[_order.OpenedBar - 1] + data.TickSize;
+
+				if (data.Open[currentBar] >= entryPrice)
+				{
+					_order.Buy(data.Open[currentBar], currentBar, "Opened above setup bar high");
+					return true;
+				}
+				else if (data.High[currentBar] >= entryPrice)
+				{
+					_order.Buy(entryPrice, currentBar, "Crossed setup bar high");
+					return true;
+				}
+			}
+			// Short orders are placed 1 tick below the setup bar low.
+			else
+			{
+				double entryPrice = data.Low[_order.OpenedBar - 1] - data.TickSize;
+
+				if (data.Open[currentBar] <= entryPrice)
+				{
+					_order.Buy(data.Open[currentBar], currentBar, "Opened below setup bar low");
+					return true;
+				}
+				else if (data.Low[currentBar] <= entryPrice)
+				{
+					_order.Buy(entryPrice, currentBar, "Crossed setup bar low");
+					return true;
+				}
+
+			}
+
+			return false;
 		}
 	}
 }

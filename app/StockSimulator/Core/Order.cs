@@ -95,9 +95,7 @@ namespace StockSimulator.Core
 		public StrategyStatistics StartStatistics { get; set; }
 		public StrategyStatistics EndStatistics { get; set; }
 		public List<string> DependentIndicatorNames { get; set; }
-
-		private double LimitBuyPrice { get; set; }
-		private int OpenedBar { get; set; }
+		public int OpenedBar { get; set; }
 
 		private double _orderValue;
 		private double _sizeOfOrder;
@@ -143,7 +141,6 @@ namespace StockSimulator.Core
 			Ticker = tickerData;
 			DependentIndicatorNames = dependentIndicatorNames;
 			AccountValue = 0;
-			LimitBuyPrice = tickerData.High[currentBar];
 			OpenedBar = currentBar + 1;
 
 			OrderOpened();
@@ -272,6 +269,14 @@ namespace StockSimulator.Core
 			SellReason = sellReason;
 
 			_orderValue = NumberOfShares * SellPrice;
+		}
+
+		/// <summary>
+		/// Cancels the order.
+		/// </summary>
+		public void Cancel()
+		{
+			Status = OrderStatus.Cancelled;
 		}
 
 		/// <summary>

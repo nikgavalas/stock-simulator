@@ -107,6 +107,7 @@
     <Compile Include="Core\BuySellConditions\SellCondition.cs" />
     <Compile Include="Core\BuySellConditions\MarketBuyCondition.cs" />
     <Compile Include="Core\BuySellConditions\StopSellCondition.cs" />
+    <Compile Include="Core\BuySellConditions\StopSetupBarLowSellCondition.cs" />
     <Compile Include="Core\BuySellConditions\StrategyFoundSellCondition.cs" />
     <Compile Include="Core\ComboSet.cs" />
     <Compile Include="Core\DataOutputter.cs" />

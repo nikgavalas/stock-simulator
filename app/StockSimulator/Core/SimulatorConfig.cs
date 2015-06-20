@@ -254,7 +254,13 @@ namespace StockSimulator.Core
 		public int BressertMaxBarsOpen { get; set; }
 
 		[Category("Bressert Strategy")]
-		[PropertyOrder(3)]
+		[PropertyOrder(4)]
+		[DisplayName("Max Bars To Fill")]
+		[Description("Max bars an order can remain open and not filled before it is cancelled")]
+		public int BressertMaxBarsToFill { get; set; }
+
+		[Category("Bressert Strategy")]
+		[PropertyOrder(5)]
 		[DisplayName("Size Of Order")]
 		[Description("Amount of money to invest in each stock order")]
 		public double BressertSizeOfOrder { get; set; }
@@ -307,6 +313,7 @@ namespace StockSimulator.Core
 			BressertBandPadding = 3;
 			BressertBarsBetweenCycles = 20;
 			BressertMaxBarsOpen = 20;
+			BressertMaxBarsToFill = 3;
 			BressertSizeOfOrder = 10000;
 
 			// Output

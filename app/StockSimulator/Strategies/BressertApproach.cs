@@ -82,15 +82,16 @@ namespace StockSimulator.Strategies
 				// TODO: use the 1 bar trailing high/low entry conditions.
 				List<BuyCondition> buyConditions = new List<BuyCondition>()
 				{
-					new MarketBuyCondition()
+					new AboveSetupBarBuyCondition()
 				};
 
 				// Always have a max time in market and an absolute stop for sell conditions.
 				BressertTimingBands timingBands = (BressertTimingBands)Dependents[2];
 				List<SellCondition> sellConditions = new List<SellCondition>()
 				{
-					new StopSellCondition(Simulator.Config.ComboStopPercent),
-					new MaxLengthSellCondition(foundStrategy == bullStrategy ? timingBands.LowCycleAvg[currentBar] : timingBands.HighCycleAvg[currentBar])
+					new StopSetupBarLowSellCondition(),
+					new MaxLengthSellCondition(foundStrategy == bullStrategy ? timingBands.LowCycleAvg[currentBar] : timingBands.HighCycleAvg[currentBar]),
+					new StrategyFoundSellCondition(oppositeStrategy),
 				};
 
 				List<string> dependentIndicators = foundStrategy.GetDependentIndicatorNames();
