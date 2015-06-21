@@ -63,7 +63,7 @@ namespace StockSimulator.Strategies
 			// That strategy will take care of placing the orders.
 
 			// The setup bar is found when the indicator goes above the buyline (40) and then turns down.
-			if (DataSeries.IsAbove(ind.Value, 50, currentBar, 0) != -1 && UtilityMethods.IsPeak(ind.Value, currentBar))
+			if (DataSeries.IsAbove(ind.Value, 60, currentBar, 2) != -1 && UtilityMethods.IsPeak(ind.Value, currentBar))
 			{
 				WasFound[currentBar] = true;
 			}

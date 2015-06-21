@@ -273,15 +273,19 @@ namespace StockSimulator.Core
 				{
 					isTradingBar = true;
 
-					// Check to make sure it meets our percentage and price requirements.
-					if (strat.Bars[currentBar].HighestPercent >= Config.ComboPercentForBuy &&
-						strat.Data.Open[currentBar] >= Config.MinPriceForOrder)
+					// All bars have a zero value by default. So something is found when the 
+					// percent is higher than that.
+					if (strat.Bars[currentBar].HighestPercent > 0.0)
 					{
-						// If this is a short order, some brokers have min prices they allow for shorts.
-						if (strat.Bars[currentBar].StrategyOrderType == Order.OrderType.Long ||
-							(strat.Bars[currentBar].StrategyOrderType == Order.OrderType.Short && strat.Data.Open[currentBar] >= Config.MinPriceForShort))
+						// All orders set a min price to place an order.
+						if (strat.Data.Open[currentBar] >= Config.MinPriceForOrder)
 						{
-							buyList.Add(strat);
+							// If this is a short order, some brokers have min prices they allow for shorts.
+							if (strat.Bars[currentBar].StrategyOrderType == Order.OrderType.Long ||
+								(strat.Bars[currentBar].StrategyOrderType == Order.OrderType.Short && strat.Data.Open[currentBar] >= Config.MinPriceForShort))
+							{
+								buyList.Add(strat);
+							}
 						}
 					}
 				}
@@ -424,7 +428,7 @@ namespace StockSimulator.Core
 		{
 			// Check here that the strategy order type matches
 			// with the higher timeframe trend. Continue if it doesn't.
-			if (Config.UseHigherTimeframeMainStrategy == true && orderType != ticker.HigherTimeframeMomentum[currentBar])
+			if (orderType != ticker.HigherTimeframeMomentum[currentBar])
 			{
 				return 0;
 			}

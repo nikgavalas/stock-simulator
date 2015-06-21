@@ -20,6 +20,7 @@ namespace StockSimulator.Indicators
 		private List<double> toBeSmoothed;
 
 		private int _period = 10;
+		private int _smoothing = 15;
 
 		public BressertDss(TickerData tickerData, RunnableFactory factory, int period)
 			: base(tickerData, factory)
@@ -75,7 +76,7 @@ namespace StockSimulator.Indicators
 			double denominator = periodHigh - periodLow;
 
 			toBeSmoothed[currentBar] = denominator > 0.0 ? ((Data.Close[currentBar] - periodLow) / denominator) * 100.0 : 0.0;
-			ema[currentBar] = UtilityMethods.Ema(toBeSmoothed, ema, currentBar, _period);
+			ema[currentBar] = UtilityMethods.Ema(toBeSmoothed, ema, currentBar, _smoothing);
 
 			Value[currentBar] = ema[currentBar];
 		}

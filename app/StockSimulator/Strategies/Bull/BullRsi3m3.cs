@@ -54,7 +54,7 @@ namespace StockSimulator.Strategies
 			}
 
 			Rsi3m3 rsi = (Rsi3m3)Dependents[0];
-			if (DataSeries.IsBelow(rsi.Value, 30, currentBar, 0) != -1 && UtilityMethods.IsValley(rsi.Value, currentBar))
+			if (DataSeries.IsBelow(rsi.Value, 30, currentBar, 2) != -1 && UtilityMethods.IsValley(rsi.Value, currentBar))
 			{
 				WasFound[currentBar] = true;
 			}

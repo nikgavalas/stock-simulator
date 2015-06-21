@@ -21,6 +21,7 @@ namespace StockSimulator.Strategies
 			_maxComboSize = Simulator.Config.BressertComboMaxComboSize;
 			_maxBarsOpen = Simulator.Config.BressertComboMaxBarsOpen;
 			_comboLeewayBars = Simulator.Config.BressertComboLeewayBars;
+			_minPercentForBuy = Simulator.Config.BressertComboPercentForBuy;
 			_sizeOfOrder = Simulator.Config.BressertComboSizeOfOrder;
 			_stopPercent = Simulator.Config.BressertComboStopPercent;
 			_namePrefix = "BC-";

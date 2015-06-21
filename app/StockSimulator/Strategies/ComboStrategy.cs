@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using StockSimulator.Core;
 using StockSimulator.Core.BuySellConditions;
+using System.Diagnostics;
 
 namespace StockSimulator.Strategies
 {
@@ -18,6 +19,7 @@ namespace StockSimulator.Strategies
 		protected int _maxComboSize;
 		protected int _maxBarsOpen;
 		protected int _comboLeewayBars;
+		protected double _minPercentForBuy;
 		protected double _sizeOfOrder;
 		protected double _stopPercent;
 		protected string _namePrefix;
@@ -34,6 +36,7 @@ namespace StockSimulator.Strategies
 			_maxComboSize = Simulator.Config.ComboMaxComboSize;
 			_maxBarsOpen = Simulator.Config.ComboMaxBarsOpen;
 			_comboLeewayBars = Simulator.Config.ComboLeewayBars;
+			_minPercentForBuy = Simulator.Config.ComboPercentForBuy;
 			_sizeOfOrder = Simulator.Config.ComboSizeOfOrder;
 			_stopPercent = Simulator.Config.ComboStopPercent;
 			_namePrefix = "";
@@ -183,8 +186,7 @@ namespace StockSimulator.Strategies
 			// Bull and bear strategies can't combo with each other but we still want
 			// to compare them side by side to find our what combo is the best.
 			// So append all the bear combos to the combo list so they can be evaluated too.
-			List<List<Strategy>> combos = Data.HigherTimeframeMomentum[currentBar] == Order.OrderType.Long ?
-				GetComboList(currentBar, Order.OrderType.Long) : GetComboList(currentBar, Order.OrderType.Short);
+			List<List<Strategy>> combos = GetComboList(currentBar, Data.HigherTimeframeMomentum[currentBar]);
 
 			// Place orders for all the combos.
 			List<StrategyStatistics> stats = new List<StrategyStatistics>();
@@ -234,7 +236,7 @@ namespace StockSimulator.Strategies
 
 					// For each combo we want to find out the winning % and the gain
 					// for it and save those values for the bar.
-					if (orderStats.WinPercent > highestWinPercent)
+					if (orderStats.WinPercent > highestWinPercent && orderStats.WinPercent > _minPercentForBuy)
 					{
 						highestWinPercent = orderStats.WinPercent;
 						highestName = orderStats.StrategyName;
@@ -331,13 +333,6 @@ namespace StockSimulator.Strategies
 
 					// Ensure each dependent has the same order type.
 					if (orderType != dependentStrategy.OrderType)
-					{
-						continue;
-					}
-
-					// Check here that the strategy order type matches
-					// with the higher timeframe trend. Continue if it doesn't.
-					if (Simulator.Config.UseHigherTimeframeSubstrategies == true && dependentStrategy.OrderType != dependentStrategy.Data.HigherTimeframeMomentum[currentBar])
 					{
 						continue;
 					}

@@ -75,16 +75,6 @@ namespace StockSimulator.Core
 		[Description("The number of bars to aggregate the lower timeframe for the higher timeframe")]
 		public int NumBarsHigherTimeframe { get; set; }
 
-		[Category("Higher Timeframe")]
-		[DisplayName("Use for Substrategies")]
-		[Description("Use the higher timeframe momentum on substrategies")]
-		public bool UseHigherTimeframeSubstrategies { get; set; }
-
-		[Category("Higher Timeframe")]
-		[DisplayName("Use for Main Strategy")]
-		[Description("Use the higher timeframe momentum on the main strategy")]
-		public bool UseHigherTimeframeMainStrategy { get; set; }
-
 		/////////////////////////////// OUTPUT ////////////////////////////////////
 
 		[Category("Output")]
@@ -332,8 +322,6 @@ namespace StockSimulator.Core
 
 			// Higher timeframe
 			NumBarsHigherTimeframe = 5;
-			UseHigherTimeframeSubstrategies = true;
-			UseHigherTimeframeMainStrategy = true;
 
 			// Combo strategy
 			ComboPercentForBuy = 65;

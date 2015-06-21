@@ -491,8 +491,7 @@ namespace StockSimulator.Core
 						{
 							tickerData.Typical.Add(Convert.ToDouble(splitData[(int)DataFields.Typical]));
 							tickerData.Median.Add(Convert.ToDouble(splitData[(int)DataFields.Median]));
-							tickerData.HigherTimeframeMomentum.Add(splitData[(int)DataFields.HigherState] == "Long"
-								? Order.OrderType.Long : Order.OrderType.Short);
+							tickerData.HigherTimeframeMomentum.Add(Convert.ToDouble(splitData[(int)DataFields.HigherState]));
 						}
 						else
 						{
