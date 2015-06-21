@@ -52,8 +52,13 @@ namespace StockSimulator.Core
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
-					case "BressertDss":
-						requestedItem = new BressertDss(_tickerData, this);
+					case "BressertDss10":
+						requestedItem = new BressertDss(_tickerData, this, 10);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
+						break;
+
+					case "BressertDss5":
+						requestedItem = new BressertDss(_tickerData, this, 5);
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
@@ -192,6 +197,11 @@ namespace StockSimulator.Core
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
+					case "Rsi3":
+						requestedItem = new Rsi(_tickerData, this, 3);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
+						break;
+
 					case "Rsi11":
 						requestedItem = new Rsi(_tickerData, this, 11);
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
@@ -199,6 +209,11 @@ namespace StockSimulator.Core
 
 					case "Rsi14":
 						requestedItem = new Rsi(_tickerData, this, 18);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
+						break;
+
+					case "Rsi3m3":
+						requestedItem = new Rsi3m3(_tickerData, this);
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
@@ -278,12 +293,16 @@ namespace StockSimulator.Core
 						requestedItem = new BestOfRootStrategies(_tickerData, this);
 						break;
 
-					case "BestComboStrategy":
-						requestedItem = new BestComboStrategy(_tickerData, this);
+					case "ComboStrategy":
+						requestedItem = new ComboStrategy(_tickerData, this);
 						break;
 
 					case "BressertApproach":
 						requestedItem = new BressertApproach(_tickerData, this);
+						break;
+
+					case "BressertComboStrategy":
+						requestedItem = new BressertComboStrategy(_tickerData, this);
 						break;
 
 					//
@@ -410,8 +429,16 @@ namespace StockSimulator.Core
 						requestedItem = new BullDmi(_tickerData, this);
 						break;
 
-					case "BullBressert":
-						requestedItem = new BullBressert(_tickerData, this);
+					case "BullBressertDss10":
+						requestedItem = new BullBressertDss(_tickerData, this, 10);
+						break;
+
+					case "BullBressertDss5":
+						requestedItem = new BullBressertDss(_tickerData, this, 5);
+						break;
+
+					case "BullRsi3m3":
+						requestedItem = new BullRsi3m3(_tickerData, this);
 						break;
 
 					//////////// Predicted bull strategies ///////////
@@ -609,10 +636,18 @@ namespace StockSimulator.Core
 						requestedItem = new BearDmi(_tickerData, this);
 						break;
 
-					case "BearBressert":
-						requestedItem = new BearBressert(_tickerData, this);
+					case "BearBressertDss10":
+						requestedItem = new BearBressertDss(_tickerData, this, 10);
 						break;
 
+					case "BearBressertDss5":
+						requestedItem = new BearBressertDss(_tickerData, this, 5);
+						break;
+
+					case "BearRsi3m3":
+						requestedItem = new BearRsi3m3(_tickerData, this);
+						break;
+					
 					//////////// Predicted bear strategies ///////////
 
 					case "BearCciCrossoverPredicted":

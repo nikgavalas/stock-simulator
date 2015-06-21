@@ -14,6 +14,7 @@ namespace StockSimulator.Indicators
 	class Rsi : Indicator
 	{
 		public List<double> Value { get; set; }
+		public List<double> Avg { get; set; }
 
 		private List<double> _up { get; set; }
 		private List<double> _down { get; set; }
@@ -21,11 +22,14 @@ namespace StockSimulator.Indicators
 		private List<double> _avgDown { get; set; }
 
 		private int _period = 14;
+		private int _smooth = 3;
 
 		public Rsi(TickerData tickerData, RunnableFactory factory, int period) 
 			: base(tickerData, factory)
 		{
 			Value = Enumerable.Repeat(0d, Data.NumBars).ToList();
+			Avg = Enumerable.Repeat(0d, Data.NumBars).ToList();
+
 			_up = Enumerable.Repeat(0d, Data.NumBars).ToList();
 			_down = Enumerable.Repeat(0d, Data.NumBars).ToList();
 			_avgUp = Enumerable.Repeat(0d, Data.NumBars).ToList();
@@ -72,6 +76,11 @@ namespace StockSimulator.Indicators
 
 			if (currentBar == 0)
 			{
+				if (_period < 3)
+				{
+					Avg[currentBar] = 50.0;
+				}
+
 				return;
 			}
 
@@ -80,6 +89,11 @@ namespace StockSimulator.Indicators
 
 			if (currentBar + 1 < _period)
 			{
+				if ((currentBar + 1) == (_period - 1))
+				{
+					Avg[currentBar] = 50.0;
+				}
+
 				return;
 			}
 
@@ -95,8 +109,11 @@ namespace StockSimulator.Indicators
 				_avgDown[currentBar] = (_avgDown[currentBar - 1] * (_period - 1) + _down[currentBar]) / _period;
 				_avgUp[currentBar] = (_avgUp[currentBar - 1] * (_period - 1) + _up[currentBar]) / _period;
 			}
+			double rsi = _avgDown[currentBar] == 0 ? 100 : 100 - 100 / (1 + _avgUp[currentBar] / _avgDown[currentBar]);
+			double rsiAvg = (2.0 / (1 + _smooth)) * rsi + (1 - (2.0 / (1 + _smooth))) * Avg[currentBar - 1];
 
-			Value[currentBar] = _avgDown[currentBar] == 0 ? 100 : 100 - 100 / (1 + _avgUp[currentBar] / _avgDown[currentBar]);
+			Value[currentBar] = rsi;
+			Avg[currentBar] = rsiAvg;
 		}
 	}
 }

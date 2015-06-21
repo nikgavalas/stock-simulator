@@ -8,6 +8,19 @@ namespace StockSimulator.Core.BuySellConditions
 {
 	public class AboveSetupBarBuyCondition : BuyCondition
 	{
+		private int _maxBarsToFill;
+
+		/// <summary>
+		/// Constructor
+		/// </summary>
+		/// <param name="strategy">Strategy that when found will trigger a sell</param>
+		public AboveSetupBarBuyCondition(int maxBarsToFill)
+			: base()
+		{
+			_maxBarsToFill = maxBarsToFill;
+
+		}
+
 		/// <summary>
 		/// Called before the order has been filled during the bar update.
 		/// </summary>
@@ -20,7 +33,7 @@ namespace StockSimulator.Core.BuySellConditions
 			TickerData data = _order.Ticker;
 
 			// The order can be cancelled if it's open too long.
-			if (currentBar + Simulator.Config.BressertMaxBarsToFill > _order.OpenedBar)
+			if (currentBar + _maxBarsToFill > _order.OpenedBar)
 			{
 				_order.Cancel();
 			}

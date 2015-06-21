@@ -12,32 +12,37 @@ namespace StockSimulator.Indicators
 	/// BressertDss
 	/// https://www.mql5.com/en/code/8310
 	/// </summary>
-	public class BressertDss : Indicator
+	public class Rsi3m3 : Indicator
 	{
 		public List<double> Value { get; set; }
 
-		private List<double> ema;
-		private List<double> toBeSmoothed;
-
-		private int _period = 10;
-
-		public BressertDss(TickerData tickerData, RunnableFactory factory, int period)
+		public Rsi3m3(TickerData tickerData, RunnableFactory factory)
 			: base(tickerData, factory)
 		{
-			_period = period;
-
 			Value = Enumerable.Repeat(0d, Data.NumBars).ToList();
-			ema = Enumerable.Repeat(0d, Data.NumBars).ToList();
-			toBeSmoothed = Enumerable.Repeat(0d, Data.NumBars).ToList();
 		}
 
+		/// <summary>
+		/// Returns an array of dependent names.
+		/// </summary>
+		public override string[] DependentNames
+		{
+			get
+			{
+				string[] deps = {
+					"Rsi3"
+				};
+
+				return deps;
+			}
+		}
 		/// <summary>
 		/// Returns the name of this indicator.
 		/// </summary>
 		/// <returns>The name of this indicator</returns>
 		public override string ToString()
 		{
-			return "BressertDss" + _period.ToString();
+			return "Rsi3m3";
 		}
 
 		/// <summary>
@@ -70,14 +75,8 @@ namespace StockSimulator.Indicators
 		{
 			base.OnBarUpdate(currentBar);
 
-			double periodLow = UtilityMethods.Min(Data.Close, currentBar, _period);
-			double periodHigh = UtilityMethods.Max(Data.Close, currentBar, _period);
-			double denominator = periodHigh - periodLow;
-
-			toBeSmoothed[currentBar] = denominator > 0.0 ? ((Data.Close[currentBar] - periodLow) / denominator) * 100.0 : 0.0;
-			ema[currentBar] = UtilityMethods.Ema(toBeSmoothed, ema, currentBar, _period);
-
-			Value[currentBar] = ema[currentBar];
+			Rsi rsi = (Rsi)Dependents[0];
+			Value[currentBar] = UtilityMethods.Sma(rsi.Avg, currentBar, 3);
 		}
 	}
 }

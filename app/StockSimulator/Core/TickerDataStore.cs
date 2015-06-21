@@ -543,7 +543,9 @@ namespace StockSimulator.Core
 			// Run the indicator and save it.
 			//Stochastics higherTimeframeIndicator = new Stochastics(higherTickerData, new RunnableFactory(higherTickerData));
 			Macd higherTimeframeIndicator = new Macd(higherTickerData, new RunnableFactory(higherTickerData));
+			higherTimeframeIndicator.Initialize();
 			higherTimeframeIndicator.Run();
+			higherTimeframeIndicator.Shutdown();
 
 			// Return what kind orders are allowed.
 			double state = GetHigherTimeframeStateFromIndicator(higherTimeframeIndicator, higherTimeframeIndicator.Data.NumBars - 1);

@@ -34,8 +34,8 @@ namespace StockSimulator.Strategies
 			get
 			{
 				string[] deps = {
-					"BullBressert",
-					"BearBressert",
+					"BullBressertDss",
+					"BearBressertDss",
 					"BressertTimingBands" // For the cycle length
 				};
 
@@ -59,8 +59,8 @@ namespace StockSimulator.Strategies
 		{
 			base.OnBarUpdate(currentBar);
 
-			BullBressert bullStrategy = (BullBressert)Dependents[0];
-			BearBressert bearStrategy = (BearBressert)Dependents[1];
+			BullBressertDss bullStrategy = (BullBressertDss)Dependents[0];
+			BearBressertDss bearStrategy = (BearBressertDss)Dependents[1];
 
 			Strategy foundStrategy = null;
 			Strategy oppositeStrategy = null;
@@ -82,7 +82,7 @@ namespace StockSimulator.Strategies
 				// TODO: use the 1 bar trailing high/low entry conditions.
 				List<BuyCondition> buyConditions = new List<BuyCondition>()
 				{
-					new AboveSetupBarBuyCondition()
+					new AboveSetupBarBuyCondition(Simulator.Config.BressertMaxBarsToFill)
 				};
 
 				// Always have a max time in market and an absolute stop for sell conditions.

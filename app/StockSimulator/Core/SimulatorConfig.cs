@@ -14,10 +14,11 @@ namespace StockSimulator.Core
 	[CategoryOrder("Output", 1)]
 	[CategoryOrder("All Orders", 2)]
 	[CategoryOrder("Main Strategy", 3)]
-	[CategoryOrder("Bressert Strategy", 4)]
+	[CategoryOrder("Bressert Combo", 4)]
 	[CategoryOrder("Combo Strategy", 5)]
 	[CategoryOrder("Higher Timeframe", 6)]
 	[CategoryOrder("Candlesticks", 7)]
+	[CategoryOrder("Bressert Strategy", 20)]
 	public class SimulatorConfig
 	{
 		/////////////////////////////// DATES /////////////////////////////////////
@@ -183,6 +184,50 @@ namespace StockSimulator.Core
 		[Description("Amount of money to invest in each stock order")]
 		public double ComboSizeOfOrder { get; set; }
 
+		///////////////////////////// BRESSERT COMBO ////////////////////////////////
+
+		[Category("Bressert Combo")]
+		[PropertyOrder(0)]
+		[DisplayName("Percent For Buy")]
+		[Description("Percent returned from best combo strategy to add ticker to the buy list")]
+		public double BressertComboPercentForBuy { get; set; }
+
+		[Category("Bressert Combo")]
+		[PropertyOrder(1)]
+		[DisplayName("Min Combo Size")]
+		[Description("Minimum number of strategies that must have been present to buy")]
+		public int BressertComboMinComboSize { get; set; }
+
+		[Category("Bressert Combo")]
+		[PropertyOrder(2)]
+		[DisplayName("Max Combo Size")]
+		[Description("Maximum size of a combo that can be used")]
+		public int BressertComboMaxComboSize { get; set; }
+
+		[Category("Bressert Combo")]
+		[PropertyOrder(3)]
+		[DisplayName("Combo Leeway")]
+		[Description("Number of bars back in time allowed to find a combo from the current bar")]
+		public int BressertComboLeewayBars { get; set; }
+
+		[Category("Bressert Combo")]
+		[PropertyOrder(5)]
+		[DisplayName("Stop Loss Percent")]
+		[Description("Stop loss percent for the combo strategy")]
+		public double BressertComboStopPercent { get; set; }
+
+		[Category("Bressert Combo")]
+		[PropertyOrder(6)]
+		[DisplayName("Max Bars Open")]
+		[Description("Max bars open for the combo strategy")]
+		public int BressertComboMaxBarsOpen { get; set; }
+
+		[Category("Bressert Combo")]
+		[PropertyOrder(7)]
+		[DisplayName("Size Of Order")]
+		[Description("Amount of money to invest in each stock order")]
+		public double BressertComboSizeOfOrder { get; set; }
+
 		///////////////////////////// MAIN STRATEGY ///////////////////////////////
 
 		[Category("Main Strategy")]
@@ -240,7 +285,7 @@ namespace StockSimulator.Core
 		[DisplayName("Bars Between Cycles")]
 		[Description("Number of bars between the cycles (bottom to bottom or top to top). Set to 0 to have it automatically calculated")]
 		public int BressertBarsBetweenCycles { get; set; }
-		
+
 		[Category("Bressert Strategy")]
 		[PropertyOrder(2)]
 		[DisplayName("Timing Band Padding")]
@@ -298,6 +343,15 @@ namespace StockSimulator.Core
 			ComboStopPercent = 0.04;
 			ComboMaxBarsOpen = 10;
 			ComboSizeOfOrder = 10000;
+
+			// Bressert combo
+			BressertComboPercentForBuy = 65;
+			BressertComboMinComboSize = 2;
+			BressertComboMaxComboSize = 3;
+			BressertComboLeewayBars = 0;
+			BressertComboStopPercent = 0.04;
+			BressertComboMaxBarsOpen = 10;
+			BressertComboSizeOfOrder = 10000;
 
 			// Main strategy
 			MaxOrdersPerBar = 4;

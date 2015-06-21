@@ -12,16 +12,31 @@ namespace StockSimulator.Strategies
 	/// Returns the best performing combo of lots of substrategies
 	/// for a given trading bar.
 	/// </summary>
-	class BestComboStrategy : RootSubStrategy
+	class ComboStrategy : RootSubStrategy
 	{
+		protected int _minComboSize;
+		protected int _maxComboSize;
+		protected int _maxBarsOpen;
+		protected int _comboLeewayBars;
+		protected double _sizeOfOrder;
+		protected double _stopPercent;
+		protected string _namePrefix;
+
 		/// <summary>
 		/// Construct the class and initialize the bar data to default values.
 		/// </summary>
 		/// <param name="tickerData">Ticker for the strategy</param>
 		/// <param name="factory">Factory for creating dependents</param>
-		public BestComboStrategy(TickerData tickerData, RunnableFactory factory) 
+		public ComboStrategy(TickerData tickerData, RunnableFactory factory) 
 			: base(tickerData, factory)
 		{
+			_minComboSize = Simulator.Config.ComboMinComboSize;
+			_maxComboSize = Simulator.Config.ComboMaxComboSize;
+			_maxBarsOpen = Simulator.Config.ComboMaxBarsOpen;
+			_comboLeewayBars = Simulator.Config.ComboLeewayBars;
+			_sizeOfOrder = Simulator.Config.ComboSizeOfOrder;
+			_stopPercent = Simulator.Config.ComboStopPercent;
+			_namePrefix = "";
 		}
 
 		/// <summary>
@@ -144,7 +159,7 @@ namespace StockSimulator.Strategies
 		/// <returns>The name of this strategy</returns>
 		public override string ToString()
 		{
-			return "BestComboStrategy";
+			return "ComboStrategy";
 		}
 
 		/// <summary>
@@ -168,8 +183,8 @@ namespace StockSimulator.Strategies
 			// Bull and bear strategies can't combo with each other but we still want
 			// to compare them side by side to find our what combo is the best.
 			// So append all the bear combos to the combo list so they can be evaluated too.
-			List<List<Strategy>> combos = GetComboList(currentBar, Order.OrderType.Long);
-			combos.AddRange(GetComboList(currentBar, Order.OrderType.Short));
+			List<List<Strategy>> combos = Data.HigherTimeframeMomentum[currentBar] == Order.OrderType.Long ?
+				GetComboList(currentBar, Order.OrderType.Long) : GetComboList(currentBar, Order.OrderType.Short);
 
 			// Place orders for all the combos.
 			List<StrategyStatistics> stats = new List<StrategyStatistics>();
@@ -178,7 +193,7 @@ namespace StockSimulator.Strategies
 				List<Strategy> comboList = combos[i];
 
 				// Ignore combos greater than a max amount.
-				if (comboList.Count > Simulator.Config.ComboMaxComboSize || comboList.Count < Simulator.Config.ComboMinComboSize)
+				if (comboList.Count > _maxComboSize || comboList.Count < _minComboSize)
 				{
 					continue;
 				}
@@ -200,17 +215,11 @@ namespace StockSimulator.Strategies
 					comboName = comboName.TrimEnd('-');
 				}
 
-				// Get all the buy and sell conditions for this order. Buy conditions are easy,
-				// we just want to buy on the next frame at market price.
-				List<BuyCondition> buyConditions = new List<BuyCondition>()
-				{
-					new MarketBuyCondition()
-				};
-
+				List<BuyCondition> buyConditions = GetBuyConditions();
 				List<SellCondition> sellConditions = GetSellConditions(comboList);
 
 				// Now that the name of the strategy is found, enter the order.
-				Order placedOrder = EnterOrder(comboName, currentBar, comboList[0].OrderType, Simulator.Config.ComboSizeOfOrder,
+				Order placedOrder = EnterOrder(_namePrefix + comboName, currentBar, comboList[0].OrderType, _sizeOfOrder,
 					dependentIndicators, buyConditions, sellConditions);
 
 				if (placedOrder != null)
@@ -249,10 +258,24 @@ namespace StockSimulator.Strategies
 				highestWinPercent,
 				highestName,
 				highestOrderType,
-				Simulator.Config.ComboSizeOfOrder,
+				_sizeOfOrder,
 				stats,
 				highestBuyConditions,
 				highestSellConditions);
+		}
+
+		/// <summary>
+		/// Returns a list of buy conditions.
+		/// </summary>
+		/// <returns>List of conditions that trigger a buy</returns>
+		protected virtual List<BuyCondition> GetBuyConditions()
+		{
+			List<BuyCondition> buyConditions = new List<BuyCondition>()
+			{
+				new MarketBuyCondition()
+			};
+
+			return buyConditions;
 		}
 
 		/// <summary>
@@ -260,13 +283,13 @@ namespace StockSimulator.Strategies
 		/// </summary>
 		/// <param name="strategies">List of strategies found</param>
 		/// <returns>List of sell conditions that will trigger a sell</returns>
-		private List<SellCondition> GetSellConditions(List<Strategy> strategies)
+		protected virtual List<SellCondition> GetSellConditions(List<Strategy> strategies)
 		{
 			List<SellCondition> conditions = new List<SellCondition>();
 
 			// Always have a max time in market and an absolute stop for sell conditions.
-			conditions.Add(new StopSellCondition(Simulator.Config.ComboStopPercent));
-			conditions.Add(new MaxLengthSellCondition(Simulator.Config.ComboMaxBarsOpen));
+			conditions.Add(new StopSellCondition(_stopPercent));
+			conditions.Add(new MaxLengthSellCondition(_maxBarsOpen));
 
 			// Sell when any opposite strategy is found. So loop through all the strategies
 			// that we involved with buying this order and find their counterparts. Then 
@@ -323,7 +346,7 @@ namespace StockSimulator.Strategies
 					// and back a few days to make the finding not so exact. It adds
 					// for some more leeway when finding combos as finding multiple
 					// strategies on exact bars doesn't happen as frequently.
-					for (int j = 0; j < Simulator.Config.ComboLeewayBars + 1; j++)
+					for (int j = 0; j < _comboLeewayBars + 1; j++)
 					{
 						int comboBar = currentBar - j;
 						if (comboBar < 0)
@@ -341,11 +364,7 @@ namespace StockSimulator.Strategies
 			}
 
 			// Create all the possible combos of these strategies.
-			// TODO: If we have it where we are finding more than 5
-			// strategies on a day we probably don't need to bother
-			// with tracking more than that since the likelyhood
-			// of finding a point all of those 5 strategies again is small.
-			// So we might want to set a max.
+			// Min and max combo sizes are filtered elsewhere.
 			ComboSet<Strategy> comboSet = new ComboSet<Strategy>(foundStrategies);
 			List<List<Strategy>> combos = comboSet.GetSet(1);
 			return combos;

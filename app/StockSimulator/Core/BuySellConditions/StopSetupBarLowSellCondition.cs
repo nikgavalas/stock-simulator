@@ -8,8 +8,6 @@ namespace StockSimulator.Core.BuySellConditions
 {
 	class StopSetupBarLowSellCondition : SellCondition
 	{
-		private double _stopPercent;
-
 		/// <summary>
 		/// Constructor
 		/// </summary>

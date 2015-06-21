@@ -34,13 +34,6 @@ namespace StockSimulator.Core
 
 			Data = tickerData;
 
-			// Create all the depenent runnables and save them.
-			Dependents = new List<Runnable>(DependentNames.Length);
-			for (int i = 0; i < DependentNames.Length; i++)
-			{
-				Runnable dependent = factory.GetRunnable(DependentNames[i]);
-				Dependents.Add(dependent);
-			}
 		}
 
 		/// <summary>
@@ -48,6 +41,14 @@ namespace StockSimulator.Core
 		/// </summary>
 		public virtual void Initialize()
 		{
+			// Create all the depenent runnables and save them.
+			Dependents = new List<Runnable>(DependentNames.Length);
+			for (int i = 0; i < DependentNames.Length; i++)
+			{
+				Runnable dependent = _factory.GetRunnable(DependentNames[i]);
+				Dependents.Add(dependent);
+			}
+
 			_isFinishedRunning = false;
 			for (int i = 0; i < Dependents.Count; i++)
 			{
