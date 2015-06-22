@@ -66,12 +66,12 @@ namespace StockSimulator.Strategies
 			Strategy oppositeStrategy = null;
 
 			// See if any setup bars are found.
-			if (bullStrategy.WasFound[currentBar] && Data.HigherTimeframeMomentum[currentBar] == Order.OrderType.Long)
+			if (bullStrategy.WasFound[currentBar] && Data.HigherTimeframeTrend[currentBar] == Order.OrderType.Long)
 			{
 				foundStrategy = bullStrategy;
 				oppositeStrategy = bearStrategy;
 			}
-			else if (bearStrategy.WasFound[currentBar] && Data.HigherTimeframeMomentum[currentBar] == Order.OrderType.Short)
+			else if (bearStrategy.WasFound[currentBar] && Data.HigherTimeframeTrend[currentBar] == Order.OrderType.Short)
 			{
 				foundStrategy = bearStrategy;
 				oppositeStrategy = bullStrategy;

@@ -426,13 +426,6 @@ namespace StockSimulator.Core
 			List<BuyCondition> buyConditions,
 			List<SellCondition> sellConditions)
 		{
-			// Check here that the strategy order type matches
-			// with the higher timeframe trend. Continue if it doesn't.
-			if (orderType != ticker.HigherTimeframeMomentum[currentBar])
-			{
-				return 0;
-			}
-
 			MainStrategyOrder order = new MainStrategyOrder(stats, orderType, ticker, "MainStrategy",
 				currentBar, sizeOfOrder, buyConditions, sellConditions);
 			Simulator.Orders.AddOrder(order, currentBar);

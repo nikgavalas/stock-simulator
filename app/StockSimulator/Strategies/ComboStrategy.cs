@@ -23,6 +23,7 @@ namespace StockSimulator.Strategies
 		protected double _sizeOfOrder;
 		protected double _stopPercent;
 		protected string _namePrefix;
+		protected bool _matchHigherTimeframe;
 
 		/// <summary>
 		/// Construct the class and initialize the bar data to default values.
@@ -40,6 +41,7 @@ namespace StockSimulator.Strategies
 			_sizeOfOrder = Simulator.Config.ComboSizeOfOrder;
 			_stopPercent = Simulator.Config.ComboStopPercent;
 			_namePrefix = "";
+			_matchHigherTimeframe = false;
 		}
 
 		/// <summary>
@@ -186,7 +188,7 @@ namespace StockSimulator.Strategies
 			// Bull and bear strategies can't combo with each other but we still want
 			// to compare them side by side to find our what combo is the best.
 			// So append all the bear combos to the combo list so they can be evaluated too.
-			//List<List<Strategy>> combos = GetComboList(currentBar, Data.HigherTimeframeMomentum[currentBar]);
+			//List<List<Strategy>> combos = GetComboList(currentBar, Data.HigherTimeframeTrend[currentBar]);
 			List<List<Strategy>> combos = GetComboList(currentBar, Order.OrderType.Long);
 			combos.AddRange(GetComboList(currentBar, Order.OrderType.Short));
 
@@ -238,7 +240,9 @@ namespace StockSimulator.Strategies
 
 					// For each combo we want to find out the winning % and the gain
 					// for it and save those values for the bar.
-					if (orderStats.WinPercent > highestWinPercent && orderStats.WinPercent > _minPercentForBuy)
+					if (orderStats.WinPercent > highestWinPercent && 
+						orderStats.WinPercent > _minPercentForBuy &&
+						(_matchHigherTimeframe ==  false || (_matchHigherTimeframe == true && orderStats.StrategyOrderType == Data.HigherTimeframeTrend[currentBar])))
 					{
 						highestWinPercent = orderStats.WinPercent;
 						highestName = orderStats.StrategyName;

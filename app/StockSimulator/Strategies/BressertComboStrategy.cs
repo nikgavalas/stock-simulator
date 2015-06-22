@@ -26,6 +26,7 @@ namespace StockSimulator.Strategies
 			_sizeOfOrder = Simulator.Config.BressertComboSizeOfOrder;
 			_stopPercent = Simulator.Config.BressertComboStopPercent;
 			_namePrefix = "BC-";
+			_matchHigherTimeframe = false;
 		}
 
 		/// <summary>

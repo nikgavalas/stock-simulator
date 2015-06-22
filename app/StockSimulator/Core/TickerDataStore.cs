@@ -491,7 +491,7 @@ namespace StockSimulator.Core
 						{
 							tickerData.Typical.Add(Convert.ToDouble(splitData[(int)DataFields.Typical]));
 							tickerData.Median.Add(Convert.ToDouble(splitData[(int)DataFields.Median]));
-							tickerData.HigherTimeframeMomentum.Add(Convert.ToDouble(splitData[(int)DataFields.HigherState]));
+							tickerData.HigherTimeframeTrend.Add(Convert.ToDouble(splitData[(int)DataFields.HigherState]));
 						}
 						else
 						{
@@ -505,7 +505,7 @@ namespace StockSimulator.Core
 							// Calculate the higher momentum state for this bar. This is a pretty
 							// time consuming function since it has to loop back through all the
 							// bars before (and including) this one.
-							tickerData.HigherTimeframeMomentum.Add(GetHigherTimerframeMomentumState(tickerData));
+							tickerData.HigherTimeframeTrend.Add(GetHigherTimerframeMomentumState(tickerData));
 						}
 					}
 				} while (line != null);
@@ -541,7 +541,8 @@ namespace StockSimulator.Core
 
 			// Run the indicator and save it.
 			//BressertDss higherTimeframeIndicator = new BressertDss(higherTickerData, new RunnableFactory(higherTickerData), 5);
-			Rsi3m3 higherTimeframeIndicator = new Rsi3m3(higherTickerData, new RunnableFactory(higherTickerData));
+			//Rsi3m3 higherTimeframeIndicator = new Rsi3m3(higherTickerData, new RunnableFactory(higherTickerData));
+			Macd higherTimeframeIndicator = new Macd(higherTickerData, new RunnableFactory(higherTickerData));
 			higherTimeframeIndicator.Initialize();
 			higherTimeframeIndicator.Run();
 			higherTimeframeIndicator.Shutdown();
@@ -553,7 +554,7 @@ namespace StockSimulator.Core
 			//if (ticker.TickerAndExchange.ToString() == "NFLX-NASDAQ")
 			//{
 			//	DateTime outputDate = higherTickerData.Dates[higherTickerData.Dates.Count - 1];
-			//	List<double> states = new List<double>(ticker.HigherTimeframeMomentum);
+			//	List<double> states = new List<double>(ticker.HigherTimeframeTrend);
 			//	states.Add(state);
 			//	Simulator.DataOutput.OutputHigherTimeframeData(
 			//		outputDate,
@@ -658,31 +659,39 @@ namespace StockSimulator.Core
 				{
 					return Order.OrderType.Short;
 				}
-				//if (DataSeries.IsBelow(Rsi3m3.Value, 40, currentBar, 2) != -1 && UtilityMethods.IsValley(bressertDss.Value, currentBar))
-				//{
-				//	return Order.OrderType.Long;
-				//}
-				//if (DataSeries.IsAbove(bressertDss.Value, 60, currentBar, 2) != -1 && UtilityMethods.IsPeak(bressertDss.Value, currentBar))
-				//{
-				//	return Order.OrderType.Short;
-				//}
 			}
 
 			return Order.OrderType.Long;
-		}		
-		//private Order.OrderType GetHigherTimeframeStateFromIndicator(Stochastics indicator, int curBar)
-		//{
-		//	if (DataSeries.IsAbove(indicator.K, indicator.D, curBar, 0) != -1 || indicator.K[curBar] == indicator.D[curBar])
-		//	{
-		//		return Order.OrderType.Long;
-		//	}
-		//	else if (DataSeries.IsBelow(indicator.K, indicator.D, curBar, 0) != -1)
-		//	{
-		//		return Order.OrderType.Short;
-		//	}
+		}
 
-		//	throw new Exception("Unknown higher momentum state");
-		//}
+		private double GetHigherTimeframeStateFromIndicator(BressertDss bressertDss, int currentBar)
+		{
+			if (currentBar >= 2)
+			{
+				if (DataSeries.IsBelow(bressertDss.Value, 40, currentBar, 2) != -1 && UtilityMethods.IsValley(bressertDss.Value, currentBar))
+				{
+					return Order.OrderType.Long;
+				}
+				if (DataSeries.IsAbove(bressertDss.Value, 60, currentBar, 2) != -1 && UtilityMethods.IsPeak(bressertDss.Value, currentBar))
+				{
+					return Order.OrderType.Short;
+				}
+			}
+
+			return Order.OrderType.Long;
+		}
+
+		private double GetHigherTimeframeStateFromIndicator(Macd indicator, int currentBar)
+		{
+			return DataSeries.IsAbove(indicator.Value, indicator.Avg, currentBar, 0) != -1 ||
+				indicator.Value[currentBar] == indicator.Avg[currentBar] ? Order.OrderType.Long : Order.OrderType.Short;
+		}
+
+		private double GetHigherTimeframeStateFromIndicator(Stochastics indicator, int curBar)
+		{
+			return DataSeries.IsAbove(indicator.K, indicator.D, curBar, 0) != -1 || indicator.K[curBar] == indicator.D[curBar] ?
+				Order.OrderType.Long : Order.OrderType.Short;
+		}
 
 		/// <summary>
 		/// Gets the data from the webserver and saves it onto disk for later usage.
