@@ -553,7 +553,7 @@ namespace StockSimulator.Core
 			//if (ticker.TickerAndExchange.ToString() == "NFLX-NASDAQ")
 			//{
 			//	DateTime outputDate = higherTickerData.Dates[higherTickerData.Dates.Count - 1];
-			//	List<Order.OrderType> states = new List<Order.OrderType>(ticker.HigherTimeframeMomentum);
+			//	List<double> states = new List<double>(ticker.HigherTimeframeMomentum);
 			//	states.Add(state);
 			//	Simulator.DataOutput.OutputHigherTimeframeData(
 			//		outputDate,
