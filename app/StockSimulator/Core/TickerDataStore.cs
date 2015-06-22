@@ -540,8 +540,8 @@ namespace StockSimulator.Core
 			TickerData higherTickerData = GetHigherTimeframeBars(ticker);
 
 			// Run the indicator and save it.
-			//Stochastics higherTimeframeIndicator = new Stochastics(higherTickerData, new RunnableFactory(higherTickerData));
-			Macd higherTimeframeIndicator = new Macd(higherTickerData, new RunnableFactory(higherTickerData));
+			//BressertDss higherTimeframeIndicator = new BressertDss(higherTickerData, new RunnableFactory(higherTickerData), 5);
+			Rsi3m3 higherTimeframeIndicator = new Rsi3m3(higherTickerData, new RunnableFactory(higherTickerData));
 			higherTimeframeIndicator.Initialize();
 			higherTimeframeIndicator.Run();
 			higherTimeframeIndicator.Shutdown();
@@ -645,20 +645,27 @@ namespace StockSimulator.Core
 		/// <param name="indicator">Momentum indicator to use</param>
 		/// <param name="curBar">Current bar in the momentum simulation</param>
 		/// <returns>The state of the higher momentum indicator</returns>
-		private double GetHigherTimeframeStateFromIndicator(Macd macd, int currentBar)
+		//private double GetHigherTimeframeStateFromIndicator(BressertDss bressertDss, int currentBar)
+		private double GetHigherTimeframeStateFromIndicator(Rsi3m3 rsi, int currentBar)
 		{
-			while (currentBar >= 2)
+			if (currentBar >= 2)
 			{
-				if (macd.Diff[currentBar - 2] > macd.Diff[currentBar - 1] && macd.Diff[currentBar] > macd.Diff[currentBar - 1])
+				if (DataSeries.IsBelow(rsi.Value, 30, currentBar, 2) != -1 && UtilityMethods.IsValley(rsi.Value, currentBar))
 				{
 					return Order.OrderType.Long;
 				}
-				if (macd.Diff[currentBar - 2] < macd.Diff[currentBar - 1] && macd.Diff[currentBar] < macd.Diff[currentBar - 1])
+				if (DataSeries.IsAbove(rsi.Value, 70, currentBar, 2) != -1 && UtilityMethods.IsPeak(rsi.Value, currentBar))
 				{
 					return Order.OrderType.Short;
 				}
-
-				--currentBar;
+				//if (DataSeries.IsBelow(Rsi3m3.Value, 40, currentBar, 2) != -1 && UtilityMethods.IsValley(bressertDss.Value, currentBar))
+				//{
+				//	return Order.OrderType.Long;
+				//}
+				//if (DataSeries.IsAbove(bressertDss.Value, 60, currentBar, 2) != -1 && UtilityMethods.IsPeak(bressertDss.Value, currentBar))
+				//{
+				//	return Order.OrderType.Short;
+				//}
 			}
 
 			return Order.OrderType.Long;
