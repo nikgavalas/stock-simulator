@@ -186,7 +186,9 @@ namespace StockSimulator.Strategies
 			// Bull and bear strategies can't combo with each other but we still want
 			// to compare them side by side to find our what combo is the best.
 			// So append all the bear combos to the combo list so they can be evaluated too.
-			List<List<Strategy>> combos = GetComboList(currentBar, Data.HigherTimeframeMomentum[currentBar]);
+			//List<List<Strategy>> combos = GetComboList(currentBar, Data.HigherTimeframeMomentum[currentBar]);
+			List<List<Strategy>> combos = GetComboList(currentBar, Order.OrderType.Long);
+			combos.AddRange(GetComboList(currentBar, Order.OrderType.Short));
 
 			// Place orders for all the combos.
 			List<StrategyStatistics> stats = new List<StrategyStatistics>();
