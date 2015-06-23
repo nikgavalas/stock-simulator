@@ -22,10 +22,10 @@ namespace StockSimulator.Indicators
 		private int _period = 10;
 		private int _smoothing = 15;
 
-		public BressertDss(TickerData tickerData, RunnableFactory factory, int period)
+		public BressertDss(TickerData tickerData, RunnableFactory factory, string[] settings)
 			: base(tickerData, factory)
 		{
-			_period = period;
+			_period = Convert.ToInt32(settings[0]);
 
 			Value = Enumerable.Repeat(0d, Data.NumBars).ToList();
 			ema = Enumerable.Repeat(0d, Data.NumBars).ToList();
@@ -38,7 +38,7 @@ namespace StockSimulator.Indicators
 		/// <returns>The name of this indicator</returns>
 		public override string ToString()
 		{
-			return "BressertDss" + _period.ToString();
+			return "BressertDss," + _period.ToString();
 		}
 
 		/// <summary>

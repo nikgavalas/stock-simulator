@@ -38,13 +38,13 @@ namespace StockSimulator.Strategies
 			{
 				string[] deps = {
 					// Bull strategies
-					"BullBressertDss10",
-					"BullBressertDss5",
+					"BullBressertDss,10",
+					"BullBressertDss,5",
 					"BullRsi3m3",
 
 					// Bear strategies
-					"BearBressertDss10",
-					"BearBressertDss5",
+					"BearBressertDss,10",
+					"BearBressertDss,5",
 					"BearRsi3m3"
 				};
 

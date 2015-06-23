@@ -13,10 +13,10 @@ namespace StockSimulator.Strategies
 	{
 		private int _period;
 
-		public BearBressertDss(TickerData tickerData, RunnableFactory factory, int period)
+		public BearBressertDss(TickerData tickerData, RunnableFactory factory, string[] settings)
 			: base(tickerData, factory)
 		{
-			_period = period;
+			_period = Convert.ToInt32(settings[0]);
 			_orderType = Order.OrderType.Short;
 		}
 
@@ -28,7 +28,7 @@ namespace StockSimulator.Strategies
 			get
 			{
 				string[] deps = {
-					"BressertDss" + _period.ToString()
+					"BressertDss," + _period.ToString()
 				};
 
 				return deps;
@@ -41,7 +41,7 @@ namespace StockSimulator.Strategies
 		/// <returns>The name of this strategy</returns>
 		public override string ToString()
 		{
-			return "BearBressertDss" + _period;
+			return "BearBressertDss," + _period;
 		}
 
 		/// <summary>

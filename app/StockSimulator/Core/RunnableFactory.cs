@@ -30,14 +30,22 @@ namespace StockSimulator.Core
 		/// If the runnable has already been created, returns that object. If not then
 		/// returns an new runnable object based on the name and the instrument.
 		/// </summary>
-		/// <param name="runnableName">Name of the runnable</param>
+		/// <param name="nameAndParameters">Name of the runnable</param>
 		/// <returns>The runnable object</returns>
-		public Runnable GetRunnable(string runnableName)
+		public Runnable GetRunnable(string nameAndParameters)
 		{
 			Runnable requestedItem = null;
 
+			// The name can have parameters to pass to the runnable construtor
+			// and are separated by commas.
+			// Ex: Rsi,11,3 would create the Rsi and pass the numbers to it in a
+			// list. Its up to the indicator to do what it will with each number.
+			string[] splitParams = nameAndParameters.Split(',');
+			string runnableName = splitParams[0];
+			string[] runnableParams = splitParams.Skip(1).Take(splitParams.Length - 1).ToArray();
+
 			// See if the runnable is created already and return that object if it is.
-			int key = runnableName.GetHashCode();
+			int key = nameAndParameters.GetHashCode();
 			if (_createdItems.ContainsKey(key))
 			{
 				requestedItem = _createdItems[key];
@@ -52,13 +60,8 @@ namespace StockSimulator.Core
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
-					case "BressertDss10":
-						requestedItem = new BressertDss(_tickerData, this, 10);
-						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
-						break;
-
-					case "BressertDss5":
-						requestedItem = new BressertDss(_tickerData, this, 5);
+					case "BressertDss":
+						requestedItem = new BressertDss(_tickerData, this, runnableParams);
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
@@ -287,6 +290,11 @@ namespace StockSimulator.Core
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
+					case "DtOscillator":
+						requestedItem = new DtOscillator(_tickerData, this, runnableParams);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
+						break;
+
 					///////////////////////////// Strategies ////////////////////////////
 
 					case "BestOfRootStrategies":
@@ -429,12 +437,8 @@ namespace StockSimulator.Core
 						requestedItem = new BullDmi(_tickerData, this);
 						break;
 
-					case "BullBressertDss10":
-						requestedItem = new BullBressertDss(_tickerData, this, 10);
-						break;
-
-					case "BullBressertDss5":
-						requestedItem = new BullBressertDss(_tickerData, this, 5);
+					case "BullBressertDss":
+						requestedItem = new BullBressertDss(_tickerData, this, runnableParams);
 						break;
 
 					case "BullRsi3m3":
@@ -636,12 +640,8 @@ namespace StockSimulator.Core
 						requestedItem = new BearDmi(_tickerData, this);
 						break;
 
-					case "BearBressertDss10":
-						requestedItem = new BearBressertDss(_tickerData, this, 10);
-						break;
-
-					case "BearBressertDss5":
-						requestedItem = new BearBressertDss(_tickerData, this, 5);
+					case "BearBressertDss":
+						requestedItem = new BearBressertDss(_tickerData, this, runnableParams);
 						break;
 
 					case "BearRsi3m3":
@@ -711,7 +711,7 @@ namespace StockSimulator.Core
 						break;
 
 					default:
-						throw new Exception(runnableName + " doesn't exist");
+						throw new Exception(nameAndParameters + " doesn't exist");
 				}
 
 				_createdItems[key] = requestedItem;
