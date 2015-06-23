@@ -505,7 +505,8 @@ namespace StockSimulator.Core
 							// Calculate the higher momentum state for this bar. This is a pretty
 							// time consuming function since it has to loop back through all the
 							// bars before (and including) this one.
-							tickerData.HigherTimeframeTrend.Add(GetHigherTimerframeMomentumState(tickerData));
+							double lastValue = tickerData.HigherTimeframeTrend.Count > 0 ? tickerData.HigherTimeframeTrend[tickerData.HigherTimeframeTrend.Count - 1] : Order.OrderType.Long;
+							tickerData.HigherTimeframeTrend.Add(GetHigherTimerframeMomentumState(tickerData, lastValue));
 						}
 					}
 				} while (line != null);
@@ -533,8 +534,9 @@ namespace StockSimulator.Core
 		/// higher time frame momentum analysis.
 		/// </summary>
 		/// <param name="ticker">Ticker data</param>
+		/// <param name="lastState">Last state of the higher timeframe</param>
 		/// <returns>Order type allowed for the last bar of the ticker data</returns>
-		private double GetHigherTimerframeMomentumState(TickerData ticker)
+		private double GetHigherTimerframeMomentumState(TickerData ticker, double lastState)
 		{
 			// Get all the bars for the higher timeframe.
 			TickerData higherTickerData = GetHigherTimeframeBars(ticker);
@@ -542,27 +544,28 @@ namespace StockSimulator.Core
 			// Run the indicator and save it.
 			//BressertDss higherTimeframeIndicator = new BressertDss(higherTickerData, new RunnableFactory(higherTickerData), 5);
 			//Rsi3m3 higherTimeframeIndicator = new Rsi3m3(higherTickerData, new RunnableFactory(higherTickerData));
-			Macd higherTimeframeIndicator = new Macd(higherTickerData, new RunnableFactory(higherTickerData));
+			//Macd higherTimeframeIndicator = new Macd(higherTickerData, new RunnableFactory(higherTickerData));
+			DtOscillator higherTimeframeIndicator = new DtOscillator(higherTickerData, new RunnableFactory(higherTickerData), new string[] { "13", "8", "5", "5" });
 			higherTimeframeIndicator.Initialize();
 			higherTimeframeIndicator.Run();
 			higherTimeframeIndicator.Shutdown();
 
 			// Return what kind orders are allowed.
-			double state = GetHigherTimeframeStateFromIndicator(higherTimeframeIndicator, higherTimeframeIndicator.Data.NumBars - 1);
+			double state = GetHigherTimeframeStateFromIndicator(higherTimeframeIndicator, higherTimeframeIndicator.Data.NumBars - 1, lastState);
 
 			////////////////// START HIGHER TIME FRAME DEBUGGING ////////////////////
-			//if (ticker.TickerAndExchange.ToString() == "NFLX-NASDAQ")
-			//{
-			//	DateTime outputDate = higherTickerData.Dates[higherTickerData.Dates.Count - 1];
-			//	List<double> states = new List<double>(ticker.HigherTimeframeTrend);
-			//	states.Add(state);
-			//	Simulator.DataOutput.OutputHigherTimeframeData(
-			//		outputDate,
-			//		higherTimeframeIndicator,
-			//		higherTickerData,
-			//		ticker,
-			//		states);
-			//}
+			if (ticker.TickerAndExchange.ToString() == "NFLX-NASDAQ")
+			{
+				DateTime outputDate = higherTickerData.Dates[higherTickerData.Dates.Count - 1];
+				List<double> states = new List<double>(ticker.HigherTimeframeTrend);
+				states.Add(state);
+				Simulator.DataOutput.OutputHigherTimeframeData(
+					outputDate,
+					higherTimeframeIndicator,
+					higherTickerData,
+					ticker,
+					states);
+			}
 			//////////////////  END  HIGHER TIME FRAME DEBUGGING ////////////////////
 
 			return state;
@@ -645,9 +648,10 @@ namespace StockSimulator.Core
 		/// </summary>
 		/// <param name="indicator">Momentum indicator to use</param>
 		/// <param name="curBar">Current bar in the momentum simulation</param>
+		/// <param name="lastState">Last state of the higher timeframe</param>
 		/// <returns>The state of the higher momentum indicator</returns>
 		//private double GetHigherTimeframeStateFromIndicator(BressertDss bressertDss, int currentBar)
-		private double GetHigherTimeframeStateFromIndicator(Rsi3m3 rsi, int currentBar)
+		private double GetHigherTimeframeStateFromIndicator(Rsi3m3 rsi, int currentBar, double lastState)
 		{
 			if (currentBar >= 2)
 			{
@@ -661,10 +665,10 @@ namespace StockSimulator.Core
 				}
 			}
 
-			return Order.OrderType.Long;
+			return lastState;
 		}
 
-		private double GetHigherTimeframeStateFromIndicator(BressertDss bressertDss, int currentBar)
+		private double GetHigherTimeframeStateFromIndicator(BressertDss bressertDss, int currentBar, double lastState)
 		{
 			if (currentBar >= 2)
 			{
@@ -678,19 +682,45 @@ namespace StockSimulator.Core
 				}
 			}
 
-			return Order.OrderType.Long;
+			return lastState;
 		}
 
-		private double GetHigherTimeframeStateFromIndicator(Macd indicator, int currentBar)
+		private double GetHigherTimeframeStateFromIndicator(Macd indicator, int currentBar, double lastState)
 		{
 			return DataSeries.IsAbove(indicator.Value, indicator.Avg, currentBar, 0) != -1 ||
 				indicator.Value[currentBar] == indicator.Avg[currentBar] ? Order.OrderType.Long : Order.OrderType.Short;
 		}
 
-		private double GetHigherTimeframeStateFromIndicator(Stochastics indicator, int curBar)
+		private double GetHigherTimeframeStateFromIndicator(DtOscillator ind, int currentBar, double lastState)
 		{
-			return DataSeries.IsAbove(indicator.K, indicator.D, curBar, 0) != -1 || indicator.K[curBar] == indicator.D[curBar] ?
-				Order.OrderType.Long : Order.OrderType.Short;
+			if (currentBar > 0)
+			{
+				if (DataSeries.CrossAbove(ind.SK, ind.SD, currentBar, 0) != -1)
+				{
+					return Order.OrderType.Long;
+				}
+				else if (DataSeries.CrossBelow(ind.SK, ind.SD, currentBar, 0) != -1)
+				{
+					return Order.OrderType.Short;
+				}
+
+				//if (DataSeries.IsBelow(ind.SK, 25, currentBar, 1) != -1)
+				//{
+				//	if (DataSeries.CrossAbove(ind.SK, ind.SD, currentBar, 0) != -1)
+				//	{
+				//		return Order.OrderType.Long;
+				//	}
+				//}
+				//else if (DataSeries.IsAbove(ind.SK, 75, currentBar, 1) != -1)
+				//{
+				//	if (DataSeries.CrossBelow(ind.SK, ind.SD, currentBar, 0) != -1)
+				//	{
+				//		return Order.OrderType.Short;
+				//	}
+				//}
+			}
+
+			return lastState;
 		}
 
 		/// <summary>

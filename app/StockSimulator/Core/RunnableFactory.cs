@@ -200,18 +200,8 @@ namespace StockSimulator.Core
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
-					case "Rsi3":
-						requestedItem = new Rsi(_tickerData, this, 3);
-						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
-						break;
-
-					case "Rsi11":
-						requestedItem = new Rsi(_tickerData, this, 11);
-						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
-						break;
-
-					case "Rsi14":
-						requestedItem = new Rsi(_tickerData, this, 18);
+					case "Rsi":
+						requestedItem = new Rsi(_tickerData, this, runnableParams);
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
@@ -445,6 +435,10 @@ namespace StockSimulator.Core
 						requestedItem = new BullRsi3m3(_tickerData, this);
 						break;
 
+					case "BullDtOscillator":
+						requestedItem = new BullDtOscillator(_tickerData, this);
+						break;
+
 					//////////// Predicted bull strategies ///////////
 
 					case "BullCciCrossoverPredicted":
@@ -647,7 +641,11 @@ namespace StockSimulator.Core
 					case "BearRsi3m3":
 						requestedItem = new BearRsi3m3(_tickerData, this);
 						break;
-					
+
+					case "BearDtOscillator":
+						requestedItem = new BearDtOscillator(_tickerData, this);
+						break;
+
 					//////////// Predicted bear strategies ///////////
 
 					case "BearCciCrossoverPredicted":

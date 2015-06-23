@@ -40,7 +40,7 @@ namespace StockSimulator.Indicators
 			get
 			{
 				string[] deps = {
-					"Rsi11"
+					"Rsi,11"
 				};
 
 				return deps;

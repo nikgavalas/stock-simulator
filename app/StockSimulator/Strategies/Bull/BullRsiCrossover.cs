@@ -25,7 +25,7 @@ namespace StockSimulator.Strategies
 			get
 			{
 				string[] deps = {
-					"Rsi14"
+					"Rsi,14"
 				};
 
 				return deps;

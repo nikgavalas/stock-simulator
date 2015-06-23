@@ -24,7 +24,7 @@ namespace StockSimulator.Indicators
 		private int _period = 14;
 		private int _smooth = 3;
 
-		public Rsi(TickerData tickerData, RunnableFactory factory, int period) 
+		public Rsi(TickerData tickerData, RunnableFactory factory, string[] settings) 
 			: base(tickerData, factory)
 		{
 			Value = Enumerable.Repeat(0d, Data.NumBars).ToList();
@@ -34,7 +34,8 @@ namespace StockSimulator.Indicators
 			_down = Enumerable.Repeat(0d, Data.NumBars).ToList();
 			_avgUp = Enumerable.Repeat(0d, Data.NumBars).ToList();
 			_avgDown = Enumerable.Repeat(0d, Data.NumBars).ToList();
-			_period = period;
+			
+			_period = Convert.ToInt32(settings[0]);
 		}
 
 		/// <summary>

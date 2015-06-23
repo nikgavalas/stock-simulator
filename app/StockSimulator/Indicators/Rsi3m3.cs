@@ -30,12 +30,13 @@ namespace StockSimulator.Indicators
 			get
 			{
 				string[] deps = {
-					"Rsi3"
+					"Rsi,3"
 				};
 
 				return deps;
 			}
 		}
+
 		/// <summary>
 		/// Returns the name of this indicator.
 		/// </summary>

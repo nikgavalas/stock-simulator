@@ -9,12 +9,12 @@ using StockSimulator.Indicators;
 
 namespace StockSimulator.Strategies
 {
-	class BearRsiCrossover : Strategy
+	class BullDtOscillator : Strategy
 	{
-		public BearRsiCrossover(TickerData tickerData, RunnableFactory factory) 
+		public BullDtOscillator(TickerData tickerData, RunnableFactory factory)
 			: base(tickerData, factory)
 		{
-			_orderType = Order.OrderType.Short;
+
 		}
 
 		/// <summary>
@@ -25,7 +25,7 @@ namespace StockSimulator.Strategies
 			get
 			{
 				string[] deps = {
-					"Rsi,14"
+					"DtOscillator,13,8,8,8"
 				};
 
 				return deps;
@@ -38,7 +38,7 @@ namespace StockSimulator.Strategies
 		/// <returns>The name of this strategy</returns>
 		public override string ToString()
 		{
-			return "BearRsiCrossover";
+			return "BullDtOscillator";
 		}
 
 		/// <summary>
@@ -49,10 +49,18 @@ namespace StockSimulator.Strategies
 		{
 			base.OnBarUpdate(currentBar);
 
-			Rsi rsi = (Rsi)Dependents[0];
-			if (DataSeries.CrossBelow(rsi.Value, 70, currentBar, 0) != -1)
+			if (currentBar < 1)
 			{
-				WasFound[currentBar] = true;
+				return;
+			}
+
+			DtOscillator ind = (DtOscillator)Dependents[0];
+			if (DataSeries.IsBelow(ind.SK, 25, currentBar, 1) != -1)
+			{
+				if (DataSeries.CrossAbove(ind.SK, ind.SD, currentBar, 0) != -1)
+				{
+					WasFound[currentBar] = true;
+				}
 			}
 		}
 	}
