@@ -157,6 +157,7 @@
     <Compile Include="Indicators\BressertDss.cs" />
     <Compile Include="Indicators\DtOscillator.cs" />
     <Compile Include="Indicators\EaseOfMovement.cs" />
+    <Compile Include="Indicators\FibonacciZones.cs" />
     <Compile Include="Indicators\KeltnerChannel.cs" />
     <Compile Include="Indicators\Momentum.cs" />
     <Compile Include="Indicators\PriceOscillator.cs" />
@@ -271,6 +272,8 @@
     <Compile Include="Strategies\Bull\BullTrixZeroCrossover.cs" />
     <Compile Include="Strategies\Bull\BullTrixSignalCrossover.cs" />
     <Compile Include="Strategies\Bull\BullWilliamsRCrossover.cs" />
+    <Compile Include="Strategies\FibonacciDtOscillator.cs" />
+    <Compile Include="Strategies\FibonacciRsi3m3.cs" />
     <Compile Include="Strategies\RootSubStrategy.cs" />
     <Compile Include="YahooFinanceDownloader\YahooFinanceDownloader.cs" />
     <Page Include="MainWindow.xaml">

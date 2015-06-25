@@ -285,6 +285,11 @@ namespace StockSimulator.Core
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
+					case "FibonacciZones":
+						requestedItem = new FibonacciZones(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
+						break;
+
 					///////////////////////////// Strategies ////////////////////////////
 
 					case "BestOfRootStrategies":
@@ -301,6 +306,14 @@ namespace StockSimulator.Core
 
 					case "BressertComboStrategy":
 						requestedItem = new BressertComboStrategy(_tickerData, this);
+						break;
+
+					case "FibonacciRsi3m3":
+						requestedItem = new FibonacciRsi3m3(_tickerData, this);
+						break;
+
+					case "FibonacciDtOscillator":
+						requestedItem = new FibonacciDtOscillator(_tickerData, this);
 						break;
 
 					//
