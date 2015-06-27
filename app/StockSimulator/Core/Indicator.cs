@@ -13,16 +13,24 @@ namespace StockSimulator.Core
 	[JsonObject(MemberSerialization.OptIn)]
 	public class Indicator : Runnable
 	{
+		// Common base so we can have different types of series objects.
+		public interface IPlotSeries
+		{
+		}
+
 		/// <summary>
 		/// Class for holding a series of data to be drawn on highcharts.
 		/// </summary>
-		public class PlotSeries
+		public class PlotSeries : IPlotSeries
 		{
 			[JsonProperty("data")]
 			public List<List<object>> PlotData { get; set; }
 
 			[JsonProperty("type")]
 			public string PlotType { get; set; }
+
+			[JsonProperty("connectNulls")]
+			public bool ShouldConnectNulls { get; set; }
 
 			/// <summary>
 			/// Default constructor
@@ -31,6 +39,7 @@ namespace StockSimulator.Core
 			{
 				PlotData = new List<List<object>>();
 				PlotType = "line";
+				ShouldConnectNulls = false;
 			}
 
 			/// <summary>
@@ -45,6 +54,27 @@ namespace StockSimulator.Core
 		}
 
 		/// <summary>
+		/// Series for flags.
+		/// </summary>
+		public class PlotSeriesFlag : IPlotSeries
+		{
+			[JsonProperty("data")]
+			public List<Dictionary<string, object>> PlotData { get; set; }
+
+			[JsonProperty("type")]
+			public string PlotType { get; set; }
+
+			/// <summary>
+			/// Default constructor
+			/// </summary>
+			public PlotSeriesFlag()
+			{
+				PlotData = new List<Dictionary<string, object>>();
+				PlotType = "flags";
+			}
+		}
+
+		/// <summary>
 		/// True if the indicator should be drawn in the price area. False if it should have its own area to draw.
 		/// </summary>
 		[JsonProperty("plotOnPrice")]
@@ -54,7 +84,7 @@ namespace StockSimulator.Core
 		}
 
 		[JsonProperty("series")]
-		public Dictionary<string, PlotSeries> ChartPlots { get; set; }
+		public Dictionary<string, IPlotSeries> ChartPlots { get; set; }
 
 		/// <summary>
 		/// Add this indicator to be saved for output later.
@@ -71,7 +101,7 @@ namespace StockSimulator.Core
 		/// </summary>
 		public virtual void PrepareForSerialization()
 		{
-			ChartPlots = new Dictionary<string, PlotSeries>();
+			ChartPlots = new Dictionary<string, IPlotSeries>();
 		}
 
 		/// <summary>

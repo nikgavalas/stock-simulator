@@ -290,6 +290,16 @@ namespace StockSimulator.Core
 						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
 						break;
 
+					case "ElliotWaves":
+						requestedItem = new ElliotWaves(_tickerData, this);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
+						break;
+
+					case "ZigZag":
+						requestedItem = new ZigZag(_tickerData, this, runnableParams);
+						Simulator.DataOutput.SaveIndicator((Indicator)requestedItem);
+						break;
+
 					///////////////////////////// Strategies ////////////////////////////
 
 					case "BestOfRootStrategies":
@@ -314,6 +324,10 @@ namespace StockSimulator.Core
 
 					case "FibonacciDtOscillator":
 						requestedItem = new FibonacciDtOscillator(_tickerData, this);
+						break;
+
+					case "ElliotWavesStrategy":
+						requestedItem = new ElliotWavesStrategy(_tickerData, this);
 						break;
 
 					//

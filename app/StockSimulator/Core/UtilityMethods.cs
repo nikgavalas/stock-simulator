@@ -167,5 +167,20 @@ namespace StockSimulator.Core
 			// that we acutally turned down.
 			return series[currentBar - 2] <= series[currentBar - 1] && series[currentBar - 1] > series[currentBar];
 		}
+
+		/// <summary>
+		/// Compares the two prices to see if b is valued greater than a depending on the trade
+		/// direction. So for a long trade, if b is a higher price than a, it is. For a short
+		/// trade, if b is a lower price than a, then it is.
+		/// </summary>
+		/// <param name="a">First price</param>
+		/// <param name="b">Second price</param>
+		/// <param name="direction">Trade direction, 1.0 for long, -1.0 for short</param>
+		/// <returns>Return value > 0: b is valued higher, < 0: b is valued lower, 0: they are equal</returns>
+		public static double ComparePrices(double a, double b, double direction)
+		{
+			// Bull price comparison, is b a higher price than a
+			return direction > 0.0 ? b - a : a - b;
+		}
 	}
 }

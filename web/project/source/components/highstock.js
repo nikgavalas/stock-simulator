@@ -40,11 +40,24 @@ mainApp.directive('highstock', [
 						if (data.plotOnPrice) {
 							for (seriesName in data.series) {
 								seriesData = data.series[seriesName];
-								newSeries = chart.addSeries({
-									name: seriesName,
-									data: seriesData.data,
-									type: seriesData.type
-								}, false);
+								
+								if (seriesData.type === 'flags') {
+									newSeries = chart.addSeries({
+										name: seriesName,
+										data: seriesData.data,
+										type: seriesData.type,
+										onSeries: 'price-series',
+										shape: 'squarepin'
+									}, false);
+								}
+								else {
+									newSeries = chart.addSeries({
+										name: seriesName,
+										data: seriesData.data,
+										type: seriesData.type,
+										connectNulls: seriesData.connectNulls
+									}, false);
+								}
 							}
 
 							chart.redraw();

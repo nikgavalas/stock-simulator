@@ -23,6 +23,7 @@ namespace StockSimulator.Core
 		protected RunnableFactory _factory;
 
 		private bool _isFinishedRunning;
+		private int _lastBarUpdated;
 
 		/// <summary>
 		/// Constructor for the runnable.
@@ -31,9 +32,9 @@ namespace StockSimulator.Core
 		{
 			_factory = factory;
 			_isFinishedRunning = false;
+			_lastBarUpdated = -1;
 
 			Data = tickerData;
-
 		}
 
 		/// <summary>
@@ -57,7 +58,7 @@ namespace StockSimulator.Core
 		}
 
 		/// <summary>
-		/// Runs this object for all bars included in the simulation.
+		/// Runs this object for all bars included in the simulation and all it's dependents.
 		/// </summary>
 		public virtual void Run()
 		{
@@ -67,15 +68,8 @@ namespace StockSimulator.Core
 				return;
 			}
 
-			// Run all the dependents before this one.
-			for (int i = 0; i < Dependents.Count; i++)
-			{
-				Dependents[i].Run();
-			}
- 
-			// Then run this one. Just use the closing data as the number of bars to run.
-			// The dependents will have all the other ticker data but they are all the same
-			// size lists.
+			// Just use the closing data as the number of bars to run.
+			// The dependents all have the same ticker so they are all the same size lists.
 			for (int i = 0; i < Data.Close.Count; i++)
 			{
 				if (Data.IsValidBar(i) == true)
@@ -112,6 +106,19 @@ namespace StockSimulator.Core
 		/// </summary>
 		protected virtual void OnBarUpdate(int currentBar)
 		{
+			// Prevent from updating multiple times on the same bar.
+			if (currentBar <= _lastBarUpdated)
+			{
+				return;
+			}
+
+			// Update all the dependents before this one.
+			for (int i = 0; i < Dependents.Count; i++)
+			{
+				Dependents[i].OnBarUpdate(currentBar);
+			}
+
+			_lastBarUpdated = currentBar;
 		}
 
 		// TODO: Check for circular depedents and throw an exception.

@@ -32,9 +32,10 @@ namespace StockSimulator.Strategies
 			get
 			{
 				string[] deps = {
+					"ElliotWavesStrategy"
 					//"FibonacciRsi3m3",
-					"FibonacciDtOscillator"
-					//"BressertComboStrategy"
+					//"FibonacciDtOscillator",
+					//"BressertComboStrategy",
 					//"ComboStrategy",
 					//"BressertApproach"
 				};
