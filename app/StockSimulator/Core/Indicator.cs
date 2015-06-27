@@ -87,11 +87,15 @@ namespace StockSimulator.Core
 		public Dictionary<string, IPlotSeries> ChartPlots { get; set; }
 
 		/// <summary>
+		/// Number of bars to look back and run from for this indicator.
+		/// </summary>
+		public int NumLookbackBars { get; set; }
+
+		/// <summary>
 		/// Add this indicator to be saved for output later.
 		/// </summary>
 		/// <param name="tickerData">Ticker that the indicator is calculated with</param>
-		/// <param name="factory">Factory for creating runnables</param>
-		public Indicator(TickerData tickerData, RunnableFactory factory) : base(tickerData, factory)
+		public Indicator(TickerData tickerData) : base(tickerData)
 		{
 		}
 
@@ -110,6 +114,29 @@ namespace StockSimulator.Core
 		public void FreeResourcesAfterSerialization()
 		{
 			ChartPlots = null;
+		}
+
+		/// <summary>
+		/// Runs the indicator from it's lookback bars till this bar.
+		/// </summary>
+		/// <param name="bar">Bar to run to</param>
+		public void RunToBar(int bar)
+		{
+			int startBar = Math.Max(0, bar - NumLookbackBars);
+			for (int i = startBar; i <= bar; i++)
+			{
+				OnBarUpdate(i);
+			}
+		}
+
+		/// <summary>
+		/// Called everytime there is a new bar of data. For indicators we are only
+		/// allowed to call this from the RunToBar function.
+		/// <param name="currentBar">Current bar to simulate</param>
+		/// </summary>
+		protected override void OnBarUpdate(int currentBar)
+		{
+			base.OnBarUpdate(currentBar);
 		}
 	}
 }

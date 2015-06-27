@@ -67,11 +67,11 @@ namespace StockSimulator.Strategies
 			// For each dependent strategy, see if they are found on this bar.
 			// If they are then we'll see which is the best and treat that
 			// as the only one found on todays bar for the main strategy.
-			for (int i = 0; i < Dependents.Count; i++)
+			for (int i = 0; i < _dependents.Count; i++)
 			{
-				if (Dependents[i] is RootSubStrategy)
+				if (_dependents[i] is RootSubStrategy)
 				{
-					RootSubStrategy dependentStrategy = (RootSubStrategy)Dependents[i];
+					RootSubStrategy dependentStrategy = (RootSubStrategy)_dependents[i];
 
 					// If there is a percent then there was something found. Save the
 					// highest one as the one found today.

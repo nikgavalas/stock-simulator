@@ -38,15 +38,15 @@ namespace StockSimulator.Indicators
 		private int trendDir = 0; // 1 = trend up, -1 = trend down, init = 0
 		private bool useHighLow = true;
 
-		public ZigZag(TickerData tickerData, RunnableFactory factory, string[] settings)
-			: base(tickerData, factory)
+		public ZigZag(TickerData tickerData, double devValue)
+			: base(tickerData)
 		{
 			Value = Enumerable.Repeat(0d, Data.NumBars).ToList();
 			ZigZagHighs = Enumerable.Repeat(0d, Data.NumBars).ToList();
 			ZigZagLows = Enumerable.Repeat(0d, Data.NumBars).ToList();
 			zigZagHighSeries = Enumerable.Repeat(0d, Data.NumBars).ToList();
 			zigZagLowSeries = Enumerable.Repeat(0d, Data.NumBars).ToList();
-			deviationValue = Convert.ToDouble(settings[0]);
+			deviationValue = devValue;
 		}
 
 		/// <summary>

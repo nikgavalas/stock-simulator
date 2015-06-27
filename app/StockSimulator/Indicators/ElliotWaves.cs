@@ -40,27 +40,29 @@ namespace StockSimulator.Indicators
 
 		private double _5thWaveDirection = 0.0; // 1 is bull, -1 bear, 0 not in a 5th wave
 
-		public ElliotWaves(TickerData tickerData, RunnableFactory factory)
-			: base(tickerData, factory)
+		/// <summary>
+		/// Creates the indicator.
+		/// </summary>
+		/// <param name="tickerData">Price data</param>
+		public ElliotWaves(TickerData tickerData)
+			: base(tickerData)
 		{
-			FifthWaveValue = Enumerable.Repeat(0d, Data.NumBars).ToList();
-			FifthWaveDirection = Enumerable.Repeat(0d, Data.NumBars).ToList();
-			WaveLabels = Enumerable.Repeat<WavePointLabel>(null, Data.NumBars).ToList();
+			_dependents = new List<Runnable>()
+			{
+				(Runnable)new ZigZag(Data, 5.0)
+			};
 		}
 
 		/// <summary>
-		/// Returns an array of dependent names.
+		/// Resets the indicator to it's starting state.
 		/// </summary>
-		public override string[] DependentNames
+		public override void Initialize()
 		{
-			get
-			{
-				string[] deps = {
-					"ZigZag,5"
-				};
+			base.Initialize();
 
-				return deps;
-			}
+			FifthWaveValue = Enumerable.Repeat(0d, Data.NumBars).ToList();
+			FifthWaveDirection = Enumerable.Repeat(0d, Data.NumBars).ToList();
+			WaveLabels = Enumerable.Repeat<WavePointLabel>(null, Data.NumBars).ToList();
 		}
 
 		/// <summary>

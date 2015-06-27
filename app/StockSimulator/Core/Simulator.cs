@@ -186,28 +186,28 @@ namespace StockSimulator.Core
 		/// </summary>
 		public void Run()
 		{
-			WriteMessage("Running historical analysis for all tickers");
+//			WriteMessage("Running historical analysis for all tickers");
 
-			int totalInstruments = Instruments.Count;
-			int amountFinished = 0;
+//			int totalInstruments = Instruments.Count;
+//			int amountFinished = 0;
 
-			// Run all to start with so we have the data to simulate with.
-#if DEBUG
-			foreach (KeyValuePair<string, BestOfRootStrategies> task in Instruments)
-#else
-			Parallel.ForEach(Instruments, task =>
-#endif
-			{
-				task.Value.Run();
-				Orders.PurgeTickerOrders(task.Value.Data.TickerAndExchange);
+//			// Run all to start with so we have the data to simulate with.
+//#if DEBUG
+//			foreach (KeyValuePair<string, BestOfRootStrategies> task in Instruments)
+//#else
+//			Parallel.ForEach(Instruments, task =>
+//#endif
+//			{
+//				task.Value.Run();
+//				Orders.PurgeTickerOrders(task.Value.Data.TickerAndExchange);
 
-				Interlocked.Increment(ref amountFinished);
-				WriteMessage((((double)amountFinished / totalInstruments) * 100.0).ToString("##.##") + "% Complete");
-#if DEBUG
-			}
-#else
-			});
-#endif
+//				Interlocked.Increment(ref amountFinished);
+//				WriteMessage((((double)amountFinished / totalInstruments) * 100.0).ToString("##.##") + "% Complete");
+//#if DEBUG
+//			}
+//#else
+//			});
+//#endif
 
 			DateTime startDate = DataStore.SimTickerDates.First().Key;
 			DateTime endDate = DataStore.SimTickerDates.Last().Key;
@@ -272,6 +272,9 @@ namespace StockSimulator.Core
 				if (currentBar != -1)
 				{
 					isTradingBar = true;
+
+					// Run the strategy for this bar.
+					strat.OnBarUpdate(currentBar);
 
 					// All bars have a zero value by default. So something is found when the 
 					// percent is higher than that.

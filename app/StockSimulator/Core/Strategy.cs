@@ -69,12 +69,36 @@ namespace StockSimulator.Core
 		}
 
 		/// <summary>
-		/// Updates the orders that are from this strategy.
+		/// Calls update for any dependent strategies and then runs the dependent indicators
+		/// for the require bars so they are up to date for this bar. Indicators need to be
+		/// run everytime because they can change with new bar data. For example, the ZigZag
+		/// indicator finds high and low swings and draws a line between them. On one bar, a
+		/// high might seem like the highest, but then a few bars later it's not and the line
+		/// needs to be updated. The strategy that depends on that data needs to see the updated view.
+		/// Oh and also updates the orders that are from this strategy.
 		/// </summary>
 		/// <param name="currentBar">The current bar in the simulation</param>
-		protected override void OnBarUpdate(int currentBar)
+		public override void OnBarUpdate(int currentBar)
 		{
 			base.OnBarUpdate(currentBar);
+
+			// Run any dependent strategies.
+			for (int i = 0; i < _dependents.Count; i++)
+			{
+				if (_dependents[i] is Strategy)
+				{
+					_dependents[i].OnBarUpdate(currentBar);
+				}
+			}
+
+			// Now run any dependent indicators that this strategy needs.
+			for (int i = 0; i < _dependents.Count; i++)
+			{
+				if (_dependents[i] is Indicator)
+				{
+					((Indicator)_dependents[i]).RunToBar(currentBar);
+				}
+			}
 
 			// Update all the open orders.
 			for (int i = 0; i < _activeOrders.Count; i++)
