@@ -29,11 +29,14 @@ namespace StockSimulator.Core
 		/// Adds an order to all the dictionaries for searching by multiple key types.
 		/// </summary>
 		/// <param name="order">The order to add</param>
+		/// <param name="dependentIndicators">Indicators used when making a decision to place this order</param>
 		/// <param name="currentBar">Current bar the order is being added in</param>
-		public void AddOrder(Order order, int currentBar)
+		public void AddOrder(Order order, List<Indicator> dependentIndicators, int currentBar)
 		{
 			AddToListTable(TickerDictionary, order, order.Ticker.TickerAndExchange.GetHashCode());
 			AddToListTableConcurrent(StrategyDictionary, order, order.StrategyName.GetHashCode());
+
+			SaveSnapshot(order, dependentIndicators, currentBar);
 		}
 
 		/// <summary>
@@ -144,6 +147,18 @@ namespace StockSimulator.Core
 			}
 
 			return stats;
+		}
+
+		/// <summary>
+		/// Saves the indicator series for this order so that during analysis we can see
+		/// exactly what the indicators looked like at the time the order was placed.
+		/// </summary>
+		/// <param name="order">The order to add</param>
+		/// <param name="dependentIndicators">Indicators used when making a decision to place this order</param>
+		/// <param name="currentBar">Current bar the order was placed.</param>
+		private void SaveSnapshot(Order order, List<Indicator> dependentIndicators, int currentBar)
+		{
+			Simulator.DataOutput.OutputIndicatorSnapshots(order, dependentIndicators, currentBar);
 		}
 
 		/// <summary>

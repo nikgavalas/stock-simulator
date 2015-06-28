@@ -12,17 +12,25 @@ namespace StockSimulator.Strategies
 		/// <summary>
 		/// List of bar data.
 		/// </summary>
-		public List<BarStatistics> Bars { get; set; }
+		public List<OrderSuggestion> Bars { get; set; }
 
 		/// <summary>
 		/// Construct the class and initialize the bar data to default values.
 		/// </summary>
 		/// <param name="tickerData">Ticker for the strategy</param>
-		/// <param name="factory">Factory for creating dependents</param>
-		public RootSubStrategy(TickerData tickerData, RunnableFactory factory) 
-			: base(tickerData, factory)
+		public RootSubStrategy(TickerData tickerData) 
+			: base(tickerData)
 		{
-			Bars = Enumerable.Repeat(new BarStatistics(), tickerData.NumBars).ToList();
+		}
+
+		/// <summary>
+		/// Resets the indicator to it's starting state.
+		/// </summary>
+		public override void Initialize()
+		{
+			base.Initialize();
+
+			Bars = Enumerable.Repeat(new OrderSuggestion(), Data.NumBars).ToList();
 		}
 	}
 }

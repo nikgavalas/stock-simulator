@@ -25,6 +25,7 @@ namespace StockSimulator.Core
 		/// <param name="fromStrategyName">The name of the strategy that placed this order</param>
 		/// <param name="currentBar">Current bar that the order was placed</param>
 		/// <param name="sizeOfOrder">Amount of money to place in this order</param>
+		/// <param name="dependentIndicators">List of all the dependent indicators</param>
 		/// <param name="buyConditions">All the buy conditions that must be met to fill the order</param>
 		/// <param name="sellConditions">Any of the sell conditions trigger a sell</param>
 		public MainStrategyOrder(
@@ -34,9 +35,10 @@ namespace StockSimulator.Core
 			string fromStrategyName, 
 			int currentBar,
 			double sizeOfOrder,
+			List<string> dependentIndicators,
 			List<BuyCondition> buyConditions,
 			List<SellCondition> sellConditions)
-			: base(type, tickerData, fromStrategyName, currentBar, sizeOfOrder, null, buyConditions, sellConditions)
+			: base(type, tickerData, fromStrategyName, currentBar, sizeOfOrder, dependentIndicators, buyConditions, sellConditions)
 		{
 			Statistics = stats;
 		}

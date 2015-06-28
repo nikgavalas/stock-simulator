@@ -545,9 +545,9 @@ namespace StockSimulator.Core
 			//BressertDss higherTimeframeIndicator = new BressertDss(higherTickerData, new RunnableFactory(higherTickerData), 5);
 			//Rsi3m3 higherTimeframeIndicator = new Rsi3m3(higherTickerData, new RunnableFactory(higherTickerData));
 			//Macd higherTimeframeIndicator = new Macd(higherTickerData, new RunnableFactory(higherTickerData));
-			DtOscillator higherTimeframeIndicator = new DtOscillator(higherTickerData, new RunnableFactory(higherTickerData), new string[] { "13", "8", "5", "5" });
+			DtOscillator higherTimeframeIndicator = new DtOscillator(higherTickerData) { PeriodRsi = 13, PeriodStoch = 8, PeriodSK = 5, PeriodSD = 5 };
 			higherTimeframeIndicator.Initialize();
-			higherTimeframeIndicator.Run();
+			//higherTimeframeIndicator.Run();
 			higherTimeframeIndicator.Shutdown();
 
 			// Return what kind orders are allowed.
@@ -651,45 +651,45 @@ namespace StockSimulator.Core
 		/// <param name="lastState">Last state of the higher timeframe</param>
 		/// <returns>The state of the higher momentum indicator</returns>
 		//private double GetHigherTimeframeStateFromIndicator(BressertDss bressertDss, int currentBar)
-		private double GetHigherTimeframeStateFromIndicator(Rsi3m3 rsi, int currentBar, double lastState)
-		{
-			if (currentBar >= 2)
-			{
-				if (DataSeries.IsBelow(rsi.Value, 30, currentBar, 2) != -1 && UtilityMethods.IsValley(rsi.Value, currentBar))
-				{
-					return Order.OrderType.Long;
-				}
-				if (DataSeries.IsAbove(rsi.Value, 70, currentBar, 2) != -1 && UtilityMethods.IsPeak(rsi.Value, currentBar))
-				{
-					return Order.OrderType.Short;
-				}
-			}
+		//private double GetHigherTimeframeStateFromIndicator(Rsi3m3 rsi, int currentBar, double lastState)
+		//{
+		//	if (currentBar >= 2)
+		//	{
+		//		if (DataSeries.IsBelow(rsi.Value, 30, currentBar, 2) != -1 && UtilityMethods.IsValley(rsi.Value, currentBar))
+		//		{
+		//			return Order.OrderType.Long;
+		//		}
+		//		if (DataSeries.IsAbove(rsi.Value, 70, currentBar, 2) != -1 && UtilityMethods.IsPeak(rsi.Value, currentBar))
+		//		{
+		//			return Order.OrderType.Short;
+		//		}
+		//	}
 
-			return lastState;
-		}
+		//	return lastState;
+		//}
 
-		private double GetHigherTimeframeStateFromIndicator(BressertDss bressertDss, int currentBar, double lastState)
-		{
-			if (currentBar >= 2)
-			{
-				if (DataSeries.IsBelow(bressertDss.Value, 40, currentBar, 2) != -1 && UtilityMethods.IsValley(bressertDss.Value, currentBar))
-				{
-					return Order.OrderType.Long;
-				}
-				if (DataSeries.IsAbove(bressertDss.Value, 60, currentBar, 2) != -1 && UtilityMethods.IsPeak(bressertDss.Value, currentBar))
-				{
-					return Order.OrderType.Short;
-				}
-			}
+		//private double GetHigherTimeframeStateFromIndicator(BressertDss bressertDss, int currentBar, double lastState)
+		//{
+		//	if (currentBar >= 2)
+		//	{
+		//		if (DataSeries.IsBelow(bressertDss.Value, 40, currentBar, 2) != -1 && UtilityMethods.IsValley(bressertDss.Value, currentBar))
+		//		{
+		//			return Order.OrderType.Long;
+		//		}
+		//		if (DataSeries.IsAbove(bressertDss.Value, 60, currentBar, 2) != -1 && UtilityMethods.IsPeak(bressertDss.Value, currentBar))
+		//		{
+		//			return Order.OrderType.Short;
+		//		}
+		//	}
 
-			return lastState;
-		}
+		//	return lastState;
+		//}
 
-		private double GetHigherTimeframeStateFromIndicator(Macd indicator, int currentBar, double lastState)
-		{
-			return DataSeries.IsAbove(indicator.Value, indicator.Avg, currentBar, 0) != -1 ||
-				indicator.Value[currentBar] == indicator.Avg[currentBar] ? Order.OrderType.Long : Order.OrderType.Short;
-		}
+		//private double GetHigherTimeframeStateFromIndicator(Macd indicator, int currentBar, double lastState)
+		//{
+		//	return DataSeries.IsAbove(indicator.Value, indicator.Avg, currentBar, 0) != -1 ||
+		//		indicator.Value[currentBar] == indicator.Avg[currentBar] ? Order.OrderType.Long : Order.OrderType.Short;
+		//}
 
 		private double GetHigherTimeframeStateFromIndicator(DtOscillator ind, int currentBar, double lastState)
 		{

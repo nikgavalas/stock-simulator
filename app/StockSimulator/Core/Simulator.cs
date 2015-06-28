@@ -64,7 +64,6 @@ namespace StockSimulator.Core
 		public Simulator(IProgress<string> progress, CancellationToken cancelToken)
 		{
 			NumberOfBars = 0;
-			DataOutput = new DataOutputter();
 			_activeOrders = new List<MainStrategyOrder>();
 			_progress = progress;
 			_cancelToken = cancelToken;
@@ -78,6 +77,7 @@ namespace StockSimulator.Core
 		{
 			Config = config;
 			DataStore = dataStore;
+			DataOutput = new DataOutputter();
 
 			if (Config.UseTodaysDate)
 			{
@@ -133,10 +133,10 @@ namespace StockSimulator.Core
 				if (tickerData != null)
 				{
 					DataOutput.SaveTickerData(tickerData);
-					RunnableFactory factory = new RunnableFactory(tickerData);
+					//RunnableFactory factory = new RunnableFactory(tickerData);
 
 					// This strategy will find the best strategy for this instrument everyday and save the value.
-					downloadedInstruments[item.Value.ToString()] = new BestOfRootStrategies(tickerData, factory);
+					downloadedInstruments[item.Value.ToString()] = new BestOfRootStrategies(tickerData);
 				}
 				else
 				{
@@ -325,7 +325,7 @@ namespace StockSimulator.Core
 						// If not then since the list is sorted, no other ones will
 						// be high enough and we can early out of the loop.
 						int strategyBarIndex = buyList[i].Data.GetBar(currentDate);
-						BarStatistics barStats = buyList[i].Bars[strategyBarIndex];
+						OrderSuggestion barStats = buyList[i].Bars[strategyBarIndex];
 						if (barStats.HighestPercent > 0) // TODO: move to combo strategy && barStats.ComboSizeOfHighestStrategy >= Simulator.Config.MinComboSizeToBuy)
 						{
 							// Make sure we have enough money and also that we have enough time
@@ -337,6 +337,7 @@ namespace StockSimulator.Core
 									buyList[i].Data, 
 									strategyBarIndex,
 									barStats.SizeOfOrder,
+									barStats.DependentIndicators,
 									barStats.BuyConditions,
 									barStats.SellConditions);
 							}
@@ -418,6 +419,7 @@ namespace StockSimulator.Core
 		/// <param name="ticker">Ticker we're placing the order on</param>
 		/// <param name="currentBar">Current bar of the simulation</param>
 		/// <param name="sizeOfOrder">Amount of money to place in this order</param>
+		/// <param name="dependentIndicators">List of all the dependent indicators</param>
 		/// <param name="buyConditions">All the buy conditions that must be met to fill the order</param>
 		/// <param name="sellConditions">Any of the sell conditions trigger a sell</param>
 		private int EnterOrder(
@@ -426,12 +428,25 @@ namespace StockSimulator.Core
 			TickerData ticker,
 			int currentBar,
 			double sizeOfOrder,
+			List<Indicator> dependentIndicators,
 			List<BuyCondition> buyConditions,
 			List<SellCondition> sellConditions)
 		{
+
+			// Save only the names of the indicators for the order to track. The order manager
+			// will use the actual indicators to save what they look like when this order
+			// was placed.
+			List<string> indicatorNames = new List<string>();
+			for (int i = 0; i < dependentIndicators.Count; i++)
+			{
+				indicatorNames.Add(dependentIndicators[i].ToString());
+			}
+			
 			MainStrategyOrder order = new MainStrategyOrder(stats, orderType, ticker, "MainStrategy",
-				currentBar, sizeOfOrder, buyConditions, sellConditions);
-			Simulator.Orders.AddOrder(order, currentBar);
+				currentBar, sizeOfOrder, indicatorNames, buyConditions, sellConditions);
+			
+			Simulator.Orders.AddOrder(order, dependentIndicators, currentBar);
+
 			_activeOrders.Add(order);
 			return 1;
 		}

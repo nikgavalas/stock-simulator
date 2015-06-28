@@ -41,12 +41,29 @@ namespace StockSimulator.Indicators
 		public ZigZag(TickerData tickerData, double devValue)
 			: base(tickerData)
 		{
+			deviationValue = devValue;
+		}
+
+		/// <summary>
+		/// Resets the indicator to it's starting state.
+		/// </summary>
+		public override void Initialize()
+		{
+			base.Initialize();
+
+			currentZigZagHigh = 0;
+			currentZigZagLow = 0;
+			deviationType = DeviationType.Percent;
+			lastSwingIdx = -1;
+			lastSwingPrice = 0.0;
+			trendDir = 0; // 1 = trend up, -1 = trend down, init = 0
+			useHighLow = true;
+
 			Value = Enumerable.Repeat(0d, Data.NumBars).ToList();
 			ZigZagHighs = Enumerable.Repeat(0d, Data.NumBars).ToList();
 			ZigZagLows = Enumerable.Repeat(0d, Data.NumBars).ToList();
 			zigZagHighSeries = Enumerable.Repeat(0d, Data.NumBars).ToList();
 			zigZagLowSeries = Enumerable.Repeat(0d, Data.NumBars).ToList();
-			deviationValue = devValue;
 		}
 
 		/// <summary>
@@ -68,33 +85,41 @@ namespace StockSimulator.Indicators
 		}
 
 		/// <summary>
-		/// Save the indicator data in a serialization friendly way.
+		/// Creates the plots for the data to be added to.
 		/// </summary>
-		public override void PrepareForSerialization()
+		public override void CreatePlots()
 		{
-			base.PrepareForSerialization();
+			base.CreatePlots();
 
 			// Add the indicator for plotting
 			PlotSeries line = new PlotSeries("line");
 			line.ShouldConnectNulls = true;
 			ChartPlots[ToString()] = line;
+		}
 
-			for (int i = 0; i < Data.Dates.Count; i++)
+		/// <summary>
+		/// Adds data to the created plots for the indicator at the current bar.
+		/// </summary>
+		/// <param name="currentBar"></param>
+		public override void AddToPlots(int currentBar)
+		{
+			base.AddToPlots(currentBar);
+
+			PlotSeries line = (PlotSeries)ChartPlots[ToString()];
+
+			long ticks = UtilityMethods.UnixTicks(Data.Dates[currentBar]);
+			line.PlotData.Add(new List<object>()
 			{
-				long ticks = UtilityMethods.UnixTicks(Data.Dates[i]);
-				line.PlotData.Add(new List<object>()
-				{
-					ticks,
-					Value[i] > 0.0 ? (object)Math.Round(Value[i], 2) : null
-				});
-			}
+				ticks,
+				Value[currentBar] > 0.0 ? (object)Math.Round(Value[currentBar], 2) : null
+			});
 		}
 
 		/// <summary>
 		/// Called on every new bar of data.
 		/// </summary>
 		/// <param name="currentBar">The current bar of the simulation</param>
-		protected override void OnBarUpdate(int currentBar)
+		public override void OnBarUpdate(int currentBar)
 		{
 			base.OnBarUpdate(currentBar);
 

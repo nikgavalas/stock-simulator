@@ -42,6 +42,7 @@ namespace StockSimulator.Indicators
 
 		/// <summary>
 		/// Creates the indicator.
+		/// Add any dependents here.
 		/// </summary>
 		/// <param name="tickerData">Price data</param>
 		public ElliotWaves(TickerData tickerData)
@@ -84,34 +85,43 @@ namespace StockSimulator.Indicators
 		}
 
 		/// <summary>
-		/// Save the indicator data in a serialization friendly way.
+		/// Creates the plots for the data to be added to.
 		/// </summary>
-		public override void PrepareForSerialization()
+		public override void CreatePlots()
 		{
-			base.PrepareForSerialization();
+			base.CreatePlots();
 
-			// Add the value for plotting
 			PlotSeries plot = new PlotSeries("line");
 			PlotSeriesFlag plotFlag = new PlotSeriesFlag();
 			ChartPlots[ToString()] = plot;
 			ChartPlots[ToString() + "label"] = plotFlag;
-			for (int i = 0; i < Data.Dates.Count; i++)
-			{
-				long ticks = UtilityMethods.UnixTicks(Data.Dates[i]);
-				plot.PlotData.Add(new List<object>()
-				{
-					ticks,
-					FifthWaveValue[i] > 0.0 ? (object)Math.Round(FifthWaveValue[i], 2) : null
-				});
+		}
 
-				if (WaveLabels[i] != null)
+		/// <summary>
+		/// Adds data to the created plots for the indicator at the current bar.
+		/// </summary>
+		/// <param name="currentBar"></param>
+		public override void AddToPlots(int currentBar)
+		{
+			base.AddToPlots(currentBar);
+
+			PlotSeries plot = (PlotSeries)ChartPlots[ToString()];
+			PlotSeriesFlag plotFlag = (PlotSeriesFlag)ChartPlots[ToString() + "label"];
+
+			long ticks = UtilityMethods.UnixTicks(Data.Dates[currentBar]);
+			plot.PlotData.Add(new List<object>()
+			{
+				ticks,
+				FifthWaveValue[currentBar] > 0.0 ? (object)Math.Round(FifthWaveValue[currentBar], 2) : null
+			});
+
+			if (WaveLabels[currentBar] != null)
+			{
+				plotFlag.PlotData.Add(new Dictionary<string, object>()
 				{
-					plotFlag.PlotData.Add(new Dictionary<string, object>()
-					{
-						{ "x", ticks },
-						{ "title", WaveLabels[i].Label } 
-					});
-				}
+					{ "x", ticks },
+					{ "title", WaveLabels[currentBar].Label } 
+				});
 			}
 		}
 
@@ -119,13 +129,13 @@ namespace StockSimulator.Indicators
 		/// Called on every new bar of data.
 		/// </summary>
 		/// <param name="currentBar">The current bar of the simulation</param>
-		protected override void OnBarUpdate(int currentBar)
+		public override void OnBarUpdate(int currentBar)
 		{
 			base.OnBarUpdate(currentBar);
 
 			if (currentBar > 1)
 			{
-				ZigZag zigzag = (ZigZag)Dependents[0];
+				ZigZag zigzag = (ZigZag)_dependents[0];
 
 				int cutoffBar = Math.Max(0, currentBar - _maxBarsForWave);
 				int searchBar = currentBar - 2;
@@ -221,18 +231,24 @@ namespace StockSimulator.Indicators
 					FifthWaveValue[currentBar] = _5thWaveDirection > 0.0 ? Data.Low[currentBar] : Data.High[currentBar];
 					FifthWaveDirection[currentBar] = _5thWaveDirection;
 
-					// Found the last point so lets end this wave.
+					// See if we can label the 5th point.
 					List<double> zigzagSeries = _5thWaveDirection > 0.0 ? zigzag.ZigZagHighs : zigzag.ZigZagLows;
 					if (zigzagSeries[searchBar] > 0.0)
 					{
-						_5thWaveDirection = 0.0;
 						labels[5] = new WavePointLabel() { Price = zigzag.Value[searchBar], Label = "5" };
+					}
 
-						for (int j = 0; j < 6; j++)
+					// Label all the points regardless if we have a 5th point or not.
+					for (int j = 0; j < 6; j++)
+					{
+						if (labels[j] != null)
 						{
 							WaveLabels[labels[j].Bar] = labels[j];
 						}
 					}
+
+					// Reset searching for the next bar.
+					_5thWaveDirection = 0.0;
 				}
 			}
 

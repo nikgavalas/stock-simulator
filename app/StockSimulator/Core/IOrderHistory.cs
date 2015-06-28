@@ -16,8 +16,9 @@ namespace StockSimulator.Core
 		/// Adds an order to all the dictionaries for searching by multiple key types.
 		/// </summary>
 		/// <param name="order">The order to add</param>
+		/// <param name="dependentIndicators">Indicators used when making a decision to place this order</param>
 		/// <param name="currentBar">Current bar the order is being added in</param>
-		void AddOrder(Order order, int currentBar);
+		void AddOrder(Order order, List<Indicator> dependentIndicators, int currentBar);
 
 		/// <summary>
 		/// Calculates things like win/loss percent, gain, etc. for the strategy used on the ticker.

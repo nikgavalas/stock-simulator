@@ -33,8 +33,9 @@ namespace StockSimulator.Core
 		/// Adds an order to all the dictionaries for searching by multiple key types.
 		/// </summary>
 		/// <param name="order">The order to add</param>
+		/// <param name="dependentIndicators">Indicators used when making a decision to place this order</param>
 		/// <param name="currentBar">Current bar the order is being added in</param>
-		public void AddOrder(Order order, int currentBar)
+		public void AddOrder(Order order, List<Indicator> dependentIndicators, int currentBar)
 		{
 			// Save the main order in the regular strategy dictionary since we want to 
 			// save all of it's orders with no weird processing.
@@ -72,6 +73,22 @@ namespace StockSimulator.Core
 				List<Order> orders = tickerDictionary[strategyKey];
 				RemoveOldOrders(orders, currentBar);
 				orders.Add(order);
+			}
+		}
+
+		/// <summary>
+		/// Saves the indicator series for this order so that during analysis we can see
+		/// exactly what the indicators looked like at the time the order was placed.
+		/// </summary>
+		/// <param name="order">The order to add</param>
+		/// <param name="dependentIndicators">Indicators used when making a decision to place this order</param>
+		/// <param name="currentBar">Current bar the order was placed.</param>
+		public void SaveSnapshot(Order order, List<Indicator> dependentIndicators, int currentBar)
+		{
+			// Only care about the main orders for the abbreviated output.
+			if (order.StrategyName == "MainStrategy")
+			{
+				Simulator.DataOutput.OutputIndicatorSnapshots(order, dependentIndicators, currentBar);
 			}
 		}
 

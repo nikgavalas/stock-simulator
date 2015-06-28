@@ -21,12 +21,40 @@ namespace StockSimulator.Indicators
 		private List<double> _avgUp { get; set; }
 		private List<double> _avgDown { get; set; }
 
+		#region Configurables
+		public int Period
+		{
+			get { return _period; }
+			set { _period = value; }
+		}
+
+		public int Smooth
+		{
+			get { return _smooth; }
+			set { _smooth = value; }
+		}
+
 		private int _period = 14;
 		private int _smooth = 3;
+		#endregion
 
-		public Rsi(TickerData tickerData, RunnableFactory factory, string[] settings) 
-			: base(tickerData, factory)
+		/// <summary>
+		/// Creates the indicator.
+		/// Add any dependents here.
+		/// </summary>
+		/// <param name="tickerData">Price data</param>
+		public Rsi(TickerData tickerData) 
+			: base(tickerData)
 		{
+		}
+
+		/// <summary>
+		/// Resets the indicator to it's starting state.
+		/// </summary>
+		public override void Initialize()
+		{
+			base.Initialize();
+
 			Value = Enumerable.Repeat(0d, Data.NumBars).ToList();
 			Avg = Enumerable.Repeat(0d, Data.NumBars).ToList();
 
@@ -34,8 +62,6 @@ namespace StockSimulator.Indicators
 			_down = Enumerable.Repeat(0d, Data.NumBars).ToList();
 			_avgUp = Enumerable.Repeat(0d, Data.NumBars).ToList();
 			_avgDown = Enumerable.Repeat(0d, Data.NumBars).ToList();
-			
-			_period = Convert.ToInt32(settings[0]);
 		}
 
 		/// <summary>
@@ -48,30 +74,38 @@ namespace StockSimulator.Indicators
 		}
 
 		/// <summary>
-		/// Save the indicator data in a serialization friendly way.
+		/// Creates the plots for the data to be added to.
 		/// </summary>
-		public override void PrepareForSerialization()
+		public override void CreatePlots()
 		{
-			base.PrepareForSerialization();
+			base.CreatePlots();
 
-			// Add the rsi for plotting
-			PlotSeries plot = new PlotSeries("line");
-			ChartPlots[ToString()] = plot;
-			for (int i = 0; i < Data.Dates.Count; i++)
+			// Add the indicator for plotting
+			PlotSeries line = new PlotSeries("line");
+			ChartPlots[ToString()] = line;
+		}
+
+		/// <summary>
+		/// Adds data to the created plots for the indicator at the current bar.
+		/// </summary>
+		/// <param name="currentBar"></param>
+		public override void AddToPlots(int currentBar)
+		{
+			base.AddToPlots(currentBar);
+
+			PlotSeries line = (PlotSeries)ChartPlots[ToString()];
+			line.PlotData.Add(new List<object>()
 			{
-				plot.PlotData.Add(new List<object>()
-				{
-					UtilityMethods.UnixTicks(Data.Dates[i]),
-					Math.Round(Value[i], 2)
-				});
-			}
+				UtilityMethods.UnixTicks(Data.Dates[currentBar]),
+				Math.Round(Value[currentBar], 2)
+			});
 		}
 
 		/// <summary>
 		/// Called on every new bar of data.
 		/// </summary>
 		/// <param name="currentBar">The current bar of the simulation</param>
-		protected override void OnBarUpdate(int currentBar)
+		public override void OnBarUpdate(int currentBar)
 		{
 			base.OnBarUpdate(currentBar);
 

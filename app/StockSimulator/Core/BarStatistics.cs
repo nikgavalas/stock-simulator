@@ -11,32 +11,35 @@ namespace StockSimulator.Core
 	/// For each bar the percent of the highest strategy that was found and 
 	/// a list of all other percents for the other strategies that weren't as high.
 	/// </summary>
-	public class BarStatistics
+	public class OrderSuggestion
 	{
 		public double HighestPercent { get; set; }
 		public string HighestStrategyName { get; set; }
 		public double StrategyOrderType { get; set; }
 		public double SizeOfOrder { get; set; }
+		public List<Indicator> DependentIndicators { get; set; }
 		public List<StrategyStatistics> Statistics { get; set; }
 		public List<BuyCondition> BuyConditions { get; set; }
 		public List<SellCondition> SellConditions { get; set; }
 
-		public BarStatistics()
+		public OrderSuggestion()
 		{
 			HighestPercent = 0.0;
 			HighestStrategyName = "None";
 			StrategyOrderType = Order.OrderType.Long;
-			Statistics = new List<StrategyStatistics>();
 			SizeOfOrder = 0.0;
+			DependentIndicators = new List<Indicator>();
+			Statistics = new List<StrategyStatistics>();
 			BuyConditions = new List<BuyCondition>();
 			SellConditions = new List<SellCondition>();
 		}
 
-		public BarStatistics(
+		public OrderSuggestion(
 			double percent, 
 			string name,
 			double orderType,
 			double sizeOfOrder,
+			List<Indicator> dependentIndicators,
 			List<StrategyStatistics> statistics,
 			List<BuyCondition> buyConditions,
 			List<SellCondition> sellConditions)
@@ -45,6 +48,7 @@ namespace StockSimulator.Core
 			HighestStrategyName = name;
 			StrategyOrderType = orderType;
 			SizeOfOrder = sizeOfOrder;
+			DependentIndicators = dependentIndicators;
 			Statistics = statistics;
 			BuyConditions = buyConditions;
 			SellConditions = sellConditions;

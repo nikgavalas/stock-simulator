@@ -33,39 +33,12 @@ namespace StockSimulator.Core
 		/// Constructor to initialize the strategy.
 		/// </summary>
 		/// <param name="tickerData">Data for the ticker involved</param>
-		/// <param name="factory">Factory to create dependent runnables</param>
-		public Strategy(TickerData tickerData, RunnableFactory factory) : base(tickerData, factory)
+		public Strategy(TickerData tickerData) 
+			: base(tickerData)
 		{
 			WasFound = Enumerable.Repeat(false, tickerData.NumBars).ToList();
 			_activeOrders = new List<Order>();
 			_orderType = Order.OrderType.Long; // Default to long orders.
-		}
-
-		/// <summary>
-		/// Gets all the indicator names that this strategy depends on.
-		/// </summary>
-		/// <returns></returns>
-		public List<string> GetDependentIndicatorNames()
-		{
-			List<string> ret = new List<string>();
-			for (int i = 0; i < Dependents.Count; i++)
-			{
-				if (Dependents[i] is Indicator)
-				{
-					ret.Add(Dependents[i].ToString());
-
-					// Add any dependent indicators of this indicator, only 1 level for now.
-					for (int j = 0; j < Dependents[i].Dependents.Count; j++)
-					{
-						if (Dependents[i].Dependents[j] is Indicator)
-						{
-							ret.Add(Dependents[i].Dependents[j].ToString());
-						}
-					}
-				}
-			}
-
-			return ret;
 		}
 
 		/// <summary>
@@ -96,7 +69,10 @@ namespace StockSimulator.Core
 			{
 				if (_dependents[i] is Indicator)
 				{
-					((Indicator)_dependents[i]).RunToBar(currentBar);
+					Indicator ind = (Indicator)_dependents[i];
+					ind.Initialize();
+					ind.RunToBar(currentBar);
+					ind.Shutdown();
 				}
 			}
 
@@ -119,7 +95,7 @@ namespace StockSimulator.Core
 		/// <param name="currentBar">Bar the order was placed on</param>
 		/// <param name="orderType">Type of order to place (long or short)</param>
 		/// <param name="sizeOfOrder">Amount of money to place in this order</param>
-		/// <param name="dependentIndicatorNames">List of all the dependent indicator names</param>
+		/// <param name="dependentIndicators">List of all the dependent indicators</param>
 		/// <param name="buyConditions">All the buy conditions that must be met to fill the order</param>
 		/// <param name="sellConditions">Any of the sell conditions trigger a sell</param>
 		/// <returns>The order that was placed or null if none was placed</returns>
@@ -128,7 +104,7 @@ namespace StockSimulator.Core
 			int currentBar,
 			double orderType,
 			double sizeOfOrder,
-			List<string> dependentIndicatorNames,
+			List<Indicator> dependentIndicators,
 			List<BuyCondition> buyConditions,
 			List<SellCondition> sellConditions)
 		{
@@ -147,17 +123,26 @@ namespace StockSimulator.Core
 			// Only place the order if it's less than the allowed amount of concurrent orders allowed.
 			if (openOrders < Simulator.Config.MaxConcurrentOrders)
 			{
+				// Save only the names of the indicators for the order to track. The order manager
+				// will use the actual indicators to save what they look like when this order
+				// was placed.
+				List<string> indicatorNames = new List<string>();
+				for (int i = 0; i < dependentIndicators.Count; i++)
+				{
+					indicatorNames.Add(dependentIndicators[i].ToString());
+				}
+
 				order = new Order(
 					orderType,
 					Data,
 					strategyName,
 					currentBar,
 					sizeOfOrder,
-					dependentIndicatorNames,
+					indicatorNames,
 					buyConditions,
 					sellConditions);
 
-				Simulator.Orders.AddOrder(order, currentBar);
+				Simulator.Orders.AddOrder(order, dependentIndicators, currentBar);
 				_activeOrders.Add(order);
 			}
 

@@ -19,37 +19,61 @@ namespace StockSimulator.Indicators
 		public List<double> SK { get; set; }
 		public List<double> StoRsi { get; set; }
 
+		#region Configurables
+		public int PeriodRsi
+		{
+			get { return _periodRsi; }
+			set { _periodRsi = value; }
+		}
+
+		public int PeriodStoch
+		{
+			get { return _periodStoch; }
+			set { _periodStoch = value; }
+		}
+
+		public int PeriodSK
+		{
+			get { return _periodSK; }
+			set { _periodSK = value; }
+		}
+
+		public int PeriodSD
+		{
+			get { return _periodSD; }
+			set { _periodSD = value; }
+		}
+		
 		private int _periodRsi = 13;
 		private int _periodStoch = 8;
 		private int _periodSK = 5;
 		private int _periodSD = 5;
+		#endregion
 
-		public DtOscillator(TickerData tickerData, RunnableFactory factory, string[] settings)
-			: base(tickerData, factory)
+		/// <summary>
+		/// Creates the indicator.
+		/// Add any dependents here.
+		/// </summary>
+		/// <param name="tickerData">Price data</param>
+		public DtOscillator(TickerData tickerData)
+			: base(tickerData)
 		{
-			_periodRsi = Convert.ToInt32(settings[0]);
-			_periodStoch = Convert.ToInt32(settings[1]);
-			_periodSK = Convert.ToInt32(settings[2]);
-			_periodSD = Convert.ToInt32(settings[3]);
+			_dependents = new List<Runnable>()
+			{
+				(Runnable)new Rsi(Data) { Period = PeriodRsi }
+			};
+		}
+
+		/// <summary>
+		/// Resets the indicator to it's starting state.
+		/// </summary>
+		public override void Initialize()
+		{
+			base.Initialize();
 
 			SD = Enumerable.Repeat(0d, Data.NumBars).ToList();
 			SK = Enumerable.Repeat(0d, Data.NumBars).ToList();
 			StoRsi = Enumerable.Repeat(0d, Data.NumBars).ToList();
-		}
-
-		/// <summary>
-		/// Returns an array of dependent names.
-		/// </summary>
-		public override string[] DependentNames
-		{
-			get
-			{
-				string[] deps = {
-					"Rsi," + _periodRsi.ToString()
-				};
-
-				return deps;
-			}
 		}
 
 		/// <summary>
@@ -62,43 +86,52 @@ namespace StockSimulator.Indicators
 		}
 
 		/// <summary>
-		/// Save the indicator data in a serialization friendly way.
+		/// Creates the plots for the data to be added to.
 		/// </summary>
-		public override void PrepareForSerialization()
+		public override void CreatePlots()
 		{
-			base.PrepareForSerialization();
+			base.CreatePlots();
 
 			// Add the indicator for plotting
 			PlotSeries plotD = new PlotSeries("line");
 			PlotSeries plotK = new PlotSeries("line");
 			ChartPlots["DtOscillator %D"] = plotD;
 			ChartPlots["DtOscillator %K"] = plotK;
+		}
 
-			for (int i = 0; i < Data.Dates.Count; i++)
+		/// <summary>
+		/// Adds data to the created plots for the indicator at the current bar.
+		/// </summary>
+		/// <param name="currentBar"></param>
+		public override void AddToPlots(int currentBar)
+		{
+			base.AddToPlots(currentBar);
+
+			PlotSeries plotD = (PlotSeries)ChartPlots["DtOscillator %D"];
+			PlotSeries plotK = (PlotSeries)ChartPlots["DtOscillator %K"];
+
+			long ticks = UtilityMethods.UnixTicks(Data.Dates[currentBar]);
+			plotD.PlotData.Add(new List<object>()
 			{
-				long ticks = UtilityMethods.UnixTicks(Data.Dates[i]);
-				plotD.PlotData.Add(new List<object>()
-				{
-					ticks,
-					Math.Round(SD[i], 2)
-				});
-				plotK.PlotData.Add(new List<object>()
-				{
-					ticks,
-					Math.Round(SK[i], 2)
-				});
-			}
+				ticks,
+				Math.Round(SD[currentBar], 2)
+			});
+			plotK.PlotData.Add(new List<object>()
+			{
+				ticks,
+				Math.Round(SK[currentBar], 2)
+			});
 		}
 
 		/// <summary>
 		/// Called on every new bar of data.
 		/// </summary>
 		/// <param name="currentBar">The current bar of the simulation</param>
-		protected override void OnBarUpdate(int currentBar)
+		public override void OnBarUpdate(int currentBar)
 		{
 			base.OnBarUpdate(currentBar);
 
-			Rsi rsi = (Rsi)Dependents[0];
+			Rsi rsi = (Rsi)_dependents[0];
 
 			double rsiMinValue = UtilityMethods.Min(rsi.Value, currentBar, _periodStoch);
 			double rsiMaxValue = UtilityMethods.Max(rsi.Value, currentBar, _periodStoch);

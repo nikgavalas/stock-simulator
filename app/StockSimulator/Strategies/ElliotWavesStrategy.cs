@@ -18,25 +18,13 @@ namespace StockSimulator.Strategies
 		/// Construct the class and initialize the bar data to default values.
 		/// </summary>
 		/// <param name="tickerData">Ticker for the strategy</param>
-		/// <param name="factory">Factory for creating dependents</param>
-		public ElliotWavesStrategy(TickerData tickerData, RunnableFactory factory)
-			: base(tickerData, factory)
+		public ElliotWavesStrategy(TickerData tickerData)
+			: base(tickerData)
 		{
-		}
-
-		/// <summary>
-		/// Returns an array of dependent names.
-		/// </summary>
-		public override string[] DependentNames
-		{
-			get
+			_dependents = new List<Runnable>()
 			{
-				string[] deps = {
-					"ElliotWaves"
-				};
-
-				return deps;
-			}
+				new ElliotWaves(tickerData)
+			};
 		}
 
 		/// <summary>
@@ -51,7 +39,7 @@ namespace StockSimulator.Strategies
 		/// <summary>
 		/// </summary>
 		/// <param name="currentBar">Current bar of the simulation</param>
-		protected override void OnBarUpdate(int currentBar)
+		public override void OnBarUpdate(int currentBar)
 		{
 			base.OnBarUpdate(currentBar);
 
@@ -60,7 +48,7 @@ namespace StockSimulator.Strategies
 				return;
 			}
 
-			ElliotWaves waves = (ElliotWaves)Dependents[0];
+			ElliotWaves waves = (ElliotWaves)_dependents[0];
 			double buyDirection = 0.0;
 			string foundStrategyName = "";
 
@@ -87,12 +75,7 @@ namespace StockSimulator.Strategies
 					new MaxLengthSellCondition(5),
 				};
 
-				List<string> dependentIndicators = new List<string>()
-				{
-					"ElliotWaves",
-					"ZigZag,5"
-					//"DtOscillator,13,8,8,8"
-				};
+				List<Indicator> dependentIndicators = GetDependentIndicators();
 
 				Order placedOrder = EnterOrder(foundStrategyName, currentBar, buyDirection, 10000,
 					dependentIndicators, buyConditions, sellConditions);
@@ -106,11 +89,12 @@ namespace StockSimulator.Strategies
 						currentBar,
 						Simulator.Config.MaxLookBackBars);
 
-					Bars[currentBar] = new BarStatistics(
+					Bars[currentBar] = new OrderSuggestion(
 						100.0,
 						foundStrategyName,
 						buyDirection,
 						10000,
+						dependentIndicators,
 						new List<StrategyStatistics>() { orderStats },
 						buyConditions,
 						sellConditions);

@@ -18,30 +18,13 @@ namespace StockSimulator.Strategies
 		/// Construct the class and initialize the bar data to default values.
 		/// </summary>
 		/// <param name="tickerData">Ticker for the strategy</param>
-		/// <param name="factory">Factory for creating dependents</param>
-		public BestOfRootStrategies(TickerData tickerData, RunnableFactory factory) 
-			: base(tickerData, factory)
+		public BestOfRootStrategies(TickerData tickerData) 
+			: base(tickerData)
 		{
-		}
-
-		/// <summary>
-		/// Returns an array of dependent names.
-		/// </summary>
-		public override string[] DependentNames
-		{
-			get
+			_dependents = new List<Runnable>()
 			{
-				string[] deps = {
-					"ElliotWavesStrategy"
-					//"FibonacciRsi3m3",
-					//"FibonacciDtOscillator",
-					//"BressertComboStrategy",
-					//"ComboStrategy",
-					//"BressertApproach"
-				};
-
-				return deps;
-			}
+				new ElliotWavesStrategy(tickerData)
+			};
 		}
 
 		/// <summary>
@@ -60,7 +43,7 @@ namespace StockSimulator.Strategies
 		/// of that strategy.
 		/// </summary>
 		/// <param name="currentBar">Current bar of the simulation</param>
-		protected override void OnBarUpdate(int currentBar)
+		public override void OnBarUpdate(int currentBar)
 		{
 			base.OnBarUpdate(currentBar);
 

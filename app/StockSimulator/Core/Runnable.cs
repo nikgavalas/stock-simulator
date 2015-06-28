@@ -15,7 +15,7 @@ namespace StockSimulator.Core
 		/// <summary>
 		/// List of dependents for this runnable to work.
 		/// </summary>
-		protected virtual List<Runnable> _dependents;
+		protected List<Runnable> _dependents;
 
 		/// <summary>
 		/// Constructor for the runnable.
@@ -64,6 +64,26 @@ namespace StockSimulator.Core
 		/// </summary>
 		public virtual void OnBarUpdate(int currentBar)
 		{
+		}
+
+		/// <summary>
+		/// Gets all the indicators that this strategy depends on.
+		/// </summary>
+		/// <returns>List of dependent indicators</returns>
+		public List<Indicator> GetDependentIndicators()
+		{
+			List<Indicator> ret = new List<Indicator>();
+			for (int i = 0; i < _dependents.Count; i++)
+			{
+				if (_dependents[i] is Indicator)
+				{
+					Indicator ind = (Indicator)_dependents[i];
+					ret.AddRange(ind.GetDependentIndicators());
+					ret.Add(ind);
+				}
+			}
+
+			return ret;
 		}
 
 	}

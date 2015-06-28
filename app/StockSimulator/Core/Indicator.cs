@@ -97,15 +97,40 @@ namespace StockSimulator.Core
 		/// <param name="tickerData">Ticker that the indicator is calculated with</param>
 		public Indicator(TickerData tickerData) : base(tickerData)
 		{
+			// Default to about 2 years of lookback data.
+			NumLookbackBars = 500;
 		}
 
 		/// <summary>
 		/// Inits the list so they can be outputted in a json/highcharts friendly way.
 		/// This should be overloaded for each indicator.
+		/// <param name="endBar">Bar to end the data at.</param>
 		/// </summary>
-		public virtual void PrepareForSerialization()
+		public void Serialize(int endBar)
 		{
 			ChartPlots = new Dictionary<string, IPlotSeries>();
+			CreatePlots();
+
+			int startBar = Math.Max(0, endBar - NumLookbackBars);
+			for (int i = startBar; i <= endBar; i++)
+			{
+				AddToPlots(i);
+			}
+		}
+
+		/// <summary>
+		/// Creates the plots for the data to be added to.
+		/// </summary>
+		public virtual void CreatePlots()
+		{
+		}
+
+		/// <summary>
+		/// Adds data to the created plots for the indicator at the current bar.
+		/// </summary>
+		/// <param name="currentBar"></param>
+		public virtual void AddToPlots(int currentBar)
+		{
 		}
 
 		/// <summary>
@@ -122,6 +147,15 @@ namespace StockSimulator.Core
 		/// <param name="bar">Bar to run to</param>
 		public void RunToBar(int bar)
 		{
+			// Run all the dependent indicators first.
+			for (int i = 0; i < _dependents.Count; i++)
+			{
+				if (_dependents[i] is Indicator)
+				{
+					((Indicator)_dependents[i]).RunToBar(bar);
+				}
+			}
+
 			int startBar = Math.Max(0, bar - NumLookbackBars);
 			for (int i = startBar; i <= bar; i++)
 			{
@@ -134,7 +168,7 @@ namespace StockSimulator.Core
 		/// allowed to call this from the RunToBar function.
 		/// <param name="currentBar">Current bar to simulate</param>
 		/// </summary>
-		protected override void OnBarUpdate(int currentBar)
+		public override void OnBarUpdate(int currentBar)
 		{
 			base.OnBarUpdate(currentBar);
 		}

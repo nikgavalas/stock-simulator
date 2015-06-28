@@ -63,6 +63,8 @@ namespace StockSimulator.Core
 
 		private Dictionary<DateTime, List<JsonBuyList>> _buyLists;
 
+		private string _outputFolder;
+		private string _timeString;
 		private object tickerLock;
 		private object indicatorLock;
 
@@ -76,6 +78,10 @@ namespace StockSimulator.Core
 			_buyLists = new Dictionary<DateTime, List<JsonBuyList>>();
 			tickerLock = new object();
 			indicatorLock = new object();
+
+			_timeString = DateTime.Now.ToString("MM-dd-yyyyTHH-mm-ss-ffff");
+			_outputFolder = GetOutputFolder();
+			Directory.CreateDirectory(_outputFolder.TrimEnd('\\'));
 		}
 
 		/// <summary>
@@ -136,19 +142,15 @@ namespace StockSimulator.Core
 		/// <returns>The folder the data was outtputed to</returns>
 		public string OutputData()
 		{
-			string timeString = DateTime.Now.ToString("MM-dd-yyyyTHH-mm-ss-ffff");
-			string saveFolderName = GetOutputFolder(timeString);
-			Directory.CreateDirectory(saveFolderName.TrimEnd('\\'));
+			OutputConfigFile();
+			OutputBuyList();
+			OutputPriceData();
+			//OutputIndicatorData();
+			OutputTickerStats();
+			OutputStrategyStats();
+			OutputMainStrategy();
 
-			OutputConfigFile(timeString);
-			OutputBuyList(timeString);
-			OutputPriceData(timeString);
-			OutputIndicatorData(timeString);
-			OutputTickerStats(timeString);
-			OutputStrategyStats(timeString);
-			OutputMainStrategy(timeString);
-
-			return timeString;
+			return _timeString;
 		}
 
 		/// <summary>
@@ -163,7 +165,7 @@ namespace StockSimulator.Core
 		{
 			Directory.CreateDirectory(Simulator.Config.OutputFolder + "\\higher");
 
-			ind.PrepareForSerialization();
+			ind.Serialize(higherData.GetBar(date));
 			higherData.PrepareForSerialization();
 
 			string folderName = Simulator.Config.OutputFolder + "\\higher\\" + date.ToString("yyyy-MM-dd");
@@ -188,18 +190,16 @@ namespace StockSimulator.Core
 		/// <summary>
 		/// Uses the date string as a subfolder for the output.
 		/// </summary>
-		/// <param name="timeString">Date string</param>
 		/// <returns>Root folder for the output with the date as the subfolder</returns>
-		private string GetOutputFolder(string timeString)
+		private string GetOutputFolder()
 		{
-			return Simulator.Config.OutputFolder + "\\" + timeString + "\\";
+			return Simulator.Config.OutputFolder + "\\" + _timeString + "\\";
 		}
 
 		/// <summary>
 		/// Outputs info about how each ticker has performed.
 		/// </summary>
-		/// <param name="timeString">Time string used for the folder output</param>
-		private void OutputTickerStats(string timeString)
+		private void OutputTickerStats()
 		{
 			if (Simulator.Config.UseAbbreviatedOutput == true)
 			{
@@ -233,7 +233,7 @@ namespace StockSimulator.Core
 					allTickerStatistics.Add(tickerStats);
 
 					//jsonOutput = JsonConvert.SerializeObject(tickerStats, Formatting.Indented);
-					//folderName = GetOutputFolder(timeString) + "ticker-statistics\\" + tickerName;
+					//folderName = _outputFolder + "ticker-statistics\\" + tickerName;
 					//filename = folderName + "\\overall.json";
 					//Directory.CreateDirectory(folderName);
 					//File.WriteAllText(filename, jsonOutput);
@@ -243,21 +243,20 @@ namespace StockSimulator.Core
 			}
 
 			string jsonOutput = JsonConvert.SerializeObject(allTickerStatistics);
-			string filename = GetOutputFolder(timeString) + "overall-tickers.json";
+			string filename = _outputFolder + "overall-tickers.json";
 			File.WriteAllText(filename, jsonOutput);
 		}
 
 		/// <summary>
 		/// Outputs a buy list for each day or just the last day with the option set in the config.
 		/// </summary>
-		/// <param name="timeString">Time string used for the folder output</param>
-		void OutputBuyList(string timeString)
+		void OutputBuyList()
 		{
 			string jsonOutput;
 			string filename;
 
 			// Create the buy list directory to hold all the buy list files.
-			string folderName = GetOutputFolder(timeString) + "buylist\\";
+			string folderName = _outputFolder + "buylist\\";
 			Directory.CreateDirectory(folderName);
 
 			// Only output the list for the last day simulated.
@@ -283,19 +282,17 @@ namespace StockSimulator.Core
 		/// <summary>
 		/// Outputs the config options used for this sim run.
 		/// </summary>
-		/// <param name="timeString">Time string used for the folder output</param>
-		void OutputConfigFile(string timeString)
+		void OutputConfigFile()
 		{
 			string jsonOutput = JsonConvert.SerializeObject(Simulator.Config, Formatting.Indented);
-			string filename = GetOutputFolder(timeString) + "input.json";
+			string filename = _outputFolder + "input.json";
 			File.WriteAllText(filename, jsonOutput);
 		}
 
 		/// <summary>
 		/// Outputs the all the statistics for all strategies and the overall stats for each.
 		/// </summary>
-		/// <param name="timeString">Time string used for the folder output</param>
-		void OutputStrategyStats(string timeString)
+		void OutputStrategyStats()
 		{
 			if (Simulator.Config.UseAbbreviatedOutput == true)
 			{
@@ -359,7 +356,7 @@ namespace StockSimulator.Core
 
 						// Save the info for this strategy by the ticker.
 						jsonOutput = JsonConvert.SerializeObject(item.Value);
-						folderName = GetOutputFolder(timeString) + "strategies\\" + strategyName;
+						folderName = _outputFolder + "strategies\\" + strategyName;
 						filename = folderName + "\\" + item.Value.TickerName + ".json";
 						Directory.CreateDirectory(folderName);
 						File.WriteAllText(filename, jsonOutput);
@@ -373,7 +370,7 @@ namespace StockSimulator.Core
 
 					// Output the overall stats for this strategy.
 					jsonOutput = JsonConvert.SerializeObject(overallList);
-					folderName = GetOutputFolder(timeString) + "strategies\\" + strategyName;
+					folderName = _outputFolder + "strategies\\" + strategyName;
 					filename = folderName + "\\overall.json";
 					Directory.CreateDirectory(folderName);
 					File.WriteAllText(filename, jsonOutput);
@@ -386,19 +383,18 @@ namespace StockSimulator.Core
 #endif
 
 			string overallJsonOutput = JsonConvert.SerializeObject(allStrategyStatistics.ToArray());
-			string overallFilename = GetOutputFolder(timeString) + "overall-strategies.json";
+			string overallFilename = _outputFolder + "overall-strategies.json";
 			File.WriteAllText(overallFilename, overallJsonOutput);
 		}
 
 		/// <summary>
 		/// Outputs the price data for each ticker.
 		/// </summary>
-		/// <param name="timeString">Time string used for the folder output</param>
-		void OutputPriceData(string timeString)
+		void OutputPriceData()
 		{
 			string filename;
 			string jsonOutput;
-			string folderName = GetOutputFolder(timeString) + "pricedata";
+			string folderName = _outputFolder + "pricedata";
 
 			Directory.CreateDirectory(folderName);
 			foreach (KeyValuePair<int, TickerData> item in _tickerData)
@@ -414,8 +410,7 @@ namespace StockSimulator.Core
 		/// <summary>
 		/// Outputs all the indicator values for each indicator.
 		/// </summary>
-		/// <param name="timeString">Time string used for the folder output</param>
-		void OutputIndicatorData(string timeString)
+		void OutputIndicatorData()
 		{
 			if (Simulator.Config.UseAbbreviatedOutput == true)
 			{
@@ -424,14 +419,14 @@ namespace StockSimulator.Core
 
 			string filename;
 			string jsonOutput;
-			string folderName = GetOutputFolder(timeString) + "indicators";
+			string folderName = _outputFolder + "indicators";
 
 			Directory.CreateDirectory(folderName);
 			foreach (KeyValuePair<int, Indicator> item in _indicators)
 			{
-				item.Value.PrepareForSerialization();
+				item.Value.Serialize(item.Value.Data.NumBars - 1);
 				jsonOutput = JsonConvert.SerializeObject(item.Value);
-				folderName = GetOutputFolder(timeString) + "indicators\\" + item.Value.ToString();
+				folderName = _outputFolder + "indicators\\" + item.Value.ToString();
 				filename = folderName + "\\" + item.Value.Data.TickerAndExchange.ToString() + ".json";
 				Directory.CreateDirectory(folderName);
 				File.WriteAllText(filename, jsonOutput);
@@ -440,10 +435,29 @@ namespace StockSimulator.Core
 		}
 
 		/// <summary>
+		/// Outputs the data for the indicators for an order.
+		/// </summary>
+		public void OutputIndicatorSnapshots(Order order, List<Indicator> indicators, int endBar)
+		{
+			string filename;
+			string jsonOutput;
+			string folderName = _outputFolder + "snapshots\\" + order.OrderId;
+			Directory.CreateDirectory(folderName);
+
+			foreach (Indicator ind in indicators)
+			{
+				ind.Serialize(endBar);
+				jsonOutput = JsonConvert.SerializeObject(ind);
+				filename = folderName + "\\" + ind.ToString() + ".json";
+				File.WriteAllText(filename, jsonOutput);
+				ind.FreeResourcesAfterSerialization();
+			}
+		}
+
+		/// <summary>
 		/// Outputs all the overall files for the main strategy.
 		/// </summary>
-		/// <param name="timeString">Time string used for the folder output</param>
-		void OutputMainStrategy(string timeString)
+		void OutputMainStrategy()
 		{
 			if (Simulator.Orders.StrategyDictionary.ContainsKey("MainStrategy".GetHashCode()))
 			{
@@ -459,17 +473,17 @@ namespace StockSimulator.Core
 
 				mainStratStats.CalculateStatistics();
 				jsonOutput = JsonConvert.SerializeObject(mainStratStats);
-				filename = GetOutputFolder(timeString) + "overall.json";
+				filename = _outputFolder + "overall.json";
 				File.WriteAllText(filename, jsonOutput);
 
 				List<Order> mainOrders = mainStrategyOrders.ToList();
 				mainOrders.RemoveAll(order => order.Status == Order.OrderStatus.Cancelled);
 				jsonOutput = JsonConvert.SerializeObject(mainOrders);
-				filename = GetOutputFolder(timeString) + "overall-orders.json";
+				filename = _outputFolder + "overall-orders.json";
 				File.WriteAllText(filename, jsonOutput);
 
 				jsonOutput = JsonConvert.SerializeObject(Simulator.Broker);
-				filename = GetOutputFolder(timeString) + "overall-account.json";
+				filename = _outputFolder + "overall-account.json";
 				File.WriteAllText(filename, jsonOutput);
 			}
 		}
