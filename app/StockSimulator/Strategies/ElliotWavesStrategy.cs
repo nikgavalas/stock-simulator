@@ -61,24 +61,10 @@ namespace StockSimulator.Strategies
 
 			if (buyDirection != 0.0)
 			{
-				// TODO: use the 1 bar trailing high/low entry conditions.
-				List<BuyCondition> buyConditions = new List<BuyCondition>()
-				{
-					//new AboveSetupBarBuyCondition(Simulator.Config.BressertMaxBarsToFill)
-					new MarketBuyCondition()
-				};
-
-				// Always have a max time in market and an absolute stop for sell conditions.
-				List<SellCondition> sellConditions = new List<SellCondition>()
-				{
-					new StopSellCondition(0.05),
-					new MaxLengthSellCondition(5),
-				};
-
 				List<Indicator> dependentIndicators = GetDependentIndicators();
 
 				Order placedOrder = EnterOrder(foundStrategyName, currentBar, buyDirection, 10000,
-					dependentIndicators, buyConditions, sellConditions);
+					dependentIndicators, GetBuyConditions(), GetSellConditions());
 
 				if (placedOrder != null)
 				{
@@ -96,12 +82,38 @@ namespace StockSimulator.Strategies
 						10000,
 						dependentIndicators,
 						new List<StrategyStatistics>() { orderStats },
-						buyConditions,
-						sellConditions);
+						GetBuyConditions(),
+						GetSellConditions());
 				}
 			}
 		}
 
+		/// <summary>
+		/// Returns the list of buy conditions for this strategy.
+		/// </summary>
+		/// <returns>List of buy conditions for this strategy</returns>
+		private List<BuyCondition> GetBuyConditions()
+		{
+			return new List<BuyCondition>()
+			{
+				//new AboveSetupBarBuyCondition(Simulator.Config.BressertMaxBarsToFill)
+				new MarketBuyCondition()
+			};
+		}
+
+		/// <summary>
+		/// Returns the list of sell conditions for this strategy.
+		/// </summary>
+		/// <returns>List of sell conditions for this strategy</returns>
+		private List<SellCondition> GetSellConditions()
+		{
+			// Always have a max time in market and an absolute stop for sell conditions.
+			return new List<SellCondition>()
+			{
+				new StopSellCondition(0.05),
+				new MaxLengthSellCondition(5),
+			};
+		}
 	
 	}
 }

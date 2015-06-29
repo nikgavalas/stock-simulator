@@ -86,6 +86,9 @@ namespace StockSimulator.Core
 		[JsonProperty("orderType")]
 		public double Type { get; set; }
 
+		[JsonProperty("dependentIndicators")]
+		public List<string> DependentIndicatorNames { get; set; }
+
 		public OrderStatus Status { get; set; }
 		public int BuyBar { get; set; }
 		public int SellBar { get; set; }
@@ -94,7 +97,6 @@ namespace StockSimulator.Core
 		public string StrategyName { get; set; }
 		public StrategyStatistics StartStatistics { get; set; }
 		public StrategyStatistics EndStatistics { get; set; }
-		public List<string> DependentIndicatorNames { get; set; }
 		public int OpenedBar { get; set; }
 
 		private double _orderValue;
