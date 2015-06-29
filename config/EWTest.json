@@ -30,7 +30,7 @@
   "BressertComboSizeOfOrder": 10000.0,
   "InstrumentListFile": "C:\\Users\\Nik\\Documents\\Code\\github\\stock-simulator\\input\\indtest.csv",
   "InitialAccountBalance": 99999999,
-  "NumBarsToDelayStart": 250,
+  "NumBarsToDelayStart": 0,
   "MaxOrdersPerBar": 30,
   "MaxOpenOrders": 1000,
   "MinPriceForOrder": 0.75,
