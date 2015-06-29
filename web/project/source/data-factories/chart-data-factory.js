@@ -29,10 +29,10 @@ mainApp.factory('ChartDataFactory', [
 		 * Returns the indicator data for the ticker and indicator.
 		 * @return {Object} Promise object for defered use
 		 */
-		factory.getIndicatorData = function(indicatorName, ticker) {
+		factory.getIndicatorData = function(indicatorName, orderId, ticker) {
 			var deffered = $q.defer();
 
-			$http.get(ConfigFactory.getOutputFolder() + 'indicators/' + indicatorName + '/' + ticker + '.json').success(function(data) {
+			$http.get(ConfigFactory.getOutputFolder() + 'snapshots/' + orderId + '/' + indicatorName + '.json').success(function(data) {
 				deffered.resolve(data);
 			});
 

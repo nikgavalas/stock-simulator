@@ -35,6 +35,61 @@
 			<div class="col-md-6">
 				<div class="panel panel-default">
 					<div class="panel-heading">
+						<h3 class="panel-title">Order Details</h3>
+					</div>
+					<div class="panel-body">
+						<table class="table table-condensed">
+							<tbody>
+								<tr>
+									<td><strong>Type</strong></td>
+									<td>
+										<span ng-class="{'text-success': order.orderType > 0, 'text-danger': order.orderType < 0}">
+											<strong>{{order.orderType > 0 ? 'L' : 'S'}}</strong>
+										</span>
+									</td>
+								</tr>
+								<tr>
+									<td><strong>Ticker</strong></td>
+									<td>{{order.ticker}}</td>
+								</tr>
+								<tr>
+									<td><strong>Buy Date</strong></td>
+									<td>{{order.buyDate}}</td>
+								</tr>
+								<tr>
+									<td><strong>Buy Price</strong></td>
+									<td>${{order.buyPrice}}</td>
+								</tr>
+								<tr>
+									<td><strong>Sell Date</strong></td>
+									<td>{{order.sellDate}}</td>
+								</tr>
+								<tr>
+									<td><strong>Sell Price</strong></td>
+									<td>${{order.sellPrice}}</td>
+								</tr>
+								<tr>
+									<td><strong>Number of Shares</strong></td>
+									<td>{{order.numShares}}</td>
+								</tr>
+								<tr>
+									<td><strong>Gain</strong></td>
+									<td>{{order.sellReason}}</td>
+								</tr>
+								<tr>
+									<td><strong>Sell Reason</strong></td>
+									<td>
+										<span ng-class="{'text-danger': order.gain < 0, 'text-success': order.gain >= 0}"><span class="glyphicon" ng-class="{'glyphicon-circle-arrow-up': order.gain >= 0, 'glyphicon-circle-arrow-down': order.gain < 0}"></span>&nbsp;${{abs(order.gain)}} ({{getPercentGain(order)}}%)</span>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+
+					</div>
+				</div><!-- End order details panel -->
+
+				<div class="panel panel-default">
+					<div class="panel-heading">
 						<h3 class="panel-title">Strategies Found</h3>
 					</div>
 					<div class="panel-body">

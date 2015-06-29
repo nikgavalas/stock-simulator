@@ -29,11 +29,6 @@ angular.module('mainApp').controller('StrategyDetailsCtrl', [
 			$scope.strategyData = data;
 
 			$scope.chartEvents = OrderListFactory.convertOrdersToDataSeries(data.orders);
-
-			// Add all the indicators to the chart.
-			for (var i = 0; i < data.indicators.length; i++) {
-				$scope.$broadcast('AddIndicator', { name: data.indicators[i], chartName: 'lowerTimeframe' });
-			}
 		});
 
 
@@ -44,9 +39,16 @@ angular.module('mainApp').controller('StrategyDetailsCtrl', [
 		$scope.orderClick = function(order) {
 			$scope.activeOrder = order;
 			
+			// Clear the indicators and add the indicators to show what they looked like
+			// at the time this order was placed.
+			$scope.$broadcast('ClearIndicators');
+			for (var i = 0; i < order.dependentIndicators.length; i++) {
+				$scope.$broadcast('AddIndicator', { name: order.dependentIndicators[i], orderId: order.id, chartName: 'lowerTimeframe' });
+			}
+
 			// Set the chart to position to these dates.
 			var buyDate = new Date(order.buyDate);
-			var range = 30; // Bars
+			var range = 100; // Bars
 			var rangeMs = range * ConfigFactory.getRangeInMilliseconds();
 			$scope.extremes = {
 				min: new Date(),

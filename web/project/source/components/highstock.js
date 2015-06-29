@@ -317,6 +317,19 @@ mainApp.directive('highstock', [
 					};
 				};
 
+				$scope.$on('ClearIndicators', function(msg, args) {
+					while (chart && chart.series.length > 4) {
+						chart.series[4].remove(false);
+					}
+
+					if (args && args.redraw) {
+						$timeout(function() {
+							chart.redraw();
+							chart.reflow();
+						}, 500);
+					}
+				});
+
 				$scope.$on('AddIndicator', function(msgName, args) {
 					// If this is not the chart we are looking for...
 					if ($scope.chartName !== args.chartName) {
@@ -324,7 +337,7 @@ mainApp.directive('highstock', [
 					}
 
 					// Get the indicator data and once we have it add it to the chart.
-					ChartDataFactory.getIndicatorData(args.name, $scope.ticker).then(function(data) {
+					ChartDataFactory.getIndicatorData(args.name, args.orderId, $scope.ticker).then(function(data) {
 						addIndicator(data, args);
 					});
 				});

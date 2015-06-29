@@ -41,6 +41,7 @@ angular.module('mainApp').controller('OrderDetailsCtrl', [
 				}
 			}
 
+			$scope.order = orderData;
 			$scope.strategies = orderData.strategies;
 			$scope.orderDate = orderData.buyDate;
 			
@@ -60,7 +61,7 @@ angular.module('mainApp').controller('OrderDetailsCtrl', [
 					
 					// Set the chart to position to these dates.
 					var buyDate = new Date($scope.orderDate);
-					var range = 30; // Bars
+					var range = 100; // Bars
 					var rangeMs = range * ConfigFactory.getRangeInMilliseconds();
 					$scope.extremes = {
 						min: new Date(),
@@ -69,9 +70,11 @@ angular.module('mainApp').controller('OrderDetailsCtrl', [
 					$scope.extremes.min.setTime(buyDate.getTime() - (rangeMs));
 					$scope.extremes.max.setTime(buyDate.getTime() + (rangeMs));
 					
-					// Add all the indicators to the chart.
-					for (var i = 0; i < data.indicators.length; i++) {
-						$scope.$broadcast('AddIndicator', { name: data.indicators[i], chartName: 'lowerTimeframe' });
+					// Clear the indicators and add the indicators to show what they looked like
+					// at the time this order was placed.
+					$scope.$broadcast('ClearIndicators');
+					for (var i = 0; i < orderData.dependentIndicators.length; i++) {
+						$scope.$broadcast('AddIndicator', { name: orderData.dependentIndicators[i], orderId: orderData.id, chartName: 'lowerTimeframe' });
 					}
 				});
 			}
@@ -91,6 +94,25 @@ angular.module('mainApp').controller('OrderDetailsCtrl', [
 			else {
 				$location.url(url);
 			}
+		};
+
+		/**
+		 * Returns the order gain as a percent.
+		 * @param   {Object} order Order to calculate from
+		 * @returns {Number} see description
+		 */
+		$scope.getPercentGain = function(order) {
+			var percent = (((order.sellPrice - order.buyPrice) / order.buyPrice) * 100).toFixed(2);
+			return order.orderType > 0 ? percent : -percent;
+		};
+
+		/**
+		 * Expose the absolute function to the scope html
+		 * @param  {Number} value Value to return the absolute value for
+		 * @return {Number}       Math.abs value
+		 */
+		$scope.abs = function(value) {
+			return Math.abs(value);
 		};
 
 	} // end controller
