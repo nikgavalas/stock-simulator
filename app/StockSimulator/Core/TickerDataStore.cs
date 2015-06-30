@@ -545,9 +545,9 @@ namespace StockSimulator.Core
 			//BressertDss higherTimeframeIndicator = new BressertDss(higherTickerData, new RunnableFactory(higherTickerData), 5);
 			//Rsi3m3 higherTimeframeIndicator = new Rsi3m3(higherTickerData, new RunnableFactory(higherTickerData));
 			//Macd higherTimeframeIndicator = new Macd(higherTickerData, new RunnableFactory(higherTickerData));
-			DtOscillator higherTimeframeIndicator = new DtOscillator(higherTickerData) { PeriodRsi = 13, PeriodStoch = 8, PeriodSK = 5, PeriodSD = 5 };
+			DtOscillator higherTimeframeIndicator = new DtOscillator(higherTickerData) { PeriodRsi = 8, PeriodStoch = 5, PeriodSK = 3, PeriodSD = 3 };
 			higherTimeframeIndicator.Initialize();
-			//higherTimeframeIndicator.Run();
+			higherTimeframeIndicator.RunToBar(higherTickerData.NumBars - 1);
 			higherTimeframeIndicator.Shutdown();
 
 			// Return what kind orders are allowed.

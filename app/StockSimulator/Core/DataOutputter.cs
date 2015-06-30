@@ -165,7 +165,7 @@ namespace StockSimulator.Core
 		{
 			Directory.CreateDirectory(Simulator.Config.OutputFolder + "\\higher");
 
-			ind.Serialize(higherData.GetBar(date));
+			ind.Serialize(ind.Data.NumBars - 1);
 			higherData.PrepareForSerialization();
 
 			string folderName = Simulator.Config.OutputFolder + "\\higher\\" + date.ToString("yyyy-MM-dd");
