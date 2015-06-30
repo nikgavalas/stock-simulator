@@ -31,7 +31,8 @@ namespace StockSimulator.Strategies
 			_dependents = new List<Runnable>()
 			{
 				new ElliotWaves(tickerData),
-				new PriceRetracements(tickerData)
+				new PriceRetracements(tickerData),
+				new DtOscillator(tickerData) { PeriodRsi = 8, PeriodStoch = 5, PeriodSK = 3, PeriodSD = 3 }
 			};
 		}
 
@@ -65,7 +66,23 @@ namespace StockSimulator.Strategies
 			if (DataSeries.IsAbove(waves.FifthWaveValue, 0.0, currentBar, 2) != -1 && IsBarInZone(currentBar))
 			{
 				buyDirection = waves.FifthWaveDirection[currentBar] * -1.0;
-				foundStrategyName = buyDirection > 0.0 ? "BullElliotWavesStrategy" : "BearElliotWavesStrategy";
+
+				// Verify with the mechanical buy signal.
+				DtOscillator dtosc = (DtOscillator)_dependents[2];
+				if (buyDirection > 0.0)
+				{
+					if (dtosc.SD[currentBar] <= 25.0 && dtosc.SK[currentBar] <= 25.0)
+					{
+						foundStrategyName = "BullElliotWavesStrategy";
+					}
+				}
+				else if (buyDirection < 0.0)
+				{
+					if (dtosc.SD[currentBar] >= 75.0 && dtosc.SK[currentBar] >= 75.0)
+					{
+						foundStrategyName = "BearElliotWavesStrategy";
+					}
+				}
 			}
 
 			// TEMP to see output.
@@ -75,7 +92,7 @@ namespace StockSimulator.Strategies
 			//	foundStrategyName = buyDirection > 0.0 ? "BullElliotWavesStrategy" : "BearElliotWavesStrategy";
 			//}
 
-			if (buyDirection != 0.0)
+			if (foundStrategyName.Length > 0)
 			{
 				List<Indicator> dependentIndicators = GetDependentIndicators();
 
