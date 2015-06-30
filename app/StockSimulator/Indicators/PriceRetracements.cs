@@ -117,13 +117,13 @@ namespace StockSimulator.Indicators
 			base.CreatePlots();
 
 			// Add the indicator for plotting
-			ChartPlots["Ext 1.272"] = new PlotSeries("line");
-			ChartPlots["Ext 1.618"] = new PlotSeries("line");
-			ChartPlots["Ext 2.618"] = new PlotSeries("line");
-			ChartPlots["Alt 1.00(0-1)"] = new PlotSeries("line");
-			ChartPlots["Alt 1.00(2-3)"] = new PlotSeries("line");
-			ChartPlots["Alt 0.382"] = new PlotSeries("line");
-			ChartPlots["Alt 0.618"] = new PlotSeries("line");
+			ChartPlots["Ext 1.272"] = new PlotSeries("line") { DashStyle = "ShortDot" };
+			ChartPlots["Ext 1.618"] = new PlotSeries("line") { DashStyle = "ShortDot" };
+			ChartPlots["Ext 2.618"] = new PlotSeries("line") { DashStyle = "ShortDot" };
+			ChartPlots["Alt 1.00(0-1)"] = new PlotSeries("line") { DashStyle = "ShortDot" };
+			ChartPlots["Alt 1.00(2-3)"] = new PlotSeries("line") { DashStyle = "ShortDot" };
+			ChartPlots["Alt 0.382"] = new PlotSeries("line") { DashStyle = "ShortDot" };
+			ChartPlots["Alt 0.618"] = new PlotSeries("line") { DashStyle = "ShortDot" };
 		}
 
 		/// <summary>

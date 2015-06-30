@@ -32,6 +32,9 @@ namespace StockSimulator.Core
 			[JsonProperty("connectNulls")]
 			public bool ShouldConnectNulls { get; set; }
 
+			[JsonProperty("dashStyle")]
+			public string DashStyle { get; set; }
+
 			/// <summary>
 			/// Default constructor
 			/// </summary>
@@ -40,6 +43,7 @@ namespace StockSimulator.Core
 				PlotData = new List<List<object>>();
 				PlotType = "line";
 				ShouldConnectNulls = false;
+				DashStyle = "Solid";
 			}
 
 			/// <summary>

@@ -55,7 +55,8 @@ mainApp.directive('highstock', [
 										name: seriesName,
 										data: seriesData.data,
 										type: seriesData.type,
-										connectNulls: seriesData.connectNulls
+										connectNulls: seriesData.connectNulls,
+										dashStyle: seriesData.dashStyle
 									}, false);
 								}
 							}
