@@ -14,6 +14,13 @@ namespace StockSimulator.Strategies
 	/// </summary>
 	public class ElliotWavesStrategy : RootSubStrategy
 	{
+		private class PriceZone
+		{
+			public double High { get; set; }
+			public double Low { get; set; }
+			public int NumberOfPoints { get; set; }
+		}
+
 		/// <summary>
 		/// Construct the class and initialize the bar data to default values.
 		/// </summary>
@@ -23,7 +30,8 @@ namespace StockSimulator.Strategies
 		{
 			_dependents = new List<Runnable>()
 			{
-				new ElliotWaves(tickerData)
+				new ElliotWaves(tickerData),
+				new PriceRetracements(tickerData)
 			};
 		}
 
@@ -49,15 +57,23 @@ namespace StockSimulator.Strategies
 			}
 
 			ElliotWaves waves = (ElliotWaves)_dependents[0];
+
 			double buyDirection = 0.0;
 			string foundStrategyName = "";
 
-			// See if we just started the 5th wave
-			if (waves.FifthWaveValue[currentBar - 1] == 0.0 && waves.FifthWaveValue[currentBar] > 0.0)
+			// If we're in a 5th wave, see if the price touched one of the retracement zones.
+			if (DataSeries.IsAbove(waves.FifthWaveValue, 0.0, currentBar, 2) != -1 && IsBarInZone(currentBar))
 			{
-				buyDirection = waves.FifthWaveDirection[currentBar];
+				buyDirection = waves.FifthWaveDirection[currentBar] * -1.0;
 				foundStrategyName = buyDirection > 0.0 ? "BullElliotWavesStrategy" : "BearElliotWavesStrategy";
 			}
+
+			// TEMP to see output.
+			//if (buyDirection == 0.0 && waves.FifthWaveValue[currentBar] > 0.0 && waves.FifthWaveValue[currentBar - 1] > 0.0 && waves.FifthWaveValue[currentBar - 2] > 0.0)
+			//{
+			//	buyDirection = waves.FifthWaveDirection[currentBar];
+			//	foundStrategyName = buyDirection > 0.0 ? "BullElliotWavesStrategy" : "BearElliotWavesStrategy";
+			//}
 
 			if (buyDirection != 0.0)
 			{
@@ -86,6 +102,78 @@ namespace StockSimulator.Strategies
 						GetSellConditions());
 				}
 			}
+		}
+
+		/// <summary>
+		/// Checks if the price for this bar falls in a retracement price zone.
+		/// </summary>
+		/// <param name="currentBar">Bar to check</param>
+		/// <returns>True if the price has touched one of the zones</returns>
+		private bool IsBarInZone(int currentBar)
+		{
+			PriceRetracements retracements = (PriceRetracements)_dependents[1];
+
+			// Get the retracement zones first.
+			List<PriceZone> zones = new List<PriceZone>();
+			List<double> points = new List<double>();
+			points.Add(retracements.External[(int)PriceRetracements.ExternalType._127][currentBar]);
+			points.Add(retracements.External[(int)PriceRetracements.ExternalType._162][currentBar]);
+			points.Add(retracements.Alternate[(int)PriceRetracements.AlternateType._100Wave1][currentBar]);
+			points.Add(retracements.Alternate[(int)PriceRetracements.AlternateType._100Wave3][currentBar]);
+			points.Add(retracements.Alternate[(int)PriceRetracements.AlternateType._38][currentBar]);
+			points.Add(retracements.Alternate[(int)PriceRetracements.AlternateType._62][currentBar]);
+
+			ComboSet<double> comboSet = new ComboSet<double>(points);
+			List<List<double>> combos = comboSet.GetSet(2);
+
+			for (int i = 0; i < combos.Count; i++)
+			{
+				if (AreAllPointsClose(combos[i]) == true)
+				{
+					double high = combos[i].Max();
+					double low = combos[i].Min();
+					zones.Add(new PriceZone() { High = high, Low = low, NumberOfPoints = combos[i].Count });
+				}
+			}
+
+			// The one with the most similar points is the best. See if it lands there first.
+			zones.Sort((a, b) => a.NumberOfPoints.CompareTo(b.NumberOfPoints));
+
+			for (int i = 0; i < zones.Count; i++)
+			{
+				PriceZone zone = zones[i];
+				if ((Data.High[currentBar] >= zone.High && Data.Low[currentBar] <= zone.Low) ||
+					(Data.High[currentBar] >= zone.Low && Data.Low[currentBar] <= zone.High))
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// Compares a list of points and if they are all within a certain range returns true.
+		/// </summary>
+		/// <param name="points">List of points to compare</param>
+		/// <returns>True if all points are within a specified percent</returns>
+		private bool AreAllPointsClose(List<double> points)
+		{
+			bool closeEnough = true;
+
+			for (int i = 0; i < points.Count; i++)
+			{
+				for (int j = i + 1; j < points.Count; j++)
+				{
+					if (Math.Abs(UtilityMethods.PercentChange(points[i], points[j])) > 2.0)
+					{
+						closeEnough = false;
+						break;
+					}
+				}
+			}
+
+			return closeEnough;
 		}
 
 		/// <summary>

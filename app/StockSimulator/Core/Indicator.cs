@@ -87,9 +87,14 @@ namespace StockSimulator.Core
 		public Dictionary<string, IPlotSeries> ChartPlots { get; set; }
 
 		/// <summary>
-		/// Number of bars to look back and run from for this indicator.
+		/// Number of bars to look back and simulate from the current bar.
 		/// </summary>
-		public int NumLookbackBars { get; set; }
+		public int MaxSimulationBars { get; set; }
+
+		/// <summary>
+		/// Numer of bars to plot on the chart.
+		/// </summary>
+		public int MaxPlotBars { get; set; }
 
 		/// <summary>
 		/// Add this indicator to be saved for output later.
@@ -98,7 +103,8 @@ namespace StockSimulator.Core
 		public Indicator(TickerData tickerData) : base(tickerData)
 		{
 			// Default to about 2 years of lookback data.
-			NumLookbackBars = 500;
+			MaxSimulationBars = 500;
+			MaxPlotBars = 500;
 		}
 
 		/// <summary>
@@ -111,7 +117,7 @@ namespace StockSimulator.Core
 			ChartPlots = new Dictionary<string, IPlotSeries>();
 			CreatePlots();
 
-			int startBar = Math.Max(0, endBar - NumLookbackBars);
+			int startBar = Math.Max(0, endBar - MaxPlotBars);
 			for (int i = startBar; i <= endBar; i++)
 			{
 				AddToPlots(i);
@@ -156,7 +162,7 @@ namespace StockSimulator.Core
 				}
 			}
 
-			int startBar = Math.Max(0, bar - NumLookbackBars);
+			int startBar = Math.Max(0, bar - MaxSimulationBars);
 			for (int i = startBar; i <= bar; i++)
 			{
 				OnBarUpdate(i);

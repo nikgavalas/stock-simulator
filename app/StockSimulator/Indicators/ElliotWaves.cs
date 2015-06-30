@@ -16,11 +16,9 @@ namespace StockSimulator.Indicators
 	class ElliotWaves : Indicator
 	{
 		// Identfies a wave point with a string id at a price level.
-		public class WavePointLabel
+		public class WavePointWithLabel : WavePoint
 		{
-			public double Price { get; set; }
 			public string Label { get; set; }
-			public int Bar { get; set; }
 		}
 
 		/// <summary>
@@ -34,11 +32,9 @@ namespace StockSimulator.Indicators
 
 		public List<double> FifthWaveValue { get; set; }
 		public List<double> FifthWaveDirection { get; set; }
-		public List<WavePointLabel> WaveLabels { get; set; }
+		public List<WavePointWithLabel> WaveLabels { get; set; }
 
-		private readonly int _maxBarsForWave = 500;
-
-		private double _5thWaveDirection = 0.0; // 1 is bull, -1 bear, 0 not in a 5th wave
+		private int _maxBarsForWave = 500;
 
 		/// <summary>
 		/// Creates the indicator.
@@ -52,6 +48,8 @@ namespace StockSimulator.Indicators
 			{
 				(Runnable)new ZigZag(Data, 5.0)
 			};
+
+			MaxSimulationBars = 0;
 		}
 
 		/// <summary>
@@ -63,7 +61,38 @@ namespace StockSimulator.Indicators
 
 			FifthWaveValue = Enumerable.Repeat(0d, Data.NumBars).ToList();
 			FifthWaveDirection = Enumerable.Repeat(0d, Data.NumBars).ToList();
-			WaveLabels = Enumerable.Repeat<WavePointLabel>(null, Data.NumBars).ToList();
+			WaveLabels = Enumerable.Repeat<WavePointWithLabel>(null, Data.NumBars).ToList();
+		}
+
+		/// <summary>
+		/// Returns true if we think we are currently in the 5th wave of a 5 wave trend.
+		/// </summary>
+		/// <param name="currentBar">Current bar to check</param>
+		/// <returns>See summary</returns>
+		public bool IsInFifthWave(int currentBar)
+		{
+			return FifthWaveValue[currentBar] != 0.0;
+		}
+
+		/// <summary>
+		/// Returns the wave points for the most recent wave.
+		/// </summary>
+		/// <param name="currentBar">Bar to get the waves back from</param>
+		/// <returns>The wave points for the most recent wave</returns>
+		public List<WavePointWithLabel> GetWavePoints(int currentBar)
+		{
+			int cutoffBar = Math.Max(0, currentBar - _maxBarsForWave);
+			List<WavePointWithLabel> points = Enumerable.Repeat<WavePointWithLabel>(null, 6).ToList();
+			for (int i = currentBar; i >= cutoffBar; i--)
+			{
+				if (WaveLabels[i] != null)
+				{
+					int wavePointNum = Convert.ToInt32(WaveLabels[i].Label);
+					points[wavePointNum] = WaveLabels[i];
+				}
+			}
+
+			return points;
 		}
 
 		/// <summary>
@@ -139,48 +168,49 @@ namespace StockSimulator.Indicators
 
 				int cutoffBar = Math.Max(0, currentBar - _maxBarsForWave);
 				int searchBar = currentBar - 2;
-
-				// See if we've just recently had the end of the 4th wave. For bull
-				// waves this will start with a low and for bear will start with a high.
-				// Need to check the past 3rd bar since that is the lag of the zigzag indicator.
-				// For every zig there is a zag meaning if we found a low, the previous point will
-				// be a high. This makes it easier to search back for the patterns.
 				WavePoint[] points = new WavePoint[6];
-				WavePointLabel[] labels = new WavePointLabel[6];
+				WavePointWithLabel[] labels = new WavePointWithLabel[6];
 				List<double> currentSeries = null;
 				int waveEndpointBeingSearchFor = 4;
 				double trendDirection = 0.0;
-				if (zigzag.ZigZagLows[searchBar] > 0.0)
-				{
-					trendDirection = Order.OrderType.Long;
-					points[waveEndpointBeingSearchFor] = new WavePoint() { Bar = searchBar, Price = zigzag.Value[searchBar] };
-					labels[waveEndpointBeingSearchFor] = new WavePointLabel() { Bar = searchBar, Price = zigzag.Value[searchBar], Label = waveEndpointBeingSearchFor.ToString() };
-					currentSeries = zigzag.ZigZagHighs;
-					--waveEndpointBeingSearchFor;
-				}
-				else if (zigzag.ZigZagHighs[searchBar] > 0.0)
-				{
-					trendDirection = Order.OrderType.Short;
-					points[waveEndpointBeingSearchFor] = new WavePoint() { Bar = searchBar, Price = zigzag.Value[searchBar] };
-					labels[waveEndpointBeingSearchFor] = new WavePointLabel() { Bar = searchBar, Price = zigzag.Value[searchBar], Label = waveEndpointBeingSearchFor.ToString() };
-					currentSeries = zigzag.ZigZagLows;
-					--waveEndpointBeingSearchFor;
-				}
+				double fifthWaveDirection = 0.0; // 1 is bull, -1 bear, 0 not in a 5th wave
+
 
 				// We have an endpoint on the 4th wave, so lets check and see if we
 				// have all the previous waves by searching for the endpoints.
-				if (currentSeries != null)
+				for (int i = searchBar; i >= cutoffBar && waveEndpointBeingSearchFor >= 0; i--)
 				{
-					for (int i = searchBar - 1; i >= cutoffBar && waveEndpointBeingSearchFor >= 0; i--)
+					// See if we've just recently had the end of the 4th wave. For bull
+					// waves this will start with a low and for bear will start with a high.
+					// Need to check the past 3rd bar since that is the lag of the zigzag indicator.
+					// For every zig there is a zag meaning if we found a low, the previous point will
+					// be a high. This makes it easier to search back for the patterns.
+					if (waveEndpointBeingSearchFor == 4)
 					{
-						// Each time we find a wave endpoint, save the price and move to the next one for searching.
-						if (currentSeries[i] > 0.0)
+						if (zigzag.ZigZagLows[i] > 0.0)
 						{
+							trendDirection = Order.OrderType.Long;
 							points[waveEndpointBeingSearchFor] = new WavePoint() { Bar = i, Price = zigzag.Value[i] };
-							labels[waveEndpointBeingSearchFor] = new WavePointLabel() { Bar = i, Price = zigzag.Value[i], Label = waveEndpointBeingSearchFor.ToString() };
-							currentSeries = currentSeries == zigzag.ZigZagHighs ? zigzag.ZigZagLows : zigzag.ZigZagHighs;
+							labels[waveEndpointBeingSearchFor] = new WavePointWithLabel() { Bar = i, Price = zigzag.Value[i], Label = waveEndpointBeingSearchFor.ToString() };
+							currentSeries = zigzag.ZigZagHighs;
 							--waveEndpointBeingSearchFor;
 						}
+						else if (zigzag.ZigZagHighs[i] > 0.0)
+						{
+							trendDirection = Order.OrderType.Short;
+							points[waveEndpointBeingSearchFor] = new WavePoint() { Bar = i, Price = zigzag.Value[i] };
+							labels[waveEndpointBeingSearchFor] = new WavePointWithLabel() { Bar = i, Price = zigzag.Value[i], Label = waveEndpointBeingSearchFor.ToString() };
+							currentSeries = zigzag.ZigZagLows;
+							--waveEndpointBeingSearchFor;
+						}
+					}
+					// Each time we find a wave endpoint, save the price and move to the next one for searching.
+					else if (currentSeries != null && currentSeries[i] > 0.0)
+					{
+						points[waveEndpointBeingSearchFor] = new WavePoint() { Bar = i, Price = zigzag.Value[i] };
+						labels[waveEndpointBeingSearchFor] = new WavePointWithLabel() { Bar = i, Price = zigzag.Value[i], Label = waveEndpointBeingSearchFor.ToString() };
+						currentSeries = currentSeries == zigzag.ZigZagHighs ? zigzag.ZigZagLows : zigzag.ZigZagHighs;
+						--waveEndpointBeingSearchFor;
 					}
 				}
 
@@ -220,22 +250,27 @@ namespace StockSimulator.Indicators
 					// All the conditions are met up to the 5th wave, so we'll assume this next one is a 5th wave.
 					if (isValidTrend)
 					{
-						_5thWaveDirection = trendDirection;
+						fifthWaveDirection = trendDirection;
 					}
 				}
 
 				// We're in a 5th wave, so lets label it to see on the chart. Also, the next point we'll label
 				// as the 5th point and then save that we aren't in the 5th wave.
-				if (_5thWaveDirection != 0.0)
+				if (fifthWaveDirection != 0.0)
 				{
-					FifthWaveValue[currentBar] = _5thWaveDirection > 0.0 ? Data.Low[currentBar] : Data.High[currentBar];
-					FifthWaveDirection[currentBar] = _5thWaveDirection;
+					// Label the 5th wave from the 4th point to now.
+					int fourthWaveBar = points[4].Bar + 1;
+					for (int j = fourthWaveBar; j <= currentBar; j++)
+					{
+						FifthWaveValue[j] = fifthWaveDirection > 0.0 ? Data.Low[j] : Data.High[j];
+						FifthWaveDirection[j] = fifthWaveDirection;
+					}
 
 					// See if we can label the 5th point.
-					List<double> zigzagSeries = _5thWaveDirection > 0.0 ? zigzag.ZigZagHighs : zigzag.ZigZagLows;
+					List<double> zigzagSeries = fifthWaveDirection > 0.0 ? zigzag.ZigZagHighs : zigzag.ZigZagLows;
 					if (zigzagSeries[searchBar] > 0.0)
 					{
-						labels[5] = new WavePointLabel() { Price = zigzag.Value[searchBar], Label = "5" };
+						labels[5] = new WavePointWithLabel() { Price = zigzag.Value[searchBar], Label = "5" };
 					}
 
 					// Label all the points regardless if we have a 5th point or not.
@@ -248,7 +283,7 @@ namespace StockSimulator.Indicators
 					}
 
 					// Reset searching for the next bar.
-					_5thWaveDirection = 0.0;
+					fifthWaveDirection = 0.0;
 				}
 			}
 

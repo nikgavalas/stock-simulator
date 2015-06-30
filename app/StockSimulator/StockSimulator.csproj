@@ -169,6 +169,7 @@
     <None Include="Indicators\Trend.cs" />
     <None Include="Indicators\Trix.cs" />
     <None Include="Indicators\WilliamsR.cs" />
+    <Compile Include="Indicators\PriceRetracements.cs" />
     <Compile Include="Indicators\ZigZag.cs" />
     <None Include="Strategies\Bear\BearBressertDss.cs" />
     <None Include="Strategies\Bear\BearDmi.cs" />

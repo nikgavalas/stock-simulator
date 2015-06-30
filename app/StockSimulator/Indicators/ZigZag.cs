@@ -128,11 +128,6 @@ namespace StockSimulator.Indicators
 				return;
 			}
 
-			if (Data.Dates[currentBar].ToString("yyyy-MM-dd") == "2010-10-13")
-			{
-				//Debugger.Break();
-			}
-
 			// Initialization
 			if (lastSwingPrice == 0.0)
 			{

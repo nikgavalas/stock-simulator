@@ -11,7 +11,7 @@
   "ShouldOpenWebPage": true,
   "Commission": 4.95,
   "MaxConcurrentOrders": 1,
-  "MinRequiredOrders": 1,
+  "MinRequiredOrders": 0,
   "MaxLookBackOrders": 8,
   "MaxLookBackBars": 2000,
   "ComboPercentForBuy": 65.0,
