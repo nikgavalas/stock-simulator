@@ -104,8 +104,10 @@
     <Compile Include="Core\BuySellConditions\AboveSetupBarBuyCondition.cs" />
     <Compile Include="Core\BuySellConditions\BuyCondition.cs" />
     <Compile Include="Core\BuySellConditions\MaxLengthSellCondition.cs" />
+    <Compile Include="Core\BuySellConditions\OneBarTrailingHighLow.cs" />
     <Compile Include="Core\BuySellConditions\SellCondition.cs" />
     <Compile Include="Core\BuySellConditions\MarketBuyCondition.cs" />
+    <Compile Include="Core\BuySellConditions\StopOneBarTrailingHighLow.cs" />
     <Compile Include="Core\BuySellConditions\StopSellCondition.cs" />
     <Compile Include="Core\BuySellConditions\StopSetupBarLowSellCondition.cs" />
     <Compile Include="Core\BuySellConditions\StrategyFoundSellCondition.cs" />

@@ -28,7 +28,7 @@
   "BressertComboStopPercent": 0.04,
   "BressertComboMaxBarsOpen": 10,
   "BressertComboSizeOfOrder": 10000.0,
-  "InstrumentListFile": "C:\\Users\\Nik\\Documents\\Code\\github\\stock-simulator\\input\\indtest.csv",
+  "InstrumentListFile": "C:\\Users\\Nik\\Documents\\Code\\github\\stock-simulator\\input\\exp-small.csv",
   "InitialAccountBalance": 99999999,
   "NumBarsToDelayStart": 0,
   "MaxOrdersPerBar": 30,

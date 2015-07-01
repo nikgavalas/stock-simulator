@@ -85,13 +85,6 @@ namespace StockSimulator.Strategies
 				}
 			}
 
-			// TEMP to see output.
-			//if (buyDirection == 0.0 && waves.FifthWaveValue[currentBar] > 0.0 && waves.FifthWaveValue[currentBar - 1] > 0.0 && waves.FifthWaveValue[currentBar - 2] > 0.0)
-			//{
-			//	buyDirection = waves.FifthWaveDirection[currentBar];
-			//	foundStrategyName = buyDirection > 0.0 ? "BullElliotWavesStrategy" : "BearElliotWavesStrategy";
-			//}
-
 			if (foundStrategyName.Length > 0)
 			{
 				List<Indicator> dependentIndicators = GetDependentIndicators();
@@ -201,7 +194,7 @@ namespace StockSimulator.Strategies
 		{
 			return new List<BuyCondition>()
 			{
-				//new AboveSetupBarBuyCondition(Simulator.Config.BressertMaxBarsToFill)
+				//new OneBarTrailingHighLow(5)
 				new MarketBuyCondition()
 			};
 		}
@@ -216,6 +209,7 @@ namespace StockSimulator.Strategies
 			return new List<SellCondition>()
 			{
 				new StopSellCondition(0.05),
+				//new StopOneBarTrailingHighLow(),
 				new MaxLengthSellCondition(5),
 			};
 		}
