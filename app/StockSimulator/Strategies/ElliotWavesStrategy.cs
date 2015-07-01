@@ -69,14 +69,14 @@ namespace StockSimulator.Strategies
 
 				// Verify with the mechanical buy signal.
 				DtOscillator dtosc = (DtOscillator)_dependents[2];
-				if (buyDirection > 0.0)
+				if (buyDirection > 0.0 && Data.HigherTimeframeTrend[currentBar] < 0.0)
 				{
 					if (dtosc.SD[currentBar] <= 25.0 && dtosc.SK[currentBar] <= 25.0)
 					{
 						foundStrategyName = "BullElliotWavesStrategy";
 					}
 				}
-				else if (buyDirection < 0.0)
+				else if (buyDirection < 0.0 && Data.HigherTimeframeTrend[currentBar] > 0.0)
 				{
 					if (dtosc.SD[currentBar] >= 75.0 && dtosc.SK[currentBar] >= 75.0)
 					{

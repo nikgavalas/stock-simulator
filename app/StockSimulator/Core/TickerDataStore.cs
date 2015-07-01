@@ -9,6 +9,7 @@ using System.IO;
 using StockSimulator.GoogleFinanceDownloader;
 using StockSimulator.YahooFinanceDownloader;
 using StockSimulator.Indicators;
+using System.Diagnostics;
 
 namespace StockSimulator.Core
 {
@@ -693,16 +694,24 @@ namespace StockSimulator.Core
 
 		private double GetHigherTimeframeStateFromIndicator(DtOscillator ind, int currentBar, double lastState)
 		{
-			if (currentBar > 0)
+			if (currentBar > 2)
 			{
-				if (DataSeries.CrossAbove(ind.SK, ind.SD, currentBar, 0) != -1)
+				if (ind.SK[currentBar] <= 50.0 && UtilityMethods.IsValley(ind.SK, currentBar))
 				{
 					return Order.OrderType.Long;
 				}
-				else if (DataSeries.CrossBelow(ind.SK, ind.SD, currentBar, 0) != -1)
+				else if (ind.SK[currentBar] >= 50.0 && UtilityMethods.IsPeak(ind.SK, currentBar))
 				{
 					return Order.OrderType.Short;
 				}
+				//if (DataSeries.CrossAbove(ind.SK, ind.SD, currentBar, 0) != -1)
+				//{
+				//	return Order.OrderType.Long;
+				//}
+				//else if (DataSeries.CrossBelow(ind.SK, ind.SD, currentBar, 0) != -1)
+				//{
+				//	return Order.OrderType.Short;
+				//}
 
 				//if (DataSeries.IsBelow(ind.SK, 25, currentBar, 1) != -1)
 				//{
