@@ -171,6 +171,7 @@
     <None Include="Indicators\Trend.cs" />
     <None Include="Indicators\Trix.cs" />
     <None Include="Indicators\WilliamsR.cs" />
+    <Compile Include="Indicators\GavalasZones.cs" />
     <Compile Include="Indicators\PriceRetracements.cs" />
     <Compile Include="Indicators\ZigZag.cs" />
     <None Include="Strategies\Bear\BearBressertDss.cs" />
@@ -280,6 +281,7 @@
     <Compile Include="Strategies\ElliotWavesStrategy.cs" />
     <None Include="Strategies\FibonacciDtOscillator.cs" />
     <None Include="Strategies\FibonacciRsi3m3.cs" />
+    <Compile Include="Strategies\GavalasStrategy.cs" />
     <Compile Include="Strategies\RootSubStrategy.cs" />
     <Compile Include="YahooFinanceDownloader\YahooFinanceDownloader.cs" />
     <Page Include="MainWindow.xaml">
