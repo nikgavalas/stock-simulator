@@ -14,11 +14,12 @@ namespace StockSimulator.Core
 	[CategoryOrder("Output", 1)]
 	[CategoryOrder("All Orders", 2)]
 	[CategoryOrder("Main Strategy", 3)]
-	[CategoryOrder("Bressert Combo", 4)]
-	[CategoryOrder("Combo Strategy", 5)]
-	[CategoryOrder("Higher Timeframe", 6)]
-	[CategoryOrder("Candlesticks", 7)]
+	[CategoryOrder("Gavalas Strategy", 4)]
+	[CategoryOrder("Higher Timeframe", 7)]
+	[CategoryOrder("Candlesticks", 8)]
 	[CategoryOrder("Bressert Strategy", 20)]
+	[CategoryOrder("Bressert Combo", 21)]
+	[CategoryOrder("Combo Strategy", 23)]
 	public class SimulatorConfig
 	{
 		/////////////////////////////// DATES /////////////////////////////////////
@@ -173,6 +174,32 @@ namespace StockSimulator.Core
 		[DisplayName("Size Of Order")]
 		[Description("Amount of money to invest in each stock order")]
 		public double ComboSizeOfOrder { get; set; }
+
+		/////////////////////////// GAVALAS STRATEGY //////////////////////////////
+
+		[Category("Gavalas Strategy")]
+		[PropertyOrder(0)]
+		[DisplayName("Percent For Buy")]
+		[Description("Min success percent from past orders to add ticker to the buy list")]
+		public double GavalasPercentForBuy { get; set; }
+
+		[Category("Gavalas Strategy")]
+		[PropertyOrder(5)]
+		[DisplayName("Stop Loss Percent")]
+		[Description("Stop loss percent for the strategy")]
+		public double GavalasStopPercent { get; set; }
+
+		[Category("Gavalas Strategy")]
+		[PropertyOrder(6)]
+		[DisplayName("Max Bars Open")]
+		[Description("Max bars open for the strategy")]
+		public int GavalasMaxBarsOpen { get; set; }
+
+		[Category("Gavalas Strategy")]
+		[PropertyOrder(7)]
+		[DisplayName("Size Of Order")]
+		[Description("Amount of money to invest in each stock order")]
+		public double GavalasSizeOfOrder { get; set; }
 
 		///////////////////////////// BRESSERT COMBO ////////////////////////////////
 
@@ -340,6 +367,12 @@ namespace StockSimulator.Core
 			BressertComboStopPercent = 0.04;
 			BressertComboMaxBarsOpen = 10;
 			BressertComboSizeOfOrder = 10000;
+
+			// Gavalas Strategy
+			GavalasPercentForBuy = 50;
+			GavalasStopPercent = 0.05;
+			GavalasMaxBarsOpen = 5;
+			GavalasSizeOfOrder = 10000;
 
 			// Main strategy
 			MaxOrdersPerBar = 4;

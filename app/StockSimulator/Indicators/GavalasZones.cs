@@ -81,6 +81,7 @@ namespace StockSimulator.Indicators
 		private int _minProjectionsForZone = 2;
 		#endregion
 
+		private int _maxCycleLookback = 100;
 
 		/// <summary>
 		/// Creates the indicator.
@@ -92,11 +93,12 @@ namespace StockSimulator.Indicators
 		{
 			_dependents = new List<Runnable>()
 			{
-				new ZigZag(tickerData, 3.0)
+				new ZigZag(tickerData, 3.0) { MaxSimulationBars = 150, MaxPlotBars = 150 }
 			};
 
-			MaxSimulationBars = 100;
-			MaxPlotBars = 100;
+			MaxSimulationBars = 1;
+			MaxPlotBars = 1;
+
 		}
 
 		/// <summary>
@@ -268,7 +270,7 @@ namespace StockSimulator.Indicators
 			int lastPoint = numPoints - 1;
 
 			ZigZag zigzag = (ZigZag)_dependents[0];
-			int cutoffBar = Math.Max(0, currentBar - MaxSimulationBars);
+			int cutoffBar = Math.Max(0, currentBar - _maxCycleLookback);
 			int searchBar = currentBar - 2;
 			ZigZagPoint[] points = new ZigZagPoint[numPoints];
 			List<double> currentSeries = null;

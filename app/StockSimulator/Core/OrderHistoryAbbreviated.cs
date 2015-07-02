@@ -74,6 +74,8 @@ namespace StockSimulator.Core
 				RemoveOldOrders(orders, currentBar);
 				orders.Add(order);
 			}
+
+			SaveSnapshot(order, dependentIndicators, currentBar);
 		}
 
 		/// <summary>
@@ -86,7 +88,7 @@ namespace StockSimulator.Core
 		public void SaveSnapshot(Order order, List<Indicator> dependentIndicators, int currentBar)
 		{
 			// Only care about the main orders for the abbreviated output.
-			if (order.StrategyName == "MainStrategy")
+			if (order is MainStrategyOrder)
 			{
 				Simulator.DataOutput.OutputIndicatorSnapshots(order, dependentIndicators, currentBar);
 			}

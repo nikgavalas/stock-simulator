@@ -86,7 +86,7 @@ namespace StockSimulator.Strategies
 			{
 				List<Indicator> dependentIndicators = GetDependentIndicators();
 
-				Order placedOrder = EnterOrder(foundStrategyName, currentBar, buyDirection, 10000,
+				Order placedOrder = EnterOrder(foundStrategyName, currentBar, buyDirection, Simulator.Config.GavalasSizeOfOrder,
 					dependentIndicators, GetBuyConditions(), GetSellConditions());
 
 				if (placedOrder != null)
@@ -98,15 +98,18 @@ namespace StockSimulator.Strategies
 						currentBar,
 						Simulator.Config.MaxLookBackBars);
 
-					Bars[currentBar] = new OrderSuggestion(
-						100.0,
-						foundStrategyName,
-						buyDirection,
-						10000,
-						dependentIndicators,
-						new List<StrategyStatistics>() { orderStats },
-						GetBuyConditions(),
-						GetSellConditions());
+					if (orderStats.WinPercent >= Simulator.Config.GavalasPercentForBuy)
+					{
+						Bars[currentBar] = new OrderSuggestion(
+							orderStats.WinPercent,
+							foundStrategyName,
+							buyDirection,
+							Simulator.Config.GavalasSizeOfOrder,
+							dependentIndicators,
+							new List<StrategyStatistics>() { orderStats },
+							GetBuyConditions(),
+							GetSellConditions());
+					}
 				}
 			}
 		}
@@ -133,9 +136,9 @@ namespace StockSimulator.Strategies
 			// Always have a max time in market and an absolute stop for sell conditions.
 			return new List<SellCondition>()
 			{
-				new StopSellCondition(0.05),
+				new StopSellCondition(Simulator.Config.GavalasStopPercent),
 				//new StopOneBarTrailingHighLow(),
-				new MaxLengthSellCondition(5),
+				new MaxLengthSellCondition(Simulator.Config.GavalasMaxBarsOpen),
 			};
 		}
 
