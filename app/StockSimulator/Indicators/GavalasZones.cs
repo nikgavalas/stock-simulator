@@ -99,36 +99,27 @@ namespace StockSimulator.Indicators
 			MaxSimulationBars = 1;
 			MaxPlotBars = 1;
 
-		}
-
-		/// <summary>
-		/// Resets the indicator to it's starting state.
-		/// </summary>
-		public override void Initialize()
-		{
-			base.Initialize();
-
-			BuyDirection = Enumerable.Repeat(0d, Data.NumBars).ToList();
+			BuyDirection = UtilityMethods.CreateList<double>(Data.NumBars, 0d);
 
 			int count = (int)ExternalType.Count;
 			External = new List<double>[count];
 			for (int i = 0; i < count; i++)
 			{
-				External[i] = Enumerable.Repeat(0d, Data.NumBars).ToList();
+				External[i] = UtilityMethods.CreateList<double>(Data.NumBars, 0d);
 			}
 
 			count = (int)InternalType.Count;
 			Internal = new List<double>[count];
 			for (int i = 0; i < count; i++)
 			{
-				Internal[i] = Enumerable.Repeat(0d, Data.NumBars).ToList();
+				Internal[i] = UtilityMethods.CreateList<double>(Data.NumBars, 0d);
 			}
 
 			count = (int)AlternateType.Count;
 			Alternate = new List<double>[count];
 			for (int i = 0; i < count; i++)
 			{
-				Alternate[i] = Enumerable.Repeat(0d, Data.NumBars).ToList();
+				Alternate[i] = UtilityMethods.CreateList<double>(Data.NumBars, 0d);
 			}
 		}
 
@@ -333,6 +324,19 @@ namespace StockSimulator.Indicators
 
 				// The last cycle sets us up for the opposite cycle.
 				BuyDirection[currentBar] = trendDirection * -1.0;
+			}
+			else
+			{
+				External[(int)ExternalType._127][currentBar] = 0.0;
+				External[(int)ExternalType._162][currentBar] = 0.0;
+				Alternate[(int)AlternateType._62][currentBar] = 0.0;
+				Alternate[(int)AlternateType._100][currentBar] = 0.0;
+				Alternate[(int)AlternateType._162][currentBar] = 0.0;
+				Internal[(int)InternalType._38][currentBar] = 0.0;
+				Internal[(int)InternalType._50][currentBar] = 0.0;
+				Internal[(int)InternalType._62][currentBar] = 0.0;
+				Internal[(int)InternalType._79][currentBar] = 0.0;
+				BuyDirection[currentBar] = 0.0;
 			}
 		}
 

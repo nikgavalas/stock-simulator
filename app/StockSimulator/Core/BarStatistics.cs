@@ -14,6 +14,7 @@ namespace StockSimulator.Core
 	public class OrderSuggestion
 	{
 		public double HighestPercent { get; set; }
+		public double HighestGain { get; set; }
 		public string HighestStrategyName { get; set; }
 		public double StrategyOrderType { get; set; }
 		public double SizeOfOrder { get; set; }
@@ -25,6 +26,7 @@ namespace StockSimulator.Core
 		public OrderSuggestion()
 		{
 			HighestPercent = 0.0;
+			HighestGain = 0.0;
 			HighestStrategyName = "None";
 			StrategyOrderType = Order.OrderType.Long;
 			SizeOfOrder = 0.0;
@@ -35,7 +37,8 @@ namespace StockSimulator.Core
 		}
 
 		public OrderSuggestion(
-			double percent, 
+			double percent,
+			double gain,
 			string name,
 			double orderType,
 			double sizeOfOrder,
@@ -45,6 +48,7 @@ namespace StockSimulator.Core
 			List<SellCondition> sellConditions)
 		{
 			HighestPercent = percent;
+			HighestGain = gain;
 			HighestStrategyName = name;
 			StrategyOrderType = orderType;
 			SizeOfOrder = sizeOfOrder;

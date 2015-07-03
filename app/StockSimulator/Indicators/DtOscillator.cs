@@ -62,18 +62,10 @@ namespace StockSimulator.Indicators
 			{
 				(Runnable)new Rsi(Data) { Period = PeriodRsi }
 			};
-		}
 
-		/// <summary>
-		/// Resets the indicator to it's starting state.
-		/// </summary>
-		public override void Initialize()
-		{
-			base.Initialize();
-
-			SD = Enumerable.Repeat(0d, Data.NumBars).ToList();
-			SK = Enumerable.Repeat(0d, Data.NumBars).ToList();
-			StoRsi = Enumerable.Repeat(0d, Data.NumBars).ToList();
+			SD = UtilityMethods.CreateList<double>(Data.NumBars, 0d);
+			SK = UtilityMethods.CreateList<double>(Data.NumBars, 0d);
+			StoRsi = UtilityMethods.CreateList<double>(Data.NumBars, 0d);
 		}
 
 		/// <summary>

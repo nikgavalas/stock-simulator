@@ -182,5 +182,54 @@ namespace StockSimulator.Core
 			// Bull price comparison, is b a higher price than a
 			return direction > 0.0 ? b - a : a - b;
 		}
+
+		/// <summary>
+		/// Creates a list with a default size
+		/// </summary>
+		/// <typeparam name="T">Type of list</typeparam>
+		/// <param name="count">Number of items desired</param>
+		/// <returns>New list created</returns>
+		public static List<T> CreateList<T>(int count)
+		{
+			if (count < 0)
+			{
+				throw new ArgumentException("Count of elements cannot be less than zero", "count");
+			}
+
+			return new List<T>(new T[count]);
+		}
+
+		/// <summary>
+		/// Creates a list with a default size and inits it.
+		/// </summary>
+		/// <typeparam name="T">Type of list</typeparam>
+		/// <param name="count">Number of items desired</param>
+		/// <param name="val">Value to fill the list with</param>
+		/// <returns>New list created</returns>
+		public static List<T> CreateList<T>(int count, T val)
+		{
+			if (count < 0)
+			{
+				throw new ArgumentException("Count of elements cannot be less than zero", "count");
+			}
+
+			List<T> list = new List<T>(new T[count]);
+			list.Fill(val);
+			return list;
+		}
+
+		/// <summary>
+		/// Fills a list with a default value which is faster than using Enumerable.Repeat()
+		/// </summary>
+		/// <typeparam name="T">Type of list</typeparam>
+		/// <param name="list">The list being filled</param>
+		/// <param name="val">Value to fill the list with</param>
+		public static void Fill<T>(this List<T> list, T val)
+		{
+			for (int i = 0; i < list.Count; i++)
+			{
+				list[i] = val;
+			}
+		}
 	}
 }

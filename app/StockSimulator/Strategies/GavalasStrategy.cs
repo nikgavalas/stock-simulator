@@ -102,6 +102,7 @@ namespace StockSimulator.Strategies
 					{
 						Bars[currentBar] = new OrderSuggestion(
 							orderStats.WinPercent,
+							orderStats.Gain,
 							foundStrategyName,
 							buyDirection,
 							Simulator.Config.GavalasSizeOfOrder,

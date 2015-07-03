@@ -297,7 +297,7 @@ namespace StockSimulator.Core
 			if (isTradingBar == true)
 			{
 				// Sort the list so the instruments that have the highest buy value are first in the list.
-				buyList.Sort((x, y) => -1 * x.Bars[x.Data.GetBar(currentDate)].HighestPercent.CompareTo(y.Bars[y.Data.GetBar(currentDate)].HighestPercent));
+				buyList.Sort((x, y) => -1 * x.Bars[x.Data.GetBar(currentDate)].HighestGain.CompareTo(y.Bars[y.Data.GetBar(currentDate)].HighestGain));
 
 				// Output the buy list for each day.
 				DataOutput.SaveBuyList(buyList, currentDate);

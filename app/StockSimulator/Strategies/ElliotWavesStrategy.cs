@@ -103,6 +103,7 @@ namespace StockSimulator.Strategies
 
 					Bars[currentBar] = new OrderSuggestion(
 						100.0,
+						orderStats.Gain,
 						foundStrategyName,
 						buyDirection,
 						10000,

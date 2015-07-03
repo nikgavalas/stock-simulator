@@ -46,22 +46,13 @@ namespace StockSimulator.Indicators
 		public Rsi(TickerData tickerData) 
 			: base(tickerData)
 		{
-		}
+			Value = UtilityMethods.CreateList<double>(Data.NumBars, 0d);
+			Avg = UtilityMethods.CreateList<double>(Data.NumBars, 0d);
 
-		/// <summary>
-		/// Resets the indicator to it's starting state.
-		/// </summary>
-		public override void Initialize()
-		{
-			base.Initialize();
-
-			Value = Enumerable.Repeat(0d, Data.NumBars).ToList();
-			Avg = Enumerable.Repeat(0d, Data.NumBars).ToList();
-
-			_up = Enumerable.Repeat(0d, Data.NumBars).ToList();
-			_down = Enumerable.Repeat(0d, Data.NumBars).ToList();
-			_avgUp = Enumerable.Repeat(0d, Data.NumBars).ToList();
-			_avgDown = Enumerable.Repeat(0d, Data.NumBars).ToList();
+			_up = UtilityMethods.CreateList<double>(Data.NumBars, 0d);
+			_down = UtilityMethods.CreateList<double>(Data.NumBars, 0d);
+			_avgUp = UtilityMethods.CreateList<double>(Data.NumBars, 0d);
+			_avgDown = UtilityMethods.CreateList<double>(Data.NumBars, 0d);
 		}
 
 		/// <summary>

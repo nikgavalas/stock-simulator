@@ -42,6 +42,12 @@ namespace StockSimulator.Indicators
 			: base(tickerData)
 		{
 			deviationValue = devValue;
+
+			Value = UtilityMethods.CreateList<double>(Data.NumBars, 0d);
+			ZigZagHighs = UtilityMethods.CreateList<double>(Data.NumBars, 0d);
+			ZigZagLows = UtilityMethods.CreateList<double>(Data.NumBars, 0d);
+			zigZagHighSeries = UtilityMethods.CreateList<double>(Data.NumBars, 0d);
+			zigZagLowSeries = UtilityMethods.CreateList<double>(Data.NumBars, 0d);
 		}
 
 		/// <summary>
@@ -58,12 +64,6 @@ namespace StockSimulator.Indicators
 			lastSwingPrice = 0.0;
 			trendDir = 0; // 1 = trend up, -1 = trend down, init = 0
 			useHighLow = true;
-
-			Value = Enumerable.Repeat(0d, Data.NumBars).ToList();
-			ZigZagHighs = Enumerable.Repeat(0d, Data.NumBars).ToList();
-			ZigZagLows = Enumerable.Repeat(0d, Data.NumBars).ToList();
-			zigZagHighSeries = Enumerable.Repeat(0d, Data.NumBars).ToList();
-			zigZagLowSeries = Enumerable.Repeat(0d, Data.NumBars).ToList();
 		}
 
 		/// <summary>
@@ -162,6 +162,7 @@ namespace StockSimulator.Indicators
 
 			ZigZagHighs[currentBar] = 0;
 			ZigZagLows[currentBar] = 0;
+			Value[currentBar] = 0;
 
 			if (!isSwingHigh && !isSwingLow)
 			{
