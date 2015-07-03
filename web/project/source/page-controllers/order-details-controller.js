@@ -5,6 +5,7 @@ angular.module('mainApp').controller('OrderDetailsCtrl', [
 	'$routeParams',
 	'$location',
 	'$window',
+	'$timeout',
 	'ConfigFactory',
 	'OrderListFactory',
 	'StrategyListFactory',
@@ -13,6 +14,7 @@ angular.module('mainApp').controller('OrderDetailsCtrl', [
 		$routeParams,
 		$location,
 		$window,
+		$timeout,
 		ConfigFactory,
 		OrderListFactory,
 		StrategyListFactory
@@ -61,7 +63,7 @@ angular.module('mainApp').controller('OrderDetailsCtrl', [
 					
 					// Set the chart to position to these dates.
 					var buyDate = new Date($scope.orderDate);
-					var range = 100; // Bars
+					var range = 50; // Bars
 					var rangeMs = range * ConfigFactory.getRangeInMilliseconds();
 					$scope.extremes = {
 						min: new Date(),
@@ -76,6 +78,10 @@ angular.module('mainApp').controller('OrderDetailsCtrl', [
 					for (var i = 0; i < orderData.dependentIndicators.length; i++) {
 						$scope.$broadcast('AddIndicator', { name: orderData.dependentIndicators[i], orderId: orderData.id, chartName: 'lowerTimeframe' });
 					}
+
+					$timeout(function() {
+						$scope.$broadcast('RedrawChart');
+					}, 500);
 				});
 			}
 		});
@@ -102,8 +108,12 @@ angular.module('mainApp').controller('OrderDetailsCtrl', [
 		 * @returns {Number} see description
 		 */
 		$scope.getPercentGain = function(order) {
-			var percent = (((order.sellPrice - order.buyPrice) / order.buyPrice) * 100).toFixed(2);
-			return order.orderType > 0 ? percent : -percent;
+			if (order) {
+				var percent = (((order.sellPrice - order.buyPrice) / order.buyPrice) * 100).toFixed(2);
+				return order.orderType > 0 ? percent : -percent;
+			}
+
+			return 0;
 		};
 
 		/**

@@ -4,6 +4,7 @@ angular.module('mainApp').controller('StrategyDetailsCtrl', [
 	'$scope',
 	'$routeParams',
 	'$location',
+	'$timeout',
 	'ConfigFactory',
 	'OrderListFactory',
 	'StrategyListFactory',
@@ -11,6 +12,7 @@ angular.module('mainApp').controller('StrategyDetailsCtrl', [
 		$scope,
 		$routeParams,
 		$location,
+		$timeout,
 		ConfigFactory,
 		OrderListFactory,
 		StrategyListFactory
@@ -46,9 +48,13 @@ angular.module('mainApp').controller('StrategyDetailsCtrl', [
 				$scope.$broadcast('AddIndicator', { name: order.dependentIndicators[i], orderId: order.id, chartName: 'lowerTimeframe' });
 			}
 
+			$timeout(function() {
+				$scope.$broadcast('RedrawChart');
+			}, 500);
+
 			// Set the chart to position to these dates.
 			var buyDate = new Date(order.buyDate);
-			var range = 100; // Bars
+			var range = 50; // Bars
 			var rangeMs = range * ConfigFactory.getRangeInMilliseconds();
 			$scope.extremes = {
 				min: new Date(),

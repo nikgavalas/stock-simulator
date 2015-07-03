@@ -30,7 +30,10 @@ mainApp.directive('highstock', [
 				// The chart so that we can manipulate it in the directive.
 				var chart = null;
 				var priceHeight = 450;
+				var priceTop = 80;
 				var indicatorHeight = 180;
+				var highstockExtrasHeight = 200;
+				var axisPaddingHeight = 10;
 				var axisIds = [];
 
 				function addIndicator(data, args) {
@@ -60,9 +63,6 @@ mainApp.directive('highstock', [
 									}, false);
 								}
 							}
-
-							chart.redraw();
-							chart.reflow();
 						}
 						else {
 							var axisId = args.name + '-axis';
@@ -70,15 +70,9 @@ mainApp.directive('highstock', [
 
 							chart.addAxis({
 								id: axisId,
-								labels: {
-									align: 'right',
-									x: -3
-								},
 								title: {
 									text: args.name
 								},
-								top: '15%',
-								height: '15%',
 								lineWidth: 2,
 								opposite: true,
 								offset: 0
@@ -93,28 +87,24 @@ mainApp.directive('highstock', [
 									yAxis: axisId
 								}, false);
 							}
-
-							// Need to rebalance the percentages of the height.
-							var heightsAndTops = $scope.setTotalHeightAndGetAxisTopAndHeights(axisIds.length);
-
-							// Update all the heights of each chart.
-							for (var i = 0; i < axisIds.length; i++) {
-								var axis = chart.get(axisIds[i]);
-								axis.update({
-									top: heightsAndTops.tops[i],
-									height: heightsAndTops.heights[i],
-									labels: {
-										align: 'center',
-										x: -3
-									},
-								}, false);
-							}
-
-							$timeout(function() {
-								chart.redraw();
-								chart.reflow();
-							}, 500);
 						}
+
+						// Need to rebalance the percentages of the height.
+						var heightsAndTops = $scope.setTotalHeightAndGetAxisTopAndHeights(axisIds.length);
+
+						// Update all the heights of each chart.
+						for (var i = 0; i < axisIds.length; i++) {
+							var axis = chart.get(axisIds[i]);
+							axis.update({
+								top: heightsAndTops.tops[i],
+								height: heightsAndTops.heights[i],
+								labels: {
+									align: 'center',
+									x: -3
+								},
+							}, false);
+						}
+
 					}
 					catch (e) {
 						console.log(e);
@@ -213,8 +203,8 @@ mainApp.directive('highstock', [
 								title: {
 									text: 'Candlestick'
 								},
-								top: heightsAndTops.tops[0],
-								height: heightsAndTops.heights[0],
+								top: priceTop,
+								height: priceHeight,
 								lineWidth: 2,
 								id: axisIds[0]
 							},
@@ -226,8 +216,8 @@ mainApp.directive('highstock', [
 								title: {
 									text: 'Volume'
 								},
-								top: heightsAndTops.tops[1],
-								height: heightsAndTops.heights[1],
+								top: priceHeight + priceTop + axisPaddingHeight,
+								height: indicatorHeight,
 								offset: 0,
 								lineWidth: 2,
 								id: axisIds[1]
@@ -247,6 +237,7 @@ mainApp.directive('highstock', [
 							{
 								type: 'column',
 								name: 'Volume',
+								id: 'volume-series',
 								data: volume,
 								yAxis: axisIds[1],
 								dataGrouping: {
@@ -271,6 +262,7 @@ mainApp.directive('highstock', [
 						var newSeries = chart.addSeries({
 							data: eventData,
 							name: 'Events',
+							id: 'event-series',
 							type: 'flags',
 							onSeries: 'price-series',
 							shape: 'squarepin',
@@ -293,19 +285,20 @@ mainApp.directive('highstock', [
 					var heights = [];
 					var tops = [];
 					var extraAxis = numberOfyAxis - 1;
-					var totalHeight = priceHeight + (extraAxis * indicatorHeight);
-					var topTotal = 0;
+					var totalHeight = priceHeight + highstockExtrasHeight + (extraAxis * (indicatorHeight + axisPaddingHeight));
+					var topTotal = priceTop;
+
 					// Percent height for the chart.
-					tops.push(topTotal + '%');
-					var newHeight = (priceHeight / totalHeight) * 100;
-					heights.push(newHeight + '%');
-					topTotal += newHeight;
+					tops.push(topTotal);
+					var newHeight = priceHeight
+					heights.push(newHeight);
+					topTotal += newHeight + axisPaddingHeight;
 
 					for (var i = 0; i < extraAxis; i++) {
-						newHeight = (indicatorHeight / totalHeight) * 100;
-						heights.push(newHeight + '%');
-						tops.push(topTotal + '%');
-						topTotal += newHeight;
+						newHeight = indicatorHeight;
+						heights.push(newHeight);
+						tops.push(topTotal);
+						topTotal += newHeight + axisPaddingHeight;
 					}
 
 					$scope.elementStyle = {
@@ -319,15 +312,36 @@ mainApp.directive('highstock', [
 				};
 
 				$scope.$on('ClearIndicators', function(msg, args) {
-					while (chart && chart.series.length > 4) {
-						chart.series[4].remove(false);
-					}
+					if (chart) {
+						for (var i = chart.series.length - 1; i >= 0; i--) {
+							var series = chart.series[i]
+							var seriesId = series.options.id;
+							if (seriesId && (seriesId === 'price-series' || seriesId === 'volume-series' || seriesId === 'event-series' || seriesId === 'highcharts-navigator-series')) {
+								continue;
+							}
 
-					if (args && args.redraw) {
-						$timeout(function() {
-							chart.redraw();
-							chart.reflow();
-						}, 500);
+							// Remove from the chart.
+							chart.series[i].remove(false);
+						}
+
+						// Remove all the axis that any indicator might have added.
+						for (var j = chart.axes.length - 1; j >= 0; j--) {
+							var axis = chart.axes[j];
+							var axisId = axis.options.id;
+							if (axisId) {
+								if (axisId !== 'price-axis' && axisId !== 'volume-axis' && axisId !== 'navigator-x-axis' && axisId !== 'navigator-y-axis') {
+									axis.remove(false);
+
+									// Remove the id from the saved array so the resizing works.
+									for (var k = 0; k < axisIds.length; k++) {
+										if (axisIds[k] === axisId) {
+											axisIds.splice(k, 1);
+											break;
+										}
+									}
+								}
+							}
+						}
 					}
 				});
 
@@ -356,7 +370,12 @@ mainApp.directive('highstock', [
 					createChart(args.data);
 				});
 
-				var heightsAndTops = $scope.setTotalHeightAndGetAxisTopAndHeights(2);
+				$scope.$on('RedrawChart', function(msgName, args) {
+					chart.reflow();
+					chart.redraw();
+				});
+
+				$scope.setTotalHeightAndGetAxisTopAndHeights(2);
 
 				// Get the data first before creating the chart.
 				ChartDataFactory.getPriceData($scope.ticker).then(function(data) {
