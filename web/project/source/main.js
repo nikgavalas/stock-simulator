@@ -67,7 +67,7 @@ angular.module('mainApp').controller('MainCtrl', [
 			$scope.tickers = data;
 			// Sort so the strategy with the highest is at the top and that is the one that is shown first.
 			$scope.tickers.sort(function(a, b) {
-				return b.winPercent - a.winPercent;
+				return b.gain - a.gain;
 			});
 
 			updateFiltered($scope.filterTerm);

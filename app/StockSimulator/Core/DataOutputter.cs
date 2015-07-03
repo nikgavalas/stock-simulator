@@ -201,11 +201,6 @@ namespace StockSimulator.Core
 		/// </summary>
 		private void OutputTickerStats()
 		{
-			if (Simulator.Config.UseAbbreviatedOutput == true)
-			{
-				return;
-			}
-
 			List<StrategyStatistics> allTickerStatistics = new List<StrategyStatistics>();
 
 			foreach (KeyValuePair<int, List<Order>> tickerOrder in Simulator.Orders.TickerDictionary)
@@ -242,9 +237,27 @@ namespace StockSimulator.Core
 				}
 			}
 
+			allTickerStatistics.Sort((a, b) => b.Gain.CompareTo(a.Gain));
 			string jsonOutput = JsonConvert.SerializeObject(allTickerStatistics);
 			string filename = _outputFolder + "overall-tickers.json";
 			File.WriteAllText(filename, jsonOutput);
+
+			// Output a csv of all the stocks with positive gains in case we want to 
+			// use that file as an input to do even better.
+			allTickerStatistics.RemoveAll(a => a.Gain <= 0);
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < allTickerStatistics.Count; i++)
+			{
+				string[] split = allTickerStatistics[i].StrategyName.Split('-');
+				sb.Append(split[0] + "," + split[1]);
+
+				if (i + 1 < allTickerStatistics.Count)
+				{
+					sb.Append("," + Environment.NewLine);
+				}
+			}
+			filename = _outputFolder + "positive-gainers.csv";
+			File.WriteAllText(filename, sb.ToString());
 		}
 
 		/// <summary>

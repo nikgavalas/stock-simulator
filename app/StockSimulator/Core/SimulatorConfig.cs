@@ -85,16 +85,25 @@ namespace StockSimulator.Core
 		public string OutputFolder { get; set; }
 
 		[Category("Output")]
+		[PropertyOrder(2)]
 		[DisplayName("Use Abbreviated Output")]
 		[Description("Only outputs the buy list and the overal orders and stats. Significantly improves speed of outputing data.")]
 		public bool UseAbbreviatedOutput { get; set; }
 
 		[Category("Output")]
+		[PropertyOrder(3)]
+		[DisplayName("Only Main Strategy Snapshots")]
+		[Description("Only outputs the order snapshots for the Main Strategy")]
+		public bool OnlyMainStrategySnapshots { get; set; }
+
+		[Category("Output")]
+		[PropertyOrder(4)]
 		[DisplayName("Output Last Buy List")]
 		[Description("Only outputs the last buy list the occurs on the end date. Useful for finding out what tickers to buy today.")]
 		public bool OnlyOutputLastBuyList { get; set; }
 
 		[Category("Output")]
+		[PropertyOrder(5)]
 		[DisplayName("Should Open Web Page")]
 		[Description("Should auto open the web page after the sim finishes running.")]
 		public bool ShouldOpenWebPage { get; set; }
@@ -392,6 +401,7 @@ namespace StockSimulator.Core
 			BressertSizeOfOrder = 10000;
 
 			// Output
+			OnlyMainStrategySnapshots = true;
 			UseAbbreviatedOutput = false;
 			OnlyOutputLastBuyList = false;
 			ShouldOpenWebPage = true;

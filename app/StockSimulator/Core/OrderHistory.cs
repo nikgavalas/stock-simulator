@@ -158,6 +158,11 @@ namespace StockSimulator.Core
 		/// <param name="currentBar">Current bar the order was placed.</param>
 		private void SaveSnapshot(Order order, List<Indicator> dependentIndicators, int currentBar)
 		{
+			if (Simulator.Config.OnlyMainStrategySnapshots && !(order is MainStrategyOrder))
+			{
+				return;
+			}
+
 			Simulator.DataOutput.OutputIndicatorSnapshots(order, dependentIndicators, currentBar);
 		}
 
