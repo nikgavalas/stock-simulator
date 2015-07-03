@@ -262,10 +262,14 @@ namespace StockSimulator.Core
 		private void OnBarUpdate(DateTime currentDate, int barNumber)
 		{
 			bool isTradingBar = false;
-			List<BestOfRootStrategies> buyList = new List<BestOfRootStrategies>();
+			ConcurrentBag<BestOfRootStrategies> buyBag = new ConcurrentBag<BestOfRootStrategies>();
 
 			// Add all the tickers that are above our set percent to buy.
+#if DEBUG
 			foreach (KeyValuePair<string, BestOfRootStrategies> instrument in Instruments)
+#else
+						Parallel.ForEach(Instruments, instrument =>
+#endif
 			{
 				BestOfRootStrategies strat = instrument.Value;
 				int currentBar = strat.Data.GetBar(currentDate);
@@ -287,15 +291,21 @@ namespace StockSimulator.Core
 							if (strat.Bars[currentBar].StrategyOrderType == Order.OrderType.Long ||
 								(strat.Bars[currentBar].StrategyOrderType == Order.OrderType.Short && strat.Data.Open[currentBar] >= Config.MinPriceForShort))
 							{
-								buyList.Add(strat);
+								buyBag.Add(strat);
 							}
 						}
 					}
 				}
+#if DEBUG
 			}
+#else
+			});
+#endif
 
 			if (isTradingBar == true)
 			{
+				List<BestOfRootStrategies> buyList = buyBag.ToList();
+
 				// Sort the list so the instruments that have the highest buy value are first in the list.
 				buyList.Sort((x, y) => -1 * x.Bars[x.Data.GetBar(currentDate)].HighestGain.CompareTo(y.Bars[y.Data.GetBar(currentDate)].HighestGain));
 
