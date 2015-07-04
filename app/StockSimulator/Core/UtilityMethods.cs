@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace StockSimulator.Core
 {
@@ -181,6 +182,33 @@ namespace StockSimulator.Core
 		{
 			// Bull price comparison, is b a higher price than a
 			return direction > 0.0 ? b - a : a - b;
+		}
+
+		/// <summary>
+		/// Calculates the angle of the price vector from b to a and b to c.
+		/// </summary>
+		/// <param name="a">First point</param>
+		/// <param name="b">Second point</param>
+		/// <param name="c">Third point</param>
+		/// <param name="aBar">First point bar</param>
+		/// <param name="bBar">Second point bar</param>
+		/// <param name="cBar">Third point bar</param>
+		/// <returnsh>The angle in degrees</returns>
+		public static double CalculateAngle(double a, double b, double c, int aBar, int bBar, int cBar)
+		{
+			Point ba = new Point(a - b, aBar - bBar); 
+			Point bc = new Point(c - b, cBar - bBar);
+			return RadianToDegree(Math.Acos((ba.X * bc.X + ba.Y * bc.Y) / (Math.Sqrt(ba.X * ba.X + ba.Y * ba.Y) * Math.Sqrt(bc.X * bc.X + bc.Y * bc.Y))));
+		}
+
+		/// <summary>
+		/// Converts an angle from radians to degrees.
+		/// </summary>
+		/// <param name="angle">Angle in radians</param>
+		/// <returns>Angle in degrees</returns>
+		public static double RadianToDegree(double angle)
+		{
+			return angle * (180.0 / Math.PI);
 		}
 
 		/// <summary>

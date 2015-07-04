@@ -77,11 +77,14 @@ namespace StockSimulator.Indicators
 			set { _minProjectionsForZone = value; }
 		}
 
-		private double _maxZonePercent = 1.0;
+		private double _maxZonePercent = 0.3;
 		private int _minProjectionsForZone = 2;
 		#endregion
 
 		private int _maxCycleLookback = 100;
+		private int _numPoints;
+		private int _lastPoint;
+
 
 		/// <summary>
 		/// Creates the indicator.
@@ -98,6 +101,10 @@ namespace StockSimulator.Indicators
 
 			MaxSimulationBars = 1;
 			MaxPlotBars = 1;
+
+			_numPoints = 4;
+			_lastPoint = _numPoints - 1;
+
 
 			BuyDirection = UtilityMethods.CreateList<double>(Data.NumBars, 0d);
 
@@ -257,21 +264,18 @@ namespace StockSimulator.Indicators
 				return;
 			}
 
-			int numPoints = 4;
-			int lastPoint = numPoints - 1;
-
 			ZigZag zigzag = (ZigZag)_dependents[0];
 			int cutoffBar = Math.Max(0, currentBar - _maxCycleLookback);
 			int searchBar = currentBar - 2;
-			ZigZagPoint[] points = new ZigZagPoint[numPoints];
+			ZigZagPoint[] points = new ZigZagPoint[_numPoints];
 			List<double> currentSeries = null;
-			int pointBeingSearchFor = lastPoint;
+			int pointBeingSearchFor = _lastPoint;
 			double trendDirection = 0.0;
 
 			// Start searching for the point that either made a high-high or low-low cycle.
 			for (int i = searchBar; i >= cutoffBar && pointBeingSearchFor >= 0; i--)
 			{
-				if (pointBeingSearchFor == lastPoint)
+				if (pointBeingSearchFor == _lastPoint)
 				{
 					if (zigzag.ZigZagLows[i] > 0.0)
 					{
@@ -298,29 +302,29 @@ namespace StockSimulator.Indicators
 			}
 
 			// Did we get all the points needed to make price and time projections.
-			if (pointBeingSearchFor < 0)
+			if (pointBeingSearchFor < 0 && DoWavesPassFilters(points))
 			{
 				// TODO: do the time projection first, and if the current bar is within the timing
 				// zone then we'll do the price projections and save them. So that way all that shows up
 				// on the chart are the price projections where the time projections are.
 
 				// External retracements are last point minus the one before projected from the last point.
-				double externalDiff = points[lastPoint].Price - points[lastPoint - 1].Price;
-				External[(int)ExternalType._127][currentBar] = points[lastPoint].Price - externalDiff * 1.272;
-				External[(int)ExternalType._162][currentBar] = points[lastPoint].Price - externalDiff * 1.618;
+				double externalDiff = points[_lastPoint].Price - points[_lastPoint - 1].Price;
+				External[(int)ExternalType._127][currentBar] = points[_lastPoint].Price - externalDiff * 1.272;
+				External[(int)ExternalType._162][currentBar] = points[_lastPoint].Price - externalDiff * 1.618;
 
 				// Alternate retracements are the 2nd to last point minus the one right before it projected from the last point.
-				double alternateDiff = points[lastPoint - 1].Price - points[lastPoint - 2].Price;
-				Alternate[(int)AlternateType._62][currentBar] = points[lastPoint].Price + alternateDiff * 0.618;
-				Alternate[(int)AlternateType._100][currentBar] = points[lastPoint].Price + alternateDiff;
-				Alternate[(int)AlternateType._162][currentBar] = points[lastPoint].Price + alternateDiff * 1.618;
+				double alternateDiff = points[_lastPoint - 1].Price - points[_lastPoint - 2].Price;
+				Alternate[(int)AlternateType._62][currentBar] = points[_lastPoint].Price + alternateDiff * 0.618;
+				Alternate[(int)AlternateType._100][currentBar] = points[_lastPoint].Price + alternateDiff;
+				Alternate[(int)AlternateType._162][currentBar] = points[_lastPoint].Price + alternateDiff * 1.618;
 
 				// Internal retracements are the 2nd point minus the first point projected from the last point.
 				double interalDiff = points[1].Price - points[0].Price;
-				Internal[(int)InternalType._38][currentBar] = points[lastPoint].Price - interalDiff * 0.382;
-				Internal[(int)InternalType._50][currentBar] = points[lastPoint].Price - interalDiff * 0.500;
-				Internal[(int)InternalType._62][currentBar] = points[lastPoint].Price - interalDiff * 0.618;
-				Internal[(int)InternalType._79][currentBar] = points[lastPoint].Price - interalDiff * 0.786;
+				Internal[(int)InternalType._38][currentBar] = points[_lastPoint].Price - interalDiff * 0.382;
+				Internal[(int)InternalType._50][currentBar] = points[_lastPoint].Price - interalDiff * 0.500;
+				Internal[(int)InternalType._62][currentBar] = points[_lastPoint].Price - interalDiff * 0.618;
+				Internal[(int)InternalType._79][currentBar] = points[_lastPoint].Price - interalDiff * 0.786;
 
 				// The last cycle sets us up for the opposite cycle.
 				BuyDirection[currentBar] = trendDirection * -1.0;
@@ -439,5 +443,61 @@ namespace StockSimulator.Indicators
 			return closeEnough;
 		}
 
+		/// <summary>
+		/// Checks the found waves to make sure they are optimal for the strategy to work.
+		/// </summary>
+		/// <param name="points">Array of points making up the waves</param>
+		/// <returns>True if the waves will work for our strategy</returns>
+		private bool DoWavesPassFilters(ZigZagPoint[] points)
+		{
+			return true;
+			//return 
+			//	AreWavesGreaterThanMinBars(points) && 
+			//	AreWaveAnglesInRange(points);
+		}
+
+		/// <summary>
+		/// Returns true if all the waves are greater than the min required bar.
+		/// </summary>
+		/// <param name="points">Array of points making up the waves</param>
+		/// <returns>See Summary</returns>
+		private bool AreWavesGreaterThanMinBars(ZigZagPoint[] points)
+		{
+			for (int i = 1; i < points.Length; i++)
+			{
+				int length = points[i].Bar - points[i - 1].Bar;
+				if (length < 2)
+				{
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Returns if the angle between all the waves is in an acceptable range.
+		/// </summary>
+		/// <param name="points">Array of points making up the waves</param>
+		/// <returns>See Summary</returns>
+		private bool AreWaveAnglesInRange(ZigZagPoint[] points)
+		{
+			double lastWaveAngle = UtilityMethods.CalculateAngle(points[_lastPoint].Price, points[_lastPoint - 1].Price, points[_lastPoint - 2].Price, points[_lastPoint].Bar, points[_lastPoint - 1].Bar, points[_lastPoint - 2].Bar);
+			double firstWaveAngle = UtilityMethods.CalculateAngle(points[_lastPoint - 1].Price, points[_lastPoint - 2].Price, points[_lastPoint - 3].Price, points[_lastPoint - 1].Bar, points[_lastPoint - 2].Bar, points[_lastPoint - 3].Bar);
+
+			if (lastWaveAngle > 160 || lastWaveAngle < 20 || firstWaveAngle > 160 || firstWaveAngle < 20)
+			{
+				return false;
+			}
+
+			// Make sure the waves aren't too different from each other. Like a steep wave then a really
+			// shallow wave with not much price change.
+			if (Math.Abs(lastWaveAngle - firstWaveAngle) > 50)
+			{
+				return false;
+			}
+
+			return true;
+		}
 	}
 }
