@@ -24,7 +24,7 @@ namespace StockSimulator.Core.JsonConverters
 			string shortDate = "";
 			if (value is DateTime)
 			{
-				shortDate = ((DateTime)value).ToString("g", CultureInfo.CreateSpecificCulture("en-us"));
+				shortDate = ((DateTime)value).ToString("yyyy-MM-dd");
 			}
 			else
 			{
