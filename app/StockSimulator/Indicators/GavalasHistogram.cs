@@ -38,7 +38,7 @@ namespace StockSimulator.Indicators
 			set { _histogramValue = value; }
 		}
 
-		private double _histogramValue = 30.0;
+		private double _histogramValue = 1.0;
 		private int _barPadding = 0;
 		#endregion
 

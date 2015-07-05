@@ -174,7 +174,7 @@ namespace StockSimulator.Core
 				}
 			}
 
-			int startBar = Math.Max(0, bar - MaxSimulationBars);
+			int startBar = Math.Max(0, bar - (MaxSimulationBars - 1));
 			for (int i = startBar; i <= bar; i++)
 			{
 				OnBarUpdate(i);

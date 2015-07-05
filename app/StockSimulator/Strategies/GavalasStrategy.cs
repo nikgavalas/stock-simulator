@@ -32,7 +32,8 @@ namespace StockSimulator.Strategies
 			{
 				new GavalasZones(tickerData),
 				new DtOscillator(tickerData) { PeriodRsi = 8, PeriodStoch = 5, PeriodSK = 3, PeriodSD = 3 },
-				new GavalasHistogram(tickerData)
+				new GavalasHistogram(tickerData),
+				new DmiAdx(tickerData)
 			};
 		}
 
@@ -64,7 +65,7 @@ namespace StockSimulator.Strategies
 			string foundStrategyName = "";
 
 			// See if we hit one of our buy zones.
-			if (buyDirection != 0.0 && histogram.Value[currentBar] > 30 && zones.DidBarTouchZone(Data.Low[currentBar], Data.High[currentBar], currentBar))
+			if (buyDirection != 0.0 && zones.DidBarTouchZone(Data.Low[currentBar], Data.High[currentBar], currentBar))
 			{
 				// Verify with the mechanical buy signal.
 				DtOscillator dtosc = (DtOscillator)_dependents[1];

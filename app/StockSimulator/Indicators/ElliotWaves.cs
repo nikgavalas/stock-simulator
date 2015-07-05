@@ -49,7 +49,7 @@ namespace StockSimulator.Indicators
 				(Runnable)new ZigZag(Data, 5.0)
 			};
 
-			MaxSimulationBars = 0;
+			MaxSimulationBars = 1;
 		}
 
 		/// <summary>
