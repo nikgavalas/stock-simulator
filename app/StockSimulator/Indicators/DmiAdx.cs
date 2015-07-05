@@ -9,9 +9,9 @@ using StockSimulator.Core;
 namespace StockSimulator.Indicators
 {
 	/// <summary>
-	/// Dmi
+	/// DmiAdx
 	/// </summary>
-	class Dmi : Indicator
+	class DmiAdx : Indicator
 	{
 		public List<double> Value { get; set; }
 
@@ -20,8 +20,8 @@ namespace StockSimulator.Indicators
 		private List<double> dmPlus;
 		private List<double> tr;
 
-		public Dmi(TickerData tickerData, RunnableFactory factory)
-			: base(tickerData, factory)
+		public DmiAdx(TickerData tickerData)
+			: base(tickerData)
 		{
 			Value = Enumerable.Repeat(0d, Data.NumBars).ToList();
 			dmMinus = Enumerable.Repeat(0d, Data.NumBars).ToList();
@@ -35,7 +35,7 @@ namespace StockSimulator.Indicators
 		/// <returns>The name of this indicator</returns>
 		public override string ToString()
 		{
-			return "Dmi";
+			return "DmiAdx";
 		}
 
 		/// <summary>
