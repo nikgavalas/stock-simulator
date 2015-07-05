@@ -78,8 +78,11 @@ namespace StockSimulator.Core
 				if (_dependents[i] is Indicator)
 				{
 					Indicator ind = (Indicator)_dependents[i];
-					ret.AddRange(ind.GetDependentIndicators());
-					ret.Add(ind);
+					if (ind.HasPlot == true)
+					{
+						ret.AddRange(ind.GetDependentIndicators());
+						ret.Add(ind);
+					}
 				}
 			}
 

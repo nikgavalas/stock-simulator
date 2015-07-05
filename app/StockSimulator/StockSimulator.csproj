@@ -171,6 +171,7 @@
     <None Include="Indicators\Trend.cs" />
     <None Include="Indicators\Trix.cs" />
     <None Include="Indicators\WilliamsR.cs" />
+    <Compile Include="Indicators\GavalasHistogram.cs" />
     <Compile Include="Indicators\GavalasZones.cs" />
     <Compile Include="Indicators\PriceRetracements.cs" />
     <Compile Include="Indicators\ZigZag.cs" />
@@ -214,6 +215,7 @@
     <None Include="Strategies\Bull\BullDtOscillator.cs" />
     <None Include="Strategies\Bull\BullRsi3m3.cs" />
     <None Include="Strategies\ComboStrategy.cs" />
+    <Compile Include="Indicators\ZigZagWaves.cs" />
     <Compile Include="Strategies\BestOfRootStrategies.cs" />
     <None Include="Strategies\BressertApproach.cs" />
     <None Include="Strategies\Bull\BullBollingerExtended.cs" />

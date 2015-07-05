@@ -91,6 +91,14 @@ namespace StockSimulator.Core
 		public Dictionary<string, IPlotSeries> ChartPlots { get; set; }
 
 		/// <summary>
+		/// Whether this indicator should be plotted or not.
+		/// </summary>
+		public virtual bool HasPlot
+		{
+			get { return true; }
+		}
+
+		/// <summary>
 		/// Number of bars to look back and simulate from the current bar.
 		/// </summary>
 		public int MaxSimulationBars { get; set; }
