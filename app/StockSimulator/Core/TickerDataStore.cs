@@ -10,6 +10,7 @@ using StockSimulator.GoogleFinanceDownloader;
 using StockSimulator.YahooFinanceDownloader;
 using StockSimulator.Indicators;
 using System.Diagnostics;
+using System.Collections.Concurrent;
 
 namespace StockSimulator.Core
 {
@@ -22,7 +23,7 @@ namespace StockSimulator.Core
 		public SortedDictionary<DateTime, bool> SimTickerDates { get; set; }
 		public string DataType { get; set; }
 
-		private SortedDictionary<int, TickerData> _symbolsInMemory;
+		private ConcurrentDictionary<int, TickerData> _symbolsInMemory;
 
 		private readonly string _cacheFolder = @"DataCache\";
 		private readonly DateTime _earliestStartAllowed = new DateTime(2000, 1, 4); // Max allowed is the first trading day of the year.
@@ -47,7 +48,7 @@ namespace StockSimulator.Core
 		/// </summary>
 		public TickerDataStore()
 		{
-			_symbolsInMemory = new SortedDictionary<int, TickerData>();
+			_symbolsInMemory = new ConcurrentDictionary<int, TickerData>();
 			SimTickerDates = new SortedDictionary<DateTime, bool>();
 
 			// Create the root datacache folders and all the sub folders for the different type

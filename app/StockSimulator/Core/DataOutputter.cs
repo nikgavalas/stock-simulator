@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using StockSimulator.Strategies;
 using StockSimulator.Core.JsonConverters;
+using System.Text.RegularExpressions;
 
 namespace StockSimulator.Core
 {
@@ -194,6 +195,29 @@ namespace StockSimulator.Core
 		private string GetOutputFolder()
 		{
 			return Simulator.Config.OutputFolder + "\\" + _timeString + "\\";
+		}
+
+		/// <summary>
+		/// Returns if this string is a valid filename string or not.
+		/// </summary>
+		/// <param name="testName">Filename</param>
+		/// <returns>See summary</returns>
+		bool IsValidFilename(string testName)
+		{
+			Regex containsABadCharacter = new Regex("["
+						+ Regex.Escape(new string(System.IO.Path.GetInvalidPathChars())) + "]");
+			if (containsABadCharacter.IsMatch(testName)) 
+			{
+				return false; 
+			}
+
+			// other checks for UNC, drive-path format, etc
+			if (testName.Contains('*'))
+			{
+				return false;
+			}
+
+			return true;
 		}
 
 		/// <summary>
@@ -412,11 +436,14 @@ namespace StockSimulator.Core
 			Directory.CreateDirectory(folderName);
 			foreach (KeyValuePair<int, TickerData> item in _tickerData)
 			{
-				item.Value.PrepareForSerialization();
-				jsonOutput = JsonConvert.SerializeObject(item.Value);
-				filename = folderName + "\\" + item.Value.TickerAndExchange.ToString() + ".json";
-				File.WriteAllText(filename, jsonOutput);
-				item.Value.FreeResourcesAfterSerialization();
+				if (IsValidFilename(item.Value.TickerAndExchange.ToString()))
+				{
+					item.Value.PrepareForSerialization();
+					jsonOutput = JsonConvert.SerializeObject(item.Value);
+					filename = folderName + "\\" + item.Value.TickerAndExchange.ToString() + ".json";
+					File.WriteAllText(filename, jsonOutput);
+					item.Value.FreeResourcesAfterSerialization();
+				}
 			}
 		}
 
@@ -452,6 +479,11 @@ namespace StockSimulator.Core
 		/// </summary>
 		public void OutputIndicatorSnapshots(Order order, List<Indicator> indicators, int endBar)
 		{
+			if (Simulator.Config.UseAbbreviatedOutput == true)
+			{
+				return;
+			}
+
 			string filename;
 			string jsonOutput;
 			string folderName = _outputFolder + "snapshots\\" + order.OrderId;

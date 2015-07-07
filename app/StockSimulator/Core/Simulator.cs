@@ -219,9 +219,17 @@ namespace StockSimulator.Core
 			// This way to just see if the ticker traded that day, and if it did, then we use it.
 			// Otherwise we just ignore it for the day it doesn't have.
 			int i = 0;
+			int lastPercent = 0;
 			foreach (KeyValuePair<DateTime, bool> date in DataStore.SimTickerDates)
 			{
 				OnBarUpdate(date.Key, i++);
+
+				int percent = Convert.ToInt32(((double)i / DataStore.SimTickerDates.Count) * 100.0);
+				if (percent > lastPercent)
+				{
+					lastPercent = percent;
+					WriteMessage(percent.ToString() + "% Complete");
+				}
 			}
 		}
 
