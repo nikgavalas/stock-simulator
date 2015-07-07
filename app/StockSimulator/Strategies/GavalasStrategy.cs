@@ -154,11 +154,11 @@ namespace StockSimulator.Strategies
 		/// <returns>Returns true if the situation passes and we should buy</returns>
 		private bool DoesPassFilters(int currentBar)
 		{
-			DmiAdx dmiAdx = (DmiAdx)_dependents[3];
-			if (dmiAdx.Adx[currentBar] > 20.0)
-			{
-				return false;
-			}
+			//DmiAdx dmiAdx = (DmiAdx)_dependents[3];
+			//if (dmiAdx.Adx[currentBar] > 50.0)
+			//{
+			//	return false;
+			//}
 
 			AverageVolume vol = (AverageVolume)_dependents[4];
 			if (vol.Avg[currentBar] < 500000)
