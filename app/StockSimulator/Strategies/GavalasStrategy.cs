@@ -33,7 +33,8 @@ namespace StockSimulator.Strategies
 				new GavalasZones(tickerData),
 				new DtOscillator(tickerData) { PeriodRsi = 8, PeriodStoch = 5, PeriodSK = 3, PeriodSD = 3 },
 				new GavalasHistogram(tickerData),
-				new DmiAdx(tickerData)
+				new DmiAdx(tickerData),
+				new AverageVolume(tickerData)
 			};
 		}
 
@@ -85,7 +86,7 @@ namespace StockSimulator.Strategies
 				}
 			}
 
-			if (foundStrategyName.Length > 0)
+			if (foundStrategyName.Length > 0 && DoesPassFilters(currentBar))
 			{
 				List<Indicator> dependentIndicators = GetDependentIndicators();
 
@@ -146,5 +147,26 @@ namespace StockSimulator.Strategies
 			};
 		}
 
+		/// <summary>
+		/// One last check to filter out bad buys.
+		/// </summary>
+		/// <param name="currentBar">Current bar of the simulation</param>
+		/// <returns>Returns true if the situation passes and we should buy</returns>
+		private bool DoesPassFilters(int currentBar)
+		{
+			DmiAdx dmiAdx = (DmiAdx)_dependents[3];
+			if (dmiAdx.Adx[currentBar] > 20.0)
+			{
+				return false;
+			}
+
+			AverageVolume vol = (AverageVolume)_dependents[4];
+			if (vol.Avg[currentBar] < 500000)
+			{
+				return false;
+			}
+
+			return true;
+		}
 	}
 }

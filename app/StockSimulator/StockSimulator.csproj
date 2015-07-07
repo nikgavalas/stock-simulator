@@ -157,6 +157,7 @@
     <None Include="Indicators\Cci.cs" />
     <None Include="Indicators\BressertDss.cs" />
     <Compile Include="Indicators\Adx.cs" />
+    <Compile Include="Indicators\AverageVolume.cs" />
     <Compile Include="Indicators\DmiAdx.cs" />
     <Compile Include="Indicators\DtOscillator.cs" />
     <None Include="Indicators\EaseOfMovement.cs" />
