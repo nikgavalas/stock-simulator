@@ -3,11 +3,13 @@
 angular.module('mainApp').controller('AnalysisCtrl', [
 	'$scope',
 	'$routeParams',
+	'$window',
 	'ConfigFactory',
 	'OrderListFactory',
 	function(
 		$scope,
 		$routeParams,
+		$window,
 		ConfigFactory,
 		OrderListFactory
 	) {
@@ -31,7 +33,7 @@ angular.module('mainApp').controller('AnalysisCtrl', [
 		 */
 		$scope.updateList = function() {
 			$scope.errorMsg = '';
-			
+
 			try {
 				$scope.numHighlightedText = 'Highlighted 0 of 0 orders (0%)';
 				if ($scope.allOrders.length) {

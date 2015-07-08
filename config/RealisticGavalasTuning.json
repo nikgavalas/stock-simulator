@@ -6,6 +6,7 @@
   "TrendStrength": 4,
   "NumBarsHigherTimeframe": 5,
   "OutputFolder": "C:\\Users\\Nik\\Documents\\Code\\github\\stock-simulator\\output\\output",
+  "AddExtraOrderInfo": true,
   "UseAbbreviatedOutput": false,
   "OnlyMainStrategySnapshots": true,
   "OnlyOutputLastBuyList": false,
