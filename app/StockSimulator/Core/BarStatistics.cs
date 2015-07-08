@@ -22,6 +22,7 @@ namespace StockSimulator.Core
 		public List<StrategyStatistics> Statistics { get; set; }
 		public List<BuyCondition> BuyConditions { get; set; }
 		public List<SellCondition> SellConditions { get; set; }
+		public Dictionary<string, object> ExtraOrderInfo { get; set; }
 
 		public OrderSuggestion()
 		{
@@ -34,6 +35,7 @@ namespace StockSimulator.Core
 			Statistics = new List<StrategyStatistics>();
 			BuyConditions = new List<BuyCondition>();
 			SellConditions = new List<SellCondition>();
+			ExtraOrderInfo = new Dictionary<string, object>();
 		}
 
 		public OrderSuggestion(
@@ -45,7 +47,8 @@ namespace StockSimulator.Core
 			List<Indicator> dependentIndicators,
 			List<StrategyStatistics> statistics,
 			List<BuyCondition> buyConditions,
-			List<SellCondition> sellConditions)
+			List<SellCondition> sellConditions,
+			Dictionary<string, object> extraOrderInfo)
 		{
 			HighestPercent = percent;
 			HighestGain = gain;
@@ -56,6 +59,7 @@ namespace StockSimulator.Core
 			Statistics = statistics;
 			BuyConditions = buyConditions;
 			SellConditions = sellConditions;
+			ExtraOrderInfo = extraOrderInfo;
 		}
 	}
 }

@@ -89,6 +89,9 @@ namespace StockSimulator.Core
 		[JsonProperty("dependentIndicators")]
 		public List<string> DependentIndicatorNames { get; set; }
 
+		[JsonProperty("extra")]
+		public Dictionary<string, object> ExtraInfo { get; set; }
+
 		public OrderStatus Status { get; set; }
 		public int BuyBar { get; set; }
 		public int SellBar { get; set; }
@@ -144,6 +147,8 @@ namespace StockSimulator.Core
 			DependentIndicatorNames = dependentIndicatorNames;
 			AccountValue = 0;
 			OpenedBar = currentBar + 1;
+
+			ExtraInfo = new Dictionary<string, object>();
 
 			OrderOpened();
 		}
@@ -279,6 +284,35 @@ namespace StockSimulator.Core
 		public void Cancel()
 		{
 			Status = OrderStatus.Cancelled;
+		}
+
+		/// <summary>
+		/// Used to return a key/value pair to add to the extra info.
+		/// </summary>
+		/// <returns>Key/value pair to be added to the extra info</returns>
+		/// <see cref="AddExtraInfo"/>
+		public delegate KeyValuePair<string, object> GetExtraInfoFunction();
+
+		/// <summary>
+		/// Adds extra info to the order for later analysis. Things like indicator values
+		/// or anything can be added. Using a delegate function so that we can have one
+		/// option to turn off the calculations so that users of this function don't have
+		/// to worry if the calculation is expensive and turn it off there too if the option
+		/// is disabled.
+		/// </summary>
+		/// <param name="getFn">Function that returns the key/value to be added</param>
+		public void AddExtraInfo(GetExtraInfoFunction getFn)
+		{
+			if (Simulator.Config.AddExtraOrderInfo == true)
+			{
+				KeyValuePair<string, object> extraValue = getFn();
+				if (ExtraInfo.ContainsKey(extraValue.Key))
+				{
+					throw new Exception("Attempting to add a duplicate key for extra info (key=" + extraValue.Key);
+				}
+
+				ExtraInfo[extraValue.Key] = extraValue.Value;
+			}
 		}
 
 		/// <summary>

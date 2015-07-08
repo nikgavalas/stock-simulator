@@ -110,7 +110,8 @@ namespace StockSimulator.Strategies
 						dependentIndicators,
 						new List<StrategyStatistics>() { orderStats },
 						GetBuyConditions(),
-						GetSellConditions());
+						GetSellConditions(),
+						null);
 				}
 			}
 		}

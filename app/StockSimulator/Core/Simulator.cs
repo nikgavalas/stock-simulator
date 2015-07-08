@@ -357,7 +357,8 @@ namespace StockSimulator.Core
 									barStats.SizeOfOrder,
 									barStats.DependentIndicators,
 									barStats.BuyConditions,
-									barStats.SellConditions);
+									barStats.SellConditions,
+									barStats.ExtraOrderInfo);
 							}
 						}
 						else
@@ -440,6 +441,7 @@ namespace StockSimulator.Core
 		/// <param name="dependentIndicators">List of all the dependent indicators</param>
 		/// <param name="buyConditions">All the buy conditions that must be met to fill the order</param>
 		/// <param name="sellConditions">Any of the sell conditions trigger a sell</param>
+		/// <param name="extraOrderInfo">The extra order info from the substrategy</param>
 		private int EnterOrder(
 			List<StrategyStatistics> stats,
 			double orderType, 
@@ -448,7 +450,8 @@ namespace StockSimulator.Core
 			double sizeOfOrder,
 			List<Indicator> dependentIndicators,
 			List<BuyCondition> buyConditions,
-			List<SellCondition> sellConditions)
+			List<SellCondition> sellConditions,
+			Dictionary<string, object> extraOrderInfo)
 		{
 
 			// Save only the names of the indicators for the order to track. The order manager
@@ -461,7 +464,7 @@ namespace StockSimulator.Core
 			}
 			
 			MainStrategyOrder order = new MainStrategyOrder(stats, orderType, ticker, "MainStrategy",
-				currentBar, sizeOfOrder, indicatorNames, buyConditions, sellConditions);
+				currentBar, sizeOfOrder, indicatorNames, buyConditions, sellConditions, extraOrderInfo);
 			
 			Simulator.Orders.AddOrder(order, dependentIndicators, currentBar);
 

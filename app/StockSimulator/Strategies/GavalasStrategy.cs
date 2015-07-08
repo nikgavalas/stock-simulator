@@ -102,6 +102,8 @@ namespace StockSimulator.Strategies
 						currentBar,
 						Simulator.Config.MaxLookBackBars);
 
+					AddExtraOrderInfo(placedOrder, currentBar);
+
 					if (orderStats.WinPercent >= Simulator.Config.GavalasPercentForBuy)
 					{
 						Bars[currentBar] = new OrderSuggestion(
@@ -113,7 +115,8 @@ namespace StockSimulator.Strategies
 							dependentIndicators,
 							new List<StrategyStatistics>() { orderStats },
 							GetBuyConditions(),
-							GetSellConditions());
+							GetSellConditions(),
+							placedOrder.ExtraInfo);
 					}
 				}
 			}
@@ -161,12 +164,62 @@ namespace StockSimulator.Strategies
 			//}
 
 			AverageVolume vol = (AverageVolume)_dependents[4];
-			if (vol.Avg[currentBar] < 500000)
+			if (vol.Avg[currentBar] < 250000)
 			{
 				return false;
 			}
 
 			return true;
+		}
+
+		/// <summary>
+		/// Adds extra info to the order so that we can analyze it later.
+		/// </summary>
+		/// <param name="o">Order that was just placed</param>
+		/// <param name="currentBar">Current simulation bar</param>
+		private void AddExtraOrderInfo(Order o, int currentBar)
+		{
+			o.AddExtraInfo(() =>
+			{
+				DtOscillator ind = (DtOscillator)_dependents[1];
+				return new KeyValuePair<string, object>("dtosc %k", (object)Math.Round(ind.SK[currentBar], 2));
+			});
+
+			o.AddExtraInfo(() =>
+			{
+				DtOscillator ind = (DtOscillator)_dependents[1];
+				return new KeyValuePair<string, object>("dtosc %d", (object)Math.Round(ind.SD[currentBar], 2));
+			});
+
+			o.AddExtraInfo(() =>
+			{
+				GavalasHistogram ind = (GavalasHistogram)_dependents[2];
+				return new KeyValuePair<string, object>("histogram", (object)Math.Round(ind.Value[currentBar], 2));
+			});
+
+			o.AddExtraInfo(() =>
+			{
+				DmiAdx ind = (DmiAdx)_dependents[3];
+				return new KeyValuePair<string, object>("adx", (object)Math.Round(ind.Adx[currentBar], 2));
+			});
+
+			o.AddExtraInfo(() =>
+			{
+				DmiAdx ind = (DmiAdx)_dependents[3];
+				return new KeyValuePair<string, object>("dmi+", (object)Math.Round(ind.DmiPlus[currentBar], 2));
+			});
+
+			o.AddExtraInfo(() =>
+			{
+				DmiAdx ind = (DmiAdx)_dependents[3];
+				return new KeyValuePair<string, object>("dmi-", (object)Math.Round(ind.DmiMinus[currentBar], 2));
+			});
+			
+			o.AddExtraInfo(() =>
+			{
+				AverageVolume ind = (AverageVolume)_dependents[4];
+				return new KeyValuePair<string, object>("avgVolume", (object)Math.Round(ind.Avg[currentBar], 2));
+			});
 		}
 	}
 }

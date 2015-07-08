@@ -85,6 +85,12 @@ namespace StockSimulator.Core
 		public string OutputFolder { get; set; }
 
 		[Category("Output")]
+		[PropertyOrder(1)]
+		[DisplayName("Add Extra Order Info")]
+		[Description("Should add extra info (like indicator values) to each order for analysis")]
+		public bool AddExtraOrderInfo { get; set; }
+
+		[Category("Output")]
 		[PropertyOrder(2)]
 		[DisplayName("Use Abbreviated Output")]
 		[Description("Only outputs the buy list and the overal orders and stats. Significantly improves speed of outputing data.")]
@@ -402,6 +408,7 @@ namespace StockSimulator.Core
 
 			// Output
 			OnlyMainStrategySnapshots = true;
+			AddExtraOrderInfo = false;
 			UseAbbreviatedOutput = false;
 			OnlyOutputLastBuyList = false;
 			ShouldOpenWebPage = true;

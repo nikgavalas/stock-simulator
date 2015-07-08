@@ -28,6 +28,7 @@ namespace StockSimulator.Core
 		/// <param name="dependentIndicators">List of all the dependent indicators</param>
 		/// <param name="buyConditions">All the buy conditions that must be met to fill the order</param>
 		/// <param name="sellConditions">Any of the sell conditions trigger a sell</param>
+		/// <param name="extraOrderInfo">The extra order info from the substrategy</param>
 		public MainStrategyOrder(
 			List<StrategyStatistics> stats, 
 			double type, 
@@ -37,10 +38,12 @@ namespace StockSimulator.Core
 			double sizeOfOrder,
 			List<string> dependentIndicators,
 			List<BuyCondition> buyConditions,
-			List<SellCondition> sellConditions)
+			List<SellCondition> sellConditions,
+			Dictionary<string, object> extraOrderInfo)
 			: base(type, tickerData, fromStrategyName, currentBar, sizeOfOrder, dependentIndicators, buyConditions, sellConditions)
 		{
 			Statistics = stats;
+			ExtraInfo = extraOrderInfo;
 		}
 	}
 }
