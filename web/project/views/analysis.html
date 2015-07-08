@@ -1,0 +1,63 @@
+<div class="container-fluid container-padding">
+	<navbar></navbar>
+	
+	<!-- The row for the grid -->
+	<div class="row firstrow-container">
+
+		<div class="row">
+			<div class="col-xs-12">
+
+				<div class="panel panel-default">
+					<div class="panel-body">
+						<form class="form" ng-submit="updateList()">
+							<div class="form-group">
+								<label for="inputFilterBy" class="control-label">Filter By</label>
+								<input ng-model="inputFilterBy" type="text" class="form-control" id="inputFilterBy" placeholder="Enter compare code using o.<property name>">
+								<p class="help-block">Example Date.parse(o.buyDate) > Date.parse('2012-01-01') && o.gain > 0</p>
+							</div>
+							<div class="form-group">
+								<label for="inputHighlightBy" class="control-label">Highlight By</label>
+								<input ng-model="inputHighlightBy" type="text" class="form-control" id="inputHighlightBy" placeholder="o.gain < 150.0">
+							</div>
+							<div class="form-group">
+								<button type="submit" class="btn btn-default">Update List</button>
+							</div>
+						</form>
+					</div>
+				</div>
+
+				<div ng-show="errorMsg !== ''" class="alert alert-warning" role="alert">{{errorMsg}}</div>
+				<div class="alert alert-info" role="alert">{{numHighlightedText}}</div>
+
+				<table class="table table-condensed table-hover">
+					<thead>
+						<th>o.orderType</th>
+						<th>o.ticker</th>
+						<th>o.buyDate</th>
+						<th>o.buyPrice</th>
+						<th>o.sellDate</th>
+						<th>o.sellPrice</th>
+						<th>o.numShares</th>
+						<th>o.gain</th>
+						<th>o.sellReason</th>
+						<th ng-repeat="(key, value) in extraColumns">o.extra.{{key}}</th>
+					</thead>
+					<tbody>
+						<tr ng-repeat="order in filteredOrders" ng-click="orderClick(order, $event)" class="hover-pointer" ng-class="{'info': order.isHighlighted}">
+							<td>{{order.orderType}}</td>
+							<td>{{order.ticker}}</td>
+							<td>{{order.buyDate}}</td>
+							<td>{{order.buyPrice}}</td>
+							<td>{{order.sellDate}}</td>
+							<td>{{order.sellPrice}}</td>
+							<td>{{order.numShares}}</td>
+							<td>{{order.gain}}</td>
+							<td>{{order.sellReason}}</td>
+							<td ng-repeat="(key, value) in order.extra">{{value}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

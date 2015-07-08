@@ -45,6 +45,10 @@ var mainApp = angular.module('mainApp', [
 			templateUrl: 'views/higher-timeframe.html',
 			controller: 'HigherTimeframeCtrl'
 		})
+		.when('/:runName/analysis', {
+			templateUrl: 'views/analysis.html',
+			controller: 'AnalysisCtrl'
+		})
 		.otherwise({
 			redirectTo: '/'
 		});
