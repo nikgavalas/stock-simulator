@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using StockSimulator.Core;
 using Newtonsoft.Json;
+using System.Windows;
 
 namespace StockSimulator.Indicators
 {
@@ -55,6 +56,13 @@ namespace StockSimulator.Indicators
 
 		public List<double> BuyDirection { get; set; }
 
+		public List<double> HighBestFitLine { get; set; }
+		public List<double> LowBestFitLine { get; set; }
+		public List<double> AllBestFitLine { get; set; }
+		public List<double> HighBestFitLineSlope { get; set; }
+		public List<double> LowBestFitLineSlope { get; set; }
+		public List<double> AllBestFitLineSlope { get; set; }
+
 		#region Configurables
 		public double MaxZonePercent
 		{
@@ -86,9 +94,17 @@ namespace StockSimulator.Indicators
 			};
 
 			MaxSimulationBars = 1;
-			MaxPlotBars = 1;
+			MaxPlotBars = 150;
 
 			BuyDirection = UtilityMethods.CreateList<double>(Data.NumBars, 0d);
+			
+			HighBestFitLine = UtilityMethods.CreateList<double>(Data.NumBars, 0d);
+			LowBestFitLine = UtilityMethods.CreateList<double>(Data.NumBars, 0d);
+			AllBestFitLine = UtilityMethods.CreateList<double>(Data.NumBars, 0d);
+
+			HighBestFitLineSlope = UtilityMethods.CreateList<double>(Data.NumBars, 0d);
+			LowBestFitLineSlope = UtilityMethods.CreateList<double>(Data.NumBars, 0d);
+			AllBestFitLineSlope = UtilityMethods.CreateList<double>(Data.NumBars, 0d);
 
 			int count = (int)ExternalType.Count;
 			External = new List<double>[count];
@@ -138,15 +154,19 @@ namespace StockSimulator.Indicators
 			base.CreatePlots();
 
 			// Add the indicator for plotting
-			ChartPlots["Ext 1.272"] = new PlotSeries("line") { DashStyle = "ShortDot" };
-			ChartPlots["Ext 1.618"] = new PlotSeries("line") { DashStyle = "ShortDot" };
-			ChartPlots["Alt 0.618"] = new PlotSeries("line") { DashStyle = "ShortDot" };
-			ChartPlots["Alt 1.000"] = new PlotSeries("line") { DashStyle = "ShortDot" };
-			ChartPlots["Alt 1.618"] = new PlotSeries("line") { DashStyle = "ShortDot" };
-			ChartPlots["Int 0.382"] = new PlotSeries("line") { DashStyle = "ShortDot" };
-			ChartPlots["Int 0.500"] = new PlotSeries("line") { DashStyle = "ShortDot" };
-			ChartPlots["Int 0.618"] = new PlotSeries("line") { DashStyle = "ShortDot" };
-			ChartPlots["Int 0.786"] = new PlotSeries("line") { DashStyle = "ShortDot" };
+			ChartPlots["Ext 1.272"] = new PlotSeries("line") { DashStyle = "ShortDot", ShouldConnectNulls = true };
+			ChartPlots["Ext 1.618"] = new PlotSeries("line") { DashStyle = "ShortDot", ShouldConnectNulls = true };
+			ChartPlots["Alt 0.618"] = new PlotSeries("line") { DashStyle = "ShortDot", ShouldConnectNulls = true };
+			ChartPlots["Alt 1.000"] = new PlotSeries("line") { DashStyle = "ShortDot", ShouldConnectNulls = true };
+			ChartPlots["Alt 1.618"] = new PlotSeries("line") { DashStyle = "ShortDot", ShouldConnectNulls = true };
+			ChartPlots["Int 0.382"] = new PlotSeries("line") { DashStyle = "ShortDot", ShouldConnectNulls = true };
+			ChartPlots["Int 0.500"] = new PlotSeries("line") { DashStyle = "ShortDot", ShouldConnectNulls = true };
+			ChartPlots["Int 0.618"] = new PlotSeries("line") { DashStyle = "ShortDot", ShouldConnectNulls = true };
+			ChartPlots["Int 0.786"] = new PlotSeries("line") { DashStyle = "ShortDot", ShouldConnectNulls = true };
+
+			ChartPlots["High Best Fit"] = new PlotSeries("line") { ShouldConnectNulls = true };
+			ChartPlots["Low Best Fit"] = new PlotSeries("line") { ShouldConnectNulls = true };
+			ChartPlots["All Best Fit"] = new PlotSeries("line") { ShouldConnectNulls = true };
 		}
 
 		/// <summary>
@@ -160,77 +180,41 @@ namespace StockSimulator.Indicators
 			long ticks = UtilityMethods.UnixTicks(Data.Dates[currentBar]);
 			double value = 0.0;
 
-			PlotSeries plot = (PlotSeries)ChartPlots["Ext 1.272"];
 			value = External[(int)ExternalType._127][currentBar];
-			plot.PlotData.Add(new List<object>()
-			{
-				ticks,
-				value > 0.0 ? (object)Math.Round(value, 2) : null
-			});
+			AddValueToPlot("Ext 1.272", ticks, value > 0.0 ? (object)Math.Round(value, 2) : null);
 
-			plot = (PlotSeries)ChartPlots["Ext 1.618"];
 			value = External[(int)ExternalType._162][currentBar];
-			plot.PlotData.Add(new List<object>()
-			{
-				ticks,
-				value > 0.0 ? (object)Math.Round(value, 2) : null
-			});
+			AddValueToPlot("Ext 1.618", ticks, value > 0.0 ? (object)Math.Round(value, 2) : null);
 
-			plot = (PlotSeries)ChartPlots["Alt 0.618"];
 			value = Alternate[(int)AlternateType._62][currentBar];
-			plot.PlotData.Add(new List<object>()
-			{
-				ticks,
-				value > 0.0 ? (object)Math.Round(value, 2) : null
-			});
+			AddValueToPlot("Alt 0.618", ticks, value > 0.0 ? (object)Math.Round(value, 2) : null);
 
-			plot = (PlotSeries)ChartPlots["Alt 1.000"];
 			value = Alternate[(int)AlternateType._100][currentBar];
-			plot.PlotData.Add(new List<object>()
-			{
-				ticks,
-				value > 0.0 ? (object)Math.Round(value, 2) : null
-			});
+			AddValueToPlot("Alt 1.000", ticks, value > 0.0 ? (object)Math.Round(value, 2) : null);
 
-			plot = (PlotSeries)ChartPlots["Alt 1.618"];
 			value = Alternate[(int)AlternateType._162][currentBar];
-			plot.PlotData.Add(new List<object>()
-			{
-				ticks,
-				value > 0.0 ? (object)Math.Round(value, 2) : null
-			});
+			AddValueToPlot("Alt 1.618", ticks, value > 0.0 ? (object)Math.Round(value, 2) : null);
 
-			plot = (PlotSeries)ChartPlots["Int 0.382"];
 			value = Internal[(int)InternalType._38][currentBar];
-			plot.PlotData.Add(new List<object>()
-			{
-				ticks,
-				value > 0.0 ? (object)Math.Round(value, 2) : null
-			});
+			AddValueToPlot("Int 0.382", ticks, value > 0.0 ? (object)Math.Round(value, 2) : null);
 
-			plot = (PlotSeries)ChartPlots["Int 0.500"];
 			value = Internal[(int)InternalType._50][currentBar];
-			plot.PlotData.Add(new List<object>()
-			{
-				ticks,
-				value > 0.0 ? (object)Math.Round(value, 2) : null
-			});
+			AddValueToPlot("Int 0.500", ticks, value > 0.0 ? (object)Math.Round(value, 2) : null);
 
-			plot = (PlotSeries)ChartPlots["Int 0.618"];
 			value = Internal[(int)InternalType._62][currentBar];
-			plot.PlotData.Add(new List<object>()
-			{
-				ticks,
-				value > 0.0 ? (object)Math.Round(value, 2) : null
-			});
+			AddValueToPlot("Int 0.618", ticks, value > 0.0 ? (object)Math.Round(value, 2) : null);
 
-			plot = (PlotSeries)ChartPlots["Int 0.786"];
 			value = Internal[(int)InternalType._79][currentBar];
-			plot.PlotData.Add(new List<object>()
-			{
-				ticks,
-				value > 0.0 ? (object)Math.Round(value, 2) : null
-			});
+			AddValueToPlot("Int 0.786", ticks, value > 0.0 ? (object)Math.Round(value, 2) : null);
+
+			value = HighBestFitLine[currentBar];
+			AddValueToPlot("High Best Fit", ticks, value > 0.0 ? (object)Math.Round(value, 2) : null);
+
+			value = LowBestFitLine[currentBar];
+			AddValueToPlot("Low Best Fit", ticks, value > 0.0 ? (object)Math.Round(value, 2) : null);
+
+			value = AllBestFitLine[currentBar];
+			AddValueToPlot("All Best Fit", ticks, value > 0.0 ? (object)Math.Round(value, 2) : null);
 		}
 
 		/// <summary>
@@ -246,6 +230,29 @@ namespace StockSimulator.Indicators
 				return;
 			}
 
+			// Zero out all the values for the plot.
+			for (int i = currentBar; i >= currentBar - MaxPlotBars && i >= 0; i--)
+			{
+				External[(int)ExternalType._127][i] = 0.0;
+				External[(int)ExternalType._162][i] = 0.0;
+				Alternate[(int)AlternateType._62][i] = 0.0;
+				Alternate[(int)AlternateType._100][i] = 0.0;
+				Alternate[(int)AlternateType._162][i] = 0.0;
+				Internal[(int)InternalType._38][i] = 0.0;
+				Internal[(int)InternalType._50][i] = 0.0;
+				Internal[(int)InternalType._62][i] = 0.0;
+				Internal[(int)InternalType._79][i] = 0.0;
+			
+				BuyDirection[i] = 0.0;
+
+				HighBestFitLine[i] = 0.0;
+				LowBestFitLine[i] = 0.0;
+				AllBestFitLine[i] = 0.0;
+				HighBestFitLineSlope[i] = 0.0;
+				LowBestFitLineSlope[i] = 0.0;
+				AllBestFitLineSlope[i] = 0.0;
+			}
+
 			ZigZagWaves zigzag = (ZigZagWaves)_dependents[0];
 
 			// Did we get all the points needed to make price and time projections.
@@ -257,39 +264,34 @@ namespace StockSimulator.Indicators
 					// Points indicies are ordered in the first point is the closest point
 					// to the current bar.
 
-					// External retracements are last point minus the one before projected from the last point.
-					double externalDiff = points[0].Price - points[1].Price;
-					External[(int)ExternalType._127][currentBar] = points[0].Price - externalDiff * 1.272;
-					External[(int)ExternalType._162][currentBar] = points[0].Price - externalDiff * 1.618;
+					// Loop twice purely to display the line as a flat line and we need at least
+					// two points for the line to show up on the chart.
+					for (int i = currentBar; i >= currentBar - 1; i--)
+					{
+						// External retracements are last point minus the one before projected from the last point.
+						double externalDiff = points[0].Price - points[1].Price;
+						External[(int)ExternalType._127][i] = points[0].Price - externalDiff * 1.272;
+						External[(int)ExternalType._162][i] = points[0].Price - externalDiff * 1.618;
 
-					// Alternate retracements are the 2nd to last point minus the one right before it projected from the last point.
-					double alternateDiff = points[1].Price - points[2].Price;
-					Alternate[(int)AlternateType._62][currentBar] = points[0].Price + alternateDiff * 0.618;
-					Alternate[(int)AlternateType._100][currentBar] = points[0].Price + alternateDiff;
-					Alternate[(int)AlternateType._162][currentBar] = points[0].Price + alternateDiff * 1.618;
+						// Alternate retracements are the 2nd to last point minus the one right before it projected from the last point.
+						double alternateDiff = points[1].Price - points[2].Price;
+						Alternate[(int)AlternateType._62][i] = points[0].Price + alternateDiff * 0.618;
+						Alternate[(int)AlternateType._100][i] = points[0].Price + alternateDiff;
+						Alternate[(int)AlternateType._162][i] = points[0].Price + alternateDiff * 1.618;
 
-					// Internal retracements are the 2nd to last point minus the 3rd to last point projected from the last point.
-					double interalDiff = points[2].Price - points[3].Price;
-					Internal[(int)InternalType._38][currentBar] = points[0].Price - interalDiff * 0.382;
-					Internal[(int)InternalType._50][currentBar] = points[0].Price - interalDiff * 0.500;
-					Internal[(int)InternalType._62][currentBar] = points[0].Price - interalDiff * 0.618;
-					Internal[(int)InternalType._79][currentBar] = points[0].Price - interalDiff * 0.786;
+						// Internal retracements are the 2nd to last point minus the 3rd to last point projected from the last point.
+						double interalDiff = points[2].Price - points[3].Price;
+						Internal[(int)InternalType._38][i] = points[0].Price - interalDiff * 0.382;
+						Internal[(int)InternalType._50][i] = points[0].Price - interalDiff * 0.500;
+						Internal[(int)InternalType._62][i] = points[0].Price - interalDiff * 0.618;
+						Internal[(int)InternalType._79][i] = points[0].Price - interalDiff * 0.786;
+					}
 
 					// The last cycle sets us up for the opposite cycle.
 					BuyDirection[currentBar] = zigzag.Waves[currentBar].TrendDirection * -1.0;
-				}
-				else
-				{
-					External[(int)ExternalType._127][currentBar] = 0.0;
-					External[(int)ExternalType._162][currentBar] = 0.0;
-					Alternate[(int)AlternateType._62][currentBar] = 0.0;
-					Alternate[(int)AlternateType._100][currentBar] = 0.0;
-					Alternate[(int)AlternateType._162][currentBar] = 0.0;
-					Internal[(int)InternalType._38][currentBar] = 0.0;
-					Internal[(int)InternalType._50][currentBar] = 0.0;
-					Internal[(int)InternalType._62][currentBar] = 0.0;
-					Internal[(int)InternalType._79][currentBar] = 0.0;
-					BuyDirection[currentBar] = 0.0;
+
+					// Save the best fit lines for this set of waves.
+					CalculateLinesOfBestFit(points, currentBar);
 				}
 			}
 		}
@@ -315,6 +317,82 @@ namespace StockSimulator.Indicators
 			}
 
 			return false;
+		}
+
+		/// <summary>
+		/// Calculates lines of best fit for the past highs and lows.
+		/// </summary>
+		/// <param name="points">List of points to calculate from</param>
+		/// <param name="currentBar">Current bar of the simulation</param>
+		private void CalculateLinesOfBestFit(List<ZigZagWaves.WavePoint> points, int currentBar)
+		{
+			int highMod = BuyDirection[currentBar] > 0.0 ? 0 : 1;
+			int lowMod = highMod ^ 1;
+
+			ZigZagWaves zigzag = (ZigZagWaves)_dependents[0];
+			int maxPoints = zigzag.MinRequiredPoints;
+
+			// Get the highs and lows as a list of points to use for the generation.
+			List<ZigZagWaves.WavePoint> highs = points.Where((item, index) => index % 2 == highMod && index < maxPoints).ToList();
+			List<ZigZagWaves.WavePoint> lows = points.Where((item, index) => index % 2 == lowMod && index < maxPoints).ToList();
+
+			// Also do a line for all the points.
+			List<ZigZagWaves.WavePoint> all = points.Where((item, index) => index < maxPoints).ToList();
+
+			// Reverse the order of the points since the lowest index is the last point which will 
+			// mess up the slope calculations.
+			highs.Reverse();
+			lows.Reverse();
+			all.Reverse();
+
+			// Save the lines to the values to be plotted.
+			SaveLineOfBestFit(HighBestFitLine, highs, HighBestFitLineSlope, currentBar);
+			SaveLineOfBestFit(LowBestFitLine, lows, LowBestFitLineSlope, currentBar);
+			SaveLineOfBestFit(AllBestFitLine, all, AllBestFitLineSlope, currentBar);
+		}
+
+		private void SaveLineOfBestFit(List<double> pointSeries, List<ZigZagWaves.WavePoint> points, List<double> slopeSeries, int currentBar)
+		{
+			double lineSlope;
+			List<ZigZagWaves.WavePoint> generatedPoints = GenerateLinearBestFit(points, currentBar, out lineSlope);
+
+			for (int i = 0; i < generatedPoints.Count; i++)
+			{
+				pointSeries[generatedPoints[i].Bar] = generatedPoints[i].Price;
+			}
+
+			slopeSeries[currentBar] = lineSlope;
+		}
+
+		/// <summary>
+		/// Generates a line of best fit from a list zigzag points. Also generates a point for the current bar
+		/// so we can see the line projected farther on the chart.
+		/// http://stackoverflow.com/questions/12946341/algorithm-for-scatter-plot-best-fit-line
+		/// </summary>
+		/// <param name="points">List of zigzag points</param>
+		/// <param name="currentBar">Current bar of the simulation</param>
+		/// <param name="lineSlope">Pass out the line slope to be saved if we want</param>
+		/// <returns>List of points along the line of best fit</returns>
+		private List<ZigZagWaves.WavePoint> GenerateLinearBestFit(List<ZigZagWaves.WavePoint> points, int currentBar, out double lineSlope)
+		{
+			int numPoints = points.Count;
+			double meanX = points.Average(point => point.Bar);
+			double meanY = points.Average(point => point.Price);
+
+			double sumXSquared = points.Sum(point => point.Bar * point.Bar);
+			double sumXY = points.Sum(point => point.Bar * point.Price);
+
+			double a = (sumXY / numPoints - meanX * meanY) / (sumXSquared / numPoints - meanX * meanX);
+			double b = (a * meanX - meanY);
+
+			lineSlope = a;
+
+			List<ZigZagWaves.WavePoint> bestFitPoints = points.Select(point => new ZigZagWaves.WavePoint() { Bar = point.Bar, Price = a * point.Bar - b }).ToList();
+
+			// Add the current bar point.
+			bestFitPoints.Add(new ZigZagWaves.WavePoint() { Bar = currentBar, Price = a * currentBar - b });
+
+			return bestFitPoints;
 		}
 
 		/// <summary>

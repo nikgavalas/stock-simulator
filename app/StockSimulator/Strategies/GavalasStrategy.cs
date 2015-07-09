@@ -181,44 +181,20 @@ namespace StockSimulator.Strategies
 		{
 			o.AddExtraInfo(() =>
 			{
-				DtOscillator ind = (DtOscillator)_dependents[1];
-				return new KeyValuePair<string, object>("dtosc %k", (object)Math.Round(ind.SK[currentBar], 2));
+				GavalasZones ind = (GavalasZones)_dependents[0];
+				return new KeyValuePair<string, object>("slopehigh", (object)Math.Round(ind.HighBestFitLineSlope[currentBar], 2));
 			});
 
 			o.AddExtraInfo(() =>
 			{
-				DtOscillator ind = (DtOscillator)_dependents[1];
-				return new KeyValuePair<string, object>("dtosc %d", (object)Math.Round(ind.SD[currentBar], 2));
+				GavalasZones ind = (GavalasZones)_dependents[0];
+				return new KeyValuePair<string, object>("slopelow", (object)Math.Round(ind.LowBestFitLineSlope[currentBar], 2));
 			});
 
 			o.AddExtraInfo(() =>
 			{
-				GavalasHistogram ind = (GavalasHistogram)_dependents[2];
-				return new KeyValuePair<string, object>("histogram", (object)Math.Round(ind.Value[currentBar], 2));
-			});
-
-			o.AddExtraInfo(() =>
-			{
-				DmiAdx ind = (DmiAdx)_dependents[3];
-				return new KeyValuePair<string, object>("adx", (object)Math.Round(ind.Adx[currentBar], 2));
-			});
-
-			o.AddExtraInfo(() =>
-			{
-				DmiAdx ind = (DmiAdx)_dependents[3];
-				return new KeyValuePair<string, object>("dmi+", (object)Math.Round(ind.DmiPlus[currentBar], 2));
-			});
-
-			o.AddExtraInfo(() =>
-			{
-				DmiAdx ind = (DmiAdx)_dependents[3];
-				return new KeyValuePair<string, object>("dmi-", (object)Math.Round(ind.DmiMinus[currentBar], 2));
-			});
-			
-			o.AddExtraInfo(() =>
-			{
-				AverageVolume ind = (AverageVolume)_dependents[4];
-				return new KeyValuePair<string, object>("avgVolume", (object)Math.Round(ind.Avg[currentBar], 2));
+				GavalasZones ind = (GavalasZones)_dependents[0];
+				return new KeyValuePair<string, object>("slopeall", (object)Math.Round(ind.AllBestFitLineSlope[currentBar], 2));
 			});
 		}
 	}

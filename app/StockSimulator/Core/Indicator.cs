@@ -190,5 +190,23 @@ namespace StockSimulator.Core
 		{
 			base.OnBarUpdate(currentBar);
 		}
+
+		/// <summary>
+		/// Helper function for indicators to add values to a plot so we don't
+		/// have to cut and paste this so much.
+		/// </summary>
+		/// <param name="plotName">Name of plot to add to</param>
+		/// <param name="ticks">Time in ticks of the value</param>
+		/// <param name="value">Value to add</param>
+		protected void AddValueToPlot(string plotName, long ticks, object value)
+		{
+			PlotSeries plot = (PlotSeries)ChartPlots[plotName];
+			plot.PlotData.Add(new List<object>()
+			{
+				ticks,
+				value
+			});
+		}
+
 	}
 }
