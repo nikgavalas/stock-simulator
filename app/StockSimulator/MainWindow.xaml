@@ -25,10 +25,10 @@
 				<RowDefinition Height="*"></RowDefinition>
 			</Grid.RowDefinitions>
 
-			<xctk:PropertyGrid x:Name="_propertyGrid" Width="Auto" Margin="10,70,10,50"
+			<xctk:PropertyGrid x:Name="_propertyGrid" Width="Auto" Margin="10,100,10,10"
                                     AutoGenerateProperties="True">
 			</xctk:PropertyGrid>
-			<Button x:Name="_runButton" Content="Run Simulation" Margin="10,0,10,10" VerticalAlignment="Bottom" Height="30" Click="_runButton_Click"/>
+			<Button x:Name="_runButton" Content="Run Simulation" Margin="10,60,10,10" VerticalAlignment="Top" Height="30" Click="_runButton_Click"/>
 
 			<TextBox x:Name="_statusText" Grid.Column="1" Margin="10,10,10,10" TextWrapping="Wrap" Text="" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"/>
 			<TextBox x:Name="_configFilePath" Height="40" Margin="10,10,110,10" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top"/>
