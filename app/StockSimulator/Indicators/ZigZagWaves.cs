@@ -101,7 +101,7 @@ namespace StockSimulator.Indicators
 
 			ZigZag zigzag = (ZigZag)_dependents[0];
 			int cutoffBar = Math.Max(0, currentBar - _maxCycleLookback);
-			int searchBar = currentBar - 2;
+			int searchBar = currentBar - 1;
 			List<WavePoint> points = new List<WavePoint>();
 			List<double> currentSeries = null;
 			int pointBeingSearchFor = 0; // Point 0 being the last point most recent in time.
