@@ -21,7 +21,7 @@ namespace StockSimulator.Indicators
 		/// </summary>
 		public class WaveData
 		{
-			public WavePoint[] Points { get; set; }
+			public List<WavePoint> Points { get; set; }
 			public double TrendDirection { get; set; }
 		}
 
@@ -38,12 +38,16 @@ namespace StockSimulator.Indicators
 		public List<WaveData> Waves { get; set; }
 
 		#region Configurables
+		public int MinRequiredPoints
+		{
+			get { return _minRequiredPoints; }
+			set { _minRequiredPoints = value; }
+		}
+
+		private int _minRequiredPoints = 6;
 		#endregion
 
 		private int _maxCycleLookback = 100;
-
-		public const int NUMBER_OF_POINTS = 4;
-		public const int LAST_POINT = NUMBER_OF_POINTS - 1;
 
 
 		/// <summary>
@@ -98,42 +102,42 @@ namespace StockSimulator.Indicators
 			ZigZag zigzag = (ZigZag)_dependents[0];
 			int cutoffBar = Math.Max(0, currentBar - _maxCycleLookback);
 			int searchBar = currentBar - 2;
-			WavePoint[] points = new WavePoint[NUMBER_OF_POINTS];
+			List<WavePoint> points = new List<WavePoint>();
 			List<double> currentSeries = null;
-			int pointBeingSearchFor = LAST_POINT;
+			int pointBeingSearchFor = 0; // Point 0 being the last point most recent in time.
 			double trendDirection = 0.0;
 
 			// Start searching for the point that either made a high-high or low-low cycle.
-			for (int i = searchBar; i >= cutoffBar && pointBeingSearchFor >= 0; i--)
+			for (int i = searchBar; i >= cutoffBar; i--)
 			{
-				if (pointBeingSearchFor == LAST_POINT)
+				if (pointBeingSearchFor == 0)
 				{
 					if (zigzag.ZigZagLows[i] > 0.0)
 					{
 						trendDirection = Order.OrderType.Long;
-						points[pointBeingSearchFor] = new WavePoint() { Bar = i, Price = zigzag.Value[i] };
+						points.Add(new WavePoint() { Bar = i, Price = zigzag.Value[i] });
 						currentSeries = zigzag.ZigZagHighs;
-						--pointBeingSearchFor;
+						++pointBeingSearchFor;
 					}
 					else if (zigzag.ZigZagHighs[i] > 0.0)
 					{
 						trendDirection = Order.OrderType.Short;
-						points[pointBeingSearchFor] = new WavePoint() { Bar = i, Price = zigzag.Value[i] };
+						points.Add(new WavePoint() { Bar = i, Price = zigzag.Value[i] });
 						currentSeries = zigzag.ZigZagLows;
-						--pointBeingSearchFor;
+						++pointBeingSearchFor;
 					}
 				}
 				// Each time we find a zigzag point, save the price and move to the next one for searching.
 				else if (currentSeries != null && currentSeries[i] > 0.0)
 				{
-					points[pointBeingSearchFor] = new WavePoint() { Bar = i, Price = zigzag.Value[i] };
+					points.Add(new WavePoint() { Bar = i, Price = zigzag.Value[i] });
 					currentSeries = currentSeries == zigzag.ZigZagHighs ? zigzag.ZigZagLows : zigzag.ZigZagHighs;
-					--pointBeingSearchFor;
+					++pointBeingSearchFor;
 				}
 			}
 
 			// Did we get all the points needed to wave information about the waves.
-			if (pointBeingSearchFor < 0)
+			if (pointBeingSearchFor >= MinRequiredPoints)
 			{
 				Waves[currentBar] = new WaveData() { Points = points, TrendDirection = trendDirection };
 			}

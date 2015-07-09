@@ -129,25 +129,25 @@ namespace StockSimulator.Indicators
 			// Did we get all the points needed to make price and time projections.
 			if (zigzag.Waves[currentBar] != null)
 			{
-				ZigZagWaves.WavePoint[] points = zigzag.Waves[currentBar].Points;
+				List<ZigZagWaves.WavePoint> points = zigzag.Waves[currentBar].Points;
 
 				// External retracements are last point minus the one before projected from the last point.
-				int externalDiff = points[ZigZagWaves.LAST_POINT].Bar - points[ZigZagWaves.LAST_POINT - 1].Bar;
-				AddValueToHistogram(points[ZigZagWaves.LAST_POINT].Bar + Convert.ToInt32(externalDiff * 1.272));
-				AddValueToHistogram(points[ZigZagWaves.LAST_POINT].Bar + Convert.ToInt32(externalDiff * 1.618));
+				int externalDiff = points[0].Bar - points[1].Bar;
+				AddValueToHistogram(points[0].Bar + Convert.ToInt32(externalDiff * 1.272));
+				AddValueToHistogram(points[0].Bar + Convert.ToInt32(externalDiff * 1.618));
 
 				// Alternate retracements are the 2nd to last point minus the one right before it projected from the last point.
-				int alternateDiff = points[ZigZagWaves.LAST_POINT - 1].Bar - points[ZigZagWaves.LAST_POINT - 2].Bar;
-				AddValueToHistogram(points[ZigZagWaves.LAST_POINT].Bar + Convert.ToInt32(alternateDiff * 0.618));
-				AddValueToHistogram(points[ZigZagWaves.LAST_POINT].Bar + alternateDiff);
-				AddValueToHistogram(points[ZigZagWaves.LAST_POINT].Bar + Convert.ToInt32(alternateDiff * 1.618));
+				int alternateDiff = points[1].Bar - points[2].Bar;
+				AddValueToHistogram(points[0].Bar + Convert.ToInt32(alternateDiff * 0.618));
+				AddValueToHistogram(points[0].Bar + alternateDiff);
+				AddValueToHistogram(points[0].Bar + Convert.ToInt32(alternateDiff * 1.618));
 
-				// Internal retracements are the 2nd point minus the first point projected from the last point.
-				int interalDiff = points[1].Bar - points[0].Bar;
-				AddValueToHistogram(points[ZigZagWaves.LAST_POINT].Bar + Convert.ToInt32(interalDiff * 0.382));
-				AddValueToHistogram(points[ZigZagWaves.LAST_POINT].Bar + Convert.ToInt32(interalDiff * 0.500));
-				AddValueToHistogram(points[ZigZagWaves.LAST_POINT].Bar + Convert.ToInt32(interalDiff * 0.618));
-				AddValueToHistogram(points[ZigZagWaves.LAST_POINT].Bar + Convert.ToInt32(interalDiff * 0.786));
+				// Internal retracements are the 2nd to last point minus the 3rd to last point projected from the last point.
+				int interalDiff = points[2].Bar - points[3].Bar;
+				AddValueToHistogram(points[0].Bar + Convert.ToInt32(interalDiff * 0.382));
+				AddValueToHistogram(points[0].Bar + Convert.ToInt32(interalDiff * 0.500));
+				AddValueToHistogram(points[0].Bar + Convert.ToInt32(interalDiff * 0.618));
+				AddValueToHistogram(points[0].Bar + Convert.ToInt32(interalDiff * 0.786));
 			}
 		}
 
