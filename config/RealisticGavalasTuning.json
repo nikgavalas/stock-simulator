@@ -24,6 +24,7 @@
   "ComboMaxBarsOpen": 10,
   "ComboSizeOfOrder": 10000.0,
   "GavalasPercentForBuy": 0.0,
+  "GavalasProfitPercent": 0.8,
   "GavalasStopPercent": 0.05,
   "GavalasMaxBarsOpen": 5,
   "GavalasSizeOfOrder": 20000.0,
