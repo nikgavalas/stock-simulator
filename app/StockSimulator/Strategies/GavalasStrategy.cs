@@ -145,6 +145,7 @@ namespace StockSimulator.Strategies
 			return new List<SellCondition>()
 			{
 				new StopSellCondition(Simulator.Config.GavalasStopPercent),
+				new ProfitSellCondition(Simulator.Config.GavalasProfitPercent),
 				//new StopOneBarTrailingHighLow(),
 				new MaxLengthSellCondition(Simulator.Config.GavalasMaxBarsOpen),
 			};
