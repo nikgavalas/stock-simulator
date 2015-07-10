@@ -262,6 +262,54 @@ namespace StockSimulator.Core
 		}
 
 		/// <summary>
+		/// Has the series recently turned up.
+		/// </summary>
+		/// <param name="series1">The series get the value for</param>
+		/// <param name="startBar">The bar to start from</param>
+		/// <param name="lookBackPeriod">How many bars to look back from the start bar</param>
+		/// <returns>The bar the data series has recently turned up. -1 if it's not</returns>
+		public static int IsValley(List<double> series1, int startBar, int lookBackPeriod)
+		{
+			int beginBar = startBar - lookBackPeriod;
+			if (beginBar > 1)
+			{
+				for (int i = beginBar; i <= startBar; i++)
+				{
+					if (UtilityMethods.IsValley(series1, i))
+					{
+						return i;
+					}
+				}
+			}
+
+			return -1;
+		}
+
+		/// <summary>
+		/// Has the series recently turned down.
+		/// </summary>
+		/// <param name="series1">The series get the value for</param>
+		/// <param name="startBar">The bar to start from</param>
+		/// <param name="lookBackPeriod">How many bars to look back from the start bar</param>
+		/// <returns>The bar the data series has recently turned down. -1 if it's not</returns>
+		public static int IsPeak(List<double> series1, int startBar, int lookBackPeriod)
+		{
+			int beginBar = startBar - lookBackPeriod;
+			if (beginBar > 1)
+			{
+				for (int i = beginBar; i <= startBar; i++)
+				{
+					if (UtilityMethods.IsPeak(series1, i))
+					{
+						return i;
+					}
+				}
+			}
+
+			return -1;
+		}
+
+		/// <summary>
 		/// Returns the next predicted value of the data series based on the slop of the
 		/// line formed by the point at the start bar and the previous point.
 		/// </summary>
