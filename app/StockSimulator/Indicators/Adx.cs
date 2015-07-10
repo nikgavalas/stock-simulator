@@ -29,7 +29,7 @@ namespace StockSimulator.Indicators
 			set { _period = value; }
 		}
 
-		private int _period = 14;
+		private int _period = 8;
 		#endregion
 
 
