@@ -60,33 +60,24 @@ namespace StockSimulator.Strategies
 			}
 
 			GavalasZones zones = (GavalasZones)_dependents[0];
-			GavalasHistogram histogram = (GavalasHistogram)_dependents[2];
 
 			double buyDirection = zones.BuyDirection[currentBar];
 			string foundStrategyName = "";
 
 			// See if we hit one of our buy zones.
-			if (buyDirection != 0.0 && zones.DidBarTouchZone(Data.Low[currentBar], Data.High[currentBar], currentBar))
+			if (ShouldBuy(buyDirection, currentBar))
 			{
-				// Verify with the mechanical buy signal.
-				DtOscillator dtosc = (DtOscillator)_dependents[1];
-				if (buyDirection > 0.0 && Data.HigherTimeframeTrend[currentBar] > 0.0)
+				if (buyDirection > 0.0 && ShouldBuyLong(currentBar))
 				{
-					if (dtosc.SD[currentBar] <= 25.0 && dtosc.SK[currentBar] <= 25.0)
-					{
-						foundStrategyName = "BullGavalasStrategy";
-					}
+					foundStrategyName = "BullGavalasStrategy";
 				}
-				else if (buyDirection < 0.0 && Data.HigherTimeframeTrend[currentBar] < 0.0)
+				else if (buyDirection < 0.0 && ShouldBuyShort(currentBar))
 				{
-					if (dtosc.SD[currentBar] >= 75.0 && dtosc.SK[currentBar] >= 75.0)
-					{
-						foundStrategyName = "BearGavalasStrategy";
-					}
+					foundStrategyName = "BearGavalasStrategy";
 				}
 			}
 
-			if (foundStrategyName.Length > 0 && DoesPassFilters(currentBar))
+			if (foundStrategyName.Length > 0)
 			{
 				List<Indicator> dependentIndicators = GetDependentIndicators();
 
@@ -154,18 +145,83 @@ namespace StockSimulator.Strategies
 		/// <summary>
 		/// One last check to filter out bad buys.
 		/// </summary>
+		/// <param name="buyDirection">Direction of the order (1 for long -1 for short)</param>
 		/// <param name="currentBar">Current bar of the simulation</param>
 		/// <returns>Returns true if the situation passes and we should buy</returns>
-		private bool DoesPassFilters(int currentBar)
+		private bool ShouldBuy(double buyDirection, int currentBar)
 		{
+			if (buyDirection == 0.0)
+			{
+				return false;
+			}
+
 			//DmiAdx dmiAdx = (DmiAdx)_dependents[3];
-			//if (dmiAdx.Adx[currentBar] > 50.0)
+			//if (dmiAdx.Adx[currentBar] > 20.0)
 			//{
-			//	return false;
+			//	if (buyDirection > 0.0 && (dmiAdx.DmiMinus[currentBar] - dmiAdx.DmiPlus[currentBar]) > 10.0)
+			//	{
+			//		return false;
+			//	}
+			//	else if (buyDirection < 0.0 && (dmiAdx.DmiPlus[currentBar] - dmiAdx.DmiMinus[currentBar]) > 10.0)
+			//	{
+			//		return false;
+			//	}
 			//}
 
 			AverageVolume vol = (AverageVolume)_dependents[4];
 			if (vol.Avg[currentBar] < 250000)
+			{
+				return false;
+			}
+
+			GavalasZones zones = (GavalasZones)_dependents[0];
+			if (zones.DidBarTouchZone(Data.Low[currentBar], Data.High[currentBar], currentBar) == false)
+			{
+				return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Returns true if we pass all the conditions to buy long.
+		/// </summary>
+		/// <param name="currentBar">Current bar of the simulation</param>
+		/// <returns>See summary</returns>
+		private bool ShouldBuyLong(int currentBar)
+		{
+			// Higher timeframe
+			if (Data.HigherTimeframeTrend[currentBar] < 0.0)
+			{
+				return false;
+			}
+
+			// Verify with the mechanical buy signal.
+			DtOscillator dtosc = (DtOscillator)_dependents[1];
+			if (dtosc.SD[currentBar] > 25.0 || dtosc.SK[currentBar] > 25.0)
+			{
+				return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Returns true if we pass all the conditions to buy short.
+		/// </summary>
+		/// <param name="currentBar">Current bar of the simulation</param>
+		/// <returns>See summary</returns>
+		private bool ShouldBuyShort(int currentBar)
+		{
+			// Higher timeframe
+			if (Data.HigherTimeframeTrend[currentBar] > 0.0)
+			{
+				return false;
+			}
+
+			// Verify with the mechanical buy signal.
+			DtOscillator dtosc = (DtOscillator)_dependents[1];
+			if (dtosc.SD[currentBar] < 75.0 || dtosc.SK[currentBar] < 75.0)
 			{
 				return false;
 			}
@@ -196,6 +252,24 @@ namespace StockSimulator.Strategies
 			{
 				GavalasZones ind = (GavalasZones)_dependents[0];
 				return new KeyValuePair<string, object>("slopeall", (object)Math.Round(ind.AllBestFitLineSlope[currentBar], 2));
+			});
+
+			o.AddExtraInfo(() =>
+			{
+				DmiAdx ind = (DmiAdx)_dependents[3];
+				return new KeyValuePair<string, object>("adx", (object)Math.Round(ind.Adx[currentBar], 2));
+			});
+
+			o.AddExtraInfo(() =>
+			{
+				DmiAdx ind = (DmiAdx)_dependents[3];
+				return new KeyValuePair<string, object>("dmi+", (object)Math.Round(ind.DmiPlus[currentBar], 2));
+			});
+
+			o.AddExtraInfo(() =>
+			{
+				DmiAdx ind = (DmiAdx)_dependents[3];
+				return new KeyValuePair<string, object>("dmi-", (object)Math.Round(ind.DmiMinus[currentBar], 2));
 			});
 		}
 	}
