@@ -320,6 +320,17 @@ namespace StockSimulator.Indicators
 		}
 
 		/// <summary>
+		/// Returns the wave data for the current zigzag waves.
+		/// </summary>
+		/// <param name="currentBar">Current bar of the simulation</param>
+		/// <returns>See summary</returns>
+		public ZigZagWaves.WaveData GetWaveData(int currentBar)
+		{
+			ZigZagWaves zigzag = (ZigZagWaves)_dependents[0];
+			return zigzag.Waves[currentBar];
+		}
+
+		/// <summary>
 		/// Calculates lines of best fit for the past highs and lows.
 		/// </summary>
 		/// <param name="points">List of points to calculate from</param>

@@ -71,10 +71,10 @@ namespace StockSimulator.Strategies
 				{
 					foundStrategyName = "BullGavalasStrategy";
 				}
-				else if (buyDirection < 0.0 && ShouldBuyShort(currentBar))
-				{
-					foundStrategyName = "BearGavalasStrategy";
-				}
+				//else if (buyDirection < 0.0 && ShouldBuyShort(currentBar))
+				//{
+				//	foundStrategyName = "BearGavalasStrategy";
+				//}
 			}
 
 			if (foundStrategyName.Length > 0)
@@ -121,8 +121,8 @@ namespace StockSimulator.Strategies
 		{
 			return new List<BuyCondition>()
 			{
-				new OneBarTrailingHighLow(3)
-				//new MarketBuyCondition()
+				//new OneBarTrailingHighLow(2)
+				new MarketBuyCondition()
 			};
 		}
 
@@ -154,19 +154,6 @@ namespace StockSimulator.Strategies
 			{
 				return false;
 			}
-
-			//DmiAdx dmiAdx = (DmiAdx)_dependents[3];
-			//if (dmiAdx.Adx[currentBar] > 20.0)
-			//{
-			//	if (buyDirection > 0.0 && (dmiAdx.DmiMinus[currentBar] - dmiAdx.DmiPlus[currentBar]) > 10.0)
-			//	{
-			//		return false;
-			//	}
-			//	else if (buyDirection < 0.0 && (dmiAdx.DmiPlus[currentBar] - dmiAdx.DmiMinus[currentBar]) > 10.0)
-			//	{
-			//		return false;
-			//	}
-			//}
 
 			AverageVolume vol = (AverageVolume)_dependents[4];
 			if (vol.Avg[currentBar] < 250000)
@@ -202,6 +189,13 @@ namespace StockSimulator.Strategies
 			{
 				return false;
 			}
+
+			// Are we in a very strong downtrend? If so the upside is limited.
+			//DmiAdx dmiAdx = (DmiAdx)_dependents[3];
+			//if (dmiAdx.DmiMinus[currentBar] > 35.0 && dmiAdx.DmiPlus[currentBar] < 10.0)
+			//{
+			//	return false;
+			//}
 
 			return true;
 		}
@@ -254,6 +248,30 @@ namespace StockSimulator.Strategies
 				return new KeyValuePair<string, object>("slopeall", (object)Math.Round(ind.AllBestFitLineSlope[currentBar], 2));
 			});
 
+			o.AddExtraInfo(() =>
+			{
+				GavalasZones ind = (GavalasZones)_dependents[0];
+				ZigZagWaves.WaveData waves = ind.GetWaveData(currentBar);
+				int barLength = waves.Points[0].Bar - waves.Points[1].Bar;
+				return new KeyValuePair<string, object>("wave3bars", barLength);
+			});
+
+			o.AddExtraInfo(() =>
+			{
+				GavalasZones ind = (GavalasZones)_dependents[0];
+				ZigZagWaves.WaveData waves = ind.GetWaveData(currentBar);
+				int barLength = waves.Points[1].Bar - waves.Points[2].Bar;
+				return new KeyValuePair<string, object>("wave2bars", barLength);
+			});
+
+			o.AddExtraInfo(() =>
+			{
+				GavalasZones ind = (GavalasZones)_dependents[0];
+				ZigZagWaves.WaveData waves = ind.GetWaveData(currentBar);
+				int barLength = waves.Points[2].Bar - waves.Points[3].Bar;
+				return new KeyValuePair<string, object>("wave1bars", barLength);
+			});
+			
 			o.AddExtraInfo(() =>
 			{
 				DmiAdx ind = (DmiAdx)_dependents[3];
