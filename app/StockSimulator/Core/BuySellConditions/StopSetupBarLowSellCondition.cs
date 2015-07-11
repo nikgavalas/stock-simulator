@@ -8,12 +8,16 @@ namespace StockSimulator.Core.BuySellConditions
 {
 	class StopSetupBarLowSellCondition : SellCondition
 	{
+		private bool _buyAndSellSameBar;
+
 		/// <summary>
 		/// Constructor
 		/// </summary>
-		public StopSetupBarLowSellCondition()
+		/// <param name="buyAndSellSameBar">If false then we can't sell the same bar we bought in</param>
+		public StopSetupBarLowSellCondition(bool buyAndSellSameBar = true)
 			: base()
 		{
+			_buyAndSellSameBar = buyAndSellSameBar;
 		}
 
 		/// <summary>
@@ -34,6 +38,11 @@ namespace StockSimulator.Core.BuySellConditions
 		/// <returns>True if the order was closed</returns>
 		public override bool OnUpdate(int currentBar)
 		{
+			if (_buyAndSellSameBar == false && _order.BuyBar == currentBar)
+			{
+				return false;
+			}
+
 			TickerData data = _order.Ticker;
 
 			if (_order.Type == Order.OrderType.Long)
