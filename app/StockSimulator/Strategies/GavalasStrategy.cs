@@ -34,7 +34,9 @@ namespace StockSimulator.Strategies
 				new DtOscillator(tickerData) { PeriodRsi = 8, PeriodStoch = 5, PeriodSK = 3, PeriodSD = 3 },
 				new GavalasHistogram(tickerData),
 				new DmiAdx(tickerData),
-				new AverageVolume(tickerData)
+				new AverageVolume(tickerData),
+				new Atr(tickerData),
+				new Ppo(tickerData)
 			};
 		}
 
@@ -288,6 +290,24 @@ namespace StockSimulator.Strategies
 			{
 				DmiAdx ind = (DmiAdx)_dependents[3];
 				return new KeyValuePair<string, object>("dmi-", (object)Math.Round(ind.DmiMinus[currentBar], 2));
+			});
+
+			o.AddExtraInfo(() =>
+			{
+				Atr ind = (Atr)_dependents[5];
+				return new KeyValuePair<string, object>("atrnorm", (object)Math.Round(ind.ValueNormalized[currentBar], 4));
+			});
+
+			o.AddExtraInfo(() =>
+			{
+				Ppo ind = (Ppo)_dependents[6];
+				return new KeyValuePair<string, object>("ppo", (object)Math.Round(ind.Value[currentBar], 2));
+			});
+
+			o.AddExtraInfo(() =>
+			{
+				Ppo ind = (Ppo)_dependents[6];
+				return new KeyValuePair<string, object>("pposmooth", (object)Math.Round(ind.Smoothed[currentBar], 2));
 			});
 		}
 	}
