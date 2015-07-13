@@ -3,12 +3,14 @@
 angular.module('mainApp').controller('HigherTimeframeCtrl', [
 	'$scope',
 	'$routeParams',
+	'$timeout',
 	'HigherTimeframeFactory',
 	'ConfigFactory',
 	'DateFactory',
 	function(
 		$scope,
 		$routeParams,
+		$timeout,
 		HigherTimeframeFactory,
 		ConfigFactory,
 		DateFactory
@@ -24,24 +26,31 @@ angular.module('mainApp').controller('HigherTimeframeCtrl', [
 
 			$scope.datesAndStates = [];
 
-			HigherTimeframeFactory.get(date).then(function(data) {
+			HigherTimeframeFactory.get(date, $scope.ticker).then(function(data) {
+				$scope.$broadcast('ClearIndicators');
+
 				$scope.datesAndStates = data.statesData;
 				$scope.$broadcast('CreateChartExistingData', { data: data.priceData, chartName: 'higherTimeframe' });
-				$scope.$broadcast('AddIndicatorExistingData', { data: data.indicatorData, chartName: 'higherTimeframe' });
+				$scope.$broadcast('AddIndicatorExistingData', { name: 'Higher Indicator', data: data.indicatorData, chartName: 'higherTimeframe' });
+
+				$timeout(function() {
+					$scope.$broadcast('RedrawChart');
+				}, 500);
 			});
 		}
 
 		// Save since it will be used in the rest of the app.
 		ConfigFactory.setOutputFolder($routeParams.runName);
 
-		$scope.calendarDate = new Date();
+		$scope.ticker = $routeParams.ticker;
+
 		$scope.highFrameDate = $routeParams.date;
+		$scope.calendarDate = $scope.highFrameDate ? new Date(Date.parse($scope.highFrameDate)) : new Date();
 		if (!$scope.highFrameDate) {
 			$scope.highFrameDate = DateFactory.convertDateToString(new Date());
 		}
 
 		$scope.setDate = function() {
-			// TODO: use moment.js for better date manipulation...
 			$scope.calendarDate = new Date($scope.highFrameDate);
 			if (!DateFactory.isValidDate($scope.calendarDate)) {
 				$scope.calendarDate = new Date();

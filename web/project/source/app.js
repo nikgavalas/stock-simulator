@@ -41,7 +41,7 @@ var mainApp = angular.module('mainApp', [
 			templateUrl: 'views/account-value.html',
 			controller: 'AccountValueCtrl'
 		})
-		.when('/:runName/higher', {
+		.when('/:runName/higher/:ticker/:date', {
 			templateUrl: 'views/higher-timeframe.html',
 			controller: 'HigherTimeframeCtrl'
 		})

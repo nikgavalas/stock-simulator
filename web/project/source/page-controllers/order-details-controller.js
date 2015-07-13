@@ -27,7 +27,6 @@ angular.module('mainApp').controller('OrderDetailsCtrl', [
 
 		$scope.ticker = $routeParams.ticker;
 		$scope.orderId = $routeParams.orderId;
-
 		$scope.orderDate = '';
 
 		// Load all the overall strategies.
@@ -46,6 +45,8 @@ angular.module('mainApp').controller('OrderDetailsCtrl', [
 			$scope.order = orderData;
 			$scope.strategies = orderData.strategies;
 			$scope.orderDate = orderData.buyDate;
+			$scope.higherTimeframeLink = '#/' + ConfigFactory.getOutputName() + '/higher/' + 
+				$scope.ticker + '/' + $scope.orderDate;
 			
 			// Sort so the strategy with the highest is at the top and that is the one that is shown first.
 			$scope.strategies.sort(function(a, b) {

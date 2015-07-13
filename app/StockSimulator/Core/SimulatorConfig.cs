@@ -114,6 +114,12 @@ namespace StockSimulator.Core
 		[Description("Should auto open the web page after the sim finishes running.")]
 		public bool ShouldOpenWebPage { get; set; }
 
+		[Category("Output")]
+		[PropertyOrder(6)]
+		[DisplayName("Output Higher Timeframe")]
+		[Description("(Time consuming) Output the higher timeframe price and indicator for all stocks.")]
+		public bool OutputHigherTimeframeData { get; set; }
+
 		//////////////////////////// ALL ORDERS ///////////////////////////////////
 
 		[Category("All Orders")]

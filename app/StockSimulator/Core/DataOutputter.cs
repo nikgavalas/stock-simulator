@@ -164,12 +164,13 @@ namespace StockSimulator.Core
 		/// <param name="states">Order type states for each lower timeframe bar up to this date</param>
 		public void OutputHigherTimeframeData(DateTime date, Indicator ind, TickerData higherData, TickerData lowerData, List<double> states)
 		{
-			Directory.CreateDirectory(Simulator.Config.OutputFolder + "\\higher");
+			string rootFolderName = Simulator.Config.OutputFolder + "\\higher\\" + lowerData.TickerAndExchange.ToString() + "\\";
+			Directory.CreateDirectory(rootFolderName);
 
 			ind.Serialize(ind.Data.NumBars - 1);
 			higherData.PrepareForSerialization();
 
-			string folderName = Simulator.Config.OutputFolder + "\\higher\\" + date.ToString("yyyy-MM-dd");
+			string folderName = rootFolderName + date.ToString("yyyy-MM-dd");
 
 			string jsonOutput = JsonConvert.SerializeObject(higherData);
 			string filename = folderName + "-data.json";

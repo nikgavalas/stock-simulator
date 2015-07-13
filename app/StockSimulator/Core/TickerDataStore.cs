@@ -556,18 +556,18 @@ namespace StockSimulator.Core
 			double state = GetHigherTimeframeStateFromIndicator(higherTimeframeIndicator, higherTimeframeIndicator.Data.NumBars - 1, lastState);
 
 			////////////////// START HIGHER TIME FRAME DEBUGGING ////////////////////
-			//if (ticker.TickerAndExchange.ToString() == "NFLX-NASDAQ")
-			//{
-			//	DateTime outputDate = higherTickerData.Dates[higherTickerData.Dates.Count - 1];
-			//	List<double> states = new List<double>(ticker.HigherTimeframeTrend);
-			//	states.Add(state);
-			//	Simulator.DataOutput.OutputHigherTimeframeData(
-			//		outputDate,
-			//		higherTimeframeIndicator,
-			//		higherTickerData,
-			//		ticker,
-			//		states);
-			//}
+			if (Simulator.Config.OutputHigherTimeframeData)
+			{
+				DateTime outputDate = higherTickerData.Dates[higherTickerData.Dates.Count - 1];
+				List<double> states = new List<double>(ticker.HigherTimeframeTrend);
+				states.Add(state);
+				Simulator.DataOutput.OutputHigherTimeframeData(
+					outputDate,
+					higherTimeframeIndicator,
+					higherTickerData,
+					ticker,
+					states);
+			}
 			//////////////////  END  HIGHER TIME FRAME DEBUGGING ////////////////////
 
 			return state;

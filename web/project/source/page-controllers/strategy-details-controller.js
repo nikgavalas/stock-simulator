@@ -8,6 +8,7 @@ angular.module('mainApp').controller('StrategyDetailsCtrl', [
 	'ConfigFactory',
 	'OrderListFactory',
 	'StrategyListFactory',
+	'DateFactory',
 	function(
 		$scope,
 		$routeParams,
@@ -15,7 +16,8 @@ angular.module('mainApp').controller('StrategyDetailsCtrl', [
 		$timeout,
 		ConfigFactory,
 		OrderListFactory,
-		StrategyListFactory
+		StrategyListFactory,
+		DateFactory
 	) {
 		// Save since it will be used in the rest of the app.
 		ConfigFactory.setOutputFolder($routeParams.runName);
@@ -62,6 +64,10 @@ angular.module('mainApp').controller('StrategyDetailsCtrl', [
 			};
 			$scope.extremes.min.setTime(buyDate.getTime() - (rangeMs));
 			$scope.extremes.max.setTime(buyDate.getTime() + (rangeMs));
+
+			$scope.higherTimeframeLink = '#/' + ConfigFactory.getOutputName() + '/higher/' + 
+				$scope.ticker + '/' + DateFactory.convertDateToString(buyDate);
+
 		};
 
 		/**
