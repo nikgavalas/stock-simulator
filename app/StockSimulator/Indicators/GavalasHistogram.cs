@@ -143,11 +143,18 @@ namespace StockSimulator.Indicators
 				AddValueToHistogram(points[0].Bar + Convert.ToInt32(alternateDiff * 1.618));
 
 				// Internal retracements are the 2nd to last point minus the 3rd to last point projected from the last point.
-				int interalDiff = points[2].Bar - points[3].Bar;
-				AddValueToHistogram(points[0].Bar + Convert.ToInt32(interalDiff * 0.382));
-				AddValueToHistogram(points[0].Bar + Convert.ToInt32(interalDiff * 0.500));
-				AddValueToHistogram(points[0].Bar + Convert.ToInt32(interalDiff * 0.618));
-				AddValueToHistogram(points[0].Bar + Convert.ToInt32(interalDiff * 0.786));
+				//int interalDiff = points[2].Bar - points[3].Bar;
+				//AddValueToHistogram(points[0].Bar + Convert.ToInt32(interalDiff * 0.382));
+				//AddValueToHistogram(points[0].Bar + Convert.ToInt32(interalDiff * 0.500));
+				//AddValueToHistogram(points[0].Bar + Convert.ToInt32(interalDiff * 0.618));
+				//AddValueToHistogram(points[0].Bar + Convert.ToInt32(interalDiff * 0.786));
+
+				// Add the last cycle averages for the opposite cycles since the last point
+				// is opposite the way we want to buy.
+				int cycleAverage = points[1].Bar - points[3].Bar;
+				cycleAverage += points[3].Bar - points[5].Bar;
+				cycleAverage = Convert.ToInt32(cycleAverage / 2.0);
+				AddValueToHistogram(points[0].Bar + cycleAverage);
 			}
 		}
 
