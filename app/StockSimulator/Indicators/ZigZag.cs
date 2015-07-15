@@ -21,6 +21,12 @@ namespace StockSimulator.Indicators
 		public List<double> ZigZagHighs { get; set; }
 		public List<double> ZigZagLows { get; set; }
 
+		public double DeviationValue
+		{
+			get { return deviationValue; }
+			set { deviationValue = Math.Max(0.1, Math.Round(value, 1)); }
+		}
+
 		private enum DeviationType
 		{
 			Percent = 0,
@@ -29,7 +35,7 @@ namespace StockSimulator.Indicators
 
 		private double currentZigZagHigh = 0;
 		private double currentZigZagLow = 0;
-		private DeviationType deviationType = DeviationType.Percent;
+		private DeviationType deviationType = DeviationType.Points;
 		private double deviationValue = 1.0;
 		private List<double> zigZagHighSeries;
 		private List<double> zigZagLowSeries;
@@ -59,7 +65,6 @@ namespace StockSimulator.Indicators
 
 			currentZigZagHigh = 0;
 			currentZigZagLow = 0;
-			deviationType = DeviationType.Percent;
 			lastSwingIdx = -1;
 			lastSwingPrice = 0.0;
 			trendDir = 0; // 1 = trend up, -1 = trend down, init = 0
@@ -140,7 +145,7 @@ namespace StockSimulator.Indicators
 			if (!useHighLow)
 			{
 				highSeries = Data.Close;
-				lowSeries = Data.Close;
+				lowSeries = Data.Open;
 			}
 
 			// Calculation always for 1-bar ago!
