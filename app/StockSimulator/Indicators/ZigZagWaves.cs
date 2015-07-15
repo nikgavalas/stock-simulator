@@ -47,7 +47,7 @@ namespace StockSimulator.Indicators
 		private int _minRequiredPoints = 6;
 		#endregion
 
-		private int _maxCycleLookback = 100;
+		private int _maxCycleLookback = 500;
 
 
 		/// <summary>
@@ -60,7 +60,7 @@ namespace StockSimulator.Indicators
 		{
 			_dependents = new List<Runnable>()
 			{
-				new ZigZag(tickerData, 3.0) { MaxSimulationBars = 150, MaxPlotBars = 150 }
+				new ZigZag(tickerData, 3.0)
 			};
 
 			MaxSimulationBars = 1;
@@ -147,5 +147,14 @@ namespace StockSimulator.Indicators
 			}
 		}
 
+		/// <summary>
+		/// Sets the zigzag deviation value.
+		/// </summary>
+		/// <param name="deviation">New deviation value</param>
+		public void SetZigZagDeviation(double deviation)
+		{
+			ZigZag zigzag = (ZigZag)_dependents[0];
+			zigzag.DeviationValue = deviation;
+		}
 	}
 }

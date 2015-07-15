@@ -14,12 +14,7 @@ namespace StockSimulator.Strategies
 	/// </summary>
 	public class GavalasStrategy : RootSubStrategy
 	{
-		private class PriceZone
-		{
-			public double High { get; set; }
-			public double Low { get; set; }
-			public int NumberOfPoints { get; set; }
-		}
+		private double lastAtrValue = 0.0;
 
 		/// <summary>
 		/// Construct the class and initialize the bar data to default values.
@@ -50,11 +45,29 @@ namespace StockSimulator.Strategies
 		}
 
 		/// <summary>
+		/// Called before the indicators are run so the strategy can update
+		/// any values in the dependent indicators before they start. Things like
+		/// configurable periods and such and such.
+		/// </summary>
+		/// <param name="currentBar">The current bar in the simulation</param>
+		protected override void OnBeforeIndicatorRun(int currentBar)
+		{
+			// Set the zigzag value to be based on the atr of the last frame. This 
+			// will hopefully allow the zigzag to adapt to the more recent stock moves
+			// and allow it to adapt to different stocks.
+			GavalasZones zones = (GavalasZones)_dependents[0];
+			zones.SetZigZagDeviation(lastAtrValue * 1.2);
+		}
+
+		/// <summary>
 		/// </summary>
 		/// <param name="currentBar">Current bar of the simulation</param>
 		public override void OnBarUpdate(int currentBar)
 		{
 			base.OnBarUpdate(currentBar);
+
+			// Save this so we can use it to set the zigzag deviation.
+			lastAtrValue = ((Atr)_dependents[5]).Value[currentBar];
 
 			if (currentBar < 2)
 			{
@@ -73,10 +86,10 @@ namespace StockSimulator.Strategies
 				{
 					foundStrategyName = "BullGavalasStrategy";
 				}
-				//else if (buyDirection < 0.0 && ShouldBuyShort(currentBar))
-				//{
-				//	foundStrategyName = "BearGavalasStrategy";
-				//}
+				else if (buyDirection < 0.0 && ShouldBuyShort(currentBar))
+				{
+					foundStrategyName = "BearGavalasStrategy";
+				}
 			}
 
 			if (foundStrategyName.Length > 0)

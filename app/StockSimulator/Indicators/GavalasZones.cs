@@ -331,6 +331,16 @@ namespace StockSimulator.Indicators
 		}
 
 		/// <summary>
+		/// Sets the zigzag deviation value.
+		/// </summary>
+		/// <param name="deviation">New deviation value</param>
+		public void SetZigZagDeviation(double deviation)
+		{
+			ZigZagWaves zigzag = (ZigZagWaves)_dependents[0];
+			zigzag.SetZigZagDeviation(deviation);
+		}
+
+		/// <summary>
 		/// Calculates lines of best fit for the past highs and lows.
 		/// </summary>
 		/// <param name="points">List of points to calculate from</param>
