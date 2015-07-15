@@ -51,6 +51,7 @@ namespace StockSimulator.Indicators
 			base.CreatePlots();
 
 			// Add the indicator for plotting
+			ChartPlots["Atr"] = new PlotSeries("line");
 			ChartPlots["AtrNormalized"] = new PlotSeries("line");
 		}
 
@@ -64,7 +65,10 @@ namespace StockSimulator.Indicators
 
 			long ticks = UtilityMethods.UnixTicks(Data.Dates[currentBar]);
 
-			double value = ValueNormalized[currentBar];
+			double value = Value[currentBar];
+			AddValueToPlot("Atr", ticks, Math.Round(value, 4));
+
+			value = ValueNormalized[currentBar];
 			AddValueToPlot("AtrNormalized", ticks, Math.Round(value, 4));
 		}
 
