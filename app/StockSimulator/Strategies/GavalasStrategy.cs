@@ -56,7 +56,7 @@ namespace StockSimulator.Strategies
 			// will hopefully allow the zigzag to adapt to the more recent stock moves
 			// and allow it to adapt to different stocks.
 			GavalasZones zones = (GavalasZones)_dependents[0];
-			zones.SetZigZagDeviation(lastAtrValue * 1.2);
+			zones.SetZigZagDeviation(lastAtrValue * 1.0);
 		}
 
 		/// <summary>
