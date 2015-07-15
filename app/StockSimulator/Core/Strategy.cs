@@ -64,6 +64,8 @@ namespace StockSimulator.Core
 				}
 			}
 
+			OnBeforeIndicatorRun(currentBar);
+
 			// Now run any dependent indicators that this strategy needs.
 			for (int i = 0; i < _dependents.Count; i++)
 			{
@@ -86,6 +88,16 @@ namespace StockSimulator.Core
 			// Remove the orders that are finished. This will just remove them from
 			// this array but they order will still be saved in the order history.
 			_activeOrders.RemoveAll(order => order.IsFinished() || order.Status == Order.OrderStatus.Cancelled);
+		}
+
+		/// <summary>
+		/// Called before the indicators are run so the strategy can update
+		/// any values in the dependent indicators before they start. Things like
+		/// configurable periods and such and such.
+		/// </summary>
+		/// <param name="currentBar">The current bar in the simulation</param>
+		protected virtual void OnBeforeIndicatorRun(int currentBar)
+		{
 		}
 
 		/// <summary>
