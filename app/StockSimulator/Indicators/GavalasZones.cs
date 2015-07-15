@@ -499,9 +499,7 @@ namespace StockSimulator.Indicators
 		/// <returns>True if the waves will work for our strategy</returns>
 		private bool DoWavesPassFilters(List<ZigZagWaves.WavePoint> points)
 		{
-			return true;
-			//return 
-			//	AreWavesGreaterThanMinBars(points) && 
+			return AreWavesGreaterThanMinBars(points);
 			//	AreWaveAnglesInRange(points);
 		}
 
@@ -512,14 +510,20 @@ namespace StockSimulator.Indicators
 		/// <returns>See Summary</returns>
 		private bool AreWavesGreaterThanMinBars(List<ZigZagWaves.WavePoint> points)
 		{
-			for (int i = 1; i < points.Count && i < 4; i++)
-			{
-				int length = points[i].Bar - points[i - 1].Bar;
-				if (length < 2)
-				{
-					return false;
-				}
-			}
+			// Check just the last wave for now.
+			//if (points[0].Bar - points[1].Bar < 3 || points[1].Bar - points[2].Bar < 3)
+			//{
+			//	return false;
+			//}
+
+			//for (int i = 1; i < points.Count && i < 4; i++)
+			//{
+			//	int length = points[i].Bar - points[i - 1].Bar;
+			//	if (length < 2)
+			//	{
+			//		return false;
+			//	}
+			//}
 
 			return true;
 		}

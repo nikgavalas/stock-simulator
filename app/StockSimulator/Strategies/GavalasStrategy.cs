@@ -110,7 +110,7 @@ namespace StockSimulator.Strategies
 
 					AddExtraOrderInfo(placedOrder, currentBar);
 
-					if (orderStats.WinPercent >= Simulator.Config.GavalasPercentForBuy)
+					if (orderStats.WinPercent >= Simulator.Config.GavalasPercentForBuy && orderStats.Gain > Simulator.Config.GavalasGainForBuy)
 					{
 						Bars[currentBar] = new OrderSuggestion(
 							orderStats.WinPercent,

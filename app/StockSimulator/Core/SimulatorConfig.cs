@@ -205,6 +205,12 @@ namespace StockSimulator.Core
 		public double GavalasPercentForBuy { get; set; }
 
 		[Category("Gavalas Strategy")]
+		[PropertyOrder(1)]
+		[DisplayName("Gain For Buy")]
+		[Description("Min gain from past orders to add ticker to the buy list")]
+		public double GavalasGainForBuy { get; set; }
+
+		[Category("Gavalas Strategy")]
 		[PropertyOrder(4)]
 		[DisplayName("Profit Target Percent")]
 		[Description("Profit target percent for the strategy")]
@@ -397,6 +403,7 @@ namespace StockSimulator.Core
 
 			// Gavalas Strategy
 			GavalasPercentForBuy = 50;
+			GavalasGainForBuy = 500;
 			GavalasProfitPercent = 0.05;
 			GavalasStopPercent = 0.05;
 			GavalasMaxBarsOpen = 5;
