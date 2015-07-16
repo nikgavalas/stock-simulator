@@ -58,6 +58,9 @@ namespace StockSimulator.Core
 		private CancellationToken _cancelToken;
 		private static IProgress<string> _progress = null;
 
+		private int _startingAccountMonth = 0;
+		private double _startingMonthAccountValue = 0.0;
+
 		/// <summary>
 		/// Constructor
 		/// </summary>
@@ -214,6 +217,9 @@ namespace StockSimulator.Core
 
 			WriteMessage("Running main strategy for dates " + startDate.ToShortDateString() + " to " + endDate.ToShortDateString());
 
+			_startingAccountMonth = 0;
+			_startingMonthAccountValue = Broker.AccountCash;
+
 			// Loop through each date. We use dates because different tickers have different
 			// amounts of trading days. And some are trading on certain days while others aren't.
 			// This way to just see if the ticker traded that day, and if it did, then we use it.
@@ -323,7 +329,11 @@ namespace StockSimulator.Core
 				// Update all the active orders before placing new ones.
 				UpdateOrders(currentDate);
 
-				// Buy stocks if we it's a good time.
+				// Keep tabs on the account cash at the start of the month. We want to 
+				// limit our losses for the month.
+				UpdateMonthlyAccountValue(currentDate);
+
+				// Buy stocks if it's a good time.
 				if (barNumber >= Config.NumBarsToDelayStart)
 				{
 					int currentCount = 0;
@@ -334,7 +344,10 @@ namespace StockSimulator.Core
 						// $100,000 and we double it in 2 years. We don't want to be investing our $200,000 worth
 						// of cash. We still want to work with our original amount. This way we can see how much 
 						// of a bankroll we'll need to make a living off investing.
-						if (_activeOrders.Count >= Config.MaxOpenOrders || currentCount >= Config.MaxOrdersPerBar)
+						// Also limit our losses and make sure we have not lost too much money this month.
+						if (_activeOrders.Count >= Config.MaxOpenOrders ||
+							currentCount >= Config.MaxOrdersPerBar ||
+							_startingMonthAccountValue - Broker.CurrentAccountValue > Simulator.Config.MaxMonthlyLoss)
 						{
 							break;
 						}
@@ -427,7 +440,22 @@ namespace StockSimulator.Core
 
 			// Save the current value at the end of the frame.
 			accountValue += Broker.AccountCash;
+			Broker.CurrentAccountValue = accountValue;
 			Broker.AddValueToList(currentDate, accountValue);
+		}
+
+		/// <summary>
+		/// Updates the account value for the start of the month if we are starting
+		/// a new month of trading. 
+		/// </summary>
+		/// <param name="currentDate">Current date of the simulation</param>
+		private void UpdateMonthlyAccountValue(DateTime currentDate)
+		{
+			if (_startingAccountMonth != currentDate.Month)
+			{
+				_startingAccountMonth = currentDate.Month;
+				_startingMonthAccountValue = Broker.CurrentAccountValue;
+			}
 		}
 
 		/// <summary>

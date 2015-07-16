@@ -17,6 +17,7 @@ namespace StockSimulator.Core
 		public List<List<object>> AccountValue { get; set; }
 		
 		public double AccountCash { get; set; }
+		public double CurrentAccountValue { get; set; }
 
 		/// <summary>
 		/// Initializes the broker.
@@ -26,6 +27,7 @@ namespace StockSimulator.Core
 		public Broker(double startingCash, int numberOfBars)
 		{
 			AccountCash = startingCash;
+			CurrentAccountValue = startingCash;
 			AccountValue = new List<List<object>>();
 		}
 

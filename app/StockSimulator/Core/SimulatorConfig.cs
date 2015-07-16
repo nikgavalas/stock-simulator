@@ -322,6 +322,12 @@ namespace StockSimulator.Core
 		[Description("Minimum price for a short order to be placed on a ticker")]
 		public double MinPriceForShort { get; set; }
 
+		[Category("Main Strategy")]
+		[PropertyOrder(7)]
+		[DisplayName("Max Monthly Loss")]
+		[Description("Maximum amount of money to be lost per month before we call it quits for the month")]
+		public double MaxMonthlyLoss { get; set; }
+
 		/////////////////////////// BRESSERT STRATEGY /////////////////////////////
 
 		[Category("Bressert Strategy")]
@@ -416,6 +422,7 @@ namespace StockSimulator.Core
 			NumBarsToDelayStart = 250;
 			MinPriceForOrder = 0.75;
 			MinPriceForShort = 5.00;
+			MaxMonthlyLoss = 15000;
 			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\test.csv";
 			
 			// Bressert Strategy
