@@ -344,10 +344,13 @@ namespace StockSimulator.Core
 						// $100,000 and we double it in 2 years. We don't want to be investing our $200,000 worth
 						// of cash. We still want to work with our original amount. This way we can see how much 
 						// of a bankroll we'll need to make a living off investing.
+						if (_activeOrders.Count >= Config.MaxOpenOrders || currentCount >= Config.MaxOrdersPerBar)
+						{
+							break;
+						}
+
 						// Also limit our losses and make sure we have not lost too much money this month.
-						if (_activeOrders.Count >= Config.MaxOpenOrders ||
-							currentCount >= Config.MaxOrdersPerBar ||
-							_startingMonthAccountValue - Broker.CurrentAccountValue > Simulator.Config.MaxMonthlyLoss)
+						if (_startingMonthAccountValue - Broker.CurrentAccountValue > Simulator.Config.MaxMonthlyLoss)
 						{
 							break;
 						}
