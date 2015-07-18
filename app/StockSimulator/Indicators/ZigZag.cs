@@ -145,7 +145,7 @@ namespace StockSimulator.Indicators
 			if (!useHighLow)
 			{
 				highSeries = Data.Close;
-				lowSeries = Data.Open;
+				lowSeries = Data.Close;
 			}
 
 			// Calculation always for 1-bar ago!
