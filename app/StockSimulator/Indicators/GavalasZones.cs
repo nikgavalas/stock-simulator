@@ -19,7 +19,7 @@ namespace StockSimulator.Indicators
 		/// <summary>
 		/// Buy zone class
 		/// </summary>
-		private class PriceZone
+		public class PriceZone
 		{
 			public double High { get; set; }
 			public double Low { get; set; }
@@ -49,6 +49,8 @@ namespace StockSimulator.Indicators
 			_162,
 			Count
 		}
+
+		public List<PriceZone> HitZone { get; set; }
 
 		public List<double>[] External { get; set; }
 		public List<double>[] Internal { get; set; }
@@ -95,6 +97,8 @@ namespace StockSimulator.Indicators
 
 			MaxSimulationBars = 1;
 			MaxPlotBars = 150;
+
+			HitZone = UtilityMethods.CreateList<PriceZone>(Data.NumBars, null);
 
 			BuyDirection = UtilityMethods.CreateList<double>(Data.NumBars, 0d);
 			
@@ -233,6 +237,8 @@ namespace StockSimulator.Indicators
 			// Zero out all the values for the plot.
 			for (int i = currentBar; i >= currentBar - MaxPlotBars && i >= 0; i--)
 			{
+				HitZone[i] = null;
+
 				External[(int)ExternalType._127][i] = 0.0;
 				External[(int)ExternalType._162][i] = 0.0;
 				Alternate[(int)AlternateType._62][i] = 0.0;
@@ -312,6 +318,7 @@ namespace StockSimulator.Indicators
 				if ((highPrice >= zone.High && lowPrice <= zone.Low) ||
 					(highPrice >= zone.Low && lowPrice <= zone.High))
 				{
+					HitZone[barNum] = zone;
 					return true;
 				}
 			}

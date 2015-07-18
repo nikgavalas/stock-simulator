@@ -57,6 +57,8 @@ namespace StockSimulator.Strategies
 			// and allow it to adapt to different stocks.
 			GavalasZones zones = (GavalasZones)_dependents[0];
 			zones.SetZigZagDeviation(lastAtrValue * 1.0);
+			GavalasHistogram histo = (GavalasHistogram)_dependents[2];
+			histo.SetZigZagDeviation(lastAtrValue * 1.0);
 		}
 
 		/// <summary>
@@ -176,6 +178,12 @@ namespace StockSimulator.Strategies
 				return false;
 			}
 
+			GavalasHistogram histo = (GavalasHistogram)_dependents[2];
+			if (histo.Value[currentBar] < 1)
+			{
+				return false;
+			}
+
 			GavalasZones zones = (GavalasZones)_dependents[0];
 			if (zones.DidBarTouchZone(Data.Low[currentBar], Data.High[currentBar], currentBar) == false)
 			{
@@ -263,6 +271,7 @@ namespace StockSimulator.Strategies
 				return new KeyValuePair<string, object>("slopeall", (object)Math.Round(ind.AllBestFitLineSlope[currentBar], 2));
 			});
 
+			// Num bars of the waves
 			o.AddExtraInfo(() =>
 			{
 				GavalasZones ind = (GavalasZones)_dependents[0];
@@ -286,42 +295,77 @@ namespace StockSimulator.Strategies
 				int barLength = waves.Points[2].Bar - waves.Points[3].Bar;
 				return new KeyValuePair<string, object>("wave1bars", barLength);
 			});
-			
+
+			// Wave diffs between the points.
 			o.AddExtraInfo(() =>
 			{
-				DmiAdx ind = (DmiAdx)_dependents[3];
-				return new KeyValuePair<string, object>("adx", (object)Math.Round(ind.Adx[currentBar], 2));
+				GavalasZones ind = (GavalasZones)_dependents[0];
+				ZigZagWaves.WaveData waves = ind.GetWaveData(currentBar);
+				return new KeyValuePair<string, object>("wave3diff", (object)Math.Round(waves.Points[0].Retracement, 2));
 			});
 
 			o.AddExtraInfo(() =>
 			{
-				DmiAdx ind = (DmiAdx)_dependents[3];
-				return new KeyValuePair<string, object>("dmi+", (object)Math.Round(ind.DmiPlus[currentBar], 2));
+				GavalasZones ind = (GavalasZones)_dependents[0];
+				ZigZagWaves.WaveData waves = ind.GetWaveData(currentBar);
+				return new KeyValuePair<string, object>("wave2diff", (object)Math.Round(waves.Points[1].Retracement, 2));
 			});
 
 			o.AddExtraInfo(() =>
 			{
-				DmiAdx ind = (DmiAdx)_dependents[3];
-				return new KeyValuePair<string, object>("dmi-", (object)Math.Round(ind.DmiMinus[currentBar], 2));
+				GavalasZones ind = (GavalasZones)_dependents[0];
+				ZigZagWaves.WaveData waves = ind.GetWaveData(currentBar);
+				return new KeyValuePair<string, object>("wave1diff", (object)Math.Round(waves.Points[2].Retracement, 2));
+			});
+
+			// Zone info.
+			o.AddExtraInfo(() =>
+			{
+				GavalasZones ind = (GavalasZones)_dependents[0];
+				return new KeyValuePair<string, object>("zonewidth", (object)Math.Round(UtilityMethods.PercentChange(ind.HitZone[currentBar].Low, ind.HitZone[currentBar].High), 2));
 			});
 
 			o.AddExtraInfo(() =>
 			{
-				Atr ind = (Atr)_dependents[5];
-				return new KeyValuePair<string, object>("atrnorm", (object)Math.Round(ind.ValueNormalized[currentBar], 4));
+				GavalasZones ind = (GavalasZones)_dependents[0];
+				return new KeyValuePair<string, object>("zonepoints", ind.HitZone[currentBar].NumberOfPoints);
 			});
 
-			o.AddExtraInfo(() =>
-			{
-				Ppo ind = (Ppo)_dependents[6];
-				return new KeyValuePair<string, object>("ppo", (object)Math.Round(ind.Value[currentBar], 2));
-			});
+			//o.AddExtraInfo(() =>
+			//{
+			//	DmiAdx ind = (DmiAdx)_dependents[3];
+			//	return new KeyValuePair<string, object>("adx", (object)Math.Round(ind.Adx[currentBar], 2));
+			//});
 
-			o.AddExtraInfo(() =>
-			{
-				Ppo ind = (Ppo)_dependents[6];
-				return new KeyValuePair<string, object>("pposmooth", (object)Math.Round(ind.Smoothed[currentBar], 2));
-			});
+			//o.AddExtraInfo(() =>
+			//{
+			//	DmiAdx ind = (DmiAdx)_dependents[3];
+			//	return new KeyValuePair<string, object>("dmi+", (object)Math.Round(ind.DmiPlus[currentBar], 2));
+			//});
+
+			//o.AddExtraInfo(() =>
+			//{
+			//	DmiAdx ind = (DmiAdx)_dependents[3];
+			//	return new KeyValuePair<string, object>("dmi-", (object)Math.Round(ind.DmiMinus[currentBar], 2));
+			//});
+
+			//o.AddExtraInfo(() =>
+			//{
+			//	Atr ind = (Atr)_dependents[5];
+			//	return new KeyValuePair<string, object>("atrnorm", (object)Math.Round(ind.ValueNormalized[currentBar], 4));
+			//});
+
+			//o.AddExtraInfo(() =>
+			//{
+			//	Ppo ind = (Ppo)_dependents[6];
+			//	return new KeyValuePair<string, object>("ppo", (object)Math.Round(ind.Value[currentBar], 2));
+			//});
+
+			//o.AddExtraInfo(() =>
+			//{
+			//	Ppo ind = (Ppo)_dependents[6];
+			//	return new KeyValuePair<string, object>("pposmooth", (object)Math.Round(ind.Smoothed[currentBar], 2));
+			//});
 		}
 	}
 }

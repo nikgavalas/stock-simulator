@@ -30,10 +30,10 @@ namespace StockSimulator.Indicators
 		/// </summary>
 		public class WavePoint
 		{
+			public double Retracement { get; set; }
 			public double Price { get; set; }
 			public int Bar { get; set; }
 		}
-
 
 		public List<WaveData> Waves { get; set; }
 
@@ -130,7 +130,12 @@ namespace StockSimulator.Indicators
 				// Each time we find a zigzag point, save the price and move to the next one for searching.
 				else if (currentSeries != null && currentSeries[i] > 0.0)
 				{
-					points.Add(new WavePoint() { Bar = i, Price = zigzag.Value[i] });
+					// Calculate the retracement in percentage from the previous point.
+					WavePoint previousPoint = points[points.Count - 1];
+					double retracement = UtilityMethods.PercentChange(zigzag.Value[i], previousPoint.Price);
+					previousPoint.Retracement = retracement;
+
+					points.Add(new WavePoint() { Bar = i, Price = zigzag.Value[i], Retracement = 0.0 });
 					currentSeries = currentSeries == zigzag.ZigZagHighs ? zigzag.ZigZagLows : zigzag.ZigZagHighs;
 					++pointBeingSearchFor;
 				}

@@ -259,5 +259,31 @@ namespace StockSimulator.Core
 				list[i] = val;
 			}
 		}
+
+		/// <summary>
+		/// Returns a new list with the outlier values removed.
+		/// http://www.ehow.com/how_5201412_calculate-outliers.html
+		/// https://en.wikipedia.org/wiki/Quartile
+		/// http://stackoverflow.com/questions/3141692/standard-deviation-of-generic-list
+		/// </summary>
+		/// <param name="list">List to filter from</param>
+		/// <returns>See summary</returns>
+		public static void FilterOutliers(this List<int> list)
+		{
+			if (list.Count() > 0)
+			{
+				// Compute the Average      
+				double avg = list.Average();
+				// Perform the Sum of (value-avg)_2_2      
+				double sum = list.Sum(d => Math.Pow(d - avg, 2));
+				// Put it all together      
+				double stddev = Math.Sqrt((sum) / (list.Count() - 1));
+				double stddevPlus3 = avg + stddev * 1.1;
+				double stddevMinus3 = avg - stddev * 1.1;
+
+				list.RemoveAll(x => x < stddevMinus3 || x > stddevPlus3);
+			}
+		}
+
 	}
 }

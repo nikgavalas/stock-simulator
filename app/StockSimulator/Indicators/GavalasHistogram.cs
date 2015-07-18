@@ -132,15 +132,15 @@ namespace StockSimulator.Indicators
 				List<ZigZagWaves.WavePoint> points = zigzag.Waves[currentBar].Points;
 
 				// External retracements are last point minus the one before projected from the last point.
-				int externalDiff = points[0].Bar - points[1].Bar;
-				AddValueToHistogram(points[0].Bar + Convert.ToInt32(externalDiff * 1.272));
-				AddValueToHistogram(points[0].Bar + Convert.ToInt32(externalDiff * 1.618));
+				//int externalDiff = points[0].Bar - points[1].Bar;
+				//AddValueToHistogram(points[0].Bar + Convert.ToInt32(externalDiff * 1.272));
+				//AddValueToHistogram(points[0].Bar + Convert.ToInt32(externalDiff * 1.618));
 
 				// Alternate retracements are the 2nd to last point minus the one right before it projected from the last point.
-				int alternateDiff = points[1].Bar - points[2].Bar;
-				AddValueToHistogram(points[0].Bar + Convert.ToInt32(alternateDiff * 0.618));
-				AddValueToHistogram(points[0].Bar + alternateDiff);
-				AddValueToHistogram(points[0].Bar + Convert.ToInt32(alternateDiff * 1.618));
+				//int alternateDiff = points[1].Bar - points[2].Bar;
+				//AddValueToHistogram(points[0].Bar + Convert.ToInt32(alternateDiff * 0.618));
+				//AddValueToHistogram(points[0].Bar + alternateDiff);
+				//AddValueToHistogram(points[0].Bar + Convert.ToInt32(alternateDiff * 1.618));
 
 				// Internal retracements are the 2nd to last point minus the 3rd to last point projected from the last point.
 				//int interalDiff = points[2].Bar - points[3].Bar;
@@ -151,11 +151,39 @@ namespace StockSimulator.Indicators
 
 				// Add the last cycle averages for the opposite cycles since the last point
 				// is opposite the way we want to buy.
-				int cycleAverage = points[1].Bar - points[3].Bar;
-				cycleAverage += points[3].Bar - points[5].Bar;
-				cycleAverage = Convert.ToInt32(cycleAverage / 2.0);
-				AddValueToHistogram(points[0].Bar + cycleAverage);
+				List<int> cycleDiffs = new List<int>();
+				for (int i = 1; i < points.Count - 2 && i <= 9; i += 2)
+				{
+					cycleDiffs.Add(points[i].Bar - points[i + 2].Bar);
+				}
+				cycleDiffs.FilterOutliers();
+				for (int i = cycleDiffs.Min(); i < cycleDiffs.Max(); i++)
+				{
+					AddValueToHistogram(points[1].Bar + i);
+				}
+
+				// Add the low to high or high to low cycle and then project that from the last point.
+				cycleDiffs.Clear();
+				for (int i = 0; i < points.Count - 1 && i <= 8; i += 2)
+				{
+					cycleDiffs.Add(points[i].Bar - points[i + 1].Bar);
+				}
+				cycleDiffs.FilterOutliers();
+				for (int i = cycleDiffs.Min(); i < cycleDiffs.Max(); i++)
+				{
+					AddValueToHistogram(points[0].Bar + i);
+				}
 			}
+		}
+
+		/// <summary>
+		/// Sets the zigzag deviation value.
+		/// </summary>
+		/// <param name="deviation">New deviation value</param>
+		public void SetZigZagDeviation(double deviation)
+		{
+			ZigZagWaves zigzag = (ZigZagWaves)_dependents[0];
+			zigzag.SetZigZagDeviation(deviation);
 		}
 
 		/// <summary>
