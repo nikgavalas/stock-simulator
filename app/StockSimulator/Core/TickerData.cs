@@ -164,28 +164,32 @@ namespace StockSimulator.Core
 				}
 			}
 
-			if (copyEndIndex == -1 && end > Dates.Last())
+			if (copyStartIndex != -1)
 			{
-				copyEndIndex = Dates.Count - 1;
+				if (copyEndIndex == -1 && end > Dates.Last())
+				{
+					copyEndIndex = Dates.Count - 1;
+				}
+
+				int amountToCopy = (copyEndIndex - copyStartIndex) + 1;
+				copyData.Dates.AddRange(Dates.GetRange(copyStartIndex, amountToCopy));
+				copyData.Open.AddRange(Open.GetRange(copyStartIndex, amountToCopy));
+				copyData.Close.AddRange(Close.GetRange(copyStartIndex, amountToCopy));
+				copyData.High.AddRange(High.GetRange(copyStartIndex, amountToCopy));
+				copyData.Low.AddRange(Low.GetRange(copyStartIndex, amountToCopy));
+				copyData.Volume.AddRange(Volume.GetRange(copyStartIndex, amountToCopy));
+
+				// Extras
+				copyData.Typical.AddRange(Typical.GetRange(copyStartIndex, amountToCopy));
+				copyData.Median.AddRange(Median.GetRange(copyStartIndex, amountToCopy));
+				copyData.HigherTimeframeTrend.AddRange(HigherTimeframeTrend.GetRange(copyStartIndex, amountToCopy));
+
+				copyData.Start = copyData.Dates[0];
+				copyData.End = copyData.Dates[copyData.Dates.Count - 1];
+				copyData.NumBars = copyData.Dates.Count;
+				copyData.SaveDates();
 			}
 
-			int amountToCopy = (copyEndIndex - copyStartIndex) + 1;
-			copyData.Dates.AddRange(Dates.GetRange(copyStartIndex, amountToCopy));
-			copyData.Open.AddRange(Open.GetRange(copyStartIndex, amountToCopy));
-			copyData.Close.AddRange(Close.GetRange(copyStartIndex, amountToCopy));
-			copyData.High.AddRange(High.GetRange(copyStartIndex, amountToCopy));
-			copyData.Low.AddRange(Low.GetRange(copyStartIndex, amountToCopy));
-			copyData.Volume.AddRange(Volume.GetRange(copyStartIndex, amountToCopy));
-
-			// Extras
-			copyData.Typical.AddRange(Typical.GetRange(copyStartIndex, amountToCopy));
-			copyData.Median.AddRange(Median.GetRange(copyStartIndex, amountToCopy));
-			copyData.HigherTimeframeTrend.AddRange(HigherTimeframeTrend.GetRange(copyStartIndex, amountToCopy));
-
-			copyData.Start = copyData.Dates[0];
-			copyData.End = copyData.Dates[copyData.Dates.Count - 1];
-			copyData.NumBars = copyData.Dates.Count;
-			copyData.SaveDates();
 			return copyData;
 		}
 
@@ -294,7 +298,7 @@ namespace StockSimulator.Core
 		/// <returns>The bar if the date exists, otherwise -1</returns>
 		public int GetBar(DateTime date)
 		{
-			return _dateToBar.ContainsKey(date) ? _dateToBar[date] : -1;
+			return _dateToBar != null && _dateToBar.ContainsKey(date) ? _dateToBar[date] : -1;
 		}
 
 		/// <summary>
