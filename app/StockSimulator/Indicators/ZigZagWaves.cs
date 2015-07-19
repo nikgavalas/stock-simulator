@@ -44,7 +44,7 @@ namespace StockSimulator.Indicators
 			set { _minRequiredPoints = value; }
 		}
 
-		private int _minRequiredPoints = 6;
+		private int _minRequiredPoints = 8;
 		#endregion
 
 		private int _maxCycleLookback = 500;

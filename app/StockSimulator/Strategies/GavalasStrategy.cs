@@ -138,8 +138,8 @@ namespace StockSimulator.Strategies
 		{
 			return new List<BuyCondition>()
 			{
-				//new OneBarTrailingHighLow(2)
-				new MarketBuyCondition()
+				new OneBarTrailingHighLow(1)
+				//new MarketBuyCondition()
 			};
 		}
 
@@ -152,9 +152,9 @@ namespace StockSimulator.Strategies
 			// Always have a max time in market and an absolute stop for sell conditions.
 			return new List<SellCondition>()
 			{
-				new StopSellCondition(Simulator.Config.GavalasStopPercent, false),
+				//new StopSellCondition(Simulator.Config.GavalasStopPercent, false),
 				new ProfitSellCondition(Simulator.Config.GavalasProfitPercent),
-				//new StopOneBarTrailingHighLow(false),
+				new StopOneBarTrailingHighLow(false),
 				new MaxLengthSellCondition(Simulator.Config.GavalasMaxBarsOpen),
 			};
 		}
