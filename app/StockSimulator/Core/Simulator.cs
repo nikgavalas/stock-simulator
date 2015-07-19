@@ -366,11 +366,13 @@ namespace StockSimulator.Core
 							// before the end of the sim to complete the order we place.
 							if (barNumber < NumberOfBars && Broker.AccountCash > barStats.SizeOfOrder * 1.1)
 							{
+								double sizeOfOrder = GetOrderSize(strategyBarIndex, barStats.SizeOfOrder, barStats.StrategyOrderType, buyList[i].Data);
+
 								currentCount += EnterOrder(barStats.Statistics,
 									barStats.StrategyOrderType, 
 									buyList[i].Data, 
 									strategyBarIndex,
-									barStats.SizeOfOrder,
+									sizeOfOrder,
 									barStats.DependentIndicators,
 									barStats.BuyConditions,
 									barStats.SellConditions,
@@ -384,6 +386,28 @@ namespace StockSimulator.Core
 					}
 				}
 			}
+		}
+
+		/// <summary>
+		/// Returns the size the order should be based on performance.
+		/// </summary>
+		/// <param name="originalSize">Original size of the order returned from the strategy</param>
+		/// <param name="ticker">Ticker we are buying</param>
+		/// <returns>See summary</returns>
+		private double GetOrderSize(int currentBar, double originalSize, double orderType, TickerData ticker)
+		{
+			StrategyStatistics stats = Orders.GetStrategyStatistics("MainStrategy", orderType, ticker.TickerAndExchange, currentBar, Simulator.Config.MaxLookBackBars);
+
+			// Use the Kelly Criterion to compute how much to invest
+			// %K = W - [(1 - W) / R]
+			// W is the winning probability of the past trades.
+			// R is the win/loss ratio from the past trades.
+			double winPercent = orderType == Order.OrderType.Long ? stats.LongWinAvgPercent : stats.ShortWinPercent;
+			double avgGain = orderType == Order.OrderType.Long ? stats.LongWinAvg : stats.ShortWinAvg;
+			double avgLoss = orderType == Order.OrderType.Long ? stats.LongLossAvg : stats.ShortLossAvg;
+			double percentK = avgGain == 0.0 || avgLoss == 0.0 ? 1.0 : winPercent - ((1 - winPercent) / (avgGain / avgLoss));
+
+			return originalSize * percentK;
 		}
 
 		/// <summary>
