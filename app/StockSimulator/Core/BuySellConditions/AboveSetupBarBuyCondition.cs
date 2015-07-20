@@ -13,7 +13,7 @@ namespace StockSimulator.Core.BuySellConditions
 		/// <summary>
 		/// Constructor
 		/// </summary>
-		/// <param name="strategy">Strategy that when found will trigger a sell</param>
+		/// <param name="maxBarsToFill">How many bars we're allowed to be open and not filled before we cancel the order</param>
 		public AboveSetupBarBuyCondition(int maxBarsToFill)
 			: base()
 		{

@@ -140,6 +140,7 @@ namespace StockSimulator.Strategies
 			{
 				//new OneBarTrailingHighLow(1)
 				new MarketBuyCondition()
+				//new DirectionBuyCondition(1)
 			};
 		}
 
