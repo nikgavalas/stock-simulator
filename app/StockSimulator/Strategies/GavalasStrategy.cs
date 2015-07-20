@@ -112,7 +112,7 @@ namespace StockSimulator.Strategies
 
 					AddExtraOrderInfo(placedOrder, currentBar);
 
-					if (orderStats.WinPercent >= Simulator.Config.GavalasPercentForBuy && orderStats.Gain > Simulator.Config.GavalasGainForBuy)
+					//if (orderStats.WinPercent >= Simulator.Config.GavalasPercentForBuy && orderStats.Gain > Simulator.Config.GavalasGainForBuy)
 					{
 						Bars[currentBar] = new OrderSuggestion(
 							orderStats.WinPercent,
@@ -138,8 +138,8 @@ namespace StockSimulator.Strategies
 		{
 			return new List<BuyCondition>()
 			{
-				new OneBarTrailingHighLow(1)
-				//new MarketBuyCondition()
+				//new OneBarTrailingHighLow(1)
+				new MarketBuyCondition()
 			};
 		}
 
@@ -152,9 +152,9 @@ namespace StockSimulator.Strategies
 			// Always have a max time in market and an absolute stop for sell conditions.
 			return new List<SellCondition>()
 			{
-				//new StopSellCondition(Simulator.Config.GavalasStopPercent, false),
+				new StopSellCondition(Simulator.Config.GavalasStopPercent, false),
 				new ProfitSellCondition(Simulator.Config.GavalasProfitPercent),
-				new StopOneBarTrailingHighLow(false),
+				//new StopOneBarTrailingHighLow(false),
 				new MaxLengthSellCondition(Simulator.Config.GavalasMaxBarsOpen),
 			};
 		}
@@ -178,11 +178,11 @@ namespace StockSimulator.Strategies
 				return false;
 			}
 
-			GavalasHistogram histo = (GavalasHistogram)_dependents[2];
-			if (histo.Value[currentBar] < 1)
-			{
-				return false;
-			}
+			//GavalasHistogram histo = (GavalasHistogram)_dependents[2];
+			//if (histo.Value[currentBar] < 1)
+			//{
+			//	return false;
+			//}
 
 			GavalasZones zones = (GavalasZones)_dependents[0];
 			if (zones.DidBarTouchZone(Data.Low[currentBar], Data.High[currentBar], currentBar) == false)
@@ -212,13 +212,6 @@ namespace StockSimulator.Strategies
 			{
 				return false;
 			}
-
-			// Are we in a very strong downtrend? If so the upside is limited.
-			//DmiAdx dmiAdx = (DmiAdx)_dependents[3];
-			//if (dmiAdx.DmiMinus[currentBar] > 35.0 && dmiAdx.DmiPlus[currentBar] < 10.0)
-			//{
-			//	return false;
-			//}
 
 			return true;
 		}
