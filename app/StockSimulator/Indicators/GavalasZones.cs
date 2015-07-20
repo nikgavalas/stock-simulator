@@ -312,6 +312,15 @@ namespace StockSimulator.Indicators
 		public bool DidBarTouchZone(double lowPrice, double highPrice, int barNum)
 		{
 			List<PriceZone> zones = GetZones(barNum);
+
+			// Get a list of all the zones with more than 2 points and if there are
+			// any that these are the better zones to use.
+			//List<PriceZone> betterZones = zones.Where(z => z.NumberOfPoints > 2).ToList();
+			//if (betterZones.Count > 0)
+			//{
+			//	zones = betterZones;
+			//}
+
 			for (int i = 0; i < zones.Count; i++)
 			{
 				PriceZone zone = zones[i];
@@ -379,6 +388,13 @@ namespace StockSimulator.Indicators
 			SaveLineOfBestFit(AllBestFitLine, all, AllBestFitLineSlope, currentBar);
 		}
 
+		/// <summary>
+		/// Saves the line in the plotseries for graphing.
+		/// </summary>
+		/// <param name="pointSeries">Plot series</param>
+		/// <param name="points">List of points</param>
+		/// <param name="slopeSeries">Slope series</param>
+		/// <param name="currentBar">Current bar of the simulation</param>
 		private void SaveLineOfBestFit(List<double> pointSeries, List<ZigZagWaves.WavePoint> points, List<double> slopeSeries, int currentBar)
 		{
 			double lineSlope;
@@ -483,6 +499,16 @@ namespace StockSimulator.Indicators
 		private bool AreAllPointsClose(List<double> points)
 		{
 			bool closeEnough = true;
+
+			//points.Sort();
+			//for (int i = 0; i < points.Count - 1; i++)
+			//{
+			//	if (Math.Abs(UtilityMethods.PercentChange(points[i], points[i + 1])) > MaxZonePercent)
+			//	{
+			//		closeEnough = false;
+			//		break;
+			//	}
+			//}
 
 			for (int i = 0; i < points.Count; i++)
 			{
