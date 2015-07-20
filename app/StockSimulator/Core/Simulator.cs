@@ -396,18 +396,25 @@ namespace StockSimulator.Core
 		/// <returns>See summary</returns>
 		private double GetOrderSize(int currentBar, double originalSize, double orderType, TickerData ticker)
 		{
-			StrategyStatistics stats = Orders.GetStrategyStatistics("MainStrategy", orderType, ticker.TickerAndExchange, currentBar, Simulator.Config.MaxLookBackBars);
+			StrategyStatistics stats = Orders.GetStrategyStatistics("MainStrategy", orderType, null, currentBar, Simulator.Config.MaxLookBackBars);
 
 			// Use the Kelly Criterion to compute how much to invest
 			// %K = W - [(1 - W) / R]
 			// W is the winning probability of the past trades.
 			// R is the win/loss ratio from the past trades.
-			double winPercent = orderType == Order.OrderType.Long ? stats.LongWinAvgPercent : stats.ShortWinPercent;
+			double winPercent = (orderType == Order.OrderType.Long ? stats.LongWinPercent : stats.ShortWinPercent) / 100.0;
 			double avgGain = orderType == Order.OrderType.Long ? stats.LongWinAvg : stats.ShortWinAvg;
 			double avgLoss = orderType == Order.OrderType.Long ? stats.LongLossAvg : stats.ShortLossAvg;
-			double percentK = avgGain == 0.0 || avgLoss == 0.0 ? 1.0 : winPercent - ((1 - winPercent) / (avgGain / avgLoss));
+			double percentK = avgGain == 0.0 || avgLoss == 0.0 ? 1.0 : winPercent - ((1 - winPercent) / (Math.Abs(avgGain) / Math.Abs(avgLoss)));
 
-			return originalSize * percentK;
+			// Minimum investment percent since we got this order for a reason, so we want
+			// to invest something.
+			if (percentK < 0.25)
+			{
+				percentK = 0.25;
+			}
+
+			return originalSize;// *percentK;
 		}
 
 		/// <summary>
