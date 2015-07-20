@@ -121,29 +121,47 @@ namespace StockSimulator.Core
 				cutoffBar = 0;
 			}
 
+			// Get the list of orders to search.
 			StrategyStatistics stats = new StrategyStatistics(strategyName, orderType);
-
-			int tickerKey = tickerAndExchange.GetHashCode();
-			if (TickerStrategyOrders.ContainsKey(tickerKey))
+			List<Order> orderList = null;
+			if (strategyName.Length > 0 && tickerAndExchange == null)
 			{
-				Dictionary<int, List<Order>> tickerDictionary = TickerStrategyOrders[tickerKey];
-
 				int strategyKey = strategyName.GetHashCode();
-				if (tickerDictionary.ContainsKey(strategyKey))
+				if (StrategyDictionary.ContainsKey(strategyKey))
 				{
-					List<Order> tickerOrders = tickerDictionary[strategyKey];
+					orderList = StrategyDictionary[strategyKey].ToList();
+				}
+			}
+			else if (tickerAndExchange != null)
+			{
+				int tickerKey = tickerAndExchange.GetHashCode();
+				if (TickerStrategyOrders.ContainsKey(tickerKey))
+				{
+					Dictionary<int, List<Order>> tickerDictionary = TickerStrategyOrders[tickerKey];
 
-					for (int i = tickerOrders.Count - 1; i >= 0; i--)
+					int strategyKey = strategyName.GetHashCode();
+					if (tickerDictionary.ContainsKey(strategyKey))
 					{
-						Order order = tickerOrders[i];
+						orderList = tickerDictionary[strategyKey];
+					}
+				}
+			}
 
-						// Add orders that are newer than the maximum lookback and only keep a set
-						// amount of orders.
-						if (order.IsFinished() && order.BuyBar >= cutoffBar &&
-							stats.NumberOfOrders < Simulator.Config.MaxLookBackOrders)
-						{
-							stats.AddOrder(order);
-						}
+			if (orderList != null)
+			{
+				for (int i = orderList.Count - 1; i >= 0; i--)
+				{
+					Order order = orderList[i];
+
+					// Add orders that are newer than the maximum lookback and only keep a set
+					// amount of orders.
+					if (order.IsFinished() && 
+						order.StrategyName == strategyName &&
+						order.BuyBar >= cutoffBar && 
+						order.Type == orderType &&
+						stats.NumberOfOrders < Simulator.Config.MaxLookBackOrders)
+					{
+						stats.AddOrder(order);
 					}
 				}
 			}

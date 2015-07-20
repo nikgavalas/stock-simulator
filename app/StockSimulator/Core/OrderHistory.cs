@@ -65,21 +65,38 @@ namespace StockSimulator.Core
 				cutoffBar = 0;
 			}
 
+			// Get the list of orders to search.
 			StrategyStatistics stats = new StrategyStatistics(strategyName, orderType);
-
-			int tickerHash = tickerAndExchange.GetHashCode();
-			if (TickerDictionary.ContainsKey(tickerHash))
+			List<Order> orderList = null;
+			if (strategyName.Length > 0 && tickerAndExchange == null)
 			{
-				List<Order> tickerOrders = TickerDictionary[tickerHash];
-
-				for (int i = tickerOrders.Count - 1; i >= 0; i--)
+				int strategyKey = strategyName.GetHashCode();
+				if (StrategyDictionary.ContainsKey(strategyKey))
 				{
-					Order order = tickerOrders[i];
+					orderList = StrategyDictionary[strategyKey].ToList();
+				}
+			}
+			else if (tickerAndExchange != null)
+			{
+				int tickerHash = tickerAndExchange.GetHashCode();
+				if (TickerDictionary.ContainsKey(tickerHash))
+				{
+					orderList = TickerDictionary[tickerHash];
+				}
+			}
 
-					// For the date
-					if (order.IsFinished() && order.StrategyName == strategyName &&
-						order.BuyBar >= cutoffBar && stats.NumberOfOrders < Simulator.Config.MaxLookBackOrders)
-					{ 
+			if (orderList != null)
+			{
+				for (int i = orderList.Count - 1; i >= 0; i--)
+				{
+					Order order = orderList[i];
+
+					if (order.IsFinished() && 
+						order.StrategyName == strategyName &&
+						order.BuyBar >= cutoffBar && 
+						order.Type == orderType &&
+						stats.NumberOfOrders < Simulator.Config.MaxLookBackOrders)
+					{
 						stats.AddOrder(order);
 					}
 				}
