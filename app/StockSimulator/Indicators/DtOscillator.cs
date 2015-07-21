@@ -23,7 +23,11 @@ namespace StockSimulator.Indicators
 		public int PeriodRsi
 		{
 			get { return _periodRsi; }
-			set { _periodRsi = value; }
+			set 
+			{ 
+				_periodRsi = value;
+				((Rsi)_dependents[0]).Period = _periodRsi;
+			}
 		}
 
 		public int PeriodStoch
@@ -44,10 +48,10 @@ namespace StockSimulator.Indicators
 			set { _periodSD = value; }
 		}
 		
-		private int _periodRsi = 13;
-		private int _periodStoch = 8;
-		private int _periodSK = 5;
-		private int _periodSD = 5;
+		private int _periodRsi = 8;
+		private int _periodStoch = 5;
+		private int _periodSK = 3;
+		private int _periodSD = 3;
 		#endregion
 
 		/// <summary>
