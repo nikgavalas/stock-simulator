@@ -191,6 +191,13 @@ namespace StockSimulator.Strategies
 				return false;
 			}
 
+			//ZigZagWaves.WaveData waveData = zones.GetWaveData(currentBar);
+			//double avgWaveHeight = (Math.Abs(waveData.Points[0].Retracement) + Math.Abs(waveData.Points[1].Retracement) + Math.Abs(waveData.Points[2].Retracement)) / 3;
+			//if (avgWaveHeight < 4)
+			//{
+			//	return false;
+			//}
+
 			return true;
 		}
 
