@@ -448,21 +448,22 @@ namespace StockSimulator.Core
 							break;
 						}
 
-						// Add the data to our object.
-						double open = 0;
-						double high = 0;
-						double low = 0;
-						double close = 0;
-						long volume = 0;
-					
-						if (IsDataFieldValid(splitData, 1) && IsDataFieldValid(splitData, 2) && IsDataFieldValid(splitData, 3) && IsDataFieldValid(splitData, 4) && IsDataFieldValid(splitData, 5))
+						// Sometimes google has random 0's or 0.01 values for things so we'll just skip those bars.
+						if (!IsDataFieldValid(splitData, 1) || 
+							!IsDataFieldValid(splitData, 2) || 
+							!IsDataFieldValid(splitData, 3) ||
+							!IsDataFieldValid(splitData, 4) ||
+							!IsDataFieldValid(splitData, 5))
 						{
-							open = Convert.ToDouble(splitData[1]);
-							high = Convert.ToDouble(splitData[2]);
-							low = Convert.ToDouble(splitData[3]);
-							close = Convert.ToDouble(splitData[4]);
-							volume = Convert.ToInt64(splitData[5]);
+							continue;
 						}
+
+						// Add the data to our object.
+						double open = Convert.ToDouble(splitData[1]);
+						double high = Convert.ToDouble(splitData[2]);
+						double low = Convert.ToDouble(splitData[3]);
+						double close = Convert.ToDouble(splitData[4]);
+						long volume = Convert.ToInt64(splitData[5]);
 
 						tickerData.Dates.Add(lineDate);
 						tickerData.Open.Add(open);
@@ -471,21 +472,6 @@ namespace StockSimulator.Core
 						tickerData.Close.Add(close);
 						tickerData.Volume.Add(volume);
 						tickerData.NumBars = tickerData.Dates.Count;
-
-						// Google has a weird bug where sometimes the open price will turn out to be
-						// zero for some random bars. If this happens we'll just hack it now so that 
-						// the open price = the close from the previous day.
-						if (tickerData.Open[tickerData.Open.Count - 1] <= 0)
-						{
-							tickerData.Open[tickerData.Open.Count - 1] = (tickerData.Close.Count > 1) 
-								? tickerData.Close[tickerData.Close.Count - 2]
-								: tickerData.Close[tickerData.Close.Count - 1];
-							//Simulator.WriteMessage("[" + ticker.ToString() + "] Open price 0 for bar: " + (tickerData.Open.Count - 1));
-						}
-						if (tickerData.Close[tickerData.Close.Count - 1] <= 0)
-						{
-							//Simulator.WriteMessage("[" + ticker.ToString() + "] Close price 0 for bar: " + (tickerData.Open.Count - 1));
-						}
 
 						// If this data is from the disk we don't need to calculate the extra fields since
 						// we've already saved them in the file.
@@ -528,7 +514,7 @@ namespace StockSimulator.Core
 		/// <param name="index">Index to verify</param>
 		private bool IsDataFieldValid(string[] data, int index)
 		{
-			return index < data.Length && data[index] != "-";
+			return index < data.Length && data[index] != "-" && Convert.ToDouble(data[index]) > 0.01;
 		}
 
 		/// <summary>
