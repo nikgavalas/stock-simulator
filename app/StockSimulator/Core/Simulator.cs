@@ -60,6 +60,7 @@ namespace StockSimulator.Core
 
 		private int _startingAccountMonth = 0;
 		private double _startingMonthAccountValue = 0.0;
+		private bool _isMonthlyLossExceeded = false;
 
 		/// <summary>
 		/// Constructor
@@ -350,7 +351,7 @@ namespace StockSimulator.Core
 						}
 
 						// Also limit our losses and make sure we have not lost too much money this month.
-						if (_startingMonthAccountValue - Broker.CurrentAccountValue > Simulator.Config.MaxMonthlyLoss)
+						if (_isMonthlyLossExceeded)
 						{
 							break;
 						}
@@ -489,6 +490,11 @@ namespace StockSimulator.Core
 			{
 				_startingAccountMonth = currentDate.Month;
 				_startingMonthAccountValue = Broker.CurrentAccountValue;
+				_isMonthlyLossExceeded = false;
+			}
+			else if (_startingMonthAccountValue - Broker.CurrentAccountValue > Simulator.Config.MaxMonthlyLoss)
+			{
+				_isMonthlyLossExceeded = true;
 			}
 		}
 
