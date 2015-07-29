@@ -31,7 +31,7 @@ namespace StockSimulator.Strategies
 				new DmiAdx(tickerData),
 				new AverageVolume(tickerData),
 				new Atr(tickerData),
-				new Ppo(tickerData)
+				new KeltnerChannel(tickerData)
 			};
 		}
 
@@ -191,12 +191,12 @@ namespace StockSimulator.Strategies
 				return false;
 			}
 
-			//ZigZagWaves.WaveData waveData = zones.GetWaveData(currentBar);
-			//double avgWaveHeight = (Math.Abs(waveData.Points[0].Retracement) + Math.Abs(waveData.Points[1].Retracement) + Math.Abs(waveData.Points[2].Retracement)) / 3;
-			//if (avgWaveHeight < 4)
-			//{
-			//	return false;
-			//}
+			ZigZagWaves.WaveData waveData = zones.GetWaveData(currentBar);
+			double avgWaveHeight = (Math.Abs(waveData.Points[0].Retracement) + Math.Abs(waveData.Points[1].Retracement) + Math.Abs(waveData.Points[2].Retracement)) / 3;
+			if (avgWaveHeight < 4)
+			{
+				return false;
+			}
 
 			return true;
 		}
@@ -356,17 +356,23 @@ namespace StockSimulator.Strategies
 			//	return new KeyValuePair<string, object>("atrnorm", (object)Math.Round(ind.ValueNormalized[currentBar], 4));
 			//});
 
-			//o.AddExtraInfo(() =>
-			//{
-			//	Ppo ind = (Ppo)_dependents[6];
-			//	return new KeyValuePair<string, object>("ppo", (object)Math.Round(ind.Value[currentBar], 2));
-			//});
+			o.AddExtraInfo(() =>
+			{
+				KeltnerChannel ind = (KeltnerChannel)_dependents[6];
+				return new KeyValuePair<string, object>("keltlow", (object)Math.Round(ind.Lower[currentBar], 2));
+			});
 
-			//o.AddExtraInfo(() =>
-			//{
-			//	Ppo ind = (Ppo)_dependents[6];
-			//	return new KeyValuePair<string, object>("pposmooth", (object)Math.Round(ind.Smoothed[currentBar], 2));
-			//});
+			o.AddExtraInfo(() =>
+			{
+				KeltnerChannel ind = (KeltnerChannel)_dependents[6];
+				return new KeyValuePair<string, object>("keltmid", (object)Math.Round(ind.Midline[currentBar], 2));
+			});
+
+			o.AddExtraInfo(() =>
+			{
+				KeltnerChannel ind = (KeltnerChannel)_dependents[6];
+				return new KeyValuePair<string, object>("keltup", (object)Math.Round(ind.Upper[currentBar], 2));
+			});
 		}
 	}
 }

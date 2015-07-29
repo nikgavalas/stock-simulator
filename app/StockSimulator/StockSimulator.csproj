@@ -167,7 +167,7 @@
     <None Include="Indicators\EaseOfMovement.cs" />
     <Compile Include="Indicators\ElliotWaves.cs" />
     <None Include="Indicators\FibonacciZones.cs" />
-    <None Include="Indicators\KeltnerChannel.cs" />
+    <Compile Include="Indicators\KeltnerChannel.cs" />
     <None Include="Indicators\Momentum.cs" />
     <None Include="Indicators\PriceOscillator.cs" />
     <None Include="Indicators\Rsi3m3.cs" />

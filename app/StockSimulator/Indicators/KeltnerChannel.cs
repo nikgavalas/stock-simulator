@@ -20,11 +20,27 @@ namespace StockSimulator.Indicators
 		
 		private List<double> _diff { get; set; }
 
+		#region Configurables
+		public int Period
+		{
+			get { return _period; }
+			set { _period = value; }
+		}
+
+		public double OffsetMultiplier
+		{
+			get { return offsetMultiplier; }
+			set { offsetMultiplier = value; }
+		}
+
 		private int _period = 10;
 		private double offsetMultiplier = 1.5;
+		#endregion
 
-		public KeltnerChannel(TickerData tickerData, RunnableFactory factory)
-			: base(tickerData, factory)
+
+
+		public KeltnerChannel(TickerData tickerData)
+			: base(tickerData)
 		{
 			Midline = Enumerable.Repeat(0d, Data.NumBars).ToList();
 			Upper = Enumerable.Repeat(0d, Data.NumBars).ToList();
@@ -51,45 +67,55 @@ namespace StockSimulator.Indicators
 		}
 
 		/// <summary>
-		/// Save the indicator data in a serialization friendly way.
+		/// Creates the plots for the data to be added to.
 		/// </summary>
-		public override void PrepareForSerialization()
+		public override void CreatePlots()
 		{
-			base.PrepareForSerialization();
+			base.CreatePlots();
 
 			// Add the indicator for plotting
-			PlotSeries plotMidline = new PlotSeries("line");
-			PlotSeries plotUpper = new PlotSeries("line");
-			PlotSeries plotLower = new PlotSeries("line");
-			ChartPlots[ToString() + " Midline"] = plotMidline;
-			ChartPlots[ToString() + " Upper"] = plotUpper;
-			ChartPlots[ToString() + " Lower"] = plotLower;
-			for (int i = 0; i < Data.Dates.Count; i++)
+			ChartPlots[ToString() + " Midline"] = new PlotSeries("line");
+			ChartPlots[ToString() + " Upper"] = new PlotSeries("line");
+			ChartPlots[ToString() + " Lower"] = new PlotSeries("line");
+		}
+
+		/// <summary>
+		/// Adds data to the created plots for the indicator at the current bar.
+		/// </summary>
+		/// <param name="currentBar"></param>
+		public override void AddToPlots(int currentBar)
+		{
+			base.AddToPlots(currentBar);
+
+			long ticks = UtilityMethods.UnixTicks(Data.Dates[currentBar]);
+
+			PlotSeries line = (PlotSeries)ChartPlots[ToString() + " Midline"];
+			line.PlotData.Add(new List<object>()
 			{
-				long ticks = UtilityMethods.UnixTicks(Data.Dates[i]);
-				plotMidline.PlotData.Add(new List<object>()
-				{
-					ticks,
-					Math.Round(Midline[i], 2)
-				});
-				plotUpper.PlotData.Add(new List<object>()
-				{
-					ticks,
-					Math.Round(Upper[i], 2)
-				});
-				plotLower.PlotData.Add(new List<object>()
-				{
-					ticks,
-					Math.Round(Lower[i], 2)
-				});
-			}
+				ticks,
+				Math.Round(Midline[currentBar], 2)
+			});
+
+			line = (PlotSeries)ChartPlots[ToString() + " Upper"]; 
+			line.PlotData.Add(new List<object>()
+			{
+				ticks,
+				Math.Round(Upper[currentBar], 2)
+			});
+
+			line = (PlotSeries)ChartPlots[ToString() + " Lower"]; 
+			line.PlotData.Add(new List<object>()
+			{
+				ticks,
+				Math.Round(Lower[currentBar], 2)
+			});
 		}
 
 		/// <summary>
 		/// Called on every new bar of data.
 		/// </summary>
 		/// <param name="currentBar">The current bar of the simulation</param>
-		protected override void OnBarUpdate(int currentBar)
+		public override void OnBarUpdate(int currentBar)
 		{
 			base.OnBarUpdate(currentBar);
 
