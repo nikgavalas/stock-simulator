@@ -576,6 +576,8 @@ namespace StockSimulator.Core
 			// Reset the states since we'll calculate them again.
 			TickerData higherData = new TickerData(ticker.TickerAndExchange);
 
+			int currentWeek = UtilityMethods.GetIso8601WeekOfYear(ticker.Dates.First());
+
 			// Aggregate all the data into the higher timeframe.
 			for (int i = 0; i < ticker.Dates.Count; i++)
 			{
@@ -611,7 +613,9 @@ namespace StockSimulator.Core
 				// something for the last bar. Ex. We have 5 bars set for the higher timeframe length,
 				// but we've only got 3 bars of data and the for loop will end on the next iteration.
 				// In that case we want to use the 3 bars we have for the data.
-				if (barCount == Simulator.Config.NumBarsHigherTimeframe || (i + 1) == ticker.Dates.Count)
+				if ((i + 1 == ticker.Dates.Count) ||
+					(Simulator.Config.DataType == "daily" && UtilityMethods.GetIso8601WeekOfYear(ticker.Dates[i + 1]) != currentWeek) || 
+					(Simulator.Config.DataType != "daily" && barCount == Simulator.Config.NumBarsHigherTimeframe))
 				{
 					close = ticker.Close[i];
 
@@ -625,6 +629,8 @@ namespace StockSimulator.Core
 
 					// Start aggregating a new set.
 					barCount = 0;
+					int nextWeekIndex = i + 1 == ticker.Dates.Count ? i : i + 1;
+					currentWeek = UtilityMethods.GetIso8601WeekOfYear(ticker.Dates[nextWeekIndex]);
 				}
 			}
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,6 +34,27 @@ namespace StockSimulator.Core
 			DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 			long ms = Convert.ToInt64(timestamp);
 			return origin.AddMilliseconds(ms);
+		}
+
+		/// <summary>
+		/// This presumes that weeks start with Monday. Week 1 is the 1st week of the year with a Thursday in it.
+		/// http://stackoverflow.com/questions/11154673/get-the-correct-week-number-of-a-given-date
+		/// </summary>
+		/// <param name="time">Date to get the week of</param>
+		/// <returns>Week index for the year starting with 1</returns>
+		public static int GetIso8601WeekOfYear(DateTime time)
+		{
+			// Seriously cheat.  If its Monday, Tuesday or Wednesday, then it'll 
+			// be the same week# as whatever Thursday, Friday or Saturday are,
+			// and we always get those right
+			DayOfWeek day = CultureInfo.InvariantCulture.Calendar.GetDayOfWeek(time);
+			if (day >= DayOfWeek.Monday && day <= DayOfWeek.Wednesday)
+			{
+				time = time.AddDays(3);
+			}
+
+			// Return the week of our adjusted day
+			return CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(time, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
 		}
 
 		/// <summary>
