@@ -40,7 +40,8 @@ namespace StockSimulator.Core
 			Volume,
 			Typical,
 			Median,
-			HigherState
+			HigherState,
+			Atr
 		}
 
 		/// <summary>
@@ -480,6 +481,7 @@ namespace StockSimulator.Core
 							tickerData.Typical.Add(Convert.ToDouble(splitData[(int)DataFields.Typical]));
 							tickerData.Median.Add(Convert.ToDouble(splitData[(int)DataFields.Median]));
 							tickerData.HigherTimeframeTrend.Add(Convert.ToDouble(splitData[(int)DataFields.HigherState]));
+							tickerData.HigherTimeframeAtr.Add(Convert.ToDouble(splitData[(int)DataFields.Atr]));
 						}
 						else
 						{
@@ -494,7 +496,9 @@ namespace StockSimulator.Core
 							// time consuming function since it has to loop back through all the
 							// bars before (and including) this one.
 							double lastValue = tickerData.HigherTimeframeTrend.Count > 0 ? tickerData.HigherTimeframeTrend[tickerData.HigherTimeframeTrend.Count - 1] : Order.OrderType.Long;
-							tickerData.HigherTimeframeTrend.Add(GetHigherTimerframeMomentumState(tickerData, lastValue));
+							double atr = 0.0;
+							tickerData.HigherTimeframeTrend.Add(GetHigherTimerframeExtras(tickerData, lastValue, out atr));
+							tickerData.HigherTimeframeAtr.Add(atr);
 						}
 					}
 				} while (line != null);
@@ -523,8 +527,9 @@ namespace StockSimulator.Core
 		/// </summary>
 		/// <param name="ticker">Ticker data</param>
 		/// <param name="lastState">Last state of the higher timeframe</param>
+		/// <param name="atr">Out for the atr value at this point</param>
 		/// <returns>Order type allowed for the last bar of the ticker data</returns>
-		private double GetHigherTimerframeMomentumState(TickerData ticker, double lastState)
+		private double GetHigherTimerframeExtras(TickerData ticker, double lastState, out double atr)
 		{
 			// Get all the bars for the higher timeframe.
 			TickerData higherTickerData = GetHigherTimeframeBars(ticker);
@@ -538,6 +543,17 @@ namespace StockSimulator.Core
 			higherTimeframeIndicator.RunToBar(higherTickerData.NumBars - 1);
 			higherTimeframeIndicator.Shutdown();
 
+			Atr atrInd = new Atr(higherTickerData) { Period = 14 };
+			atrInd.Initialize();
+			atrInd.RunToBar(higherTickerData.NumBars - 1);
+			atrInd.Shutdown();
+			atr = atrInd.Value.Last();
+
+			KeltnerChannel keltner = new KeltnerChannel(higherTickerData);
+			keltner.Initialize();
+			keltner.RunToBar(higherTickerData.NumBars - 1);
+			keltner.Shutdown();
+
 			// Return what kind orders are allowed.
 			double state = GetHigherTimeframeStateFromIndicator(higherTimeframeIndicator, higherTimeframeIndicator.Data.NumBars - 1, lastState);
 
@@ -549,7 +565,7 @@ namespace StockSimulator.Core
 				states.Add(state);
 				Simulator.DataOutput.OutputHigherTimeframeData(
 					outputDate,
-					higherTimeframeIndicator,
+					new List<Indicator>() { higherTimeframeIndicator, atrInd, keltner },
 					higherTickerData,
 					ticker,
 					states);
@@ -626,6 +642,10 @@ namespace StockSimulator.Core
 					higherData.Close.Add(close);
 					higherData.Volume.Add(volume);
 					higherData.NumBars = higherData.Dates.Count;
+
+					// Extras
+					higherData.Typical.Add((high + low + close) / 3);
+					higherData.Median.Add((high + low) / 2);
 
 					// Start aggregating a new set.
 					barCount = 0;

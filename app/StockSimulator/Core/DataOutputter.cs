@@ -162,12 +162,11 @@ namespace StockSimulator.Core
 		/// <param name="higherData">Higher timeframe bar data</param>
 		/// <param name="lowerData">Lower timeframe bar data</param>
 		/// <param name="states">Order type states for each lower timeframe bar up to this date</param>
-		public void OutputHigherTimeframeData(DateTime date, Indicator ind, TickerData higherData, TickerData lowerData, List<double> states)
+		public void OutputHigherTimeframeData(DateTime date, List<Indicator> inds, TickerData higherData, TickerData lowerData, List<double> states)
 		{
 			string rootFolderName = Simulator.Config.OutputFolder + "\\higher\\" + lowerData.TickerAndExchange.ToString() + "\\";
 			Directory.CreateDirectory(rootFolderName);
 
-			ind.Serialize(ind.Data.NumBars - 1);
 			higherData.PrepareForSerialization();
 
 			string folderName = rootFolderName + date.ToString("yyyy-MM-dd");
@@ -176,16 +175,20 @@ namespace StockSimulator.Core
 			string filename = folderName + "-data.json";
 			File.WriteAllText(filename, jsonOutput);
 
-			jsonOutput = JsonConvert.SerializeObject(ind);
-			filename = folderName + "-ind.json";
-			File.WriteAllText(filename, jsonOutput);
+			for (int i = 0; i < inds.Count; i++)
+			{
+				inds[i].Serialize(inds[i].Data.NumBars - 1);
+				jsonOutput = JsonConvert.SerializeObject(inds[i]);
+				filename = folderName + "-ind" + i + ".json";
+				File.WriteAllText(filename, jsonOutput);
+			}
 
 			JsonOrderState orderState = new JsonOrderState(lowerData.Dates, states);
 			jsonOutput = JsonConvert.SerializeObject(orderState);
 			filename = folderName + "-states.json";
 			File.WriteAllText(filename, jsonOutput);
 
-			ind.FreeResourcesAfterSerialization();
+			inds.ForEach(i => i.FreeResourcesAfterSerialization());
 			higherData.FreeResourcesAfterSerialization();
 		}
 

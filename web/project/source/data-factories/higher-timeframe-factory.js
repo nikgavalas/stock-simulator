@@ -24,15 +24,21 @@ mainApp.factory('HigherTimeframeFactory', [
 
 			var folderName = dataFolder + ticker + '/';
 			var dataPromise = $http.get(folderName + date + '-data.json');
-			var indicatorPromise = $http.get(folderName + date + '-ind.json');
 			var statesPromise = $http.get(folderName + date + '-states.json');
+			var indicatorPromiseDtOsc = $http.get(folderName + date + '-ind0.json');
+			var indicatorPromiseAtr = $http.get(folderName + date + '-ind1.json');
+			var indicatorPromiseKeltner = $http.get(folderName + date + '-ind2.json');
 
 			// Wait for both requests to complete.
-			$q.all([dataPromise, indicatorPromise, statesPromise]).then(function(data) {
+			$q.all([dataPromise, statesPromise, indicatorPromiseDtOsc, indicatorPromiseAtr, indicatorPromiseKeltner]).then(function(data) {
 				deffered.resolve({
 					priceData: data[0].data,
-					indicatorData: data[1].data,
-					statesData: data[2].data
+					statesData: data[1].data,
+					indicatorData: [
+						data[2].data,
+						data[3].data,
+						data[4].data
+					]
 				});
 			});
 

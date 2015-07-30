@@ -25,6 +25,7 @@ namespace StockSimulator.Core
 		public List<double> Median { get; set; }
 		public List<long> Volume { get; set; }
 		public List<double> HigherTimeframeTrend { get; set; }
+		public List<double> HigherTimeframeAtr { get; set; }
 		public int NumBars { get; set; }
 		public TickerExchangePair TickerAndExchange { get; set; }
 		public double TickSize { get { return 0.01; } }
@@ -66,6 +67,7 @@ namespace StockSimulator.Core
 			Typical = new List<double>();
 			Median = new List<double>();
 			HigherTimeframeTrend = new List<double>();
+			HigherTimeframeAtr = new List<double>();
 		}
 
 		/// <summary>
@@ -100,6 +102,7 @@ namespace StockSimulator.Core
 				Typical.InsertRange(0, otherData.Typical.GetRange(0, copyEndIndex));
 				Median.InsertRange(0, otherData.Median.GetRange(0, copyEndIndex));
 				HigherTimeframeTrend.InsertRange(0, otherData.HigherTimeframeTrend.GetRange(0, copyEndIndex));
+				HigherTimeframeAtr.InsertRange(0, otherData.HigherTimeframeAtr.GetRange(0, copyEndIndex));
 			}
 
 			// Append
@@ -127,6 +130,7 @@ namespace StockSimulator.Core
 				Typical.AddRange(otherData.Typical.GetRange(copyStartIndex, otherData.Typical.Count - copyStartIndex));
 				Median.AddRange(otherData.Median.GetRange(copyStartIndex, otherData.Median.Count - copyStartIndex));
 				HigherTimeframeTrend.AddRange(otherData.HigherTimeframeTrend.GetRange(copyStartIndex, otherData.HigherTimeframeTrend.Count - copyStartIndex));
+				HigherTimeframeAtr.AddRange(otherData.HigherTimeframeAtr.GetRange(copyStartIndex, otherData.HigherTimeframeAtr.Count - copyStartIndex));
 			}
 
 			Start = Dates[0];
@@ -183,6 +187,7 @@ namespace StockSimulator.Core
 				copyData.Typical.AddRange(Typical.GetRange(copyStartIndex, amountToCopy));
 				copyData.Median.AddRange(Median.GetRange(copyStartIndex, amountToCopy));
 				copyData.HigherTimeframeTrend.AddRange(HigherTimeframeTrend.GetRange(copyStartIndex, amountToCopy));
+				copyData.HigherTimeframeAtr.AddRange(HigherTimeframeAtr.GetRange(copyStartIndex, amountToCopy));
 
 				copyData.Start = copyData.Dates[0];
 				copyData.End = copyData.Dates[copyData.Dates.Count - 1];
@@ -210,6 +215,7 @@ namespace StockSimulator.Core
 				Typical[i] = 0;
 				Median[i] = 0;
 				HigherTimeframeTrend[i] = Order.OrderType.Long;
+				HigherTimeframeAtr[i] = 0;
 			}
 		}
 
@@ -235,6 +241,7 @@ namespace StockSimulator.Core
 				output += Typical[i].ToString() + ',';
 				output += Median[i].ToString() + ',';
 				output += HigherTimeframeTrend[i].ToString() + ',';
+				output += HigherTimeframeAtr[i].ToString() + ',';
 
 				// End with a new line so it's easier to view raw
 				output += Environment.NewLine;
