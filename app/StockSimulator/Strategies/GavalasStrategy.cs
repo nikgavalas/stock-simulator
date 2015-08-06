@@ -14,7 +14,14 @@ namespace StockSimulator.Strategies
 	/// </summary>
 	public class GavalasStrategy : RootSubStrategy
 	{
-		private double lastAtrValue = 0.0;
+		private double _lastAtrValue = 0.0;
+		private double _stopPrice = 0.0;
+		private double _expectedGainPrice = 0.0;
+		private double _expectedGainPercent = 0.0;
+		private double _riskRatio = 0.0;
+		private double _stdDev = 0.0;
+		private double _lastZoneHitDirection = 0.0;
+		private int _barLastZoneHit = 0;
 
 		/// <summary>
 		/// Construct the class and initialize the bar data to default values.
@@ -27,11 +34,10 @@ namespace StockSimulator.Strategies
 			{
 				new GavalasZones(tickerData),
 				new DtOscillator(tickerData) { PeriodRsi = 8, PeriodStoch = 5, PeriodSK = 3, PeriodSD = 3 },
-				new GavalasHistogram(tickerData),
-				new DmiAdx(tickerData),
 				new AverageVolume(tickerData),
-				new Atr(tickerData),
-				new KeltnerChannel(tickerData)
+				new DmiAdx(tickerData),
+				new KeltnerChannel(tickerData),
+				new Atr(tickerData)
 			};
 		}
 
@@ -56,9 +62,7 @@ namespace StockSimulator.Strategies
 			// will hopefully allow the zigzag to adapt to the more recent stock moves
 			// and allow it to adapt to different stocks.
 			GavalasZones zones = (GavalasZones)_dependents[0];
-			zones.SetZigZagDeviation(lastAtrValue * 1.0);
-			GavalasHistogram histo = (GavalasHistogram)_dependents[2];
-			histo.SetZigZagDeviation(lastAtrValue * 1.0);
+			zones.SetZigZagDeviation(_lastAtrValue * 1.5);
 		}
 
 		/// <summary>
@@ -69,36 +73,47 @@ namespace StockSimulator.Strategies
 			base.OnBarUpdate(currentBar);
 
 			// Save this so we can use it to set the zigzag deviation.
-			lastAtrValue = ((Atr)_dependents[5]).Value[currentBar];
+			_lastAtrValue = ((Atr)_dependents[5]).Value[currentBar];
 
 			if (currentBar < 2)
 			{
 				return;
 			}
 
-			GavalasZones zones = (GavalasZones)_dependents[0];
+			_stdDev = UtilityMethods.StdDev(Data.Close, currentBar, 10);
 
-			double buyDirection = zones.BuyDirection[currentBar];
+			GavalasZones zones = (GavalasZones)_dependents[0];
+			if (zones.DidBarTouchZone(Data.Low[currentBar], Data.High[currentBar], currentBar) == true)
+			{
+				_barLastZoneHit = currentBar;
+				_lastZoneHitDirection = zones.BuyDirection[currentBar];
+			}
+
 			string foundStrategyName = "";
+			double buyDirection = 0.0;
 
 			// See if we hit one of our buy zones.
-			if (ShouldBuy(buyDirection, currentBar))
+			if (ShouldBuy(currentBar))
 			{
-				if (buyDirection > 0.0 && ShouldBuyLong(currentBar))
+				if (ShouldBuyLong(currentBar))
 				{
+					buyDirection = Order.OrderType.Long;
 					foundStrategyName = "BullGavalasStrategy";
 				}
-				else if (buyDirection < 0.0 && ShouldBuyShort(currentBar))
+				else if (ShouldBuyShort(currentBar))
 				{
+					buyDirection = Order.OrderType.Short;
 					foundStrategyName = "BearGavalasStrategy";
 				}
 			}
 
-			if (foundStrategyName.Length > 0)
+			if (buyDirection != 0.0)
 			{
+				CalculateTargets(buyDirection, currentBar);
+
 				List<Indicator> dependentIndicators = GetDependentIndicators();
 
-				Order placedOrder = EnterOrder(foundStrategyName, currentBar, buyDirection, Simulator.Config.GavalasSizeOfOrder,
+				Order placedOrder = EnterOrder(foundStrategyName, currentBar, buyDirection, Simulator.Config.GavalasMaxRiskAmount,
 					dependentIndicators, GetBuyConditions(), GetSellConditions());
 
 				if (placedOrder != null)
@@ -112,14 +127,19 @@ namespace StockSimulator.Strategies
 
 					AddExtraOrderInfo(placedOrder, currentBar);
 
+					// Size of order = max amount we'll risk / (current low - stop)
+					double lossPerShare = buyDirection > 0 ? Data.Low[currentBar] - _stopPrice : _stopPrice - Data.High[currentBar];
+					int sizeOfOrder = Convert.ToInt32(Simulator.Config.GavalasMaxRiskAmount / lossPerShare);
+
 					//if (orderStats.WinPercent >= Simulator.Config.GavalasPercentForBuy && orderStats.Gain > Simulator.Config.GavalasGainForBuy)
+					if (sizeOfOrder > 0)
 					{
 						Bars[currentBar] = new OrderSuggestion(
 							orderStats.WinPercent,
 							orderStats.Gain,
 							foundStrategyName,
 							buyDirection,
-							Simulator.Config.GavalasSizeOfOrder,
+							sizeOfOrder,
 							dependentIndicators,
 							new List<StrategyStatistics>() { orderStats },
 							GetBuyConditions(),
@@ -153,9 +173,10 @@ namespace StockSimulator.Strategies
 			// Always have a max time in market and an absolute stop for sell conditions.
 			return new List<SellCondition>()
 			{
-				new StopSellCondition(Simulator.Config.GavalasStopPercent, false),
-				new ProfitSellCondition(Simulator.Config.GavalasProfitPercent),
-				//new StopOneBarTrailingHighLow(false),
+				new StopSellCondition(_stopPrice, StopSellCondition.PriceType.Value, false),
+				new StopOneBarTrailingChannel((KeltnerChannel)_dependents[4]),
+				new StopOscillatorZones((DtOscillator)_dependents[1]),
+				new StopNoMovement(5),
 				new MaxLengthSellCondition(Simulator.Config.GavalasMaxBarsOpen),
 			};
 		}
@@ -163,40 +184,33 @@ namespace StockSimulator.Strategies
 		/// <summary>
 		/// One last check to filter out bad buys.
 		/// </summary>
-		/// <param name="buyDirection">Direction of the order (1 for long -1 for short)</param>
 		/// <param name="currentBar">Current bar of the simulation</param>
 		/// <returns>Returns true if the situation passes and we should buy</returns>
-		private bool ShouldBuy(double buyDirection, int currentBar)
+		private bool ShouldBuy(int currentBar)
 		{
-			if (buyDirection == 0.0)
-			{
-				return false;
-			}
-
-			AverageVolume vol = (AverageVolume)_dependents[4];
+			AverageVolume vol = (AverageVolume)_dependents[2];
 			if (vol.Avg[currentBar] < 250000)
 			{
 				return false;
 			}
 
-			//GavalasHistogram histo = (GavalasHistogram)_dependents[2];
-			//if (histo.Value[currentBar] < 1)
+			if (currentBar - _barLastZoneHit > 5)
+			{
+				return false;
+			}
+
+			//GavalasZones zones = (GavalasZones)_dependents[0];
+			//if (zones.DidBarTouchZone(Data.Low[currentBar], Data.High[currentBar], currentBar) == false)
 			//{
 			//	return false;
 			//}
 
-			GavalasZones zones = (GavalasZones)_dependents[0];
-			if (zones.DidBarTouchZone(Data.Low[currentBar], Data.High[currentBar], currentBar) == false)
-			{
-				return false;
-			}
-
-			ZigZagWaves.WaveData waveData = zones.GetWaveData(currentBar);
-			double avgWaveHeight = (Math.Abs(waveData.Points[0].Retracement) + Math.Abs(waveData.Points[1].Retracement) + Math.Abs(waveData.Points[2].Retracement)) / 3;
-			if (avgWaveHeight < 4)
-			{
-				return false;
-			}
+			//ZigZagWaves.WaveData waveData = zones.GetWaveData(currentBar);
+			//double avgWaveHeight = (Math.Abs(waveData.Points[0].Retracement) + Math.Abs(waveData.Points[1].Retracement) + Math.Abs(waveData.Points[2].Retracement)) / 3;
+			//if (avgWaveHeight < 4)
+			//{
+			//	return false;
+			//}
 
 			return true;
 		}
@@ -208,18 +222,41 @@ namespace StockSimulator.Strategies
 		/// <returns>See summary</returns>
 		private bool ShouldBuyLong(int currentBar)
 		{
+			GavalasZones zones = (GavalasZones)_dependents[0];
+
 			// Higher timeframe
 			if (Data.HigherTimeframeTrend[currentBar] < 0.0)
 			{
 				return false;
 			}
 
-			// Verify with the mechanical buy signal.
-			DtOscillator dtosc = (DtOscillator)_dependents[1];
-			if (dtosc.SD[currentBar] > 25.0 || dtosc.SK[currentBar] > 25.0)
+			// Zones buy direction
+			if (_lastZoneHitDirection < 0.0)
 			{
 				return false;
 			}
+
+			// Verify with the mechanical buy signal.
+			DtOscillator dtosc = (DtOscillator)_dependents[1];
+			if (DataSeries.IsBelow(dtosc.SK, DtOscillator.OversoldZone, currentBar, 3) == -1 ||
+				DataSeries.CrossAbove(dtosc.SK, dtosc.SD, currentBar, 0) == -1)
+			{
+				return false;
+			}
+
+			// If we are trending make sure the best fits lines are positive.
+			DmiAdx dmiAdx = (DmiAdx)_dependents[3];
+			if (dmiAdx.Adx[currentBar] >= 25)
+			{
+				double angle = UtilityMethods.RadianToDegree(Math.Atan(zones.AllBestFitLineSlope[currentBar]));
+				if (angle < 0)
+				{
+					return false;
+				}
+			}
+
+			// TODO?
+			// If we are not trending make sure we are close to the bottom of the channel?
 
 			return true;
 		}
@@ -231,20 +268,73 @@ namespace StockSimulator.Strategies
 		/// <returns>See summary</returns>
 		private bool ShouldBuyShort(int currentBar)
 		{
+			GavalasZones zones = (GavalasZones)_dependents[0];
+
 			// Higher timeframe
 			if (Data.HigherTimeframeTrend[currentBar] > 0.0)
 			{
 				return false;
 			}
 
-			// Verify with the mechanical buy signal.
-			DtOscillator dtosc = (DtOscillator)_dependents[1];
-			if (dtosc.SD[currentBar] < 75.0 || dtosc.SK[currentBar] < 75.0)
+			// Zones buy direction
+			if (_lastZoneHitDirection > 0.0)
 			{
 				return false;
 			}
 
+			// Verify with the mechanical buy signal.
+			DtOscillator dtosc = (DtOscillator)_dependents[1];
+			if (DataSeries.IsAbove(dtosc.SK, DtOscillator.OverboughtZone, currentBar, 3) == -1 || 
+				DataSeries.CrossBelow(dtosc.SK, dtosc.SD, currentBar, 0) == -1)
+			{
+				return false;
+			}
+
+			// If we are trending make sure the best fits lines are negative.
+			DmiAdx dmiAdx = (DmiAdx)_dependents[3];
+			if (dmiAdx.Adx[currentBar] >= 25)
+			{
+				double angle = UtilityMethods.RadianToDegree(Math.Atan(zones.AllBestFitLineSlope[currentBar]));
+				if (angle > 0)
+				{
+					return false;
+				}
+			}
+
+			// TODO?
+			// If we are not trending make sure we are close to the top of the channel?
+
 			return true;
+		}
+
+		/// <summary>
+		/// Calculates the stop and expected profit targets for this soon to be order.
+		/// </summary>
+		/// <param name="buyDirection">Direction of the order (1 for long, -1 for short)</param>
+		/// <param name="currentBar">Current bar of the simulation</param>
+		private void CalculateTargets(double buyDirection, int currentBar)
+		{
+			GavalasZones zones = (GavalasZones)_dependents[0];
+			KeltnerChannel kelt = (KeltnerChannel)_dependents[4];
+
+			//double high = Math.Max(zones.HitZone[currentBar].High, Data.High[currentBar]);
+			//double low = Math.Min(zones.HitZone[currentBar].Low, Data.Low[currentBar]);
+
+			double high = kelt.Upper[currentBar];
+			double low = kelt.Lower[currentBar];
+
+			// Place a protective stop above/below the hit zone using standard deviations
+			double stddevStop = _stdDev * 0.5;
+			_stopPrice = buyDirection > 0.0 ? low - stddevStop : high + stddevStop;
+
+			// Expected gain is the difference from other side of the Keltner channel to the start of the zone.
+			_expectedGainPrice = buyDirection > 0.0 ? kelt.Upper[currentBar] :
+				kelt.Lower[currentBar];
+			_expectedGainPercent = buyDirection > 0.0 ? UtilityMethods.PercentChange(Data.Close[currentBar], kelt.Upper[currentBar]) :
+				UtilityMethods.PercentChange(kelt.Lower[currentBar], Data.Close[currentBar]);
+
+			// Risk reward ratio is amount we expect to gain / stop
+			_riskRatio = _expectedGainPercent / (buyDirection > 0.0 ? UtilityMethods.PercentChange(_stopPrice, low) : UtilityMethods.PercentChange(high, _stopPrice));
 		}
 
 		/// <summary>
@@ -256,81 +346,95 @@ namespace StockSimulator.Strategies
 		{
 			o.AddExtraInfo(() =>
 			{
-				GavalasZones ind = (GavalasZones)_dependents[0];
-				return new KeyValuePair<string, object>("slopehigh", (object)Math.Round(ind.HighBestFitLineSlope[currentBar], 2));
+				return new KeyValuePair<string, object>("expectedGain", Math.Round(_expectedGainPercent, 2));
 			});
 
 			o.AddExtraInfo(() =>
 			{
-				GavalasZones ind = (GavalasZones)_dependents[0];
-				return new KeyValuePair<string, object>("slopelow", (object)Math.Round(ind.LowBestFitLineSlope[currentBar], 2));
+				return new KeyValuePair<string, object>("riskRatio", Math.Round(_riskRatio, 2));
 			});
 
-			o.AddExtraInfo(() =>
-			{
-				GavalasZones ind = (GavalasZones)_dependents[0];
-				return new KeyValuePair<string, object>("slopeall", (object)Math.Round(ind.AllBestFitLineSlope[currentBar], 2));
-			});
+			////////////////////////////////////////////////////////////////////////////
+			// DEBUG INFO
+			////////////////////////////////////////////////////////////////////////////
 
-			// Num bars of the waves
-			o.AddExtraInfo(() =>
-			{
-				GavalasZones ind = (GavalasZones)_dependents[0];
-				ZigZagWaves.WaveData waves = ind.GetWaveData(currentBar);
-				int barLength = waves.Points[0].Bar - waves.Points[1].Bar;
-				return new KeyValuePair<string, object>("wave3bars", barLength);
-			});
+			//o.AddExtraInfo(() =>
+			//{
+			//	GavalasZones ind = (GavalasZones)_dependents[0];
+			//	return new KeyValuePair<string, object>("slopehigh", (object)Math.Round(UtilityMethods.RadianToDegree(Math.Atan(ind.HighBestFitLineSlope[currentBar])), 2));
+			//});
 
-			o.AddExtraInfo(() =>
-			{
-				GavalasZones ind = (GavalasZones)_dependents[0];
-				ZigZagWaves.WaveData waves = ind.GetWaveData(currentBar);
-				int barLength = waves.Points[1].Bar - waves.Points[2].Bar;
-				return new KeyValuePair<string, object>("wave2bars", barLength);
-			});
+			//o.AddExtraInfo(() =>
+			//{
+			//	GavalasZones ind = (GavalasZones)_dependents[0];
+			//	return new KeyValuePair<string, object>("slopelow", (object)Math.Round(UtilityMethods.RadianToDegree(Math.Atan(ind.LowBestFitLineSlope[currentBar])), 2));
+			//});
 
-			o.AddExtraInfo(() =>
-			{
-				GavalasZones ind = (GavalasZones)_dependents[0];
-				ZigZagWaves.WaveData waves = ind.GetWaveData(currentBar);
-				int barLength = waves.Points[2].Bar - waves.Points[3].Bar;
-				return new KeyValuePair<string, object>("wave1bars", barLength);
-			});
+			//o.AddExtraInfo(() =>
+			//{
+			//	GavalasZones ind = (GavalasZones)_dependents[0];
+			//	return new KeyValuePair<string, object>("slopeall", (object)Math.Round(UtilityMethods.RadianToDegree(Math.Atan(ind.AllBestFitLineSlope[currentBar])), 2));
+			//});
 
-			// Wave diffs between the points.
-			o.AddExtraInfo(() =>
-			{
-				GavalasZones ind = (GavalasZones)_dependents[0];
-				ZigZagWaves.WaveData waves = ind.GetWaveData(currentBar);
-				return new KeyValuePair<string, object>("wave3diff", (object)Math.Round(waves.Points[0].Retracement, 2));
-			});
+			//// Num bars of the waves
+			//o.AddExtraInfo(() =>
+			//{
+			//	GavalasZones ind = (GavalasZones)_dependents[0];
+			//	ZigZagWaves.WaveData waves = ind.GetWaveData(currentBar);
+			//	int barLength = waves.Points[0].Bar - waves.Points[1].Bar;
+			//	return new KeyValuePair<string, object>("wave3bars", barLength);
+			//});
 
-			o.AddExtraInfo(() =>
-			{
-				GavalasZones ind = (GavalasZones)_dependents[0];
-				ZigZagWaves.WaveData waves = ind.GetWaveData(currentBar);
-				return new KeyValuePair<string, object>("wave2diff", (object)Math.Round(waves.Points[1].Retracement, 2));
-			});
+			//o.AddExtraInfo(() =>
+			//{
+			//	GavalasZones ind = (GavalasZones)_dependents[0];
+			//	ZigZagWaves.WaveData waves = ind.GetWaveData(currentBar);
+			//	int barLength = waves.Points[1].Bar - waves.Points[2].Bar;
+			//	return new KeyValuePair<string, object>("wave2bars", barLength);
+			//});
 
-			o.AddExtraInfo(() =>
-			{
-				GavalasZones ind = (GavalasZones)_dependents[0];
-				ZigZagWaves.WaveData waves = ind.GetWaveData(currentBar);
-				return new KeyValuePair<string, object>("wave1diff", (object)Math.Round(waves.Points[2].Retracement, 2));
-			});
+			//o.AddExtraInfo(() =>
+			//{
+			//	GavalasZones ind = (GavalasZones)_dependents[0];
+			//	ZigZagWaves.WaveData waves = ind.GetWaveData(currentBar);
+			//	int barLength = waves.Points[2].Bar - waves.Points[3].Bar;
+			//	return new KeyValuePair<string, object>("wave1bars", barLength);
+			//});
+
+			//// Wave diffs between the points.
+			//o.AddExtraInfo(() =>
+			//{
+			//	GavalasZones ind = (GavalasZones)_dependents[0];
+			//	ZigZagWaves.WaveData waves = ind.GetWaveData(currentBar);
+			//	return new KeyValuePair<string, object>("wave3diff", (object)Math.Round(waves.Points[0].Retracement, 2));
+			//});
+
+			//o.AddExtraInfo(() =>
+			//{
+			//	GavalasZones ind = (GavalasZones)_dependents[0];
+			//	ZigZagWaves.WaveData waves = ind.GetWaveData(currentBar);
+			//	return new KeyValuePair<string, object>("wave2diff", (object)Math.Round(waves.Points[1].Retracement, 2));
+			//});
+
+			//o.AddExtraInfo(() =>
+			//{
+			//	GavalasZones ind = (GavalasZones)_dependents[0];
+			//	ZigZagWaves.WaveData waves = ind.GetWaveData(currentBar);
+			//	return new KeyValuePair<string, object>("wave1diff", (object)Math.Round(waves.Points[2].Retracement, 2));
+			//});
 
 			// Zone info.
-			o.AddExtraInfo(() =>
-			{
-				GavalasZones ind = (GavalasZones)_dependents[0];
-				return new KeyValuePair<string, object>("zonewidth", (object)Math.Round(UtilityMethods.PercentChange(ind.HitZone[currentBar].Low, ind.HitZone[currentBar].High), 2));
-			});
+			//o.AddExtraInfo(() =>
+			//{
+			//	GavalasZones ind = (GavalasZones)_dependents[0];
+			//	return new KeyValuePair<string, object>("zonewidth", (object)Math.Round(UtilityMethods.PercentChange(ind.HitZone[currentBar].Low, ind.HitZone[currentBar].High), 2));
+			//});
 
-			o.AddExtraInfo(() =>
-			{
-				GavalasZones ind = (GavalasZones)_dependents[0];
-				return new KeyValuePair<string, object>("zonepoints", ind.HitZone[currentBar].NumberOfPoints);
-			});
+			//o.AddExtraInfo(() =>
+			//{
+			//	GavalasZones ind = (GavalasZones)_dependents[0];
+			//	return new KeyValuePair<string, object>("zonepoints", ind.HitZone[currentBar].NumberOfPoints);
+			//});
 
 			//o.AddExtraInfo(() =>
 			//{
@@ -358,19 +462,19 @@ namespace StockSimulator.Strategies
 
 			o.AddExtraInfo(() =>
 			{
-				KeltnerChannel ind = (KeltnerChannel)_dependents[6];
+				KeltnerChannel ind = (KeltnerChannel)_dependents[4];
 				return new KeyValuePair<string, object>("keltlow", (object)Math.Round(ind.Lower[currentBar], 2));
 			});
 
 			o.AddExtraInfo(() =>
 			{
-				KeltnerChannel ind = (KeltnerChannel)_dependents[6];
+				KeltnerChannel ind = (KeltnerChannel)_dependents[4];
 				return new KeyValuePair<string, object>("keltmid", (object)Math.Round(ind.Midline[currentBar], 2));
 			});
 
 			o.AddExtraInfo(() =>
 			{
-				KeltnerChannel ind = (KeltnerChannel)_dependents[6];
+				KeltnerChannel ind = (KeltnerChannel)_dependents[4];
 				return new KeyValuePair<string, object>("keltup", (object)Math.Round(ind.Upper[currentBar], 2));
 			});
 		}

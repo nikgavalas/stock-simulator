@@ -188,6 +188,7 @@ namespace StockSimulator.Core
 		public static int IsAbove(List<double> series1, double value, int startBar, int lookBackPeriod)
 		{
 			int beginBar = startBar - lookBackPeriod;
+			beginBar = beginBar < 0 ? 0 : beginBar;
 			for (int i = beginBar; i <= startBar; i++)
 			{
 				if (series1[i] > value)
@@ -209,6 +210,7 @@ namespace StockSimulator.Core
 		public static int IsAbove(List<double> series1, List<double> series2, int startBar, int lookBackPeriod)
 		{
 			int beginBar = startBar - lookBackPeriod;
+			beginBar = beginBar < 0 ? 0 : beginBar;
 			for (int i = beginBar; i <= startBar; i++)
 			{
 				if (series1[i] > series2[i])
@@ -230,6 +232,7 @@ namespace StockSimulator.Core
 		public static int IsBelow(List<double> series1, double value, int startBar, int lookBackPeriod)
 		{
 			int beginBar = startBar - lookBackPeriod;
+			beginBar = beginBar < 0 ? 0 : beginBar;
 			for (int i = beginBar; i <= startBar; i++)
 			{
 				if (series1[i] < value)
@@ -251,6 +254,7 @@ namespace StockSimulator.Core
 		public static int IsBelow(List<double> series1, List<double> series2, int startBar, int lookBackPeriod)
 		{
 			int beginBar = startBar - lookBackPeriod;
+			beginBar = beginBar < 0 ? 0 : beginBar;
 			for (int i = beginBar; i <= startBar; i++)
 			{
 				if (series1[i] < series2[i])

@@ -210,7 +210,7 @@ namespace StockSimulator.Strategies
 			// Always have a max time in market and an absolute stop for sell conditions.
 			return new List<SellCondition>()
 			{
-				new StopSellCondition(0.05),
+				//new StopSellCondition(0.05),
 				//new StopOneBarTrailingHighLow(),
 				new MaxLengthSellCondition(5),
 			};

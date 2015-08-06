@@ -8,19 +8,27 @@ namespace StockSimulator.Core.BuySellConditions
 {
 	class StopSellCondition : SellCondition
 	{
-		private double _stopPercent;
+		public enum PriceType
+		{
+			Percent,
+			Value
+		}
+
+		private double _stopValue;
 		private bool _buyAndSellSameBar;
+		private PriceType _priceType;
 
 		/// <summary>
 		/// Constructor
 		/// </summary>
-		/// <param name="stopPercent">Percent in decimal form for the stop target.</param>
+		/// <param name="stopValue">Percent in decimal form for the stop target.</param>
 		/// <param name="buyAndSellSameBar">If false then we can't sell the same bar we bought in</param>
-		public StopSellCondition(double stopPercent, bool buyAndSellSameBar = true)
+		public StopSellCondition(double stopValue, PriceType priceType, bool buyAndSellSameBar = true)
 			: base()
 		{
-			_stopPercent = stopPercent;
+			_stopValue = stopValue;
 			_buyAndSellSameBar = buyAndSellSameBar;
+			_priceType = priceType;
 		}
 
 		/// <summary>
@@ -47,7 +55,7 @@ namespace StockSimulator.Core.BuySellConditions
 			}
 
 			TickerData data = _order.Ticker;
-			double stopPrice = _order.BuyPrice - ((_order.BuyPrice * _stopPercent) * _order.Type);
+			double stopPrice = _priceType == PriceType.Value ? _stopValue : _order.BuyPrice - ((_order.BuyPrice * _stopValue) * _order.Type);
 
 			if (_order.Type == Order.OrderType.Long)
 			{

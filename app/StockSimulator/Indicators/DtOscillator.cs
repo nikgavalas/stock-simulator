@@ -15,6 +15,9 @@ namespace StockSimulator.Indicators
 	/// </summary>
 	public class DtOscillator : Indicator
 	{
+		public const double OversoldZone = 25.0;
+		public const double OverboughtZone = 75.0;
+
 		public List<double> SD { get; set; }
 		public List<double> SK { get; set; }
 		public List<double> StoRsi { get; set; }

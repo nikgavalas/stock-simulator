@@ -224,6 +224,20 @@ namespace StockSimulator.Core
 		}
 
 		/// <summary>
+		/// Returns the angle in degrees of the slope of the line.
+		/// </summary>
+		/// <param name="x1">First point x</param>
+		/// <param name="y1">First point y</param>
+		/// <param name="x2">Second point x</param>
+		/// <param name="y2">Second poitn y</param>
+		/// <returns>See summary</returns>
+		public static double LineAngle(double x1, double y1, double x2, double y2)
+		{
+			double slope = (y2 - y1) / (x2 - x1);
+			return RadianToDegree(Math.Atan(slope));
+		}
+
+		/// <summary>
 		/// Converts an angle from radians to degrees.
 		/// </summary>
 		/// <param name="angle">Angle in radians</param>

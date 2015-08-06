@@ -230,9 +230,9 @@ namespace StockSimulator.Core
 
 		[Category("Gavalas Strategy")]
 		[PropertyOrder(7)]
-		[DisplayName("Size Of Order")]
-		[Description("Amount of money to invest in each stock order")]
-		public double GavalasSizeOfOrder { get; set; }
+		[DisplayName("Max Risked")]
+		[Description("Max amount of money we can risk to lose for an order")]
+		public double GavalasMaxRiskAmount { get; set; }
 
 		///////////////////////////// BRESSERT COMBO ////////////////////////////////
 
@@ -413,7 +413,7 @@ namespace StockSimulator.Core
 			GavalasProfitPercent = 0.05;
 			GavalasStopPercent = 0.05;
 			GavalasMaxBarsOpen = 5;
-			GavalasSizeOfOrder = 10000;
+			GavalasMaxRiskAmount = 10000;
 
 			// Main strategy
 			MaxOrdersPerBar = 4;

@@ -28,6 +28,11 @@ namespace StockSimulator.Core.BuySellConditions
 		{
 			base.OnUpdate(currentBar);
 
+			//if (_order.OpenedBar == currentBar)
+			//{
+			//	return false;
+			//}
+
 			// Super simple for market orders, just buy.
 			_order.Buy(_order.Ticker.Open[currentBar], currentBar, "Market open order");
 			return true;

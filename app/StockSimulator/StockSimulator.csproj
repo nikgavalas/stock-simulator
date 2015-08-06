@@ -108,6 +108,9 @@
     <Compile Include="Core\BuySellConditions\OneBarTrailingHighLow.cs" />
     <Compile Include="Core\BuySellConditions\SellCondition.cs" />
     <Compile Include="Core\BuySellConditions\MarketBuyCondition.cs" />
+    <Compile Include="Core\BuySellConditions\StopNoMovement.cs" />
+    <Compile Include="Core\BuySellConditions\StopOscillatorZones.cs" />
+    <Compile Include="Core\BuySellConditions\StopOneBarTrailingChannel.cs" />
     <Compile Include="Core\BuySellConditions\StopOneBarTrailingHighLow.cs" />
     <Compile Include="Core\BuySellConditions\ProfitSellCondition.cs" />
     <Compile Include="Core\BuySellConditions\StopSellCondition.cs" />
