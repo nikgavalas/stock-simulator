@@ -17,8 +17,6 @@ namespace StockSimulator.Core
 	[CategoryOrder("Gavalas Strategy", 4)]
 	[CategoryOrder("Higher Timeframe", 7)]
 	[CategoryOrder("Candlesticks", 8)]
-	[CategoryOrder("Bressert Strategy", 20)]
-	[CategoryOrder("Bressert Combo", 21)]
 	[CategoryOrder("Combo Strategy", 23)]
 	public class SimulatorConfig
 	{
@@ -234,50 +232,6 @@ namespace StockSimulator.Core
 		[Description("Max amount of money we can risk to lose for an order")]
 		public double GavalasMaxRiskAmount { get; set; }
 
-		///////////////////////////// BRESSERT COMBO ////////////////////////////////
-
-		[Category("Bressert Combo")]
-		[PropertyOrder(0)]
-		[DisplayName("Percent For Buy")]
-		[Description("Percent returned from best combo strategy to add ticker to the buy list")]
-		public double BressertComboPercentForBuy { get; set; }
-
-		[Category("Bressert Combo")]
-		[PropertyOrder(1)]
-		[DisplayName("Min Combo Size")]
-		[Description("Minimum number of strategies that must have been present to buy")]
-		public int BressertComboMinComboSize { get; set; }
-
-		[Category("Bressert Combo")]
-		[PropertyOrder(2)]
-		[DisplayName("Max Combo Size")]
-		[Description("Maximum size of a combo that can be used")]
-		public int BressertComboMaxComboSize { get; set; }
-
-		[Category("Bressert Combo")]
-		[PropertyOrder(3)]
-		[DisplayName("Combo Leeway")]
-		[Description("Number of bars back in time allowed to find a combo from the current bar")]
-		public int BressertComboLeewayBars { get; set; }
-
-		[Category("Bressert Combo")]
-		[PropertyOrder(5)]
-		[DisplayName("Stop Loss Percent")]
-		[Description("Stop loss percent for the combo strategy")]
-		public double BressertComboStopPercent { get; set; }
-
-		[Category("Bressert Combo")]
-		[PropertyOrder(6)]
-		[DisplayName("Max Bars Open")]
-		[Description("Max bars open for the combo strategy")]
-		public int BressertComboMaxBarsOpen { get; set; }
-
-		[Category("Bressert Combo")]
-		[PropertyOrder(7)]
-		[DisplayName("Size Of Order")]
-		[Description("Amount of money to invest in each stock order")]
-		public double BressertComboSizeOfOrder { get; set; }
-
 		///////////////////////////// MAIN STRATEGY ///////////////////////////////
 
 		[Category("Main Strategy")]
@@ -328,43 +282,7 @@ namespace StockSimulator.Core
 		[Description("Maximum amount of money to be lost per month before we call it quits for the month")]
 		public double MaxMonthlyLoss { get; set; }
 
-		/////////////////////////// BRESSERT STRATEGY /////////////////////////////
 
-		[Category("Bressert Strategy")]
-		[PropertyOrder(0)]
-		[DisplayName("Timing Cycle Lookback")]
-		[Description("Number of bars to lookback to calculate the average cycle length")]
-		public int BressertCycleLookback { get; set; }
-
-		[Category("Bressert Strategy")]
-		[PropertyOrder(1)]
-		[DisplayName("Bars Between Cycles")]
-		[Description("Number of bars between the cycles (bottom to bottom or top to top). Set to 0 to have it automatically calculated")]
-		public int BressertBarsBetweenCycles { get; set; }
-
-		[Category("Bressert Strategy")]
-		[PropertyOrder(2)]
-		[DisplayName("Timing Band Padding")]
-		[Description("Number of bars to pad left or right from the predicted cycle target")]
-		public int BressertBandPadding { get; set; }
-
-		[Category("Bressert Strategy")]
-		[PropertyOrder(3)]
-		[DisplayName("Max Bars Open")]
-		[Description("Max bars open for the Bressert strategy")]
-		public int BressertMaxBarsOpen { get; set; }
-
-		[Category("Bressert Strategy")]
-		[PropertyOrder(4)]
-		[DisplayName("Max Bars To Fill")]
-		[Description("Max bars an order can remain open and not filled before it is cancelled")]
-		public int BressertMaxBarsToFill { get; set; }
-
-		[Category("Bressert Strategy")]
-		[PropertyOrder(5)]
-		[DisplayName("Size Of Order")]
-		[Description("Amount of money to invest in each stock order")]
-		public double BressertSizeOfOrder { get; set; }
 
 		/// <summary>
 		/// Sets the default values for the options.
@@ -398,15 +316,6 @@ namespace StockSimulator.Core
 			ComboMaxBarsOpen = 10;
 			ComboSizeOfOrder = 10000;
 
-			// Bressert combo
-			BressertComboPercentForBuy = 65;
-			BressertComboMinComboSize = 2;
-			BressertComboMaxComboSize = 3;
-			BressertComboLeewayBars = 0;
-			BressertComboStopPercent = 0.04;
-			BressertComboMaxBarsOpen = 10;
-			BressertComboSizeOfOrder = 10000;
-
 			// Gavalas Strategy
 			GavalasPercentForBuy = 50;
 			GavalasGainForBuy = 500;
@@ -425,14 +334,6 @@ namespace StockSimulator.Core
 			MaxMonthlyLoss = 15000;
 			InstrumentListFile = @"C:\Users\Nik\Documents\Code\github\stock-simulator\input\test.csv";
 			
-			// Bressert Strategy
-			BressertCycleLookback = 300;
-			BressertBandPadding = 3;
-			BressertBarsBetweenCycles = 20;
-			BressertMaxBarsOpen = 20;
-			BressertMaxBarsToFill = 3;
-			BressertSizeOfOrder = 10000;
-
 			// Output
 			OnlyMainStrategySnapshots = true;
 			AddExtraOrderInfo = false;
