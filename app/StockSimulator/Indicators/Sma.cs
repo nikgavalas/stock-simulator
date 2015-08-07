@@ -15,9 +15,17 @@ namespace StockSimulator.Indicators
 	[JsonObject(MemberSerialization.OptIn)]
 	class Sma : Indicator
 	{
-		private int _period = 14;
-
 		public List<double> Avg { get; set; }
+
+		#region Configurables
+		public int Period
+		{
+			get { return _period; }
+			set { _period = value; }
+		}
+
+		private int _period = 14;
+		#endregion
 
 		/// <summary>
 		/// This indicator is plotted on the price bars.
@@ -32,9 +40,8 @@ namespace StockSimulator.Indicators
 		/// Constructor
 		/// </summary>
 		/// <param name="tickerData">Ticker data for the indicator</param>
-		/// <param name="factory">Factory to create the dependent runnables</param>
-		public Sma(TickerData tickerData, RunnableFactory factory) 
-			: base(tickerData, factory)
+		public Sma(TickerData tickerData) 
+			: base(tickerData)
 		{
 			Avg = Enumerable.Repeat(0d, Data.NumBars).ToList();
 		}
@@ -45,34 +52,38 @@ namespace StockSimulator.Indicators
 		/// <returns>The name of this indicator</returns>
 		public override string ToString()
 		{
-			return "Sma";
+			return "Sma" + Period.ToString();
 		}
 
 		/// <summary>
-		/// Save the indicator data in a serialization friendly way.
+		/// Creates the plots for the data to be added to.
 		/// </summary>
-		public override void PrepareForSerialization()
+		public override void CreatePlots()
 		{
-			base.PrepareForSerialization();
+			base.CreatePlots();
 
-			// Add the sma avg to the the data for plotting.
-			PlotSeries smaPlot = new PlotSeries("line");
-			ChartPlots["Sma"] = smaPlot; 
-			for (int i = 0; i < Data.Dates.Count; i++)
-			{
-				smaPlot.PlotData.Add(new List<object>()
-				{
-					UtilityMethods.UnixTicks(Data.Dates[i]),
-					Math.Round(Avg[i], 2)
-				});
-			}
+			// Add the indicator for plotting
+			ChartPlots[ToString()] = new PlotSeries("line");
+		}
+
+		/// <summary>
+		/// Adds data to the created plots for the indicator at the current bar.
+		/// </summary>
+		/// <param name="currentBar"></param>
+		public override void AddToPlots(int currentBar)
+		{
+			base.AddToPlots(currentBar);
+
+			long ticks = UtilityMethods.UnixTicks(Data.Dates[currentBar]);
+			double value = Avg[currentBar];
+			AddValueToPlot(ToString(), ticks, Math.Round(value, 2));
 		}
 
 		/// <summary>
 		/// Called on every new bar of data.
 		/// </summary>
 		/// <param name="currentBar">The current bar of the simulation</param>
-		protected override void OnBarUpdate(int currentBar)
+		public override void OnBarUpdate(int currentBar)
 		{
 			base.OnBarUpdate(currentBar);
 

@@ -16,25 +16,15 @@ namespace StockSimulator.Indicators
 	{
 		public List<double> Value { get; set; }
 
-		public Rsi3m3(TickerData tickerData, RunnableFactory factory)
-			: base(tickerData, factory)
+		public Rsi3m3(TickerData tickerData)
+			: base(tickerData)
 		{
-			Value = Enumerable.Repeat(0d, Data.NumBars).ToList();
-		}
-
-		/// <summary>
-		/// Returns an array of dependent names.
-		/// </summary>
-		public override string[] DependentNames
-		{
-			get
+			_dependents = new List<Runnable>()
 			{
-				string[] deps = {
-					"Rsi,3"
-				};
+				(Runnable)new Rsi(Data) { Period = 3 }
+			};
 
-				return deps;
-			}
+			Value = Enumerable.Repeat(0d, Data.NumBars).ToList();
 		}
 
 		/// <summary>
@@ -47,36 +37,39 @@ namespace StockSimulator.Indicators
 		}
 
 		/// <summary>
-		/// Save the indicator data in a serialization friendly way.
+		/// Creates the plots for the data to be added to.
 		/// </summary>
-		public override void PrepareForSerialization()
+		public override void CreatePlots()
 		{
-			base.PrepareForSerialization();
+			base.CreatePlots();
 
-			// Add the rsi for plotting
-			PlotSeries plotValue = new PlotSeries("line");
-			ChartPlots[ToString()] = plotValue;
-
-			for (int i = 0; i < Data.Dates.Count; i++)
-			{
-				long ticks = UtilityMethods.UnixTicks(Data.Dates[i]);
-				plotValue.PlotData.Add(new List<object>()
-				{
-					ticks,
-					Math.Round(Value[i], 2)
-				});
-			}
+			// Add the indicator for plotting
+			ChartPlots[ToString()] = new PlotSeries("line");
 		}
+
+		/// <summary>
+		/// Adds data to the created plots for the indicator at the current bar.
+		/// </summary>
+		/// <param name="currentBar"></param>
+		public override void AddToPlots(int currentBar)
+		{
+			base.AddToPlots(currentBar);
+
+			long ticks = UtilityMethods.UnixTicks(Data.Dates[currentBar]);
+			double value = Value[currentBar];
+			AddValueToPlot(ToString(), ticks, Math.Round(value, 2));
+		}
+
 
 		/// <summary>
 		/// Called on every new bar of data.
 		/// </summary>
 		/// <param name="currentBar">The current bar of the simulation</param>
-		protected override void OnBarUpdate(int currentBar)
+		public override void OnBarUpdate(int currentBar)
 		{
 			base.OnBarUpdate(currentBar);
 
-			Rsi rsi = (Rsi)Dependents[0];
+			Rsi rsi = (Rsi)_dependents[0];
 			Value[currentBar] = UtilityMethods.Sma(rsi.Avg, currentBar, 3);
 		}
 	}

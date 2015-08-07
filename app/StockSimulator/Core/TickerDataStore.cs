@@ -41,7 +41,7 @@ namespace StockSimulator.Core
 			Typical,
 			Median,
 			HigherState,
-			Atr
+			HigherValuesStart
 		}
 
 		/// <summary>
@@ -226,8 +226,15 @@ namespace StockSimulator.Core
 		{
 			string fileAndPath = GetTickerFilename(ticker);
 			string contents = UtilityMethods.UnixTicks(start) + "," + UtilityMethods.UnixTicks(end) + "," + Environment.NewLine;
-			contents += "Date,Open,High,Low,Close,Volume,Typical,Median,HigherState" + Environment.NewLine;
+			contents += "Date,Open,High,Low,Close,Volume,Typical,Median,HigherState,";
+			for (int i = 0; i < TickerData.HigherTimeframeValueStrings.Length; i++)
+			{
+				contents += TickerData.HigherTimeframeValueStrings[i] + ",";
+			}
+
+			// Append all the data.
 			contents += newData.WriteToString();
+
 			try
 			{
 				File.WriteAllText(fileAndPath, contents);
@@ -481,7 +488,13 @@ namespace StockSimulator.Core
 							tickerData.Typical.Add(Convert.ToDouble(splitData[(int)DataFields.Typical]));
 							tickerData.Median.Add(Convert.ToDouble(splitData[(int)DataFields.Median]));
 							tickerData.HigherTimeframeTrend.Add(Convert.ToDouble(splitData[(int)DataFields.HigherState]));
-							tickerData.HigherTimeframeAtr.Add(Convert.ToDouble(splitData[(int)DataFields.Atr]));
+
+							for (int i = 0; i < TickerData.HigherTimeframeValueStrings.Length; i++)
+							{
+								string key = TickerData.HigherTimeframeValueStrings[i];
+								List<double> higherValues = tickerData.HigherTimeframeValues[key];
+								higherValues.Add(Convert.ToDouble(splitData[(int)DataFields.HigherValuesStart + i]));
+							}
 						}
 						else
 						{
@@ -496,9 +509,7 @@ namespace StockSimulator.Core
 							// time consuming function since it has to loop back through all the
 							// bars before (and including) this one.
 							double lastValue = tickerData.HigherTimeframeTrend.Count > 0 ? tickerData.HigherTimeframeTrend[tickerData.HigherTimeframeTrend.Count - 1] : Order.OrderType.Long;
-							double atr = 0.0;
-							tickerData.HigherTimeframeTrend.Add(GetHigherTimerframeExtras(tickerData, lastValue, out atr));
-							tickerData.HigherTimeframeAtr.Add(atr);
+							tickerData.HigherTimeframeTrend.Add(GetHigherTimerframeExtras(tickerData, lastValue));
 						}
 					}
 				} while (line != null);
@@ -527,35 +538,42 @@ namespace StockSimulator.Core
 		/// </summary>
 		/// <param name="ticker">Ticker data</param>
 		/// <param name="lastState">Last state of the higher timeframe</param>
-		/// <param name="atr">Out for the atr value at this point</param>
 		/// <returns>Order type allowed for the last bar of the ticker data</returns>
-		private double GetHigherTimerframeExtras(TickerData ticker, double lastState, out double atr)
+		private double GetHigherTimerframeExtras(TickerData ticker, double lastState)
 		{
 			// Get all the bars for the higher timeframe.
 			TickerData higherTickerData = GetHigherTimeframeBars(ticker);
 
-			// Run the indicator and save it.
-			//BressertDss higherTimeframeIndicator = new BressertDss(higherTickerData, new RunnableFactory(higherTickerData), 5);
-			//Rsi3m3 higherTimeframeIndicator = new Rsi3m3(higherTickerData, new RunnableFactory(higherTickerData));
-			//Macd higherTimeframeIndicator = new Macd(higherTickerData, new RunnableFactory(higherTickerData));
-			DtOscillator higherTimeframeIndicator = new DtOscillator(higherTickerData) { PeriodRsi = 8, PeriodStoch = 5, PeriodSK = 3, PeriodSD = 3 };
-			higherTimeframeIndicator.Initialize();
-			higherTimeframeIndicator.RunToBar(higherTickerData.NumBars - 1);
-			higherTimeframeIndicator.Shutdown();
+			Sma sma = new Sma(higherTickerData) { Period = 35 };
+			sma.Initialize();
+			sma.RunToBar(higherTickerData.NumBars - 1);
+			sma.Shutdown();
+			ticker.HigherTimeframeValues["Sma"].Add(sma.Avg.Last());
 
 			Atr atrInd = new Atr(higherTickerData) { Period = 14 };
 			atrInd.Initialize();
 			atrInd.RunToBar(higherTickerData.NumBars - 1);
 			atrInd.Shutdown();
-			atr = atrInd.Value.Last();
+			ticker.HigherTimeframeValues["Atr"].Add(atrInd.Value.Last());
 
 			KeltnerChannel keltner = new KeltnerChannel(higherTickerData);
 			keltner.Initialize();
 			keltner.RunToBar(higherTickerData.NumBars - 1);
 			keltner.Shutdown();
+			ticker.HigherTimeframeValues["KeltnerUpper"].Add(keltner.Upper.Last());
+			ticker.HigherTimeframeValues["KeltnerMidline"].Add(keltner.Midline.Last());
+			ticker.HigherTimeframeValues["KeltnerLower"].Add(keltner.Lower.Last());
+
+			Rsi3m3 rsi = new Rsi3m3(higherTickerData);
+			rsi.Initialize();
+			rsi.RunToBar(higherTickerData.NumBars - 1);
+			rsi.Shutdown();
+			ticker.HigherTimeframeValues["Rsi3m3"].Add(rsi.Value.Last());
+
+			ticker.HigherTimeframeValues["Close"].Add(higherTickerData.Close.Last());
 
 			// Return what kind orders are allowed.
-			double state = GetHigherTimeframeStateFromIndicator(higherTimeframeIndicator, higherTimeframeIndicator.Data.NumBars - 1, lastState);
+			double state = GetHigherTimeframeStateFromIndicator(higherTickerData, sma, sma.Data.NumBars - 1, lastState);
 
 			////////////////// START HIGHER TIME FRAME DEBUGGING ////////////////////
 			if (Simulator.Config.OutputHigherTimeframeData)
@@ -565,7 +583,7 @@ namespace StockSimulator.Core
 				states.Add(state);
 				Simulator.DataOutput.OutputHigherTimeframeData(
 					outputDate,
-					new List<Indicator>() { higherTimeframeIndicator, atrInd, keltner },
+					new List<Indicator>() { sma, atrInd, keltner, rsi },
 					higherTickerData,
 					ticker,
 					states);
@@ -658,89 +676,25 @@ namespace StockSimulator.Core
 		}
 
 		/// <summary>
-		/// Returns the state of the higher momentum bar. Any momentum indicator can be used here.
+		/// Returns the state of the higher timeframe trend.
 		/// </summary>
-		/// <param name="indicator">Momentum indicator to use</param>
-		/// <param name="curBar">Current bar in the momentum simulation</param>
+		/// <param name="higherData">Higher timeframe ticker data</param>
+		/// <param name="ind">Indicator to use</param>
+		/// <param name="currentBar">Current bar in the momentum simulation</param>
 		/// <param name="lastState">Last state of the higher timeframe</param>
-		/// <returns>The state of the higher momentum indicator</returns>
-		//private double GetHigherTimeframeStateFromIndicator(BressertDss bressertDss, int currentBar)
-		//private double GetHigherTimeframeStateFromIndicator(Rsi3m3 rsi, int currentBar, double lastState)
-		//{
-		//	if (currentBar >= 2)
-		//	{
-		//		if (DataSeries.IsBelow(rsi.Value, 30, currentBar, 2) != -1 && UtilityMethods.IsValley(rsi.Value, currentBar))
-		//		{
-		//			return Order.OrderType.Long;
-		//		}
-		//		if (DataSeries.IsAbove(rsi.Value, 70, currentBar, 2) != -1 && UtilityMethods.IsPeak(rsi.Value, currentBar))
-		//		{
-		//			return Order.OrderType.Short;
-		//		}
-		//	}
-
-		//	return lastState;
-		//}
-
-		//private double GetHigherTimeframeStateFromIndicator(BressertDss bressertDss, int currentBar, double lastState)
-		//{
-		//	if (currentBar >= 2)
-		//	{
-		//		if (DataSeries.IsBelow(bressertDss.Value, 40, currentBar, 2) != -1 && UtilityMethods.IsValley(bressertDss.Value, currentBar))
-		//		{
-		//			return Order.OrderType.Long;
-		//		}
-		//		if (DataSeries.IsAbove(bressertDss.Value, 60, currentBar, 2) != -1 && UtilityMethods.IsPeak(bressertDss.Value, currentBar))
-		//		{
-		//			return Order.OrderType.Short;
-		//		}
-		//	}
-
-		//	return lastState;
-		//}
-
-		//private double GetHigherTimeframeStateFromIndicator(Macd indicator, int currentBar, double lastState)
-		//{
-		//	return DataSeries.IsAbove(indicator.Value, indicator.Avg, currentBar, 0) != -1 ||
-		//		indicator.Value[currentBar] == indicator.Avg[currentBar] ? Order.OrderType.Long : Order.OrderType.Short;
-		//}
-
-		private double GetHigherTimeframeStateFromIndicator(DtOscillator ind, int currentBar, double lastState)
+		/// <returns>The state of the higher timeframe trend</returns>
+		private double GetHigherTimeframeStateFromIndicator(TickerData higherData, Sma ind, int currentBar, double lastState)
 		{
-			if (currentBar > 2)
+			if (currentBar > ind.Period)
 			{
-				//if (UtilityMethods.IsValley(ind.SK, currentBar))
-				//{
-				//	return Order.OrderType.Long;
-				//}
-				//else if (UtilityMethods.IsPeak(ind.SK, currentBar))
-				//{
-				//	return Order.OrderType.Short;
-				//}
-
-				if (DataSeries.CrossAbove(ind.SK, ind.SD, currentBar, 0) != -1)
+				if (DataSeries.IsAbove(higherData.Close, ind.Avg, currentBar, 0) != -1)
 				{
 					return Order.OrderType.Long;
 				}
-				else if (DataSeries.CrossBelow(ind.SK, ind.SD, currentBar, 0) != -1)
+				else
 				{
 					return Order.OrderType.Short;
 				}
-
-				//if (DataSeries.IsBelow(ind.SK, 25, currentBar, 1) != -1)
-				//{
-				//	if (DataSeries.CrossAbove(ind.SK, ind.SD, currentBar, 0) != -1)
-				//	{
-				//		return Order.OrderType.Long;
-				//	}
-				//}
-				//else if (DataSeries.IsAbove(ind.SK, 75, currentBar, 1) != -1)
-				//{
-				//	if (DataSeries.CrossBelow(ind.SK, ind.SD, currentBar, 0) != -1)
-				//	{
-				//		return Order.OrderType.Short;
-				//	}
-				//}
 			}
 
 			return lastState;

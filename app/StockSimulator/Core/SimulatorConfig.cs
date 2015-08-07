@@ -15,6 +15,7 @@ namespace StockSimulator.Core
 	[CategoryOrder("All Orders", 2)]
 	[CategoryOrder("Main Strategy", 3)]
 	[CategoryOrder("Gavalas Strategy", 4)]
+	[CategoryOrder("Channel Strategy", 4)]
 	[CategoryOrder("Higher Timeframe", 7)]
 	[CategoryOrder("Candlesticks", 8)]
 	[CategoryOrder("Combo Strategy", 23)]
@@ -232,6 +233,32 @@ namespace StockSimulator.Core
 		[Description("Max amount of money we can risk to lose for an order")]
 		public double GavalasMaxRiskAmount { get; set; }
 
+		/////////////////////////// CHANNEL STRATEGY //////////////////////////////
+
+		[Category("Channel Strategy")]
+		[PropertyOrder(0)]
+		[DisplayName("Max Order Size")]
+		[Description("Max size of the order regardless of risk")]
+		public int ChannelMaxOrderSize { get; set; }
+		
+		[Category("Channel Strategy")]
+		[PropertyOrder(1)]
+		[DisplayName("Max Risked")]
+		[Description("Max amount of money we can risk to lose for an order")]
+		public int ChannelMaxRiskAmount { get; set; }
+
+		[Category("Channel Strategy")]
+		[PropertyOrder(2)]
+		[DisplayName("Max Bars Open")]
+		[Description("Max bars open for the strategy")]
+		public int ChannelMaxBarsOpen { get; set; }
+
+		[Category("Channel Strategy")]
+		[PropertyOrder(3)]
+		[DisplayName("Min Risk/Reward")]
+		[Description("Min risk/reward ratio to buy")]
+		public double ChannelMinRiskRatio { get; set; }
+
 		///////////////////////////// MAIN STRATEGY ///////////////////////////////
 
 		[Category("Main Strategy")]
@@ -315,6 +342,12 @@ namespace StockSimulator.Core
 			ComboStopPercent = 0.04;
 			ComboMaxBarsOpen = 10;
 			ComboSizeOfOrder = 10000;
+
+			// Channel Strategy
+			ChannelMaxBarsOpen = 30;
+			ChannelMaxOrderSize = 20000;
+			ChannelMaxRiskAmount = 1200;
+			ChannelMinRiskRatio = 1.0;
 
 			// Gavalas Strategy
 			GavalasPercentForBuy = 50;

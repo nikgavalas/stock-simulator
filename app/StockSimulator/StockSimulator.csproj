@@ -160,7 +160,7 @@
     <None Include="Indicators\Candlesticks\UpsideGapTwoCrows.cs" />
     <None Include="Indicators\Candlesticks\UpsideTasukiGap.cs" />
     <None Include="Indicators\Cci.cs" />
-    <None Include="Indicators\BressertDss.cs" />
+    <Compile Include="Indicators\BressertDss.cs" />
     <Compile Include="Indicators\Ppo.cs" />
     <Compile Include="Indicators\Atr.cs" />
     <Compile Include="Indicators\Adx.cs" />
@@ -173,7 +173,7 @@
     <Compile Include="Indicators\KeltnerChannel.cs" />
     <None Include="Indicators\Momentum.cs" />
     <None Include="Indicators\PriceOscillator.cs" />
-    <None Include="Indicators\Rsi3m3.cs" />
+    <Compile Include="Indicators\Rsi3m3.cs" />
     <None Include="Indicators\Stochastics.cs" />
     <None Include="Indicators\StochasticsFast.cs" />
     <None Include="Indicators\StochRsi.cs" />
@@ -288,6 +288,7 @@
     <None Include="Strategies\Bull\BullTrixSignalCrossover.cs" />
     <None Include="Strategies\Bull\BullWilliamsRCrossover.cs" />
     <Compile Include="Strategies\ElliotWavesStrategy.cs" />
+    <Compile Include="Strategies\ChannelStrategy.cs" />
     <Compile Include="Strategies\GavalasStrategy.cs" />
     <Compile Include="Strategies\RootSubStrategy.cs" />
     <Compile Include="YahooFinanceDownloader\YahooFinanceDownloader.cs" />
@@ -314,7 +315,7 @@
     <Compile Include="GoogleFinanceDownloader\DownloadURIBuilder.cs" />
     <None Include="Indicators\Macd.cs" />
     <Compile Include="Indicators\Rsi.cs" />
-    <None Include="Indicators\Sma.cs" />
+    <Compile Include="Indicators\Sma.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

@@ -19,14 +19,26 @@ namespace StockSimulator.Indicators
 		private List<double> ema;
 		private List<double> toBeSmoothed;
 
+		#region Configurables
+		public int Period
+		{
+			get { return _period; }
+			set { _period = value; }
+		}
+
+		public int Smoothing
+		{
+			get { return _smoothing; }
+			set { _smoothing = value; }
+		}
+
 		private int _period = 10;
 		private int _smoothing = 15;
+		#endregion
 
-		public BressertDss(TickerData tickerData, RunnableFactory factory, string[] settings)
-			: base(tickerData, factory)
+		public BressertDss(TickerData tickerData)
+			: base(tickerData)
 		{
-			_period = Convert.ToInt32(settings[0]);
-
 			Value = Enumerable.Repeat(0d, Data.NumBars).ToList();
 			ema = Enumerable.Repeat(0d, Data.NumBars).ToList();
 			toBeSmoothed = Enumerable.Repeat(0d, Data.NumBars).ToList();
@@ -42,32 +54,38 @@ namespace StockSimulator.Indicators
 		}
 
 		/// <summary>
-		/// Save the indicator data in a serialization friendly way.
+		/// Creates the plots for the data to be added to.
 		/// </summary>
-		public override void PrepareForSerialization()
+		public override void CreatePlots()
 		{
-			base.PrepareForSerialization();
+			base.CreatePlots();
 
-			// Add the rsi for plotting
-			PlotSeries plotValue = new PlotSeries("line");
-			ChartPlots[ToString()] = plotValue;
+			// Add the indicator for plotting
+			PlotSeries line = new PlotSeries("line");
+			ChartPlots[ToString()] = line;
+		}
 
-			for (int i = 0; i < Data.Dates.Count; i++)
+		/// <summary>
+		/// Adds data to the created plots for the indicator at the current bar.
+		/// </summary>
+		/// <param name="currentBar"></param>
+		public override void AddToPlots(int currentBar)
+		{
+			base.AddToPlots(currentBar);
+
+			PlotSeries line = (PlotSeries)ChartPlots[ToString()];
+			line.PlotData.Add(new List<object>()
 			{
-				long ticks = UtilityMethods.UnixTicks(Data.Dates[i]);
-				plotValue.PlotData.Add(new List<object>()
-				{
-					ticks,
-					Math.Round(Value[i], 2)
-				});
-			}
+				UtilityMethods.UnixTicks(Data.Dates[currentBar]),
+				Math.Round(Value[currentBar], 2)
+			});
 		}
 
 		/// <summary>
 		/// Called on every new bar of data.
 		/// </summary>
 		/// <param name="currentBar">The current bar of the simulation</param>
-		protected override void OnBarUpdate(int currentBar)
+		public override void OnBarUpdate(int currentBar)
 		{
 			base.OnBarUpdate(currentBar);
 

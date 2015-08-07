@@ -24,7 +24,8 @@ namespace StockSimulator.Strategies
 			_dependents = new List<Runnable>()
 			{
 				//new ElliotWavesStrategy(tickerData)
-				new GavalasStrategy(tickerData)
+				//new GavalasStrategy(tickerData)
+				new ChannelStrategy(tickerData)
 			};
 		}
 
