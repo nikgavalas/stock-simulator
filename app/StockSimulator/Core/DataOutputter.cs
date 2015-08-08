@@ -513,11 +513,15 @@ namespace StockSimulator.Core
 				string jsonOutput;
 				string filename;
 
-				ConcurrentBag<Order> mainStrategyOrders = Simulator.Orders.StrategyDictionary["MainStrategy".GetHashCode()];
+				List<Order> mainStrategyOrders = Simulator.Orders.StrategyDictionary["MainStrategy".GetHashCode()].ToList();
 				StrategyStatistics mainStratStats = new StrategyStatistics("MainStrategy", Order.OrderType.Long);
-				foreach (Order order in mainStrategyOrders)
+				
+				// Sort so we can find out the most losers in a row.
+				mainStrategyOrders.Sort((a, b) => b.BuyDate.CompareTo(a.BuyDate));
+
+				for (int i = 0; i < mainStrategyOrders.Count; i++)
 				{
-					mainStratStats.AddOrder(order);
+					mainStratStats.AddOrder(mainStrategyOrders[i]);
 				}
 
 				mainStratStats.CalculateStatistics();
@@ -525,7 +529,7 @@ namespace StockSimulator.Core
 				filename = _outputFolder + "overall.json";
 				File.WriteAllText(filename, jsonOutput);
 
-				List<Order> mainOrders = mainStrategyOrders.ToList();
+				List<Order> mainOrders = mainStrategyOrders;
 				mainOrders.RemoveAll(order => order.Status == Order.OrderStatus.Cancelled);
 				jsonOutput = JsonConvert.SerializeObject(mainOrders);
 				filename = _outputFolder + "overall-orders.json";

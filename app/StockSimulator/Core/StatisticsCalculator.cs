@@ -37,6 +37,45 @@ namespace StockSimulator.Core
 		[JsonConverter(typeof(RoundedDoubleConverter))]
 		public double LengthExceededPercent { get; set; }
 
+		[JsonProperty("largestWinner")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
+		public double LargestWinner { get; set; }
+
+		[JsonProperty("largestWinnerBuyDate")]
+		[JsonConverter(typeof(ShortDateTimeConverter))]
+		public DateTime LargestWinnerBuyDate { get; set; }
+
+		[JsonProperty("largestLoser")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
+		public double LargestLoser { get; set; }
+
+		[JsonProperty("largestLoserBuyDate")]
+		[JsonConverter(typeof(ShortDateTimeConverter))]
+		public DateTime LargestLoserBuyDate { get; set; }
+
+		[JsonProperty("mostConsecutiveLosers")]
+		public int MostConsecutiveLosers { get; set; }
+
+		[JsonProperty("mostConsecutiveLosersDate")]
+		[JsonConverter(typeof(ShortDateTimeConverter))]
+		public DateTime MostConsecutiveLosersDate { get; set; }
+
+		[JsonProperty("maxDrawdown")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
+		public double MaxDrawdown { get; set; }
+
+		[JsonProperty("maxDrawdownDate")]
+		[JsonConverter(typeof(ShortDateTimeConverter))]
+		public DateTime MaxDrawdownDate { get; set; }
+
+		[JsonProperty("profitFactor")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
+		public double ProfitFactor { get; set; }
+
+		[JsonProperty("profitFactorLargest")]
+		[JsonConverter(typeof(RoundedDoubleConverter))]
+		public double ProfitFactorLargest { get; set; }
+
 		////////////////////// LONG //////////////////////
 
 		[JsonProperty("longWinPercent")]
@@ -162,13 +201,29 @@ namespace StockSimulator.Core
 		private long _totalLengthOfStopOrders = 0;
 
 		private double _totalGain = 0;
-	
+		private double _highestGain = 0;
+
+		private double _totalMoneyWins = 0;
+		private double _totalMoneyLosses = 0;
+
+		private int _currentConsecutiveLosers = 0;
+
 		/// <summary>
 		/// Constructor that doesn't calculate the stats to be used with add order.
 		/// </summary>
 		public StatisticsCalculator()
 		{
 			Orders = null;
+
+			LargestWinner = 0;
+			LargestWinnerBuyDate = DateTime.MinValue;
+			LargestLoser = 0;
+			LargestLoserBuyDate = DateTime.MinValue;
+
+			MostConsecutiveLosers = 0;
+			MostConsecutiveLosersDate = DateTime.MinValue;
+			MaxDrawdown = 0;
+			MaxDrawdownDate = DateTime.MinValue;
 
 			LongWinAvg = 0;
 			LongWinAvgPercent = 0;
@@ -200,10 +255,32 @@ namespace StockSimulator.Core
 				if (order.Gain > 0)
 				{
 					++_numberOfWins;
+					_currentConsecutiveLosers = 0;
+					_totalMoneyWins += order.Gain;
+
+					if (order.Gain > LargestWinner)
+					{
+						LargestWinner = order.Gain;
+						LargestWinnerBuyDate = order.BuyDate;
+					}
 				}
 				else
 				{
 					++_numberOfLosses;
+					++_currentConsecutiveLosers;
+					_totalMoneyLosses += Math.Abs(order.Gain);
+
+					if (order.Gain < LargestLoser)
+					{
+						LargestLoser = order.Gain;
+						LargestLoserBuyDate = order.BuyDate;
+					}
+
+					if (_currentConsecutiveLosers > MostConsecutiveLosers)
+					{
+						MostConsecutiveLosers = _currentConsecutiveLosers;
+						MostConsecutiveLosersDate = order.BuyDate;
+					}
 				}
 
 				if (order.SellReason == Order.SellReasonType.ProfitTarget)
@@ -226,6 +303,20 @@ namespace StockSimulator.Core
 
 				_totalLengthOfAllOrders += order.SellBar - order.BuyBar;
 				_totalGain += order.Gain;
+
+				if (_totalGain >= _highestGain)
+				{
+					_highestGain = _totalGain;
+				}
+				else
+				{
+					double currentDrawdown = _highestGain - _totalGain;
+					if (currentDrawdown > MaxDrawdown)
+					{
+						MaxDrawdown = currentDrawdown;
+						MaxDrawdownDate = order.BuyDate;
+					}
+				}
 			}
 		}
 
@@ -241,6 +332,9 @@ namespace StockSimulator.Core
 			ProfitTargetPercent = 0;
 			StopLossPercent = 0;
 			LengthExceededPercent = 0;
+
+			ProfitFactor = 0;
+			ProfitFactorLargest = 0;
 
 			LongWinPercent = 0;
 			LongLossPercent = 0;
@@ -265,6 +359,8 @@ namespace StockSimulator.Core
 				ProfitTargetPercent = Math.Round(((double)_numberOfProfitTargets / NumberOfOrders) * 100.0);
 				StopLossPercent = Math.Round(((double)_numberOfStopLosses / NumberOfOrders) * 100.0);
 				LengthExceededPercent = Math.Round(((double)_numberOfLengthExceeded / NumberOfOrders) * 100.0);
+				ProfitFactor = _totalMoneyLosses > 0 ? _totalMoneyWins / _totalMoneyLosses : _totalMoneyWins;
+				ProfitFactorLargest = LargestLoser < 0 ? LargestWinner / Math.Abs(LargestLoser) : LargestWinner;
 
 				if (LongNumberOfOrders > 0)
 				{
@@ -311,6 +407,18 @@ namespace StockSimulator.Core
 			LengthExceededPercent = stats.LengthExceededPercent;
 			Gain = stats.Gain;
 			NumberOfOrders = stats.NumberOfOrders;
+
+			LargestWinner = stats.LargestWinner;
+			LargestWinnerBuyDate = stats.LargestWinnerBuyDate;
+			LargestLoser = stats.LargestLoser;
+			LargestLoserBuyDate = stats.LargestLoserBuyDate;
+
+			MostConsecutiveLosers = stats.MostConsecutiveLosers;
+			MostConsecutiveLosersDate = stats.MostConsecutiveLosersDate;
+			MaxDrawdown = stats.MaxDrawdown;
+			MaxDrawdownDate = stats.MaxDrawdownDate;
+			ProfitFactor = stats.ProfitFactor;
+			ProfitFactorLargest = stats.ProfitFactorLargest;
 
 			LongWinPercent = stats.LongWinPercent;
 			LongLossPercent = stats.LongLossPercent;
