@@ -322,7 +322,21 @@ namespace StockSimulator.Core
 				List<BestOfRootStrategies> buyList = buyBag.ToList();
 
 				// Sort the list so the instruments that have the highest buy value are first in the list.
-				buyList.Sort((x, y) => -1 * x.Bars[x.Data.GetBar(currentDate)].HighestGain.CompareTo(y.Bars[y.Data.GetBar(currentDate)].HighestGain));
+				buyList.Sort(delegate(BestOfRootStrategies x, BestOfRootStrategies y) 
+				{
+					int xBar = x.Data.GetBar(currentDate);
+					int yBar = y.Data.GetBar(currentDate);
+					if (x.Bars[xBar].ExtraOrderInfo.ContainsKey("expectedGain"))
+					{
+						double xGain = (double)x.Bars[xBar].ExtraOrderInfo["expectedGain"];
+						double yGain = (double)y.Bars[yBar].ExtraOrderInfo["expectedGain"];
+						return yGain.CompareTo(xGain);
+					}
+					else
+					{
+						return y.Bars[yBar].HighestGain.CompareTo(x.Bars[xBar].HighestGain);
+					}
+				});
 
 				// Output the buy list for each day.
 				DataOutput.SaveBuyList(buyList, currentDate);

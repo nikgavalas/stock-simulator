@@ -259,6 +259,12 @@ namespace StockSimulator.Core
 		[Description("Min risk/reward ratio to buy")]
 		public double ChannelMinRiskRatio { get; set; }
 
+		[Category("Channel Strategy")]
+		[PropertyOrder(4)]
+		[DisplayName("Min Expected Gain")]
+		[Description("Min expected gain to buy")]
+		public double ChannelMinExpectedGain { get; set; }
+
 		///////////////////////////// MAIN STRATEGY ///////////////////////////////
 
 		[Category("Main Strategy")]
@@ -348,6 +354,7 @@ namespace StockSimulator.Core
 			ChannelMaxOrderSize = 20000;
 			ChannelMaxRiskAmount = 1200;
 			ChannelMinRiskRatio = 1.0;
+			ChannelMinExpectedGain = 4.0;
 
 			// Gavalas Strategy
 			GavalasPercentForBuy = 50;

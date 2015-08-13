@@ -28,16 +28,18 @@ mainApp.factory('HigherTimeframeFactory', [
 			var indicatorPromiseDtOsc = $http.get(folderName + date + '-ind0.json');
 			var indicatorPromiseAtr = $http.get(folderName + date + '-ind1.json');
 			var indicatorPromiseKeltner = $http.get(folderName + date + '-ind2.json');
+			var indicatorPromiseSma = $http.get(folderName + date + '-ind3.json');
 
 			// Wait for both requests to complete.
-			$q.all([dataPromise, statesPromise, indicatorPromiseDtOsc, indicatorPromiseAtr, indicatorPromiseKeltner]).then(function(data) {
+			$q.all([dataPromise, statesPromise, indicatorPromiseDtOsc, indicatorPromiseAtr, indicatorPromiseKeltner, indicatorPromiseSma]).then(function(data) {
 				deffered.resolve({
 					priceData: data[0].data,
 					statesData: data[1].data,
 					indicatorData: [
 						data[2].data,
 						data[3].data,
-						data[4].data
+						data[4].data,
+						data[5].data
 					]
 				});
 			});

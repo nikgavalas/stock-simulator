@@ -37,7 +37,7 @@ namespace StockSimulator.Core
 			"KeltnerUpper",
 			"KeltnerMidline",
 			"KeltnerLower",
-			"Rsi3m3",
+			"DtoscSK",
 			"Close"
 		};
 

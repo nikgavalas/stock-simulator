@@ -564,11 +564,11 @@ namespace StockSimulator.Core
 			ticker.HigherTimeframeValues["KeltnerMidline"].Add(keltner.Midline.Last());
 			ticker.HigherTimeframeValues["KeltnerLower"].Add(keltner.Lower.Last());
 
-			Rsi3m3 rsi = new Rsi3m3(higherTickerData);
-			rsi.Initialize();
-			rsi.RunToBar(higherTickerData.NumBars - 1);
-			rsi.Shutdown();
-			ticker.HigherTimeframeValues["Rsi3m3"].Add(rsi.Value.Last());
+			DtOscillator dtosc = new DtOscillator(higherTickerData);
+			dtosc.Initialize();
+			dtosc.RunToBar(higherTickerData.NumBars - 1);
+			dtosc.Shutdown();
+			ticker.HigherTimeframeValues["DtoscSK"].Add(dtosc.SK.Last());
 
 			ticker.HigherTimeframeValues["Close"].Add(higherTickerData.Close.Last());
 
@@ -583,7 +583,7 @@ namespace StockSimulator.Core
 				states.Add(state);
 				Simulator.DataOutput.OutputHigherTimeframeData(
 					outputDate,
-					new List<Indicator>() { sma, atrInd, keltner, rsi },
+					new List<Indicator>() { dtosc, atrInd, keltner, sma },
 					higherTickerData,
 					ticker,
 					states);
@@ -685,7 +685,7 @@ namespace StockSimulator.Core
 		/// <returns>The state of the higher timeframe trend</returns>
 		private double GetHigherTimeframeStateFromIndicator(TickerData higherData, Sma ind, int currentBar, double lastState)
 		{
-			if (currentBar > ind.Period)
+			if (currentBar >= 0)
 			{
 				if (DataSeries.IsAbove(higherData.Close, ind.Avg, currentBar, 0) != -1)
 				{

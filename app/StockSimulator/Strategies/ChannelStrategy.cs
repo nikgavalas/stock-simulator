@@ -16,8 +16,11 @@ namespace StockSimulator.Strategies
 	{
 		private double _stdDev;
 		private double _stopPrice;
+		private double _maxBuyPrice;
 		private double _expectedGainPrice;
 		private double _expectedGainPercent;
+		private double _expectedLossPercent;
+		private double _expectedLossPerShare;
 		private double _riskRatio;
 
 		/// <summary>
@@ -32,8 +35,7 @@ namespace StockSimulator.Strategies
 				new AverageVolume(tickerData),
 				new DmiAdx(tickerData),
 				new KeltnerChannel(tickerData),
-				new Rsi3m3(tickerData),
-				new BressertDss(tickerData)
+				new DtOscillator(tickerData)
 			};
 		}
 
@@ -81,61 +83,44 @@ namespace StockSimulator.Strategies
 			if (buyDirection != 0.0)
 			{
 				CalculateTargets(buyDirection, currentBar);
-
+				
 				int sizeOfOrder = CalculateOrderSize(buyDirection, currentBar);
-
-				List<Indicator> dependentIndicators = GetDependentIndicators();
-
-				Order placedOrder = EnterOrder(foundStrategyName, currentBar, buyDirection, sizeOfOrder,
-					dependentIndicators, GetBuyConditions(), GetSellConditions());
-
-				if (placedOrder != null)
+				if (sizeOfOrder > 0)
 				{
-					// Get things like win/loss percent up to the point this order was started.
-					StrategyStatistics orderStats = Simulator.Orders.GetStrategyStatistics(placedOrder.StrategyName,
-						placedOrder.Type,
-						placedOrder.Ticker.TickerAndExchange,
-						currentBar,
-						Simulator.Config.MaxLookBackBars);
+					List<Indicator> dependentIndicators = GetDependentIndicators();
 
-					AddExtraOrderInfo(placedOrder, currentBar);
+					Order placedOrder = EnterOrder(foundStrategyName, currentBar, buyDirection, sizeOfOrder,
+						dependentIndicators, GetBuyConditions(), GetSellConditions());
 
-					//if (orderStats.WinPercent >= Simulator.Config.GavalasPercentForBuy && orderStats.Gain > Simulator.Config.GavalasGainForBuy)
-					if (sizeOfOrder > 0 && _riskRatio > Simulator.Config.ChannelMinRiskRatio)
+					if (placedOrder != null)
 					{
-						Bars[currentBar] = new OrderSuggestion(
-							orderStats.WinPercent,
-							orderStats.Gain,
-							foundStrategyName,
-							buyDirection,
-							sizeOfOrder,
-							dependentIndicators,
-							new List<StrategyStatistics>() { orderStats },
-							GetBuyConditions(),
-							GetSellConditions(),
-							placedOrder.ExtraInfo);
+						// Get things like win/loss percent up to the point this order was started.
+						StrategyStatistics orderStats = Simulator.Orders.GetStrategyStatistics(placedOrder.StrategyName,
+							placedOrder.Type,
+							placedOrder.Ticker.TickerAndExchange,
+							currentBar,
+							Simulator.Config.MaxLookBackBars);
+
+						AddExtraOrderInfo(placedOrder, currentBar);
+
+						//if (orderStats.WinPercent >= Simulator.Config.GavalasPercentForBuy && orderStats.Gain > Simulator.Config.GavalasGainForBuy)
+						if (_riskRatio >= Simulator.Config.ChannelMinRiskRatio && _expectedGainPercent >= Simulator.Config.ChannelMinExpectedGain)
+						{
+							Bars[currentBar] = new OrderSuggestion(
+								orderStats.WinPercent,
+								orderStats.Gain,
+								foundStrategyName,
+								buyDirection,
+								sizeOfOrder,
+								dependentIndicators,
+								new List<StrategyStatistics>() { orderStats },
+								GetBuyConditions(),
+								GetSellConditions(),
+								placedOrder.ExtraInfo);
+						}
 					}
 				}
 			}
-		}
-
-		/// <summary>
-		/// Returns the size of the order in dollars based on our risk factors.
-		/// </summary>
-		/// <param name="buyDirection">Direction of the order (long or short)</param>
-		/// <param name="currentBar">Current bar of the simulation</param>
-		/// <returns>See summary</returns>
-		private int CalculateOrderSize(double buyDirection, int currentBar)
-		{
-			// Size of order = max amount we'll risk / (current low - stop)
-			double lossPerShare = buyDirection > 0.0 ? Data.Low[currentBar] - _stopPrice : _stopPrice - Data.High[currentBar];
-			int sizeOfOrder = Convert.ToInt32(Data.Close[currentBar] * (Simulator.Config.GavalasMaxRiskAmount / lossPerShare));
-			if (sizeOfOrder > Simulator.Config.ChannelMaxOrderSize)
-			{
-				sizeOfOrder = Simulator.Config.ChannelMaxOrderSize;
-			}
-
-			return sizeOfOrder;
 		}
 
 		/// <summary>
@@ -147,8 +132,9 @@ namespace StockSimulator.Strategies
 			return new List<BuyCondition>()
 			{
 				//new OneBarTrailingHighLow(1)
-				new MarketBuyCondition()
+				//new MarketBuyCondition()
 				//new DirectionBuyCondition(1)
+				new LimitBuyCondition(_maxBuyPrice, 1)
 			};
 		}
 
@@ -182,6 +168,13 @@ namespace StockSimulator.Strategies
 				return false;
 			}
 
+			// Make sure we are trading a stock with the right volitility.
+			//double atrNormalized = Data.HigherTimeframeValues["Atr"][currentBar] / Data.HigherTimeframeValues["Close"][currentBar];
+			//if (atrNormalized < 0.06 || atrNormalized > 0.10)
+			//{
+			//	return false;
+			//}
+
 			return true;
 		}
 
@@ -199,35 +192,31 @@ namespace StockSimulator.Strategies
 			}
 
 			KeltnerChannel kelt = (KeltnerChannel)_dependents[2];
-			if (DataSeries.CrossBelow(Data.Low, kelt.Lower, currentBar, 5) == -1)
-			{
-				return false;
-			}
+			//if (DataSeries.CrossBelow(Data.Low, kelt.Lower, currentBar, 5) == -1)
+			//{
+			//	return false;
+			//}
 
 			if (Math.Max(Data.Open[currentBar], Data.Close[currentBar]) > kelt.Midline[currentBar])
 			{
 				return false;
 			}
 
-			Rsi3m3 rsi = (Rsi3m3)_dependents[3];
-			if (DataSeries.IsValley(rsi.Value, currentBar, 0) == -1)
+			DtOscillator dtosc = (DtOscillator)_dependents[3];
+			if (DataSeries.IsBelow(dtosc.SD, DtOscillator.OversoldZone, currentBar, 3) == -1 ||
+				DataSeries.IsBelow(dtosc.SK, DtOscillator.OversoldZone, currentBar, 3) == -1 || 
+				DataSeries.CrossAbove(dtosc.SK, dtosc.SD, currentBar, 0) == -1)
 			{
 				return false;
 			}
 
-			//BressertDss dss = (BressertDss)_dependents[4];
-			//if (DataSeries.IsBelow(dss.Value, 50.0, currentBar, 2) == -1 || DataSeries.IsValley(dss.Value, currentBar, 0) == -1)
+			// Make sure we are not in a heavy trend the other way.
+			//DmiAdx dmiAdx = (DmiAdx)_dependents[1];
+			//if (dmiAdx.Adx[currentBar] > 30 && dmiAdx.DmiMinus[currentBar] > dmiAdx.DmiPlus[currentBar] && 
+			//	UtilityMethods.LineAngle(currentBar - 2, dmiAdx.Adx[currentBar - 2], currentBar, dmiAdx.Adx[currentBar]) > 5)
 			//{
 			//	return false;
 			//}
-
-			// Make sure we are not in a heavy trend the other way.
-			DmiAdx dmiAdx = (DmiAdx)_dependents[1];
-			if (dmiAdx.Adx[currentBar] > 30 && dmiAdx.DmiMinus[currentBar] > dmiAdx.DmiPlus[currentBar] && 
-				UtilityMethods.LineAngle(currentBar - 2, dmiAdx.Adx[currentBar - 2], currentBar, dmiAdx.Adx[currentBar]) > 5)
-			{
-				return false;
-			}
 
 			return true;
 		}
@@ -245,11 +234,32 @@ namespace StockSimulator.Strategies
 				return false;
 			}
 
-			Rsi3m3 rsi = (Rsi3m3)_dependents[3];
-			if (DataSeries.IsAbove(rsi.Value, 70, currentBar, 2) == -1 || UtilityMethods.IsPeak(rsi.Value, currentBar) == false)
+			KeltnerChannel kelt = (KeltnerChannel)_dependents[2];
+			//if (DataSeries.CrossAbove(Data.High, kelt.Upper, currentBar, 5) == -1)
+			//{
+			//	return false;
+			//}
+
+			if (Math.Min(Data.Open[currentBar], Data.Close[currentBar]) < kelt.Midline[currentBar])
 			{
 				return false;
 			}
+
+			DtOscillator dtosc = (DtOscillator)_dependents[3];
+			if (DataSeries.IsAbove(dtosc.SD, DtOscillator.OverboughtZone, currentBar, 3) == -1 ||
+				DataSeries.IsAbove(dtosc.SK, DtOscillator.OverboughtZone, currentBar, 3) == -1 ||
+				DataSeries.CrossBelow(dtosc.SK, dtosc.SD, currentBar, 0) == -1)
+			{
+				return false;
+			}
+
+			// Make sure we are not in a heavy trend the other way.
+			//DmiAdx dmiAdx = (DmiAdx)_dependents[1];
+			//if (dmiAdx.Adx[currentBar] > 30 && dmiAdx.DmiPlus[currentBar] > dmiAdx.DmiMinus[currentBar] &&
+			//	UtilityMethods.LineAngle(currentBar - 2, dmiAdx.Adx[currentBar - 2], currentBar, dmiAdx.Adx[currentBar]) > 5)
+			//{
+			//	return false;
+			//}
 
 			return true;
 		}
@@ -262,40 +272,57 @@ namespace StockSimulator.Strategies
 		private void CalculateTargets(double buyDirection, int currentBar)
 		{
 			KeltnerChannel kelt = (KeltnerChannel)_dependents[2];
-			double low;
+
+			_maxBuyPrice = kelt.Midline[currentBar];
 
 			if (buyDirection > 0.0)
 			{
-				low = kelt.Lower[currentBar] - _stdDev;
-				//low = Math.Min(low, Data.Low[currentBar] - _stdDev);
-				_stopPrice = low;
+				_stopPrice = Data.Low[currentBar] - Data.TickSize;
 				_expectedGainPrice = Data.HigherTimeframeValues["KeltnerUpper"][currentBar];
 				_expectedGainPercent = UtilityMethods.PercentChange(Data.Close[currentBar], _expectedGainPrice);
-				_riskRatio = _expectedGainPercent / UtilityMethods.PercentChange(_stopPrice, Data.Low[currentBar]);
+				_expectedLossPercent = UtilityMethods.PercentChange(_stopPrice, Data.Close[currentBar]);
+				_expectedLossPerShare = Data.Close[currentBar] - _stopPrice;
+				_riskRatio = _expectedGainPercent / _expectedLossPercent;
 			}
 			else
 			{
-				low = UtilityMethods.Min(Data.HigherTimeframeValues["Close"], currentBar, 5);
-				low = Math.Min(low, Data.Low[currentBar]);
-				_stopPrice = low;
-				_expectedGainPrice = Data.HigherTimeframeValues["KeltnerUpper"][currentBar];
-				_expectedGainPercent = UtilityMethods.PercentChange(Data.Close[currentBar], _expectedGainPrice);
-				_riskRatio = _expectedGainPercent / UtilityMethods.PercentChange(_stopPrice, Data.Close[currentBar]);
+				// TODO fix these.
+				//low = kelt.Upper[currentBar];// +_stdDev;
+				//_stopPrice = low;
+				//_expectedGainPrice = Data.HigherTimeframeValues["KeltnerLower"][currentBar];
+				//_expectedGainPercent = UtilityMethods.PercentChange(_expectedGainPrice, Data.Close[currentBar]);
+				//_riskRatio = _stopPrice <= Data.High[currentBar] ? 2.0 :
+				//	_expectedGainPercent / UtilityMethods.PercentChange(Data.High[currentBar], _stopPrice);
 			}
-			//double high = Data.HigherTimeframeValues["KeltnerUpper"][currentBar];
+		}
 
-			//// Place a protective stop above/below the hit zone using standard deviations
-			//double stddevStop = _stdDev * 0.5;
-			//_stopPrice = buyDirection > 0.0 ? low - stddevStop : high + stddevStop;
+		/// <summary>
+		/// Returns the size of the order in dollars based on our risk factors.
+		/// </summary>
+		/// <param name="buyDirection">Direction of the order (long or short)</param>
+		/// <param name="currentBar">Current bar of the simulation</param>
+		/// <returns>See summary</returns>
+		private int CalculateOrderSize(double buyDirection, int currentBar)
+		{
+			int sizeOfOrder;
 
-			//// Expected gain is the difference from other side of the Keltner channel to the start of the zone.
-			//_expectedGainPrice = buyDirection > 0.0 ? kelt.Upper[currentBar] :
-			//	kelt.Lower[currentBar];
-			//_expectedGainPercent = buyDirection > 0.0 ? UtilityMethods.PercentChange(Data.Close[currentBar], kelt.Upper[currentBar]) :
-			//	UtilityMethods.PercentChange(kelt.Lower[currentBar], Data.Close[currentBar]);
+			// If the loss per share is really low we can overflow our value. If thats the case then
+			// essentially it's saying there is very little risk and a lot of potential gain. So we'll
+			// just use the max order size.
+			try
+			{
+				sizeOfOrder = Convert.ToInt32(Data.Close[currentBar] * (Simulator.Config.GavalasMaxRiskAmount / _expectedLossPerShare));
+				if (sizeOfOrder > Simulator.Config.ChannelMaxOrderSize)
+				{
+					sizeOfOrder = Simulator.Config.ChannelMaxOrderSize;
+				}
+			}
+			catch (Exception)
+			{
+				sizeOfOrder = Simulator.Config.ChannelMaxOrderSize;
+			}
 
-			// Risk reward ratio is amount we expect to gain / stop
-			//_riskRatio = _expectedGainPercent / (buyDirection > 0.0 ? UtilityMethods.PercentChange(_stopPrice, low) : UtilityMethods.PercentChange(high, _stopPrice));
+			return sizeOfOrder;
 		}
 
 		/// <summary>
@@ -328,6 +355,11 @@ namespace StockSimulator.Strategies
 			////////////////////////////////////////////////////////////////////////////
 			// DEBUG INFO
 			////////////////////////////////////////////////////////////////////////////
+
+			o.AddExtraInfo(() =>
+			{
+				return new KeyValuePair<string, object>("highatrnorm", (object)Math.Round(Data.HigherTimeframeValues["Atr"][currentBar] / Data.HigherTimeframeValues["Close"][currentBar], 4));
+			});
 
 			//o.AddExtraInfo(() =>
 			//{
@@ -431,23 +463,23 @@ namespace StockSimulator.Strategies
 			//	return new KeyValuePair<string, object>("atrnorm", (object)Math.Round(ind.ValueNormalized[currentBar], 4));
 			//});
 
-			o.AddExtraInfo(() =>
-			{
-				KeltnerChannel ind = (KeltnerChannel)_dependents[2];
-				return new KeyValuePair<string, object>("keltlow", (object)Math.Round(ind.Lower[currentBar], 2));
-			});
+			//o.AddExtraInfo(() =>
+			//{
+			//	KeltnerChannel ind = (KeltnerChannel)_dependents[2];
+			//	return new KeyValuePair<string, object>("keltlow", (object)Math.Round(ind.Lower[currentBar], 2));
+			//});
 
-			o.AddExtraInfo(() =>
-			{
-				KeltnerChannel ind = (KeltnerChannel)_dependents[2];
-				return new KeyValuePair<string, object>("keltmid", (object)Math.Round(ind.Midline[currentBar], 2));
-			});
+			//o.AddExtraInfo(() =>
+			//{
+			//	KeltnerChannel ind = (KeltnerChannel)_dependents[2];
+			//	return new KeyValuePair<string, object>("keltmid", (object)Math.Round(ind.Midline[currentBar], 2));
+			//});
 
-			o.AddExtraInfo(() =>
-			{
-				KeltnerChannel ind = (KeltnerChannel)_dependents[2];
-				return new KeyValuePair<string, object>("keltup", (object)Math.Round(ind.Upper[currentBar], 2));
-			});
+			//o.AddExtraInfo(() =>
+			//{
+			//	KeltnerChannel ind = (KeltnerChannel)_dependents[2];
+			//	return new KeyValuePair<string, object>("keltup", (object)Math.Round(ind.Upper[currentBar], 2));
+			//});
 		}
 	}
 }

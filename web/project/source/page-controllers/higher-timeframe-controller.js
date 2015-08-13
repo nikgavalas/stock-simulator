@@ -34,6 +34,7 @@ angular.module('mainApp').controller('HigherTimeframeCtrl', [
 				$scope.$broadcast('AddIndicatorExistingData', { name: 'DtOsc', data: data.indicatorData[0], chartName: 'higherTimeframe' });
 				$scope.$broadcast('AddIndicatorExistingData', { name: 'Atr', data: data.indicatorData[1], chartName: 'higherTimeframe' });
 				$scope.$broadcast('AddIndicatorExistingData', { name: 'Keltner Channels', data: data.indicatorData[2], chartName: 'higherTimeframe' });
+				$scope.$broadcast('AddIndicatorExistingData', { name: 'Sma', data: data.indicatorData[3], chartName: 'higherTimeframe' });
 
 				$timeout(function() {
 					$scope.$broadcast('RedrawChart');
