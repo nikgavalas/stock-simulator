@@ -38,6 +38,7 @@ namespace StockSimulator.Core
 			"KeltnerMidline",
 			"KeltnerLower",
 			"DtoscSK",
+			"DtoscSD",
 			"Close"
 		};
 

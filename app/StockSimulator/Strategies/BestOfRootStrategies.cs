@@ -25,7 +25,8 @@ namespace StockSimulator.Strategies
 			{
 				//new ElliotWavesStrategy(tickerData)
 				//new GavalasStrategy(tickerData)
-				new ChannelStrategy(tickerData)
+				//new ChannelStrategy(tickerData)
+				new DmiStrategy(tickerData)
 			};
 		}
 

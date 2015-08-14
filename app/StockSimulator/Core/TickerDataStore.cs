@@ -569,11 +569,12 @@ namespace StockSimulator.Core
 			dtosc.RunToBar(higherTickerData.NumBars - 1);
 			dtosc.Shutdown();
 			ticker.HigherTimeframeValues["DtoscSK"].Add(dtosc.SK.Last());
+			ticker.HigherTimeframeValues["DtoscSD"].Add(dtosc.SK.Last());
 
 			ticker.HigherTimeframeValues["Close"].Add(higherTickerData.Close.Last());
 
 			// Return what kind orders are allowed.
-			double state = GetHigherTimeframeStateFromIndicator(higherTickerData, sma, sma.Data.NumBars - 1, lastState);
+			double state = GetHigherTimeframeStateFromIndicator(dtosc, dtosc.Data.NumBars - 1, lastState);
 
 			////////////////// START HIGHER TIME FRAME DEBUGGING ////////////////////
 			if (Simulator.Config.OutputHigherTimeframeData)
@@ -678,27 +679,51 @@ namespace StockSimulator.Core
 		/// <summary>
 		/// Returns the state of the higher timeframe trend.
 		/// </summary>
-		/// <param name="higherData">Higher timeframe ticker data</param>
 		/// <param name="ind">Indicator to use</param>
 		/// <param name="currentBar">Current bar in the momentum simulation</param>
 		/// <param name="lastState">Last state of the higher timeframe</param>
 		/// <returns>The state of the higher timeframe trend</returns>
-		private double GetHigherTimeframeStateFromIndicator(TickerData higherData, Sma ind, int currentBar, double lastState)
+		private double GetHigherTimeframeStateFromIndicator(DtOscillator ind, int currentBar, double lastState)
 		{
-			if (currentBar >= 0)
+			if (currentBar > 2)
 			{
-				if (DataSeries.IsAbove(higherData.Close, ind.Avg, currentBar, 0) != -1)
+				if (UtilityMethods.IsValley(ind.SK, currentBar))
 				{
 					return Order.OrderType.Long;
 				}
-				else
+				else if (UtilityMethods.IsPeak(ind.SK, currentBar))
 				{
 					return Order.OrderType.Short;
 				}
+				//if (DataSeries.CrossAbove(ind.SK, ind.SD, currentBar, 0) != -1)
+				//{
+				//	return Order.OrderType.Long;
+				//}
+				//else if (DataSeries.CrossBelow(ind.SK, ind.SD, currentBar, 0) != -1)
+				//{
+				//	return Order.OrderType.Short;
+				//}
 			}
 
 			return lastState;
 		}
+
+		//private double GetHigherTimeframeStateFromIndicator(TickerData higherData, Sma ind, DtOscillator dtosc, int currentBar, double lastState)
+		//{
+		//	if (currentBar > 0)
+		//	{
+		//		if (DataSeries.IsAbove(higherData.Close, ind.Avg, currentBar, 0) != -1)
+		//		{
+		//			return Order.OrderType.Long;
+		//		}
+		//		else
+		//		{
+		//			return Order.OrderType.Short;
+		//		}
+		//	}
+
+		//	return lastState;
+		//}
 
 		/// <summary>
 		/// Gets the data from the webserver and saves it onto disk for later usage.

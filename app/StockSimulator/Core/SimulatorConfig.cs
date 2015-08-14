@@ -14,8 +14,9 @@ namespace StockSimulator.Core
 	[CategoryOrder("Output", 1)]
 	[CategoryOrder("All Orders", 2)]
 	[CategoryOrder("Main Strategy", 3)]
-	[CategoryOrder("Gavalas Strategy", 4)]
 	[CategoryOrder("Channel Strategy", 4)]
+	[CategoryOrder("Dmi Strategy", 5)]
+	[CategoryOrder("Gavalas Strategy", 6)]
 	[CategoryOrder("Higher Timeframe", 7)]
 	[CategoryOrder("Candlesticks", 8)]
 	[CategoryOrder("Combo Strategy", 23)]
@@ -265,6 +266,38 @@ namespace StockSimulator.Core
 		[Description("Min expected gain to buy")]
 		public double ChannelMinExpectedGain { get; set; }
 
+		/////////////////////////// DMI STRATEGY //////////////////////////////
+
+		[Category("Dmi Strategy")]
+		[PropertyOrder(0)]
+		[DisplayName("Max Order Size")]
+		[Description("Max size of the order regardless of risk")]
+		public int DmiMaxOrderSize { get; set; }
+
+		[Category("Dmi Strategy")]
+		[PropertyOrder(1)]
+		[DisplayName("Max Risked")]
+		[Description("Max amount of money we can risk to lose for an order")]
+		public int DmiMaxRiskAmount { get; set; }
+
+		[Category("Dmi Strategy")]
+		[PropertyOrder(2)]
+		[DisplayName("Max Bars Open")]
+		[Description("Max bars open for the strategy")]
+		public int DmiMaxBarsOpen { get; set; }
+
+		[Category("Dmi Strategy")]
+		[PropertyOrder(3)]
+		[DisplayName("Min Risk/Reward")]
+		[Description("Min risk/reward ratio to buy")]
+		public double DmiMinRiskRatio { get; set; }
+
+		[Category("Dmi Strategy")]
+		[PropertyOrder(4)]
+		[DisplayName("Min Expected Gain")]
+		[Description("Min expected gain to buy")]
+		public double DmiMinExpectedGain { get; set; }
+
 		///////////////////////////// MAIN STRATEGY ///////////////////////////////
 
 		[Category("Main Strategy")]
@@ -355,6 +388,13 @@ namespace StockSimulator.Core
 			ChannelMaxRiskAmount = 1200;
 			ChannelMinRiskRatio = 1.0;
 			ChannelMinExpectedGain = 4.0;
+
+			// Dmi Strategy
+			DmiMaxBarsOpen = 30;
+			DmiMaxOrderSize = 20000;
+			DmiMaxRiskAmount = 1200;
+			DmiMinRiskRatio = 1.0;
+			DmiMinExpectedGain = 4.0;
 
 			// Gavalas Strategy
 			GavalasPercentForBuy = 50;

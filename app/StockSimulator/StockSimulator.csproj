@@ -103,6 +103,7 @@
     <Compile Include="Core\BarStatistics.cs" />
     <Compile Include="Core\BuySellConditions\AboveSetupBarBuyCondition.cs" />
     <Compile Include="Core\BuySellConditions\BuyCondition.cs" />
+    <Compile Include="Core\BuySellConditions\CrossoverSellCondition.cs" />
     <Compile Include="Core\BuySellConditions\DirectionBuyCondition.cs" />
     <Compile Include="Core\BuySellConditions\LimitBuyCondition.cs" />
     <Compile Include="Core\BuySellConditions\MaxLengthSellCondition.cs" />
@@ -288,6 +289,7 @@
     <None Include="Strategies\Bull\BullTrixZeroCrossover.cs" />
     <None Include="Strategies\Bull\BullTrixSignalCrossover.cs" />
     <None Include="Strategies\Bull\BullWilliamsRCrossover.cs" />
+    <Compile Include="Strategies\DmiStrategy.cs" />
     <Compile Include="Strategies\ElliotWavesStrategy.cs" />
     <Compile Include="Strategies\ChannelStrategy.cs" />
     <Compile Include="Strategies\GavalasStrategy.cs" />
